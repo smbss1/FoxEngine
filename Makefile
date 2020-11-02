@@ -16,10 +16,25 @@ SRC = $(shell find $(SRC_DIR) -name '*.cpp')
 OBJ = $(SRC:%.cpp=%.o)
 
 CFLAGS += -std=c++17 -W -Wall -Wextra $(if $(DEBUG),-g3) $(if $(DEBUG),-DDEBUG)
-LDFLAGS =
-INC_FLAGS = -Iinclude -Ilib/Foxecs/include
+LDFLAGS = -Llib/Foxely -lfoxely -Llib/Foxely/lib -llexer
+INC_FLAGS = -Iinclude -Ilib/Foxecs/include -Ilib/Foxely/include -Ilib/Foxely/lib/GenericLexer/include
 
-all: bin/$(EXECUTABLE)
+ENODES = $(shell find Enodes -name '*.enode')
+
+all: lib_all bin/$(EXECUTABLE)
+
+generate_headers:
+	@g++ -Wall -Wno-write-strings -g -fPIC -shared -I ./tools/Enode/include -I ./tools/Enode/lib/GenericLexer/include ./EngineCode.cpp -o generator.so
+	@./tools/Enode/bin/enode -c ./generator.so $(ENODES)
+
+lib_all:
+	@make -sC lib
+
+lib_clean:
+	@make clean -sC lib
+
+lib_fclean:
+	@make fclean -sC lib
 
 run: bin/$(EXECUTABLE)
 	@./bin/$(EXECUTABLE) $(ARGS)
@@ -32,11 +47,11 @@ bin/$(EXECUTABLE): $(MAIN_OBJ) $(OBJ)
 	@echo "\033[1;32mCompiled \033[1;37m'$<'\033[m"
 
 .PHONY: clean
-clean:
+clean: lib_clean
 	@$(RM) -r $(OBJ) $(MAIN_OBJ)
 
 .PHONY: fclean
-fclean: clean
+fclean: lib_fclean clean
 	@$(RM) -r $(BIN)/$(EXECUTABLE)
 	@$(RM) -r vgcore*
 
