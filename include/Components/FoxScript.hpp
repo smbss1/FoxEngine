@@ -3,9 +3,11 @@
 #include <string>
 
 class VM;
+class Handle;
 
 struct FoxScript
 {
-    std::string strFilename;
+    std::string m_strFilename;
     VM m_pVm;
+    Handle* OnUpdate;
 };

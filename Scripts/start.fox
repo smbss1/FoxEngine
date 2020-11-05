@@ -1,3 +1,8 @@
 
 
 print "The Engine Start !!";
+
+OnUpdate :: func()
+{
+    print "The Engine Update !!";
+}
