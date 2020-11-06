@@ -62,7 +62,7 @@ clean: lib_clean
 
 .PHONY: fclean
 fclean: lib_fclean clean
-	@$(RM) -r $(BIN)/$(EXECUTABLE)
+	@$(RM) -r bin/$(EXECUTABLE)
 	@$(RM) -r vgcore*
 
 .PHONY: re
