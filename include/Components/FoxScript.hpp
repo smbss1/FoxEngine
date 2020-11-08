@@ -8,6 +8,6 @@ class Handle;
 struct FoxScript
 {
     std::string m_strFilename;
-    VM m_pVm;
-    Handle* OnUpdate;
+    VM* m_pVm;
+    Callable OnUpdate;
 };

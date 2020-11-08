@@ -18,7 +18,7 @@ namespace Fox
         Engine();
 
         void Start();
-        bool Run();
+        void Run();
         void Stop();
     };
 } // namespace Fox
