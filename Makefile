@@ -15,7 +15,7 @@ MAIN_OBJ = $(MAIN_SRC:%.cpp=%.o)
 SRC = $(shell find $(SRC_DIR) -name '*.cpp')
 OBJ = $(SRC:%.cpp=%.o)
 
-LDFLAGS = -Llib/Foxely -lfoxely -Llib/Foxely/lib -llexer
+LDFLAGS = -Llib/Foxely -lfoxely -Llib/Foxely/lib -llexer -pthread
 INC_FLAGS = -Iinclude -Ilib/Foxecs/include -Ilib/Foxely/include -Ilib/Foxely/lib/GenericLexer/include
 
 ifeq ($(BUILD),debug)
