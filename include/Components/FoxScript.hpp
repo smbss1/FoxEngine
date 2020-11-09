@@ -3,7 +3,7 @@
 #include <string>
 
 class VM;
-class Handle;
+class Callable;
 
 struct FoxScript
 {

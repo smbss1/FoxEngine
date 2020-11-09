@@ -1,8 +1,11 @@
 
+import "entity";
 
-//print "The Engine Start !!\n";
 
-OnUpdate :: func()
-{
-    print "The Engine Update !!\n";
-}
+entity: var = GameObject("G");
+
+entity.printName();
+
+print "Name: %\n", entity.m_iId;
+
+entity.add(Transform(Vec2(), Vec2(), Vec2()));

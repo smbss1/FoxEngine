@@ -6,6 +6,9 @@
 */
 
 #pragma once
+
+class VM;
+
 #include "Core/World.hpp"
 
 namespace Fox

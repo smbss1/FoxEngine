@@ -8,6 +8,8 @@
 #include "Events.hpp"
 #include "FoxEngine.hpp"
 #include "Components/FoxScript.hpp"
+#include "Components/Transform.hpp"
+#include "FoxelyBindings.h"
 
 using namespace Fox;
 
@@ -15,19 +17,18 @@ static bool bIsRunning = true;
 
 void ctrl_c_handler(int sig)
 {
-    // char  c;
+    char  c;
 
-    // signal(sig, SIG_IGN);
-    // printf("OUCH, did you hit Ctrl-C?\n"
-    //     "Do you really want to quit? [y/n] ");
-    // c = getchar();
-    // if (c == 'y' || c == 'Y')
-    //     exit(0);
-    // else
-    //     signal(SIGINT, ctrl_c_handler);
-    // getchar(); // Get new line character
+    signal(sig, SIG_IGN);
+    printf("OUCH, did you hit Ctrl-C?\n"
+        "Do you really want to quit? [y/n] ");
+    c = getchar();
+    if (c == 'y' || c == 'Y')
+        bIsRunning = false;
+    else
+        signal(SIGINT, ctrl_c_handler);
+    getchar(); // Get new line character
 
-    bIsRunning = false;
 }
 
 Engine::Engine()
@@ -61,6 +62,7 @@ void Engine::Start()
     {
         FoxScript& oScript = w.GetComponent<FoxScript>(e);
         oScript.m_pVm = new VM;
+        InitBindings(w, oScript.m_pVm);
     });
 
     m_oWorld.system<FoxScript>("ScriptRemoveSystem")->kind(Foxecs::System::OnRemove, [](World& w, Entity& e)
@@ -78,7 +80,8 @@ void Engine::Start()
     });
 
     Entity e = m_oWorld.CreateEntity();
-    m_oWorld.AddComponent<FoxScript>(e, {"Scripts/start.fox"});
+    m_oWorld.AddComponent<FoxScript>(e, { "Scripts/start.fox" });
+    m_oWorld.AddComponent<Transform>(e, { });
     m_oWorld.SendEvent(FoxEvent::Engine::OnStartGame);
 }
 
