@@ -53,6 +53,12 @@ void Engine::Start()
         std::string strContent((std::istreambuf_iterator<char>(t)),
                                 std::istreambuf_iterator<char>());
         t.close();
+        
+        oScript.m_pVm->DefineModule("main");
+        Value pGameObject = Fox_DefineInstanceOf(oScript.m_pVm, "entity", "GameObject");
+        Fox_SetInstanceField(oScript.m_pVm, pGameObject, "m_strName", Fox_StringToValue(oScript.m_pVm, "GameObject"));
+        Fox_SetInstanceField(oScript.m_pVm, pGameObject, "m_iId", Fox_IntegerToValue(e));
+        oScript.m_pVm->DefineVariable("main", "gameObject", pGameObject);
         oScript.m_pVm->Interpret("main", strContent.c_str());
 
         oScript.OnUpdate = oScript.m_pVm->Function("main", "OnUpdate()");
@@ -81,7 +87,6 @@ void Engine::Start()
 
     Entity e = m_oWorld.CreateEntity();
     m_oWorld.AddComponent<FoxScript>(e, { "Scripts/start.fox" });
-    m_oWorld.AddComponent<Transform>(e, { });
     m_oWorld.SendEvent(FoxEvent::Engine::OnStartGame);
 }
 

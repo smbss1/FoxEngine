@@ -1,11 +1,33 @@
 
 import "entity";
 
+Vec2 :: class
+{
+    init(x, y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+}
 
-entity: var = GameObject("G");
+Transform :: class
+{
+    init(position, rotation, scale)
+    {
+        this.position = position;
+        this.rotation = rotation;
+        this.scale = scale;
+    }
+}
 
-entity.printName();
+gameObject.printName();
 
-print "Name: %\n", entity.m_iId;
+print "Name: %\n", gameObject.m_iId;
 
-entity.add(Transform(Vec2(), Vec2(), Vec2()));
+gameObject.add(Transform(Vec2(1, 1), Vec2(2, 2), Vec2(3, 3)));
+
+tranform: var = gameObject.get("Transform");
+print "%\n", tranform;
+print "Transform(position.x = %, position.y = %)\n", tranform.position.x, tranform.position.y;
+print "Transform(rotation.x = %, rotation.y = %)\n", tranform.rotation.x, tranform.rotation.y;
+print "Transform(scale.x = %, scale.y = %)\n", tranform.scale.x, tranform.scale.y;

@@ -39,9 +39,16 @@ void InitBindings(World& oWorld, VM* pVM)
         {
             Fox_FixArity(pVM, argc, 1);
             Entity iEntity = Fox_ValueToInteger(Fox_GetInstanceField(pVM, args[-1], "m_iId"));
-            ObjectInstance* iEntity = Fox_ValueToInstance(args[0]);
-            // oWorld.AddComponent(iEntity, );
+            ObjectInstance* pComponent = Fox_ValueToInstance(args[0]);
+            oWorld.AddComponent(iEntity, pComponent->klass->name->string.c_str(), pComponent);
             return NIL_VAL;
+        }),
+
+        std::make_pair<std::string, NativeFn>("get", [&oWorld] (VM* pVM, int argc, Value* args)
+        {
+            Fox_FixArity(pVM, argc, 1);
+            Entity iEntity = Fox_ValueToInteger(Fox_GetInstanceField(pVM, args[-1], "m_iId"));
+            return oWorld.GetComponent(iEntity, Fox_ValueToCString(args[0]));
         }),
 
         std::make_pair<std::string, NativeFn>("printName", PrintGO),
