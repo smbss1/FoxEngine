@@ -20,7 +20,7 @@ namespace Fox
 
         Engine();
 
-        void Start();
+        void Start(sf::RenderWindow& window);
         void Run();
         void Stop();
     };

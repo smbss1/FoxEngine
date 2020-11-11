@@ -1,0 +1,15 @@
+
+import "fox";
+
+gameObject.printName();
+
+print "Name: %\n", gameObject.m_iId;
+
+gameObject.add(Transform());
+
+tranform: var = gameObject.get("Transform");
+
+print "Transform(position.x = %, position.y = %)\n", tranform.position.x, tranform.position.y;
+tranform.position.x = 10.0f;
+tranform.position.y = 11.0f;
+print "Transform(position.x = %, position.y = %)\n", tranform.position.x, tranform.position.y;

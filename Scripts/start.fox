@@ -1,33 +1,25 @@
 
-import "entity";
-
-Vec2 :: class
-{
-    init(x, y)
-    {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-Transform :: class
-{
-    init(position, rotation, scale)
-    {
-        this.position = position;
-        this.rotation = rotation;
-        this.scale = scale;
-    }
-}
+import "fox";
 
 gameObject.printName();
 
 print "Name: %\n", gameObject.m_iId;
 
-gameObject.add(Transform(Vec2(1, 1), Vec2(2, 2), Vec2(3, 3)));
+gameObject.add(Transform());
 
 tranform: var = gameObject.get("Transform");
-print "%\n", tranform;
+
 print "Transform(position.x = %, position.y = %)\n", tranform.position.x, tranform.position.y;
+tranform.position.x = 10.0f;
+tranform.position.y = 11.0f;
+print "Transform(position.x = %, position.y = %)\n", tranform.position.x, tranform.position.y;
+
 print "Transform(rotation.x = %, rotation.y = %)\n", tranform.rotation.x, tranform.rotation.y;
+tranform.rotation.x = 5.0f;
+tranform.rotation.y = 17.0f;
+print "Transform(rotation.x = %, rotation.y = %)\n", tranform.rotation.x, tranform.rotation.y;
+
+print "Transform(scale.x = %, scale.y = %)\n", tranform.scale.x, tranform.scale.y;
+tranform.scale.x = 45.0f;
+tranform.scale.y = 97.0f;
 print "Transform(scale.x = %, scale.y = %)\n", tranform.scale.x, tranform.scale.y;
