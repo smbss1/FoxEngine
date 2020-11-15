@@ -9,17 +9,18 @@ gameObject.add(Transform());
 
 tranform: var = gameObject.get("Transform");
 
-print "Transform(position.x = %, position.y = %)\n", tranform.position.x, tranform.position.y;
-tranform.position.x = 10.0f;
-tranform.position.y = 11.0f;
-print "Transform(position.x = %, position.y = %)\n", tranform.position.x, tranform.position.y;
+// tranform.position.x = 100.0f;
+// tranform.position.y = 11.0f;
 
-print "Transform(rotation.x = %, rotation.y = %)\n", tranform.rotation.x, tranform.rotation.y;
-tranform.rotation.x = 5.0f;
-tranform.rotation.y = 17.0f;
-print "Transform(rotation.x = %, rotation.y = %)\n", tranform.rotation.x, tranform.rotation.y;
+tranform.scale.x = 1.0f;
+tranform.scale.y = 1.0f;
 
-print "Transform(scale.x = %, scale.y = %)\n", tranform.scale.x, tranform.scale.y;
-tranform.scale.x = 45.0f;
-tranform.scale.y = 97.0f;
-print "Transform(scale.x = %, scale.y = %)\n", tranform.scale.x, tranform.scale.y;
+OnUpdate :: func ()
+{
+    tranform.position.x = tranform.position.x + 0.01f;
+}
+
+Debug.log("Hello ", "my ", "name ", "is ", "Fox ", "!");
+Debug.logError("This is a error.");
+Debug.logWarning("This is a warning.");
+Debug.logInfo("This is an info.");

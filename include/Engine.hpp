@@ -7,9 +7,16 @@
 
 #pragma once
 
-class VM;
-
 #include "Core/World.hpp"
+#include "TextureManager.hpp"
+#include "ResourceManager.hpp"
+
+namespace sf
+{
+    class RenderWindow;
+} // namespace sf
+
+class VM;
 
 namespace Fox
 {
@@ -17,6 +24,7 @@ namespace Fox
     {
     public:
         World m_oWorld;
+        ResourceManager m_oResourceManager;
 
         Engine();
 

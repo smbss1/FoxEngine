@@ -4,10 +4,11 @@
 #include <streambuf>
 #include <signal.h>
 #include <SFML/Graphics.hpp>
+#include <cmath>
 
 #include "foxely.h"
 #include "Events.hpp"
-#include "FoxEngine.hpp"
+#include "Engine.hpp"
 #include "Components/FoxScript.hpp"
 #include "Components/Transform.hpp"
 #include "Components/Sprite.hpp"
@@ -19,18 +20,8 @@ static bool bIsRunning = true;
 
 void ctrl_c_handler(int sig)
 {
-    char  c;
-
     signal(sig, SIG_IGN);
-    printf("OUCH, did you hit Ctrl-C?\n"
-        "Do you really want to quit? [y/n] ");
-    c = getchar();
-    if (c == 'y' || c == 'Y')
-        bIsRunning = false;
-    else
-        signal(SIGINT, ctrl_c_handler);
-    getchar(); // Get new line character
-
+    bIsRunning = false;
 }
 
 Engine::Engine()
@@ -46,6 +37,9 @@ Engine::Engine()
 
 void Engine::Start(sf::RenderWindow& window)
 {
+    m_oResourceManager.AddManager("TextureFactory", new TextureManager);
+    m_oResourceManager.Add("TextureFactory", "TextureTest", "index.png");
+
     m_oWorld.system<FoxScript>("ScriptStartSystem")->kind(FoxEvent::Engine::OnStartGame, [](World& w, Entity& e)
     {
         FoxScript& oScript = w.GetComponent<FoxScript>(e);
@@ -57,7 +51,7 @@ void Engine::Start(sf::RenderWindow& window)
         oScript.m_pVm->DefineModule("main");
         Value pGameObject = Fox_DefineInstanceOf(oScript.m_pVm, "fox", "GameObject");
         Fox_SetField(oScript.m_pVm, pGameObject, "m_strName", Fox_String(oScript.m_pVm, "GameObject"));
-        Fox_SetField(oScript.m_pVm, pGameObject, "m_iId", Fox_IntegerToValue(e));
+        Fox_SetField(oScript.m_pVm, pGameObject, "m_iId", Fox_Int(e));
         oScript.m_pVm->DefineVariable("main", "gameObject", pGameObject);
         oScript.m_pVm->Interpret("main", strContent.c_str());
 
@@ -86,31 +80,47 @@ void Engine::Start(sf::RenderWindow& window)
             oScript.OnUpdate.Call();
     });
 
-    m_oWorld.system<Sprite>("SpriteUpdate")->each([&window](World& w, Entity& e)
+    m_oWorld.system<Sprite>("SpriteDraw")->each([&window](World& w, Entity& e)
     {
         Sprite& oSprite = w.GetComponent<Sprite>(e);
-        window.draw(oSprite.oSprite);
+        window.draw(oSprite);
+    });
 
-        // if (oScript.OnUpdate.IsValid())
-            // oScript.OnUpdate.Call();
+    m_oWorld.system<Transform, Sprite>("UpdatePosition")->each([&window](World& w, Entity& e)
+    {
+        Sprite& oSprite = w.GetComponent<Sprite>(e);
+        Transform& oTransform = w.GetComponent<Transform>(e);
+
+        oSprite.setPosition(sf::Vector2f(oTransform.position.x, oTransform.position.y));
+        oSprite.setScale(sf::Vector2f(oTransform.scale.x, oTransform.scale.y));
+        oSprite.setRotation(atan2(oTransform.rotation.y, oTransform.rotation.x));
     });
 
     Entity e = m_oWorld.CreateEntity();
     m_oWorld.AddComponent<FoxScript>(e, { "Scripts/start.fox" });
-    m_oWorld.AddComponent<Sprite>(e, { });
-    Sprite& s = m_oWorld.GetComponent<Sprite>(e);
-    sf::Texture t;
-    t.loadFromFile("index.png");
-    s.oSprite.setTexture(t);
+    m_oWorld.AddComponent<Sprite>(e, Sprite(*m_oResourceManager.Get<sf::Texture>("TextureFactory", "TextureTest")));
     m_oWorld.SendEvent(FoxEvent::Engine::OnStartGame);
 }
 
 void Engine::Run()
 {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Lol");
+    sf::Event oWindowEvent;
     Start(window);
-    while (bIsRunning)
+    while (bIsRunning && window.isOpen())
     {
+        while (window.pollEvent(oWindowEvent))
+        {
+            switch (oWindowEvent.type)
+            {
+            case sf::Event::Closed:
+                window.close();
+                break;
+            
+            default:
+                break;
+            }
+        }
         window.clear();
         m_oWorld.Update();
         window.display();
