@@ -5,7 +5,7 @@
 ## make an executable
 ##
 
-CC = g++
+CC = g++ -std=c++17
 
 EXECUTABLE	= FoxEngine
 SRC_DIR = src
@@ -15,9 +15,19 @@ MAIN_OBJ = $(MAIN_SRC:%.cpp=%.o)
 SRC = $(shell find $(SRC_DIR) -name '*.cpp')
 OBJ = $(SRC:%.cpp=%.o)
 
-CFLAGS += -std=c++17 -W -Wall -Wextra $(if $(DEBUG),-g3) $(if $(DEBUG),-DDEBUG)
-LDFLAGS = -Llib/Foxely -lfoxely -Llib/Foxely/lib -llexer
+LDFLAGS = -Llib/Foxely -lfoxely -Llib/Foxely/lib -llexer -pthread -lsfml-graphics -lsfml-window -lsfml-system
 INC_FLAGS = -Iinclude -Ilib/Foxecs/include -Ilib/Foxely/include -Ilib/Foxely/lib/GenericLexer/include
+
+ifeq ($(BUILD),debug)
+# "Debug" build - no optimization, and debugging symbols
+CFLAGS += -O0 -g3
+CFLAGS += -DDEBUG -DDEBUG_TRACE_EXECUTION
+CFLAGS += $(if $(DEBUG_TOKEN),-DDEBUG_TOKEN)
+CFLAGS += $(if $(DEBUG_LOG_GC),-DDEBUG_LOG_GC)
+else
+# "Release" build - optimization, and no debug symbols
+CFLAGS += -O3 -s -DNDEBUG
+endif
 
 ENODES = $(shell find Enodes -name '*.enode')
 
@@ -52,7 +62,7 @@ clean: lib_clean
 
 .PHONY: fclean
 fclean: lib_fclean clean
-	@$(RM) -r $(BIN)/$(EXECUTABLE)
+	@$(RM) -r bin/$(EXECUTABLE)
 	@$(RM) -r vgcore*
 
 .PHONY: re

@@ -1,3 +1,26 @@
 
+import "fox";
 
-print "The Engine Start !!";
+gameObject.printName();
+
+print "Name: %\n", gameObject.m_iId;
+
+gameObject.add(Transform());
+
+tranform: var = gameObject.get("Transform");
+
+// tranform.position.x = 100.0f;
+// tranform.position.y = 11.0f;
+
+tranform.scale.x = 1.0f;
+tranform.scale.y = 1.0f;
+
+OnUpdate :: func ()
+{
+    tranform.position.x = tranform.position.x + 0.01f;
+}
+
+Debug.log("Hello ", "my ", "name ", "is ", "Fox ", "!");
+Debug.logError("This is a error.");
+Debug.logWarning("This is a warning.");
+Debug.logInfo("This is an info.");
