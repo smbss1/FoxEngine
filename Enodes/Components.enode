@@ -1,0 +1,16 @@
+
+@Serialize
+Transform as class inherit JSONBase
+{
+    position: Vec2;
+    rotation: Vec2;
+    scale: Vec2;
+    origin: Vec2;
+
+    m_rotation: float;
+    m_transform: Transform;
+    m_transformNeedUpdate: bool;
+    m_inverseTransform: Transform;
+    m_inverseTransformNeedUpdate: bool;
+    parent: *Transform;
+};

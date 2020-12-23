@@ -34,7 +34,7 @@ ENODES = $(shell find Enodes -name '*.enode')
 all: lib_all bin/$(EXECUTABLE)
 
 generate_headers:
-	@g++ -Wall -Wno-write-strings -g -fPIC -shared -I ./tools/Enode/include -I ./tools/Enode/lib/GenericLexer/include ./EngineCode.cpp -o generator.so
+	@g++ -Wall -Wno-write-strings -g -fPIC -shared -I ./tools/Enode/include -I ./tools/Enode/lib/GenericLexer/include ./SerializationEnode.cpp -o generator.so
 	@./tools/Enode/bin/enode -c ./generator.so $(ENODES)
 
 lib_all:

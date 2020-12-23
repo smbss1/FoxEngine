@@ -24,12 +24,10 @@ namespace Fox
 
 				//if the resource fails to load, then it adds a default "fail" resource
 				if(!pTexture->loadFromFile(strAssetPath)) {
-					sf::Texture* pFail = new sf::Texture;
-					pFail->loadFromFile("_fail_.png");
-					assets.emplace(strAssetName, pFail);
+					pTexture->loadFromFile("_fail_.png");
+					assets.emplace(strAssetName, pTexture);
 					return false;
-				}
-				else {
+				} else {
 					assets.emplace(strAssetName, pTexture);
 					return true;
 				}

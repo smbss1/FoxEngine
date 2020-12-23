@@ -110,7 +110,7 @@ ENODE_HEADER_PROC EnodeNode* GetEnodeNodeTag(EnodeNode* pRoot, char* strTag)
     EnodeNode* pFoundTagNode = 0;
 
     for (EnodeNode* pTagNode = pRoot->m_pFirstTag; pTagNode; pTagNode = pTagNode->m_pNext) {
-        if (EnodeStringHasAlphanumericBlock((char *) pTagNode->m_strText.c_str(), strTag)) {
+        if (pTagNode->m_strText == strTag) {
             pFoundTagNode = pTagNode;
             break;
         }

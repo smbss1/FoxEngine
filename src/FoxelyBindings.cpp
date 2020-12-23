@@ -3,11 +3,13 @@
 #include "foxely.h"
 #include "FoxelyBindings.h"
 #include "Components/Transform.hpp"
+#include "Components/Sprite.hpp"
+#include "sid.h"
 
 using namespace Fox;
 
 // -----------------------
-//   Engine Function
+//   Engine Functions
 // -----------------------
 
 void AddEngineBinding(VM* pVM)
@@ -64,7 +66,7 @@ void AddEngineBinding(VM* pVM)
 
 
 // -----------------------
-//      Bind ECS
+//   Vector Functions
 // -----------------------
 
 void AddVec2Class(World& oWorld, VM* pVM)
@@ -87,26 +89,26 @@ void AddVec2Class(World& oWorld, VM* pVM)
 
             Fox_Getter(pVM, Fox_AsInstance(args[-1]), "x", [](VM* pVM, int argc, Value* args)
             {
-                Vec2* pPosition = (Vec2 *) Fox_GetUserData(args[-1]);
+                Vec2* pPosition = static_cast<Vec2*>(Fox_GetUserData(args[-1]));
                 return Fox_Double(pPosition->x);
             });
 
             Fox_Getter(pVM, Fox_AsInstance(args[-1]), "y", [](VM* pVM, int argc, Value* args)
             {
-                Vec2* pPosition = (Vec2 *) Fox_GetUserData(args[-1]);
+                Vec2* pPosition = static_cast<Vec2*>(Fox_GetUserData(args[-1]));
                 return Fox_Double(pPosition->y);
             });
 
             Fox_Setter(pVM, Fox_AsInstance(args[-1]), "x", [](VM* pVM, int argc, Value* args)
             {
-                Vec2* pPosition = (Vec2 *) Fox_GetUserData(args[-1]);
+                Vec2* pPosition = static_cast<Vec2*>(Fox_GetUserData(args[-1]));
                 pPosition->x = Fox_AsDouble(args[0]);
                 return Fox_Double(pPosition->x);
             });
 
             Fox_Setter(pVM, Fox_AsInstance(args[-1]), "y", [](VM* pVM, int argc, Value* args)
             {
-                Vec2* pPosition = (Vec2 *) Fox_GetUserData(args[-1]);
+                Vec2* pPosition = static_cast<Vec2*>(Fox_GetUserData(args[-1]));
                 pPosition->y = Fox_AsDouble(args[0]);
                 return Fox_Double(pPosition->y);
             });
@@ -118,7 +120,7 @@ void AddVec2Class(World& oWorld, VM* pVM)
 }
 
 // -----------------------
-//   Transform Function
+//   Transform Functions
 // -----------------------
 
 void AddTransformClass(World& oWorld, VM* pVM)
@@ -135,19 +137,19 @@ void AddTransformClass(World& oWorld, VM* pVM)
 
             Fox_Getter(pVM, Fox_AsInstance(args[-1]), "position", [](VM* pVM, int argc, Value* args)
             {
-                Transform* pTransform = (Transform *) Fox_GetUserData(args[-1]);
+                Transform* pTransform = static_cast<Transform*>(Fox_GetUserData(args[-1]));
                 return Fox_DefineInstanceOfCStruct(pVM, "fox", "Vec2", &pTransform->position);
             });
 
             Fox_Getter(pVM, Fox_AsInstance(args[-1]), "rotation", [](VM* pVM, int argc, Value* args)
             {
-                Transform* pTransform = (Transform *) Fox_GetUserData(args[-1]);
+                Transform* pTransform = static_cast<Transform*>(Fox_GetUserData(args[-1]));
                 return Fox_DefineInstanceOfCStruct(pVM, "fox", "Vec2", &pTransform->rotation);
             });
 
             Fox_Getter(pVM, Fox_AsInstance(args[-1]), "scale", [](VM* pVM, int argc, Value* args)
             {
-                Transform* pTransform = (Transform *) Fox_GetUserData(args[-1]);
+                Transform* pTransform = static_cast<Transform*>(Fox_GetUserData(args[-1]));
                 return Fox_DefineInstanceOfCStruct(pVM, "fox", "Vec2", &pTransform->scale);
             });
             return args[-1];
@@ -158,18 +160,54 @@ void AddTransformClass(World& oWorld, VM* pVM)
 }
 
 // -----------------------
-//   GameObject Function
+//   Sprite Functions
 // -----------------------
-
-Value PrintGO(VM* pVM, int argc, Value* args)
+void AddSpriteClass(World& oWorld, VM* pVM)
 {
-    Fox_FixArity(pVM, argc, 0);
-    Value oName = Fox_GetField(pVM, args[-1], "m_strName");
-    std::cout << "GameObject Name: ";
-    PrintValue(oName);
-    std::cout << std::endl;
-    return Fox_Nil;
+    NativeMethods oSpriteMethods =
+    {
+        std::make_pair<std::string, NativeFn>("init", [&oWorld] (VM* pVM, int argc, Value* args)
+        {
+            Fox_FixArity(pVM, argc, 0);
+
+            Fox_SetField(pVM, args[-1], "color", Fox_Nil);
+            Fox_SetField(pVM, args[-1], "texture", Fox_Nil);
+
+            Fox_Getter(pVM, Fox_AsInstance(args[-1]), "color", [](VM* pVM, int argc, Value* args)
+            {
+                Sprite* pSprite = static_cast<Sprite*>(Fox_GetUserData(args[-1]));
+                return Fox_DefineInstanceOfCStruct(pVM, "fox", "Color", &const_cast<sf::Color&>(pSprite->getColor()));
+            });
+
+            Fox_Setter(pVM, Fox_AsInstance(args[-1]), "color", [](VM* pVM, int argc, Value* args)
+            {
+                Sprite* pSprite = static_cast<Sprite*>(Fox_GetUserData(args[-1]));
+                pSprite->setColor(*static_cast<sf::Color*>(Fox_GetUserData(args[0])));
+                return Fox_Nil;
+            });
+
+            Fox_Getter(pVM, Fox_AsInstance(args[-1]), "texture", [](VM* pVM, int argc, Value* args)
+            {
+                Sprite* pSprite = static_cast<Sprite*>(Fox_GetUserData(args[-1]));
+                return Fox_DefineInstanceOfCStruct(pVM, "fox", "Texture", const_cast<sf::Texture*>(pSprite->getTexture()));
+            });
+
+            Fox_Setter(pVM, Fox_AsInstance(args[-1]), "texture", [](VM* pVM, int argc, Value* args)
+            {
+                Sprite* pSprite = static_cast<Sprite*>(Fox_GetUserData(args[-1]));
+                pSprite->setTexture(*static_cast<sf::Texture*>(Fox_GetUserData(args[0])));
+                return Fox_Nil;
+            });
+            return args[-1];
+        }),
+    };
+
+    pVM->DefineClass("fox", "Sprite", oSpriteMethods);
 }
+
+// -----------------------
+//   GameObject Functions
+// -----------------------
 
 void InitBindings(World& oWorld, VM* pVM)
 {
@@ -192,9 +230,19 @@ void InitBindings(World& oWorld, VM* pVM)
             Fox_FixArity(pVM, argc, 1);
             Entity iEntity = Fox_AsInt(Fox_GetField(pVM, args[-1], "m_iId"));
             ObjectInstance* pComponent = Fox_AsInstance(args[0]);
-            if (pComponent->klass->name->string == "Transform")
+            
+            switch (SID_VAL(pComponent->klass->name->string.c_str()))
             {
-                oWorld.AddComponent<Transform>(iEntity, {.position = Vec2(0, 0)});
+            case SID_VAL("Transform"):
+                oWorld.AddComponent<Transform>(iEntity, Transform());
+                break;
+            
+            case SID_VAL("Sprite"):
+                oWorld.AddComponent<Sprite>(iEntity, Sprite());
+                break;
+            
+            default:
+                break;
             }
             return Fox_Nil;
         }),
@@ -204,15 +252,29 @@ void InitBindings(World& oWorld, VM* pVM)
             Fox_FixArity(pVM, argc, 1);
             Entity iEntity = Fox_AsInt(Fox_GetField(pVM, args[-1], "m_iId"));
 
-            if (!strcmp(Fox_AsCString(args[0]), "Transform"))
+            switch (SID_VAL(Fox_AsCString(args[0])))
             {
+            case SID_VAL("Transform"):
                 return Fox_DefineInstanceOfCStruct(pVM, "fox", "Transform", &oWorld.GetComponent<Transform>(iEntity));
+            
+            case SID_VAL("Sprite"):
+                return Fox_DefineInstanceOfCStruct(pVM, "fox", "Sprite", &oWorld.GetComponent<Sprite>(iEntity));
+            
+            default:
+                break;
             }
             return Fox_Nil;
         }),
 
-        std::make_pair<std::string, NativeFn>("printName", PrintGO),
-        
+        std::make_pair<std::string, NativeFn>("printName", [&oWorld] (VM* pVM, int argc, Value* args)
+        {
+            Fox_FixArity(pVM, argc, 0);
+            Value oName = Fox_GetField(pVM, args[-1], "m_strName");
+            std::cout << "GameObject Name: ";
+            PrintValue(oName);
+            std::cout << std::endl;
+            return Fox_Nil;
+        }),
     };
 
     pVM->DefineModule("fox");
@@ -220,5 +282,6 @@ void InitBindings(World& oWorld, VM* pVM)
 
     AddVec2Class(oWorld, pVM);
     AddTransformClass(oWorld, pVM);
+    AddSpriteClass(oWorld, pVM);
     AddEngineBinding(pVM);
 }

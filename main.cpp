@@ -2,7 +2,7 @@
 
 int main()
 {
-    Fox::Engine engine;
+    Fox::Engine engine("Project");
 
     engine.Run();
     return 0;

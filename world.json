@@ -1,0 +1,80 @@
+{
+    "m_EntityManager" : {
+        "m_vEntity" : [
+            9,
+            8
+        ],
+        "mLivingEntityCount" : 2,
+        "mSignatures" : {
+            "9" : 2,
+            "8" : 6
+        },
+        "mAvailableEntities" : [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+        ]
+    },
+    "m_ComponentManager" : {
+        "mComponentArrays" : {
+            "9Transform" : [
+                {
+                    "position" : {
+                        "x" : 500.0,
+                        "y" : 500.0
+                    },
+                    "rotation" : {
+                        "x" : 0.0,
+                        "y" : 0.0
+                    },
+                    "scale" : {
+                        "x" : 1.0,
+                        "y" : 1.0
+                    }
+                }
+            ],
+            "m_lSize" : 1,
+            "m_vEntityToIndexMap" : {
+                "8" : 0
+            },
+            "m_vIndexToEntityMap" : {
+                "0" : 8
+            },
+            "6Sprite" : [
+                {
+                    "m_strTextureFile" : "index"
+                },
+                {
+                    "m_strTextureFile" : "index"
+                }
+            ],
+            "m_lSize" : 2,
+            "m_vEntityToIndexMap" : {
+                "9" : 0,
+                "8" : 1
+            },
+            "m_vIndexToEntityMap" : {
+                "0" : 9,
+                "1" : 8
+            },
+            "9FoxScript" : [
+            ],
+            "m_lSize" : 0,
+            "m_vEntityToIndexMap" : {
+            },
+            "m_vIndexToEntityMap" : {
+            }
+        },
+        "m_ComponentTypes" : {
+            "9Transform" : 2,
+            "6Sprite" : 1,
+            "9FoxScript" : 0
+        },
+        "mNextComponentType" : 3
+    }
+}
