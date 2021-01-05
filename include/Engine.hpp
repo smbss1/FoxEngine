@@ -34,7 +34,7 @@ namespace Fox
 
         Engine(const std::string& strProjectDir);
 
-        void Start(sf::RenderWindow& window);
+        void InitSystems();
         void Run();
         void Stop();
     };

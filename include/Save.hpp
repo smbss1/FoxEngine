@@ -44,16 +44,9 @@ namespace Fox
                 return false;
             }
 
-            // Event oLoadSceneEvent(FoxEvent::Engine::Scene::OnLoadScene);
-	        // oLoadSceneEvent.SetParam(FoxEvent::Engine::Scene::LOADED_SCENE, &oWorld);
-            // oWorld.SendEvent(oLoadSceneEvent);
-            std::shared_ptr<Simple::Signal<void ()>> pOnSceneLoaded = oLocator.Resolve<Simple::Signal<void ()>>();
-            if (pOnSceneLoaded == nullptr)
-            {
-                std::cerr << "OnSceneLoaded is null" << std::endl;
-                return false;
-            }
-            pOnSceneLoaded->emit();
+            Fox::Ecs::Event oLoadSceneEvent(Fox::Event::Engine::Scene::OnLoadScene);
+	        oLoadSceneEvent.SetParam(Fox::Event::Engine::Scene::LOADED_SCENE, &oWorld);
+            oWorld.SendEvent(oLoadSceneEvent);
             return true;
         }
     } // namespace Save

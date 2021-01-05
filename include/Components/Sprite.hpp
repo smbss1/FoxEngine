@@ -4,7 +4,10 @@
 #include <SFML/Graphics.hpp>
 #include "json_struct.h"
 
-class Event;
+namespace Fox::Ecs
+{
+    class Event;
+}
 
 struct Color
 {
@@ -33,7 +36,7 @@ public:
     Sprite(sf::Texture& oTexture);
     ~Sprite();
     
-    void Init();
+    void Init(Fox::Ecs::Event& oEvent);
     void setTexture(const sf::Texture& texture, bool resetRect = false);
     void setTextureRect(const sf::IntRect& rectangle);
     void setColor(const sf::Color& color);

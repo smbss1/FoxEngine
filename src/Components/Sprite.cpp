@@ -7,21 +7,13 @@ using namespace Fox;
 
 Sprite::Sprite() : m_oTexture(NULL), m_oTextureRect()
 {
-    // std::shared_ptr<EventManager> pEventManager = oLocator.Resolve<EventManager>();
-    // if (pEventManager == nullptr)
-    // {
-    //     std::cerr << "EventManager is null" << std::endl;
-    //     return;
-    // }
-    // pEventManager->AddListener(METHOD_LISTENER(FoxEvent::Engine::Scene::OnLoadScene, Sprite::Init));
-
-    std::shared_ptr<Simple::Signal<void ()>> pOnSceneLoaded = oLocator.Resolve<Simple::Signal<void ()>>();
-    if (pOnSceneLoaded == nullptr)
+    std::shared_ptr<EventManager> pEventManager = oLocator.Resolve<EventManager>();
+    if (pEventManager == nullptr)
     {
-        std::cerr << "OnSceneLoaded is null" << std::endl;
+        std::cerr << "EventManager is null" << std::endl;
         return;
     }
-    m_lOnSceneLoadSlot = pOnSceneLoaded->connect(Simple::slot(this, &Sprite::Init));
+    m_lOnSceneLoadSlot = pEventManager->AddListener(Fox::Event::Engine::Scene::OnLoadScene, Simple::slot(this, &Sprite::Init));
 
     m_vVertices = sf::VertexArray(sf::TriangleStrip, 4);
 
@@ -70,7 +62,7 @@ Sprite::Sprite(sf::Texture& oTexture) : m_oTexture(NULL), m_oTextureRect()
     setTexture(oTexture, true);
 }
 
-void Sprite::Init()
+void Sprite::Init(Fox::Ecs::Event& oEvent)
 {
     if (!m_strTextureFile.empty())
     {
@@ -80,20 +72,13 @@ void Sprite::Init()
 
 Sprite::~Sprite()
 {
-    // std::shared_ptr<EventManager> pEventManager = oLocator.Resolve<EventManager>();
-    // if (pEventManager == nullptr)
-    // {
-    //     std::cerr << "World is null" << std::endl;
-    //     return;
-    // }
-    // pEventManager->RemoveListener(METHOD_LISTENER(FoxEvent::Engine::Scene::OnLoadScene, Sprite::Init));
-    std::shared_ptr<Simple::Signal<void ()>> pOnSceneLoaded = oLocator.Resolve<Simple::Signal<void ()>>();
-    if (pOnSceneLoaded == nullptr)
+    std::shared_ptr<EventManager> pEventManager = oLocator.Resolve<EventManager>();
+    if (pEventManager == nullptr)
     {
-        std::cerr << "OnSceneLoaded is null" << std::endl;
+        std::cerr << "World is null" << std::endl;
         return;
     }
-    pOnSceneLoaded->disconnect(m_lOnSceneLoadSlot);
+    pEventManager->RemoveListener(Fox::Event::Engine::Scene::OnLoadScene, m_lOnSceneLoadSlot);
 }
 
 void Sprite::setTexture(const sf::Texture& texture, bool resetRect)
