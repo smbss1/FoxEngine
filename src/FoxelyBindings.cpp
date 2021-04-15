@@ -4,7 +4,6 @@
 #include "FoxelyBindings.h"
 #include "Components/Transform.hpp"
 #include "Components/Sprite.hpp"
-#include "sid.h"
 
 using namespace Fox;
 

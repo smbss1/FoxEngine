@@ -1,29 +1,19 @@
-#include "Engine.hpp"
-#include "Events.hpp"
 
-void OnStartGame(Fox::Ecs::Event& oEvent)
+#include <iostream>
+#include <string>
+#include <chrono>
+#include <future>
+#include <thread>
+#include "FoxEngine.hpp"
+
+struct Transform
 {
-    std::cout << "The game start !!" << std::endl;
-}
+	int x;
+};
 
-void OnUpdateGame(Fox::Ecs::Event& oEvent)
+int main(int argc, char**args)
 {
-    std::cout << "The game update !!" << std::endl;
-}
-
-void OnRenderGame(Fox::Ecs::Event& oEvent)
-{
-    std::cout << "The game render !!" << std::endl;
-}
-
-int main()
-{
-    Fox::Engine engine("Project");
-
-    engine.m_oWorld.AddEventListener(Fox::Event::Engine::OnStartGame, OnStartGame);
-    engine.m_oWorld.AddEventListener(Foxecs::System::OnUpdate, OnUpdateGame);
-    engine.m_oWorld.AddEventListener(Fox::Event::Engine::Gfx::OnRender, OnRenderGame);
-
-    engine.Run();
+	fox::Application app;
+	app.run();
     return 0;
 }

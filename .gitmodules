@@ -1,9 +1,0 @@
-[submodule "lib/Foxely"]
-	path = lib/Foxely
-	url = https://github.com/smbss1/Foxely
-	branch = dev
-
-[submodule "lib/Foxecs"]
-	path = lib/Foxecs
-	url = https://github.com/Foxely/Foxecs
-	branch = dev
