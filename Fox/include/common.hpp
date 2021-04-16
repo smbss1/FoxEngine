@@ -3,10 +3,11 @@
 #ifndef FOX_COMMON_HPP_
 #define FOX_COMMON_HPP_
 
-#include "bitsets.hpp"
 #include <vector>
-#include <cstring>
 #include <memory>
+#include <cstring>
+#include "Core.hpp"
+#include "bitsets.hpp"
 
 using EntityId = std::size_t;
 using CompId = EntityId;
@@ -43,7 +44,14 @@ namespace fox
 		const std::uint32_t PostUpdate = "fox::ecs::PostUpdate"_hash;
 		const std::uint32_t PreStore = "fox::ecs::PreStore"_hash;
 		const std::uint32_t OnStore = "fox::ecs::OnStore"_hash;
+
 	}
+
+	namespace game
+	{
+		const std::uint32_t OnStart = "fox::game::OnStart"_hash;
+	}
+
 
 
 	template<typename T>

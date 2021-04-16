@@ -12,4 +12,8 @@
 #include "ScriptableEntity.hpp"
 #include "Components.hpp"
 
+// ------- Entry Point --------------------------
+#include "EntryPoint.hpp"
+// ----------------------------------------------
+
 #endif
