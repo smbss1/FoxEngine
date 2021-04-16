@@ -3,7 +3,7 @@
 #define FOX_SCRIPTABLE_ENTITY
 
 #include "Option.hpp"
-#include "World.hpp"
+#include "Ecs/World.hpp"
 
 class ScriptableEntity
 {

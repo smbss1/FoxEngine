@@ -4,11 +4,8 @@
 
 #include "common.hpp"
 #include "Any.hpp"
-#include "NameUtils.hpp"
 #include "Option.hpp"
-#include "ASystem.hpp"
-#include "World.hpp"
-#include "Event.hpp"
-#include "LockFreeQueue.hpp"
+#include "Ecs/ASystem.hpp"
+#include "Ecs/World.hpp"
 
 #endif

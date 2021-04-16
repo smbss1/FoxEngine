@@ -60,6 +60,12 @@
         "condition_variable": "cpp",
         "mutex": "cpp",
         "strstream": "cpp",
-        "*.def": "cpp"
+        "*.def": "cpp",
+        "complex": "cpp",
+        "unordered_set": "cpp",
+        "regex": "cpp",
+        "future": "cpp",
+        "shared_mutex": "cpp",
+        "typeindex": "cpp"
     }
 }

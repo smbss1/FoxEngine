@@ -1,14 +1,7 @@
 
 #include <iostream>
 
-#include "World.hpp"
-
-// template<class... Cs>
-// void System<Cs...>::ForEach(Fox::Ecs::Event& event)
-// {
-// 	for(auto& ent : m_Entities)
-// 		m_oFunction.emit(m_oWorld, ent, m_oWorld.GetComponent<Cs>(ent)...);
-// }
+#include "Ecs/World.hpp"
 
 void SystemManager::EntityDestroyed(EntityId e)
 {

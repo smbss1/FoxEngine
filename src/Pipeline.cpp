@@ -1,8 +1,8 @@
 
 #include <iostream>
 #include <algorithm>
-#include "Pipeline.hpp"
-#include "ASystem.hpp"
+#include "Ecs/Pipeline.hpp"
+#include "Ecs/ASystem.hpp"
 
 Pipeline::Pipeline()
 {

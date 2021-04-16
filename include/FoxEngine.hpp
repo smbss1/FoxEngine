@@ -6,6 +6,9 @@
 
 #include "Application.hpp"
 
+#include "Event.hpp"
+#include "NameUtils.hpp"
+
 #include "ScriptableEntity.hpp"
 #include "Components.hpp"
 
