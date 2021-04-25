@@ -13,7 +13,7 @@
 class SandboxApp : public fox::Application
 {
     public:
-        SandboxApp();
+        SandboxApp(int argc, char** argv);
         ~SandboxApp();
 
     protected:

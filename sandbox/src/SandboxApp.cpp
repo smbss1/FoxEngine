@@ -57,7 +57,7 @@ public:
 };
 
 
-SandboxApp::SandboxApp()
+SandboxApp::SandboxApp(int argc, char** argv) : fox::Application(argc, argv)
 {
     switch_scene(add_scene(fox::new_ref<ExampleScene>()));
 }
@@ -67,7 +67,7 @@ SandboxApp::~SandboxApp()
     
 }
 
-fox::Application* CreateApp()
+fox::Application* CreateApp(int argc, char** argv)
 {
-    return new SandboxApp();
+    return new SandboxApp(argc, argv);
 }

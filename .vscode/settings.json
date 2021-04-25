@@ -67,6 +67,16 @@
         "future": "cpp",
         "shared_mutex": "cpp",
         "typeindex": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "variant": "cpp",
+        "cassert": "cpp",
+        "ccomplex": "cpp",
+        "cerrno": "cpp",
+        "cfloat": "cpp",
+        "climits": "cpp",
+        "ios": "cpp",
+        "locale": "cpp",
+        "queue": "cpp",
+        "cstdbool": "cpp"
     }
 }

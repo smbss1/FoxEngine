@@ -7,7 +7,7 @@
 
 namespace fox
 {
-    Application::Application()
+    Application::Application(int ac, char** av)
     {
         m_bIsRunning = true;
         m_pSceneManager = new_scope<SceneManager>();
@@ -28,21 +28,21 @@ namespace fox
         Input input;
         pGraphicContext = loader.get<IGraphic>();
         pGraphicContext->init();
-        while (m_bIsRunning)
-        {
-            pGraphicContext->poll_event(input);
-            fFixedDeltaTime += fDeltaTime;
-            while (fFixedDeltaTime >= fFixedTimeStep)
-            {
-                fFixedDeltaTime -= fFixedTimeStep;
-            }
+        // while (m_bIsRunning)
+        // {
+        //     pGraphicContext->poll_event(input);
+        //     fFixedDeltaTime += fDeltaTime;
+        //     while (fFixedDeltaTime >= fFixedTimeStep)
+        //     {
+        //         fFixedDeltaTime -= fFixedTimeStep;
+        //     }
 
-            m_pSceneManager->update(0.0f);
-            pGraphicContext->draw();
+        //     m_pSceneManager->update(0.0f);
+        //     pGraphicContext->draw();
 
-            if (pGraphicContext->quit_requested())
-                m_bIsRunning = false;
-        }
+        //     if (pGraphicContext->quit_requested())
+        //         m_bIsRunning = false;
+        // }
         pGraphicContext->shutdown();
     }
 

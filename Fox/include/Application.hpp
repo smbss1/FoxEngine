@@ -11,7 +11,7 @@ namespace fox
     class FOX_API Application
     {
     public:
-        Application();
+        Application(int ac, char** av);
         virtual ~Application();
 
         SceneId add_scene(ref<Scene> pScene);

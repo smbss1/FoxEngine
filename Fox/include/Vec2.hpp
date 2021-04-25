@@ -10,15 +10,15 @@
 
 #include <math.h>
 
-namespace fox
-{
+// namespace fox
+// {
 	class Vec2
 	{
 	public:
 		Vec2() {}
 		Vec2(float x, float y) : x(x), y(y) {}
 
-		void Set(float x_, float y_)
+		void set(float x_, float y_)
 		{
 			x = x_;
 			y = y_;
@@ -49,8 +49,9 @@ namespace fox
 			return sqrtf(x * x + y * y);
 		}
 
-		float x, y;
+		float x;
+		float y;
 	};
-} // namespace fox
+// } // namespace fox
 
 #endif

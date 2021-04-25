@@ -9,11 +9,11 @@
 #define FOX_ENTRYPOINT_HPP_
 
 #ifdef FOX_PLATFORM_LINUX
-extern fox::Application* CreateApp();
+extern fox::Application* CreateApp(int argc, char** argv);
 
 int main(int argc, char**argv)
 {
-	fox::Application* pApp = CreateApp();
+	fox::Application* pApp = CreateApp(argc, argv);
 	pApp->run();
     delete pApp;
     return 0;

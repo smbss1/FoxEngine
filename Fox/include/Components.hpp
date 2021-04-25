@@ -4,5 +4,6 @@
 #define FOX_COMPONENTS_HPP_
 
 #include "Components/NativeScript.hpp"
+#include "Components/Transform.hpp"
 
 #endif
