@@ -8,6 +8,9 @@
 #include <iostream>
 #include "LibSFML.hpp"
 #include "Input.hpp"
+#include "TextureManager.hpp"
+#include "SpriteManager.hpp"
+#include "Components.hpp"
 
 INIT_LIB_API(fox::LibSFML)
 
@@ -28,15 +31,32 @@ namespace fox
     {
     }
 
-    void LibSFML::init()
+    void LibSFML::init(Application& app)
     {
         std::cout << "[LibSFML] Init!" << std::endl;
 
         m_oWindow.create({1280, 720}, "FoxEngine");
         m_oWindow.setKeyRepeatEnabled(false);
+        app.add_manager<sf::Texture>(new TextureManager(app.get_resource_manager()));
+        app.add_manager<sf::Sprite>(new SpriteManager(app.get_resource_manager()));
+
+        app.get_active()->get_world().system<SpriteRenderer>("InitSpriteRenderer")
+            .kind(ecs::OnAdd).each([&](Entity e, SpriteRenderer& renderer)
+        {
+            app.add_asset<sf::Texture>(renderer.m_strId, renderer.m_strPath);
+            app.add_asset<sf::Sprite>(renderer.m_strId, renderer.m_strPath);
+        });
+
+        app.get_active()->get_world().system<Transform, SpriteRenderer>("DrawSpriteRenderer")
+            .kind(ecs::OnStore).each([&](Entity e, Transform& transform, SpriteRenderer& renderer)
+        {
+            sf::Sprite* sprite = app.get_asset<sf::Sprite>(renderer.m_strId);
+            sprite->setPosition(transform.position.x, transform.position.y);
+            m_oWindow.draw(*sprite);
+        });
     }
 
-    void LibSFML::shutdown()
+    void LibSFML::shutdown(Application& app)
     {
         m_oWindow.close();
     }
@@ -132,11 +152,12 @@ namespace fox
         //     oScene.pushEvent(mouse);
     }
 
-    void LibSFML::draw()
+    void LibSFML::draw(Application& app)
     {
         // MouseEvent mouse;
 
         m_oWindow.clear();
+        app.get_active()->get_world().run_phase(ecs::OnStore);
         m_oWindow.display();
     }
 

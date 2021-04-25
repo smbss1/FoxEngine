@@ -33,11 +33,11 @@ struct Transform
         position = v;
     }
 
-    // void set_pos(float x, float y)
-    // {
-    //     position.x = x;
-    //     position.y = y;
-    // }
+    void set_pos(float x, float y)
+    {
+        position.x = x;
+        position.y = y;
+    }
 };
 
 #endif

@@ -35,7 +35,6 @@ namespace fox
         m_oWorld.run_phase(ecs::OnValidate);
         m_oWorld.run_phase(ecs::PostUpdate);
         m_oWorld.run_phase(ecs::PreStore);
-        m_oWorld.run_phase(ecs::OnStore);
     }
 
     void Scene::init_systems()
@@ -50,6 +49,12 @@ namespace fox
                 script.m_pInstance->OnUpdate();
         });
     }
+
+    World& Scene::get_world()
+    {
+        return m_oWorld;
+    }
+
 
     void Scene::destroy_systems()
     {

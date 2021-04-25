@@ -15,7 +15,7 @@ protected:
 
 	virtual void OnUpdate() override
 	{
-		std::cout << "OnUpdate!"  << i++ << std::endl;
+		// std::cout << "OnUpdate!"  << i++ << std::endl;
 	}
 
 	virtual void OnDestroy() override
@@ -40,9 +40,16 @@ public:
 
     virtual void on_create() override
     {
+    }
+
+    virtual void on_start() override
+    {
         auto e1 = m_oWorld.new_entity();
-        e1.add<NativeScript>();
+        e1.add<NativeScript>()
+          .add<SpriteRenderer>("", "MySprite")
+          .add<Transform>();
         e1.get<NativeScript>()->bind<Test>();
+        e1.get<Transform>()->set_pos(45, 25);
     }
 
     void on_destroy() override
@@ -59,12 +66,16 @@ public:
 
 SandboxApp::SandboxApp(int argc, char** argv) : fox::Application(argc, argv)
 {
-    switch_scene(add_scene(fox::new_ref<ExampleScene>()));
 }
 
 SandboxApp::~SandboxApp()
 {
     
+}
+
+void SandboxApp::init()
+{
+    switch_scene(add_scene(fox::new_ref<ExampleScene>()));
 }
 
 fox::Application* CreateApp(int argc, char** argv)

@@ -308,7 +308,6 @@ public:
 		return system;
 	}
 
-
 	/* Pipeline */
 	void add_phase(uint32_t id)
 	{

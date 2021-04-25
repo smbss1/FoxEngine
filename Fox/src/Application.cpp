@@ -11,14 +11,20 @@ namespace fox
     {
         m_bIsRunning = true;
         m_pSceneManager = new_scope<SceneManager>();
+        m_pResourceManager = new_scope<ResourceManager>();
     }
 
     Application::~Application()
     {
     }
 
+    void Application::init()
+    {
+    }
+
     void Application::run()
     {
+        init();
         float fFixedDeltaTime = 0;
         float fFixedTimeStep = 1.0f / 45.0f;
         float fDeltaTime = 0;
@@ -27,23 +33,24 @@ namespace fox
 
         Input input;
         pGraphicContext = loader.get<IGraphic>();
-        pGraphicContext->init();
-        // while (m_bIsRunning)
-        // {
-        //     pGraphicContext->poll_event(input);
-        //     fFixedDeltaTime += fDeltaTime;
-        //     while (fFixedDeltaTime >= fFixedTimeStep)
-        //     {
-        //         fFixedDeltaTime -= fFixedTimeStep;
-        //     }
+        pGraphicContext->init(*this);
+        m_pSceneManager->start();
+        while (m_bIsRunning)
+        {
+            pGraphicContext->poll_event(input);
+            fFixedDeltaTime += fDeltaTime;
+            while (fFixedDeltaTime >= fFixedTimeStep)
+            {
+                fFixedDeltaTime -= fFixedTimeStep;
+            }
 
-        //     m_pSceneManager->update(0.0f);
-        //     pGraphicContext->draw();
+            m_pSceneManager->update(0.0f);
+            pGraphicContext->draw(*this);
 
-        //     if (pGraphicContext->quit_requested())
-        //         m_bIsRunning = false;
-        // }
-        pGraphicContext->shutdown();
+            if (pGraphicContext->quit_requested())
+                m_bIsRunning = false;
+        }
+        pGraphicContext->shutdown(*this);
     }
 
     SceneId Application::add_scene(ref<Scene> pScene)
@@ -60,4 +67,14 @@ namespace fox
     {
         m_pSceneManager->remove(id);
     }
+
+    // ref<Scene> Application::get_active()
+    // {
+    //     return m_pSceneManager->get_active();
+    // }
+
+    // ResourceManager& Application::get_resource_manager() const
+    // {
+    //     return *m_pResourceManager;
+    // }
 }

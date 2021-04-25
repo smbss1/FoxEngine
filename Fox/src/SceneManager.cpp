@@ -10,6 +10,12 @@ fox::SceneManager::~SceneManager()
 {
 }
 
+void fox::SceneManager::start()
+{
+    if (m_pCurrentScene)
+        m_pCurrentScene->on_start();
+}
+
 void fox::SceneManager::update(Timestep dt)
 {
     if (m_pCurrentScene)
@@ -61,3 +67,8 @@ void fox::SceneManager::remove(SceneId id)
         m_vScenes.erase(it);
     }
 }
+
+// fox::ref<fox::Scene> fox::SceneManager::get_active()
+// {
+//     return m_pCurrentScene;
+// }

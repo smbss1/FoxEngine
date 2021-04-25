@@ -15,6 +15,7 @@ class SandboxApp : public fox::Application
     public:
         SandboxApp(int argc, char** argv);
         ~SandboxApp();
+        void init() override;
 
     protected:
     private:

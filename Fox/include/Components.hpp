@@ -5,5 +5,6 @@
 
 #include "Components/NativeScript.hpp"
 #include "Components/Transform.hpp"
+#include "Components/SpriteRenderer.hpp"
 
 #endif

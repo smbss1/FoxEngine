@@ -23,6 +23,7 @@ namespace fox
             // ProcessInput, Update, LateUpdate, and Draw will simply be
             // pass through methods. They will call the correspondingly
             // named methods of the active scene.
+            void start();
             void update(Timestep dt);
 
             // Adds a scene to the state machine and returns the id of that scene.
@@ -33,6 +34,12 @@ namespace fox
 
             // Removes scene from state machine.
             void remove(SceneId id);
+
+            // Get the current scene.
+            ref<Scene> get_active()
+            {
+                return m_pCurrentScene;
+            }
 
         protected:
         private:

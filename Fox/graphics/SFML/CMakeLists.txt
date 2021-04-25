@@ -6,11 +6,13 @@ find_package(SFML 2 COMPONENTS audio graphics window system network)
 if (SFML_FOUND)
     file(GLOB_RECURSE SRCS "src/*.cpp")
 
-    add_library(fox_sfml SHARED ${SRCS} ${CORE_SYSTEM})
+    add_library(fox_sfml SHARED ${SRCS} ${CORE_SRCS})
+
     set_target_properties(fox_sfml PROPERTIES PREFIX "")
 
     target_include_directories(fox_sfml PRIVATE
-        include
+        "include"
+        "../../include"
         ${SFML_INCLUDE_DIR}
     )
     target_link_libraries(fox_sfml PRIVATE ${SFML_LIBRARIES})

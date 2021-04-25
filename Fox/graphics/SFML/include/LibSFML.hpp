@@ -32,10 +32,10 @@ namespace fox
 
         // bool mousePressed(arcade::event::MouseEvent& mouse);
 
-        void init() override;
-        void shutdown() override;
+        void init(Application&) override;
+        void shutdown(Application&) override;
         void poll_event(Input&) override;
-        void draw() override;
+        void draw(Application&) override;
         void set_vsync(bool value) override;
         bool is_vsync() override;
         bool quit_requested() override;

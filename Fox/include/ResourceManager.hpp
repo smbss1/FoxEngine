@@ -1,125 +1,96 @@
-#pragma once
+
+#ifndef FOX_RESOURCE_MANAGER_HPP_
+#define FOX_RESOURCE_MANAGER_HPP_
 
 #include <string>
 #include <memory>
 #include <unordered_map>
 
-namespace Fox
+namespace fox
 {
+	class ResourceManager;
+
 	class IAssetManager
 	{
 	public:
+		virtual ~IAssetManager() = 0;
 		virtual bool Add(const std::string& strAssetName, const std::string& strAssetPath) noexcept = 0;
-		// virtual bool Add(const std::string& strAssetName, void* asset) noexcept = 0;
 		virtual void* Get(const std::string& strAssetName) = 0;
 		virtual bool Remove(const std::string& strAssetName) noexcept = 0;
-		virtual bool Exists(const std::string& strAssetName) const = 0;
 	};
 
-	/////////////////////////////////////////////////////////////////////////////////
+	template <typename TAsset>
+	class AAssetManager : public IAssetManager
+	{
+	public:
+		AAssetManager(ResourceManager& oResourceManager) : m_oResourceManager(oResourceManager)
+		{
+		}
+		virtual ~AAssetManager() = 0;
+		virtual bool Add(const std::string& strAssetName, const std::string& strAssetPath) noexcept = 0;
+		virtual void* Get(const std::string& strAssetName) = 0;
+		virtual bool Remove(const std::string& strAssetName) noexcept = 0;
 
-	// template<typename TAsset>
-	// class AssetManager : public IAssetManager
-	// {
-	// public:
-	// 	using TAssetPtr = std::unique_ptr<TAsset>;
+		bool Exists(const std::string& strAssetName) const
+		{
+			return m_vAssets.find(strAssetName) != m_vAssets.end();
+		}
 
-	// private:
-	// 	std::unordered_map<std::string, TAssetPtr> assets;
+	protected:
+		ResourceManager& m_oResourceManager;
 
-	// public:
-	// 	// bool Add(const std::string& strAssetName, void* pAsset) noexcept override
-	// 	// {
-	// 	// 	if (!Exists(strAssetName))
-	// 	// 	{
-	// 	// 		assets.emplace(strAssetName, static_cast<TAsset*>(pAsset));
-	// 	// 		return true;
-	// 	// 	}
-	// 	// 	else
-	// 	// 		return false;
-	// 	// }
-
-	// 	bool Add(const std::string& strAssetName, const std::string& strAssetPath) noexcept override
-	// 	{
-	// 		if (!Exists(strAssetName))
-	// 		{
-	// 			assets.emplace(strAssetName, static_cast<TAsset*>(pAsset));
-	// 			return true;
-	// 		}
-	// 		else
-	// 			return false;
-	// 	}
-
-	// 	bool Exists(const std::string& strAssetName) const
-	//     {
-	//         return assets.find(strAssetName) != assets.end();
-	//     }
-
-	// 	void* Get(const std::string& strAssetName) override
-	// 	{
-	// 		if (Exists(strAssetName))
-	// 			return static_cast<void*>(assets[strAssetName].get());
-	// 		else
-	// 			return nullptr;
-	// 	}
-
-	// 	bool Remove(const std::string& strAssetName) noexcept override
-	// 	{
-	// 		if (Exists(strAssetName))
-	// 		{
-	// 			assets.erase(strAssetName);
-	// 			return true;
-	// 		}
-	// 		else
-	// 			return false;
-	// 	}
-	// };
-
-	/////////////////////////////////////////////////////////////////////////////////
+		using AssetPtr = std::unique_ptr<TAsset>;
+		std::unordered_map<std::string, AssetPtr> m_vAssets;
+	};
 
 	class ResourceManager
 	{
 	public:
 		using IAssetManagerPtr = std::unique_ptr<IAssetManager>;
 
-	private:
-		std::unordered_map<std::string, IAssetManagerPtr> m_vAssetManagers;
-
 	public:
-		bool AddManager(const std::string& strAssetManagerName, IAssetManager* pAssetManager) noexcept
+		template <typename T>
+		bool AddManager(IAssetManager* pAssetManager) noexcept
 		{
-			if (m_vAssetManagers.find(strAssetManagerName) == m_vAssetManagers.end())
+			std::size_t lHash = typeid(T).hash_code();
+			if (m_vAssetManagers.find(lHash) == m_vAssetManagers.end())
 			{
-				m_vAssetManagers.emplace(strAssetManagerName, IAssetManagerPtr(pAssetManager));
+				m_vAssetManagers.emplace(lHash, IAssetManagerPtr(pAssetManager));
 				return true;
 			}
-			else
-				return false;
+			return false;
 		}
 
-		bool Add(const std::string& strAssetManagerName, const std::string& strAssetName, const std::string& strAssetPath) noexcept
+		template <typename T>
+		bool AddAsset(const std::string& strAssetName, const std::string& strAssetPath) noexcept
 		{
-			if (m_vAssetManagers.find(strAssetManagerName) != m_vAssetManagers.end())
-				return m_vAssetManagers[strAssetManagerName]->Add(strAssetName, strAssetPath);
-			else
-				return false;
+			std::size_t lHash = typeid(T).hash_code();
+			if (m_vAssetManagers.find(lHash) != m_vAssetManagers.end())
+				return m_vAssetManagers[lHash]->Add(strAssetName, strAssetPath);
+			return false;
 		}
 
 		template<typename TAsset>
-		TAsset* Get(const std::string& strAssetManagerName, const std::string& strAssetName)
+		TAsset* GetAsset(const std::string& strAssetName)
 		{
-			if (m_vAssetManagers.find(strAssetManagerName) != m_vAssetManagers.end())
-				return static_cast<TAsset*>(m_vAssetManagers[strAssetManagerName]->Get(strAssetName));
-			else
-				return nullptr;
+			std::size_t lHash = typeid(TAsset).hash_code();
+			if (m_vAssetManagers.find(lHash) != m_vAssetManagers.end())
+				return static_cast<TAsset*>(m_vAssetManagers[lHash]->Get(strAssetName));
+			return nullptr;
 		}
 
-		bool Remove(const std::string& strAssetManagerName, const std::string& strAssetName) noexcept
+		template<typename TAsset>
+		bool RemoveAsset(const std::string& strAssetName) noexcept
 		{
-			if (m_vAssetManagers.find(strAssetManagerName) != m_vAssetManagers.end())
-				return m_vAssetManagers[strAssetManagerName]->Remove(strAssetName);
-			else
-				return false;
+			std::size_t lHash = typeid(TAsset).hash_code();
+			if (m_vAssetManagers.find(lHash) != m_vAssetManagers.end())
+				return m_vAssetManagers[lHash]->Remove(strAssetName);
+			return false;
 		}
+
+	private:
+		std::unordered_map<std::size_t, IAssetManagerPtr> m_vAssetManagers;
 	};
 } // namespace Fox
+
+#endif
