@@ -8,13 +8,10 @@ include_directories(
     "include"
 )
 
-# set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# find_package(Threads REQUIRED)
 add_subdirectory(Fox)
 add_subdirectory(lib)
 add_subdirectory(sandbox)
-# target_link_libraries(app PRIVATE Threads::Threads ${CMAKE_DL_LIBS})

@@ -18,29 +18,17 @@ protected:
 		// std::cout << "OnUpdate!"  << i++ << std::endl;
 	}
 
-	virtual void OnDestroy() override
-	{
-
-	}
+	virtual void OnDestroy() override { }
     int i = 0;
 };
 
 class ExampleScene : public fox::Scene
 {
 public:
-    ExampleScene()
-    {
+    ExampleScene() { }
+    ~ExampleScene() { }
 
-    }
-
-    ~ExampleScene()
-    {
-
-    }
-
-    virtual void on_create() override
-    {
-    }
+    virtual void on_create() override { }
 
     virtual void on_start() override
     {
@@ -52,26 +40,15 @@ public:
         e1.get<Transform>()->set_pos(45, 25);
     }
 
-    void on_destroy() override
-    {
-
-    }
-
-    void on_update(Timestep dt) override
-    {
-
-    }
+    void on_destroy() override { }
+    void on_update(Timestep dt) override { }
 };
-
 
 SandboxApp::SandboxApp(int argc, char** argv) : fox::Application(argc, argv)
 {
 }
 
-SandboxApp::~SandboxApp()
-{
-    
-}
+SandboxApp::~SandboxApp() { }
 
 void SandboxApp::init()
 {
