@@ -27,7 +27,7 @@ namespace fox
         /**
          * @brief Constructor of the class
          */
-        Pipeline();
+        Pipeline() = default;
 
         /**
          * @brief Destructor

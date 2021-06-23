@@ -7,10 +7,7 @@
 
 #include <iostream>
 #include <Core/Managers/PluginManager.hpp>
-#include "Components.hpp"
 #include "PluginEntry.hpp"
-
-//INIT_LIB_API(fox::LibSFML)
 
 namespace fox
 {
@@ -20,24 +17,23 @@ namespace fox
         std::cout << "[CppScriptPlugin] Init!" << std::endl;
 
         app.get_world().system<NativeScript>().kind(ecs::OnUpdate)
-                .force_update(true)
-                .each([](Entity e, NativeScript& script)
-                      {
-                          script.on_update();
-                      });
+            .each([&](Entity e, NativeScript& script)
+                  {
+                      script.on_update();
+                  });
 
         app.get_world().system<NativeScript>().kind(ecs::OnAdd)
-                .each([&](Entity e, NativeScript& script)
-                      {
-                          script.m_pWorld = e.get_world();
-                          script.on_create_all(e.get_id(), app, *app.get<SceneManager>()->get_active());
-                      });
+            .each([&](Entity e, NativeScript& script)
+                  {
+                      script.m_pWorld = e.get_world();
+                      script.on_create_all(e.get_id(), app, *app.get<SceneManager>()->get_active());
+                  });
 
         app.get_world().system<NativeScript>().kind(ecs::OnAddScript)
-                .each([&](Entity e, NativeScript& script)
-                      {
-                          script.on_create(e.get_id(), app, *app.get<SceneManager>()->get_active());
-                      });
+            .each([&](Entity e, NativeScript& script)
+              {
+                  script.on_create(e.get_id(), app, *app.get<SceneManager>()->get_active());
+              });
     }
 
     const std::string &CppScriptPlugin::get_name() const

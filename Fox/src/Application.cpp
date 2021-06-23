@@ -7,7 +7,7 @@
 #include "Plugin/IGraphic.hpp"
 #include "Core/Input/InputManager.hpp"
 #include "Core/Application.hpp"
-#include "Logger/Logger.hpp"
+#include "Core/Logger/Logger.hpp"
 #include "json.hpp"
 
 namespace fox

@@ -5,7 +5,7 @@
 
 #include <unordered_map>
 #include <Core/Input/Keyboard.hpp>
-#include <Logger/Logger.hpp>
+#include <Core/Logger/Logger.hpp>
 #include "KeyCodes.hpp"
 #include "MouseCodes.hpp"
 #include "Mouse.hpp"

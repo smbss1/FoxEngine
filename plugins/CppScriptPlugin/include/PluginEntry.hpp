@@ -27,7 +27,7 @@ namespace fox
 
         void plug(Application& app) override;
         const std::string &get_name() const override;
-        int get_version() const override;
+        [[nodiscard]] int get_version() const override;
 
     private:
         Application* m_oApp = nullptr;

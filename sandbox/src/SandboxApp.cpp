@@ -1,7 +1,7 @@
 
 
 #include <Core/Input/InputManager.hpp>
-#include <Logger/Logger.hpp>
+#include <Core/Logger/Logger.hpp>
 #include "SandboxApp.hpp"
 #include "ScriptableBehaviour.hpp"
 #include "NativeScript.hpp"
@@ -20,35 +20,7 @@ protected:
 	virtual void on_update() override
 	{
 		// std::cout << "OnUpdate!"  << i++ << std::endl;
-	}
-
-	virtual void on_destroy() override { }
-    int i = 0;
-};
-
-class ExampleScene : public fox::Scene
-{
-public:
-    ExampleScene() { }
-    ExampleScene(const std::string& name) : fox::Scene(name) { }
-    ~ExampleScene() { }
-
-    virtual void on_create(fox::Application& app) override { }
-
-    virtual void on_enable(fox::Application& app) override
-    {
-        auto e1 = get_world().new_entity();
-        e1.add<NativeScript>(Test())
-          .add<SpriteRenderer>("", "MySprite")
-          .add<fox::Transform>();
-        // e1.get<NativeScript>()->bind<Test>();
-        e1.get<fox::Transform>()->set_pos(45, 25);
-    }
-
-    void on_destroy(fox::Application& app) override { }
-    void on_update(fox::Application& app) override
-    {
-        fox::InputManager& input = app.get<fox::InputManager>().value();
+        fox::InputManager& input = get_app().get<fox::InputManager>().value();
 
         if (input.GetKeyDown(fox::Key::A))
         {
@@ -71,6 +43,33 @@ public:
         }
 //        fox::info("%", input.GetMousePosition());
 //        fox::info("Scroll: %", input.GetMouseScroll());
+	}
+
+	virtual void on_destroy() override { }
+    int i = 0;
+};
+
+class ExampleScene : public fox::Scene
+{
+public:
+    ExampleScene() { }
+    ExampleScene(const std::string& name) : fox::Scene(name) { }
+    ~ExampleScene() { }
+
+    virtual void on_create(fox::Application& app) override { }
+
+    virtual void on_enable(fox::Application& app) override
+    {
+        auto e1 = get_world().new_entity();
+        e1.add<NativeScript>(Test())
+          .add<SpriteRenderer>("", "MySprite")
+          .add<fox::Transform>();
+        e1.get<fox::Transform>()->set_pos(45, 25);
+    }
+
+    void on_destroy(fox::Application& app) override { }
+    void on_update(fox::Application& app) override
+    {
     }
 };
 

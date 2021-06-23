@@ -2,7 +2,7 @@
 // Created by samuel on 15/06/2021.
 //
 
-#include "Logger/Logger.hpp"
+#include "Core/Logger/Logger.hpp"
 
 namespace fox
 {

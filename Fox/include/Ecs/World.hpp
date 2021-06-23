@@ -50,7 +50,7 @@ namespace fox
          */
         void each(SystemFn updateFunc)
         {
-            m_oFunc = updateFunc;
+            m_oFunc = std::move(updateFunc);
         }
 
         /**
@@ -604,7 +604,7 @@ namespace fox
          * @brief Get World where the entity is spawned
          * @return the Ecs World
          */
-        World *get_world() const
+        [[nodiscard]] World *get_world() const
         {
             return m_oWld;
         }
@@ -649,7 +649,8 @@ namespace fox
     template<typename... Cs>
     void System<Cs...>::run()
     {
-        for (auto e : m_vEntities) {
+        for (auto e : m_vEntities)
+        {
             run(e);
         }
     }

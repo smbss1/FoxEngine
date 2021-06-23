@@ -5,7 +5,7 @@
 ** EntryPoint.cpp
 */
 
-#include <Logger/Logger.hpp>
+#include <Core/Logger/Logger.hpp>
 #include "FoxEngine.hpp"
 
 extern fox::Application* CreateApp(int argc, char** argv);

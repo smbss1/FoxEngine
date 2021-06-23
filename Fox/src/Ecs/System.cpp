@@ -40,11 +40,11 @@ namespace fox
             auto it = std::find(system->m_vEntities.begin(), system->m_vEntities.end(), entity);
             bool bIsExist = it != system->m_vEntities.end();
 
-            if ((entitySignature & system->m_Signature) == system->m_Signature) {
-                system->m_vEntities.push_back(entity);
-
+            if ((entitySignature & system->m_Signature) == system->m_Signature)
+            {
                 // Si il n'existe pas, Envoyez l'event OnAdd
                 if (!bIsExist) {
+                    system->m_vEntities.push_back(entity);
                     system->OnAddEntity(entity);
                 } else {
                     system->OnSetEntity(entity);
