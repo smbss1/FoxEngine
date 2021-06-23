@@ -1,6 +1,11 @@
+/*
+** EPITECH PROJECT, 2020
+** B-YEP-400-TLS-4-1-indiestudio-thomas.marches
+** File description:
+** bitsets.cpp
+*/
 
-
-#include "bitsets.hpp"
+#include "Utils/bitsets.hpp"
 
 const char* bitset::getData() const
 {
@@ -58,6 +63,18 @@ void bitset::set()
 
 void bitset::set(std::size_t n, bool v)
 {
+    if (n > m_lSize) {
+        char* new_data = new char[n + 1]();
+        if (new_data) {
+            new_data[n] = '\0';
+            std::fill(new_data, new_data + n, '0');
+            std::memcpy(new_data, data, m_lSize);
+            if (data)
+                delete data;
+            data = new_data;
+            m_lSize = n;
+        }
+    }
     data[n] = v ? '1' : '0';
 }
 

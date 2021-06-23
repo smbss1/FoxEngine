@@ -1,47 +1,60 @@
+/*
+** EPITECH PROJECT, 2020
+** B-YEP-400-TLS-4-1-indiestudio-thomas.marches
+** File description:
+** System.cpp
+*/
 
 #include <iostream>
+#include <algorithm>
 
 #include "Ecs/World.hpp"
 
-void SystemManager::EntityDestroyed(EntityId e)
+namespace fox
 {
-    for (auto& pair : m_vSystems)
+    void SystemManager::EntityDestroyed(EntityId e)
     {
-        auto& system = pair.second;
+        for (auto &pair : m_vSystems) {
+            auto &system = pair.second;
 
-        system->m_vEntities.erase(e);
+            auto it = std::find(system->m_vEntities.begin(), system->m_vEntities.end(), e);
+            if (it != system->m_vEntities.end()) {
+                system->m_vEntities.erase(it);
+            }
+        }
     }
-}
 
-void SystemManager::EntitySignatureChanged(EntityId entity, const CompSignature& entitySignature)
-{
-	for (auto& pair : m_vSystems)
-	{
-		auto& type = pair.first;
-		auto& system = pair.second;
+    void SystemManager::Clear()
+    {
+        for (auto &pair : m_vSystems) {
+            auto &system = pair.second;
+            system->m_vEntities.clear();
+        }
+    }
 
-        // std::cout << "Entity: " << entitySignature << std::endl;
-        // std::cout << "System: " << system->m_Signature << std::endl;
-		if ((entitySignature & system->m_Signature) == system->m_Signature)
-		{
-			bool bIsExist = system->m_vEntities.find(entity) != system->m_vEntities.end();
-			system->m_vEntities.insert(entity);
+    void SystemManager::EntitySignatureChanged(EntityId entity, const CompSignature &entitySignature)
+    {
+        for (auto &pair : m_vSystems) {
+            auto &type = pair.first;
+            auto &system = pair.second;
+            auto it = std::find(system->m_vEntities.begin(), system->m_vEntities.end(), entity);
+            bool bIsExist = it != system->m_vEntities.end();
 
-			// Si il n'existe pas, Envoyez l'event OnAdd
-			if (!bIsExist) {
-				system->OnAddEntity(entity);
-			} else {
-				system->OnSetEntity(entity);
-			}
-		}
-		else
-		{
-			bool bIsExist = system->m_vEntities.find(entity) != system->m_vEntities.end();
-			if (bIsExist)
-			{
-				system->OnRemoveEntity(entity);
-			}
-			system->m_vEntities.erase(entity);
-		}
-	}
+            if ((entitySignature & system->m_Signature) == system->m_Signature) {
+                system->m_vEntities.push_back(entity);
+
+                // Si il n'existe pas, Envoyez l'event OnAdd
+                if (!bIsExist) {
+                    system->OnAddEntity(entity);
+                } else {
+                    system->OnSetEntity(entity);
+                }
+            } else {
+                if (bIsExist) {
+                    system->OnRemoveEntity(entity);
+                    system->m_vEntities.erase(it);
+                }
+            }
+        }
+    }
 }

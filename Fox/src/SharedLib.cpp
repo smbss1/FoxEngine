@@ -9,9 +9,8 @@
 
 namespace fox
 {
-    SharedLib::SharedLib()
+    SharedLib::SharedLib() : m_pHandle(nullptr)
     {
-        m_pHandle = nullptr;
     }
 
     SharedLib::SharedLib(const std::string &strPath) : SharedLib()

@@ -1,17 +1,30 @@
 
 
-#include "IGraphic.hpp"
-#include "GraphicLibLoader.hpp"
-#include "Input.hpp"
-#include "Application.hpp"
+#include <Core/Managers/PluginManager.hpp>
+#include <chrono>
+#include <Time.hpp>
+#include <Utils/FileSystem.hpp>
+#include "Plugin/IGraphic.hpp"
+#include "Core/Input/InputManager.hpp"
+#include "Core/Application.hpp"
+#include "Logger/Logger.hpp"
+#include "json.hpp"
 
 namespace fox
 {
     Application::Application(int ac, char** av)
     {
         m_bIsRunning = true;
-        m_pSceneManager = new_scope<SceneManager>();
-        m_pResourceManager = new_scope<ResourceManager>();
+        set<SceneManager>(*this);
+        set<ResourceManager>();
+        set<InputManager>();
+
+        get_world().add_phase(game::OnStart);
+        get_world().add_phase(ecs::OnSceneEnable);
+        get_world().add_phase(ecs::OnSceneDisable);
+        get_world().add_phase(ecs::PostFixUpdate);
+        get_world().add_phase(ecs::PreFixUpdate);
+        get_world().add_phase(ecs::OnAddScript);
     }
 
     Application::~Application()
@@ -22,59 +35,74 @@ namespace fox
     {
     }
 
+    void Application::quit()
+    {
+        m_bIsRunning = false;
+    }
+
+    void Application::LoadConfig()
+    {
+        fox::info("Starting load config.json....");
+        json::Value oConfigTemp;
+        std::string out;
+        if (fox::file::ReadFile("config.json", out))
+            oConfigTemp = json::parse(out);
+        else
+            fox::error("Cannot read config.json");
+        if (!oConfigTemp.is_null()) {
+            m_oConfigFile = new_scope<json::Value>(oConfigTemp);
+            fox::info("config.json load successfully");
+        }
+        else
+            fox::error("Wrong configuration format for 'config.json'");
+    }
+
     void Application::run()
     {
-        init();
+        fox::info("Starting Application...");
         float fFixedDeltaTime = 0;
         float fFixedTimeStep = 1.0f / 45.0f;
-        float fDeltaTime = 0;
-        IGraphic* pGraphicContext = nullptr;
-        GraphicLibLoader loader("Fox/graphics/fox_sfml" + std::string(DL_EXT));
+        float fDeltaTime;
+        auto lastUpdate = std::chrono::high_resolution_clock::now();
 
-        Input input;
-        pGraphicContext = loader.get<IGraphic>();
-        pGraphicContext->init(*this);
-        m_pSceneManager->start();
+        LoadConfig();
+
+        PluginManager& plugin_manager = get_or_create<fox::PluginManager>().value();
+        plugin_manager.FindAndLoadPlugins((*m_oConfigFile)["plugins directory"].get<std::string>());
+        if(plugin_manager.GetGraphics().GetCount() <= 0)
+            throw std::runtime_error("Cannot run the application because no Graphics Plugins found");
+
+        plugin_manager.InitializePlugins(*this);
+
+        GraphicPlugin& graphic_ctx = plugin_manager.GetGraphics().GetPlugin(0);
+        init();
+        fox::info("Application is running");
         while (m_bIsRunning)
         {
-            pGraphicContext->poll_event(input);
+            graphic_ctx.poll_event();
+
+            auto now = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsed = now - lastUpdate;
+            lastUpdate = now;
+
+            fDeltaTime = elapsed.count();
+            Time::delta_time = fDeltaTime;
+            if (Time::delta_time > 0.25)
+                Time::delta_time = 0.25;
+            Time::time += fDeltaTime;
+
             fFixedDeltaTime += fDeltaTime;
             while (fFixedDeltaTime >= fFixedTimeStep)
             {
+                get<SceneManager>()->fix_update();
+                Time::fixed_delta_time = fFixedDeltaTime;
                 fFixedDeltaTime -= fFixedTimeStep;
             }
+            Time::factor_physics = fFixedDeltaTime / fFixedTimeStep;
 
-            m_pSceneManager->update(0.0f);
-            pGraphicContext->draw(*this);
-
-            if (pGraphicContext->quit_requested())
-                m_bIsRunning = false;
+            get<SceneManager>()->update();
+            graphic_ctx.draw();
         }
-        pGraphicContext->shutdown(*this);
+        remove<ResourceManager>();
     }
-
-    SceneId Application::add_scene(ref<Scene> pScene)
-    {
-        return m_pSceneManager->add(pScene);
-    }
-
-    void Application::switch_scene(SceneId id)
-    {
-        m_pSceneManager->switch_to(id);
-    }
-
-    void Application::remove_scene(SceneId id)
-    {
-        m_pSceneManager->remove(id);
-    }
-
-    // ref<Scene> Application::get_active()
-    // {
-    //     return m_pSceneManager->get_active();
-    // }
-
-    // ResourceManager& Application::get_resource_manager() const
-    // {
-    //     return *m_pResourceManager;
-    // }
 }

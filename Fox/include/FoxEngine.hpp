@@ -4,16 +4,11 @@
 
 #include "FoxEcs.hpp"
 
-#include "Application.hpp"
+#include "Core/Application.hpp"
 
-#include "Event.hpp"
-#include "NameUtils.hpp"
+#include "Core/Event.hpp"
+#include "Utils/NameUtils.hpp"
 
-#include "ScriptableEntity.hpp"
 #include "Components.hpp"
-
-// ------- Entry Point --------------------------
-#include "EntryPoint.hpp"
-// ----------------------------------------------
 
 #endif

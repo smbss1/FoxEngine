@@ -23,17 +23,15 @@
 #endif
 
 #define INIT_LIB_API(class)                                      \
-    PRIVATE_EXTERN_C                                             \
-    void *library_create()                                       \
+    extern "C" void *library_create()                                       \
     {                                                            \
         printf("[" #class "] Loading " #class " library ...\n"); \
         return new class();                                      \
     }                                                            \
-    void library_delete(void *library)                           \
+    extern "C" void library_delete(void *library)                           \
     {                                                            \
         printf("[" #class "] " #class " closing ...\n");         \
         delete static_cast<class *>(library);                    \
     }                                                            \
-    PRIVATE_EXTERN_C_END
 
 #endif /* !API_HPP_PRIVATE */

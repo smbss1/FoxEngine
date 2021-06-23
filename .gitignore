@@ -1,6 +1,7 @@
 .vscode
 build
 app
+cmake-build-debug
 
 # Prerequisites
 *.d
