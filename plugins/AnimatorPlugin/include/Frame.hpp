@@ -17,6 +17,7 @@
 template<typename T>
 struct Frame
 {
+public:
     Frame() {}
     ~Frame() = default;
 

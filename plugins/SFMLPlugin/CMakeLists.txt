@@ -13,8 +13,13 @@ if (SFML_FOUND)
 
     set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-    target_include_directories(${PROJECT_NAME} PRIVATE
+    target_include_directories(${PROJECT_NAME} PUBLIC
         "include"
     )
+#    target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_INCLUDE_IMCONFIG_H)
+#
+#    target_include_directories(${PROJECT_NAME} PRIVATE
+#        ${CMAKE_CURRENT_LIST_DIR} # needed for imgui.h to find our imconfig.h
+#    )
     target_link_libraries(${PROJECT_NAME} PRIVATE ${SFML_LIBRARIES} fox_engine)
 endif()

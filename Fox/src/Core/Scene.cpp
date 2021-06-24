@@ -68,8 +68,6 @@ namespace fox
 //                          shape.entity = e.get_id();
 //                      });
 //
-//        get_world().system<Animator>().each([](Entity e, Animator& anim) { anim.run(); });
-//
 //        get_world().system<fox::Button, Animator>().each([](Entity e, fox::Button& btn, Animator& anim)
 //        {
 //            if (btn.state() == btn.prev_state())

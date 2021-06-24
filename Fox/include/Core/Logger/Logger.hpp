@@ -5,7 +5,6 @@
 #ifndef TCPSERVER_LOGGER_HPP
 #define TCPSERVER_LOGGER_HPP
 
-
 #include <mutex>
 #include <string>
 #include <sstream>
@@ -103,8 +102,6 @@ namespace fox
     {
         return detail::Printer<Args...>{format, std::forward_as_tuple(args...)};
     }
-
-
 
 
     enum typelog {
@@ -208,30 +205,37 @@ namespace fox
 
     template <typename... Args,
             std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
+    void log(typelog type, const std::string& msg, const Args&... args)
+    {
+        Logger::instance().log(type, msg, args...);
+    }
+
+    template <typename... Args,
+            std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
     void info(const std::string& msg, const Args&... args)
     {
-        return Logger::instance().log(INFO, msg, args...);
+        log(INFO, msg, args...);
     }
 
     template <typename... Args,
             std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
     void warn(const std::string& msg, const Args&... args)
     {
-        return Logger::instance().log(WARN, msg, args...);
+        log(WARN, msg, args...);
     }
 
     template <typename... Args,
             std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
     void error(const std::string& msg, const Args&... args)
     {
-        return Logger::instance().log(ERROR, msg, args...);
+        log(ERROR, msg, args...);
     }
 
     template <typename... Args,
             std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
     void debug(const std::string& msg, const Args&... args)
     {
-        return Logger::instance().log(DEBUG, msg, args...);
+        log(DEBUG, msg, args...);
     }
 }
 

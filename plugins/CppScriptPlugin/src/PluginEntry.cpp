@@ -17,23 +17,27 @@ namespace fox
         std::cout << "[CppScriptPlugin] Init!" << std::endl;
 
         app.get_world().system<NativeScript>().kind(ecs::OnUpdate)
-            .each([&](Entity e, NativeScript& script)
+            .each([&](Entity& e, NativeScript& script)
                   {
                       script.on_update();
                   });
 
         app.get_world().system<NativeScript>().kind(ecs::OnAdd)
-            .each([&](Entity e, NativeScript& script)
+            .each([&](Entity& e, NativeScript& script)
                   {
                       script.m_pWorld = e.get_world();
                       script.on_create_all(e.get_id(), app, *app.get<SceneManager>()->get_active());
                   });
 
         app.get_world().system<NativeScript>().kind(ecs::OnAddScript)
-            .each([&](Entity e, NativeScript& script)
+            .each([&](Entity& e, NativeScript& script)
               {
                   script.on_create(e.get_id(), app, *app.get<SceneManager>()->get_active());
               });
+    }
+
+    void CppScriptPlugin::unplug(Application &app)
+    {
     }
 
     const std::string &CppScriptPlugin::get_name() const

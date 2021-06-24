@@ -5,9 +5,11 @@
 #include "SandboxApp.hpp"
 #include "ScriptableBehaviour.hpp"
 #include "NativeScript.hpp"
+#include "Animator.hpp"
 
 class Test : public ScriptableBehaviour
 {
+    float value;
 public:
 	virtual ~Test() {}
 
@@ -15,6 +17,18 @@ protected:
 	virtual void on_create() override
 	{
 		std::cout << "OnCreate!" << std::endl;
+
+        add_component<fox::Transform>(Vec2(45, 25));
+        add_component<SpriteRenderer>("", "MySprite", 12);
+        auto& anim = add_component<Animator>().add_anim_from_file("sandbox/assets/animation.json");
+        anim.signal(4, [&]{ fox::info("Value: %", value); });
+        anim.signal(4.1, [&]{ fox::info("Value: %", value); });
+        anim.signal(4.5, [&]{ fox::info("Value: %", value); });
+        anim.signal(5.00001, [&]{ fox::info("Value: %", value); });
+        anim.signal(6.0001, [&]{ fox::info("Value: %", value); });
+        anim.signal(7.001, [&]{ fox::info("Value: %", value); });
+        anim.signal(8.01, [&]{ fox::info("Value: %", value); });
+        anim.get<float>(0).apply(value);
 	}
 
 	virtual void on_update() override
@@ -60,11 +74,7 @@ public:
 
     virtual void on_enable(fox::Application& app) override
     {
-        auto e1 = get_world().new_entity();
-        e1.add<NativeScript>(Test())
-          .add<SpriteRenderer>("", "MySprite")
-          .add<fox::Transform>();
-        e1.get<fox::Transform>()->set_pos(45, 25);
+        get_world().new_entity().add<NativeScript>(Test());
     }
 
     void on_destroy(fox::Application& app) override { }
@@ -73,13 +83,13 @@ public:
     }
 };
 
-SandboxApp::SandboxApp(int argc, char** argv) : fox::Application(argc, argv)
+EditorApp::EditorApp(int argc, char** argv) : fox::Application(argc, argv)
 {
 }
 
-SandboxApp::~SandboxApp() { }
+EditorApp::~EditorApp() { }
 
-void SandboxApp::init()
+void EditorApp::init()
 {
     fox::SceneManager& sceneManager = get<fox::SceneManager>().value();
     sceneManager.add<ExampleScene>("Example");
@@ -88,5 +98,5 @@ void SandboxApp::init()
 
 fox::Application* CreateApp(int argc, char** argv)
 {
-    return new SandboxApp(argc, argv);
+    return new EditorApp(argc, argv);
 }

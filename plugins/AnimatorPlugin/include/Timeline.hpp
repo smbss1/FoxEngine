@@ -8,10 +8,16 @@
 #ifndef FOX_TIMELINE_HPP_
 #define FOX_TIMELINE_HPP_
 
-#include "Time.hpp"
-#include <Animator/Easing.hpp>
-#include <Animator/Track.hpp>
 #include <unordered_map>
+#include "Time.hpp"
+#include "Easing.hpp"
+#include "Track.hpp"
+
+struct Signal
+{
+    std::function<void()> m_func;
+    bool m_bCalled = false;
+};
 
 class Timeline
 {
@@ -64,10 +70,6 @@ public:
         Track<T>* result = new Track<T>();
         result->ease(e);
         m_vTracks.push_back(std::unique_ptr<ITrack>(result));
-        for (auto &track : m_vTracks) {
-            if (track->IsValid())
-                m_fEndTime = std::max(m_fEndTime, track->GetEndTime());
-        }
         return *result;
     }
 
@@ -82,11 +84,20 @@ public:
         Track<T>* result = new Track<T>();
         m_vTracks.push_back(std::unique_ptr<ITrack>(result));
 
-        for (auto &track : m_vTracks) {
-            if (track->IsValid())
-                m_fEndTime = std::max(m_fEndTime, track->GetEndTime());
-        }
         return *result;
+    }
+
+    /**
+     * @brief Get a track at the index provide in parameter
+     * @tparam T The type of the value to modified during the timeline execution
+     * @param idx the index of the track
+     * @return a reference to the track
+     * @note this function throw a std::out_of_range if the index is incorrect
+     */
+    template<typename T>
+    Track<T>& get(std::uint32_t idx)
+    {
+        return *static_cast<Track<T>*>(m_vTracks[idx].get());
     }
 
     /**
@@ -109,7 +120,7 @@ public:
      */
     Timeline& signal(float time, std::function<void()> cb)
     {
-        m_Signals.emplace(time, cb);
+        m_Signals.emplace(time, Signal{cb, false});
         return *this;
     }
 
@@ -119,6 +130,11 @@ public:
     void reset()
     {
         m_fSignalTime = 0;
+        m_fTime = 0;
+
+        for (auto &sig : m_Signals) {
+            sig.second.m_bCalled = false;
+        }
     }
 
     /**
@@ -127,31 +143,32 @@ public:
     void run()
     {
         m_fTime += Time::delta_time;
-        m_fSignalTime += Time::delta_time;
 
-//        if (m_fSignalTime >= m_fEndTime && m_bLoop)
-//            m_fSignalTime = 0;
+        if (m_fSignalTime <= m_fEndTime) {
+            m_fSignalTime += Time::delta_time;
+        } else {
+            if (m_bLoop && m_fSignalTime >= 0.01) {
+                reset();
+            }
+        }
 
         for (auto &track : m_vTracks) {
-            if (track->IsValid())
+            if (track->IsValid()) {
                 track->Sample(m_fTime, m_bLoop);
+                m_fEndTime = std::max(m_fEndTime, track->GetEndTime());
+            }
         }
 
         for (auto &sig : m_Signals) {
-            if (are_same(sig.first, m_fSignalTime)) {
-                sig.second();
+            if (!sig.second.m_bCalled && sig.first <= m_fSignalTime) {
+                sig.second.m_func();
+                sig.second.m_bCalled = true;
             }
         }
     }
 
-private:
-    bool are_same(float a, float b)
-    {
-        return fabs(a - b) < 0.05f;
-    }
-
 public:
-    std::unordered_map<float, std::function<void()>> m_Signals;
+    std::unordered_map<float, Signal> m_Signals;
     std::vector<std::unique_ptr<ITrack>> m_vTracks;
     bool m_bLoop;
     float m_fTime = 0;

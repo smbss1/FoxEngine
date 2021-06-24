@@ -9,7 +9,9 @@
 #define FOX_ANIMATOR_HPP_
 
 #include <unordered_map>
+#include <Utils/FileSystem.hpp>
 #include "Timeline.hpp"
+#include "Serialization.hpp"
 
 class Animator
 {
@@ -48,6 +50,28 @@ public:
                 current->reset();
             current = it->second.get();
         }
+    }
+
+    Timeline& add_anim_from_file(const std::string& strFilepath)
+    {
+        std::string out;
+        if (fox::file::ReadFile(strFilepath, out))
+        {
+            fox::info("Parse animation file: %", strFilepath);
+
+            fox::json::Value anim_json = fox::json::parse(out);
+            auto anim = anim_json.get<std::unique_ptr<Timeline>>();
+
+            fox::info("Animation Name: %", anim_json["name"].get<std::string>());
+            fox::info("Animation Tracks count: %", anim->m_vTracks.size());
+            Timeline* ptr = anim.get();
+            m_vAnimations.insert({anim_json["name"].get<std::string>(), std::move(anim)});
+            if (!current)
+                current = ptr;
+            return *ptr;
+        }
+        else
+            throw std::runtime_error("Cannot find the animation file: " + strFilepath);
     }
 
     void run()

@@ -37,7 +37,7 @@ namespace fox
                    return pSys == Sys;
                }), phase.end());
         } catch (const std::out_of_range &e) {
-            fox::error("Cannot remove system into the event '%' because it's not exist in this Pipeline.\n Use Pipeline::add_phase before removing system", id);
+            // fox::error("Cannot remove system into the event '%' because it's not exist in this Pipeline.\n Use Pipeline::add_phase before removing system", id);
         }
     }
 

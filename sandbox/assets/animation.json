@@ -1,0 +1,31 @@
+
+{
+  "name": "Idle",
+  "loop": false,
+  "tracks": [
+    {
+      "type": "float",
+      "easing": "Linear",
+      "keys": [
+        {
+          "time": 0,
+          "value": 0,
+          "in": 0,
+          "out": 0
+        },
+        {
+          "time": 9,
+          "value": 1,
+          "in": 0,
+          "out": 0
+        },
+        {
+          "time": 10,
+          "value": 1,
+          "in": 0,
+          "out": 0
+        }
+      ]
+    }
+  ]
+}

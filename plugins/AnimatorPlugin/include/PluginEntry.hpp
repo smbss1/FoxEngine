@@ -14,16 +14,15 @@
 
 #include "api.hpp"
 #include "Plugin/IPlugin.hpp"
-#include "ScriptableBehaviour.hpp"
-#include "NativeScript.hpp"
+#include "Animator.hpp"
 
 namespace fox
 {
-    class CppScriptPlugin : public IPlugin
+    class AnimatorPlugin : public IPlugin
     {
     public:
-        CppScriptPlugin() = default;
-        ~CppScriptPlugin() = default;
+        AnimatorPlugin() = default;
+        ~AnimatorPlugin() = default;
 
         void plug(Application& app) override;
         void unplug(Application &app) override;

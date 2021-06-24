@@ -43,10 +43,7 @@ namespace fox
 
     Entity World::new_entity(const std::string &name, const std::string &tag_name)
     {
-        Entity e = new_entity(name);
-        if (!tag_name.empty())
-            e.add<fox::EntityTag>(tag_name);
-        return e;
+        return new_entity(name, tag_name, true);
     }
 
     Entity World::new_entity(const std::string &name, bool enable)
@@ -56,6 +53,8 @@ namespace fox
         e.set_enable(enable);
         if (!name.empty())
             e.add<fox::EntityName>(name);
+        else
+            e.add<fox::EntityName>("GameObject");
         return e;
     }
 
@@ -64,6 +63,8 @@ namespace fox
         Entity e = new_entity(name, enable);
         if (!tag_name.empty())
             e.add<fox::EntityTag>(tag_name);
+        else
+            e.add<fox::EntityTag>("Undefined");
         return e;
     }
 

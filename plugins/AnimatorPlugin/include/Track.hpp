@@ -12,7 +12,7 @@
 #include <cstring>
 #include <iostream>
 #include "Frame.hpp"
-#include "../Utils/Vec3.hpp"
+#include "Utils/Vec3.hpp"
 #include "Utils/Quat.hpp"
 #include "Easing.hpp"
 
@@ -358,7 +358,7 @@ public:
      */
 	bool IsValid() override
 	{
-		return m_vFrames.size() > 1;
+		return m_vFrames.size() > 0;
 	}
 
     /**
@@ -389,9 +389,6 @@ public:
 		m_pTarget = &target;
         return *this;
 	}
-
-	// template<typename TVar>
-    // Track<T>& apply(TVar (T::*gettter)() const, void (T::*settter)(TVar));
 
     /**
       * @brief Set the setter of the value to be modified during the simulation

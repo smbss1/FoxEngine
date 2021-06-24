@@ -7,6 +7,10 @@
 
 #include <iostream>
 #include <Core/Managers/PluginManager.hpp>
+#include <Components/EntityName.hpp>
+#include <ImGui/imgui-SFML.h>
+#include <Time.hpp>
+#include <ImGui/imgui.h>
 #include "Core/Input/InputManager.hpp"
 #include "TextureManager.hpp"
 #include "SpriteManager.hpp"
@@ -28,24 +32,35 @@ namespace fox
         m_oWindow.create({1280, 720}, "FoxEngine");
         m_oWindow.setKeyRepeatEnabled(false);
 
+        ImGui::SFML::Init(m_oWindow);
+
         ResourceManager& resource_manager = app.get<ResourceManager>().value();
         resource_manager.AddManager<sf::Texture>(new TextureManager(resource_manager));
         resource_manager.AddManager<sf::Sprite>(new SpriteManager(resource_manager));
 
         app.get_world().system<SpriteRenderer>("InitSpriteRenderer")
-            .kind(ecs::OnAdd).each([&](Entity e, SpriteRenderer& renderer)
+            .kind(ecs::OnAdd).each([&](Entity& e, SpriteRenderer& renderer)
                {
                    resource_manager.AddAsset<sf::Texture>(renderer.m_strId, renderer.m_strPath);
                    resource_manager.AddAsset<sf::Sprite>(renderer.m_strId, renderer.m_strPath);
                });
 
         app.get_world().system<Transform, SpriteRenderer>("DrawSpriteRenderer")
-            .kind(ecs::OnStore).each([&](Entity e, Transform& transform, SpriteRenderer& renderer)
+            .order_by([](Transform& t1, SpriteRenderer& r1, Transform& t2, SpriteRenderer& r2)
+              {
+                  return r1.depth < r2.depth;
+              })
+            .kind(ecs::OnStore).each([&](Entity& e, Transform& transform, SpriteRenderer& renderer)
                  {
                      auto* sprite = resource_manager.GetAsset<sf::Sprite>(renderer.m_strId);
                      sprite->setPosition(transform.position.x, transform.position.y);
                      m_oWindow.draw(*sprite);
                  });
+    }
+
+    void SFMLPlugin::unplug(Application &app)
+    {
+        ImGui::SFML::Shutdown();
     }
 
     void SFMLPlugin::poll_event()
@@ -54,6 +69,7 @@ namespace fox
         oInputManager.Reset();
         while (m_oWindow.pollEvent(m_oEvent))
         {
+            ImGui::SFML::ProcessEvent(m_oEvent);
             switch (m_oEvent.type)
             {
             case sf::Event::Closed:
@@ -193,8 +209,17 @@ namespace fox
 
     void SFMLPlugin::draw()
     {
+        ImGui::SFML::Update(m_oWindow, deltaClock.restart());
+
+        ImGui::ShowDemoWindow();
+
+        ImGui::Begin("Hello, world!");
+        ImGui::Button("Look at this pretty button");
+        ImGui::End();
+
         m_oWindow.clear();
         m_oApp->get_world().run_phase(ecs::OnStore);
+        ImGui::SFML::Render(m_oWindow);
         m_oWindow.display();
     }
 

@@ -31,6 +31,7 @@ namespace fox
         ~SFMLPlugin();
 
         void plug(Application& app) override;
+        void unplug(Application& app) override;
         const std::string &get_name() const override;
         int get_version() const override;
         void poll_event() override;
@@ -47,6 +48,7 @@ namespace fox
 
         bool m_bIsVSync;
         Application* m_oApp = nullptr;
+        sf::Clock deltaClock;
     };
 
     std::unordered_map<sf::Keyboard::Key, fox::Key> SFMLPlugin::SFMLKeyEventMap = {

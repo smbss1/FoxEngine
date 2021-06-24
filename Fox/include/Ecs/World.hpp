@@ -12,6 +12,7 @@
 #include <memory>
 #include <typeindex>
 #include <Utils/AnyContainer.hpp>
+#include <Core/Logger/Logger.hpp>
 #include "common.hpp"
 #include "Utils/Option.hpp"
 #include "Utils/Any.hpp"
@@ -30,9 +31,11 @@ namespace fox
     class System : public ASystem
     {
     public:
-        using SystemFn = std::function<void(Entity oEntity, Cs &...)>;
+        using SystemFn = std::function<void(Entity& oEntity, Cs&...)>;
+        using OrderFn = std::function<bool(Cs&..., Cs&...)>;
         std::string m_strName;                                            // The name of the system, used to generate unique Id for the different Event Phases like OnAdd or OnRemove
         SystemFn m_oFunc;
+        OrderFn m_oOrderByFunc;
 
         /**
          * @brief Construct a new System object
@@ -51,6 +54,12 @@ namespace fox
         void each(SystemFn updateFunc)
         {
             m_oFunc = std::move(updateFunc);
+        }
+
+        System<Cs...>& order_by(OrderFn orderFn)
+        {
+            m_oOrderByFunc = std::move(orderFn);
+            return *this;
         }
 
         /**
@@ -625,6 +634,19 @@ namespace fox
     template<typename... Cs>
     void System<Cs...>::OnAddEntity(EntityId oEntity)
     {
+        if (m_oOrderByFunc)
+        {
+            std::vector<Entity> vec;
+            for (auto e : m_vEntities)
+                vec.push_back({&m_oWorld, e});
+            std::sort(vec.begin(), vec.end(), [&](Entity& e1, Entity& e2)
+            {
+                return m_oOrderByFunc(e1.get<Cs>().value()..., e2.get<Cs>().value()...);
+            });
+            m_vEntities.clear();
+            for (auto e : vec)
+                m_vEntities.push_back(e.get_id());
+        }
         if (m_uEventID == fox::ecs::OnAdd) {
             run(oEntity);
         }
