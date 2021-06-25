@@ -26,11 +26,6 @@ namespace fox
         add_phase(fox::ecs::OnStore);
     }
 
-    World::~World()
-    {
-
-    }
-
     Entity World::new_entity()
     {
         return new_entity("", true);

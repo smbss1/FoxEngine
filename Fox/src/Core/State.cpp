@@ -10,4 +10,9 @@ namespace fox
             : m_strDebugName(debugName)
     {
     }
+
+    World &State::GetWorld()
+    {
+        return m_pApp->get_world();
+    }
 }

@@ -13,7 +13,7 @@ namespace fox
     class StateMachine
     {
     public:
-        StateMachine() = default;
+        explicit StateMachine(Application& app);
 
         ~StateMachine();
 
@@ -24,6 +24,10 @@ namespace fox
         void PopState(State *state);
 
         void PopOverlay(State *overlay);
+
+        void FixUpdate();
+        void Update();
+        void UpdateImGui();
 
         std::vector<State *>::iterator begin()
         { return m_vStates.begin(); }
@@ -52,6 +56,7 @@ namespace fox
     private:
         std::vector<State *> m_vStates;
         unsigned int m_LayerInsertIndex = 0;
+        Application& m_oApp;
     };
 }
 

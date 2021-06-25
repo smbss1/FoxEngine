@@ -191,7 +191,7 @@ namespace fox
         /**
          * @brief Destroy the World object
          */
-        ~World();
+        ~World() = default;
 
         /**
          * @brief Create a new entity in the world

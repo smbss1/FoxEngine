@@ -10,8 +10,8 @@ namespace fox
 	class SpriteManager : public AAssetManager<sf::Sprite>
 	{
 	public:
-	    SpriteManager(ResourceManager&);
-		~SpriteManager();
+	    explicit SpriteManager(ResourceManager&);
+		~SpriteManager() override = default;
 
 		bool Add(const std::string& strAssetName, const std::string& strAssetPath) noexcept override;
 		void* Get(const std::string& strAssetName) override;

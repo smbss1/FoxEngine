@@ -60,14 +60,14 @@ namespace fox
 
         World& get_world()
         {
-            return m_oWorld;
+            return *m_pWorld;
         }
 
     private:
         bool m_bIsRunning;
 
     protected:
-        World m_oWorld;
+        std::unique_ptr<World> m_pWorld;
         fox::AnyContainer m_vAny;
         scope<json::Value> m_oConfigFile;
     };

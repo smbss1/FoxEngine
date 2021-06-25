@@ -2,29 +2,30 @@
 
 #include <Core/Input/InputManager.hpp>
 #include <Core/Logger/Logger.hpp>
-#include "EditorApp.hpp"
-#include "ScriptableBehaviour.hpp"
-#include "NativeScript.hpp"
+#include <Core/State.hpp>
+#include <Core/Managers/StateMachine.hpp>
+#include "SandboxApp.hpp"
 #include "Animator.hpp"
 #include "ImGui/imgui.h"
-#include "ImGui/imgui-SFML.h"
 
-class EditorLayer : public fox::Scene
+class EditorLayer : public fox::State
 {
 public:
-    EditorLayer() { }
-    EditorLayer(const std::string& name) : fox::Scene(name) { }
-    ~EditorLayer() { }
+    EditorLayer() : fox::State("Editor") { }
+    ~EditorLayer() override = default;
 
-    virtual void on_create(fox::Application& app) override { }
+    void OnEnter() override
+    {}
 
-    virtual void on_enable(fox::Application& app) override
+    void OnExit() override
+    {}
+
+    void OnUpdate() override
+    {}
+
+    void OnImGui() override
     {
-    }
-
-    void on_destroy(fox::Application& app) override { }
-    void on_update(fox::Application& app) override
-    {
+        ImGui::ShowDemoWindow();
     }
 };
 
@@ -36,9 +37,8 @@ SandboxApp::~SandboxApp() { }
 
 void SandboxApp::init()
 {
-    fox::SceneManager& sceneManager = get<fox::SceneManager>().value();
-    sceneManager.add<EditorLayer>("Example");
-    sceneManager.switch_to("Example");
+    fox::StateMachine& sceneManager = get<fox::StateMachine>().value();
+    sceneManager.PushState(new EditorLayer);
 }
 
 fox::Application* CreateApp(int argc, char** argv)

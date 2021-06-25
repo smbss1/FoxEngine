@@ -9,9 +9,9 @@
 #include <Core/Managers/PluginManager.hpp>
 #include <Components/EntityName.hpp>
 #include <ImGui/imgui-SFML.h>
-#include <Time.hpp>
-#include <ImGui/imgui.h>
+#include <Core/Managers/StateMachine.hpp>
 #include "Core/Input/InputManager.hpp"
+#include "Core/Managers/ResourceManager.hpp"
 #include "TextureManager.hpp"
 #include "SpriteManager.hpp"
 #include "Components.hpp"
@@ -211,14 +211,11 @@ namespace fox
     {
         ImGui::SFML::Update(m_oWindow, deltaClock.restart());
 
-        ImGui::ShowDemoWindow();
-
-        ImGui::Begin("Hello, world!");
-        ImGui::Button("Look at this pretty button");
-        ImGui::End();
-
         m_oWindow.clear();
         m_oApp->get_world().run_phase(ecs::OnStore);
+
+        m_oApp->get<fox::StateMachine>()->UpdateImGui();
+
         ImGui::SFML::Render(m_oWindow);
         m_oWindow.display();
     }
@@ -242,42 +239,6 @@ namespace fox
     {
         return 1;
     }
-
-
-    // bool LibSFML::mousePressed(arcade::event::MouseEvent &mouse)
-    // {
-    //     bool ret = false;
-    //     // if (!m_bWasMouseLeft && m_bMouseLeft)
-    //     // {
-    //     //     mouse.action = MouseEvent::PRESSED;
-    //     //     mouse.button = MouseEvent::MOUSE_PRIMARY;
-    //     //     ret = true;
-    //     // }
-    //     // if (!m_bWasMouseRight && m_bMouseRight)
-    //     // {
-    //     //     mouse.action = MouseEvent::PRESSED;
-    //     //     mouse.button = MouseEvent::MOUSE_SECONDARY;
-    //     //     ret = true;
-    //     // }
-    //     // if (!m_bWasMouseMiddle && m_bMouseMiddle)
-    //     // {
-    //     //     mouse.action = MouseEvent::PRESSED;
-    //     //     mouse.button = MouseEvent::MOUSE_AUXILIARY;
-    //     //     ret = true;
-    //     // }
-    //     // m_bWasMouseLeft = m_bMouseLeft;
-    //     // m_bWasMouseRight = m_bMouseRight;
-    //     // m_bWasMouseMiddle = m_bMouseMiddle;
-    //     return ret;
-    // }
-
-    // sf::Color getColor(arcade::Color color)
-    // {
-    //     return sf::Color(color.r,
-    //                         color.g,
-    //                         color.b,
-    //                         color.a);
-    // }
 }
 
 extern "C" void RegisterPlugin(fox::PluginManager &pm)

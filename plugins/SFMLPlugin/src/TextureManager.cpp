@@ -7,10 +7,6 @@ namespace fox
 	{
 	}
 
-	TextureManager::~TextureManager()
-	{
-	}
-
 	bool TextureManager::Add(const std::string& strAssetName, const std::string& strAssetPath) noexcept
 	{
 		if (!Exists(strAssetName))

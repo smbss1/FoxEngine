@@ -4,6 +4,8 @@
 #include <chrono>
 #include <Time.hpp>
 #include <Utils/FileSystem.hpp>
+#include <Core/Managers/StateMachine.hpp>
+#include <Core/Managers/ResourceManager.hpp>
 #include "Plugin/IGraphic.hpp"
 #include "Core/Input/InputManager.hpp"
 #include "Core/Application.hpp"
@@ -15,9 +17,10 @@ namespace fox
     Application::Application(int ac, char** av)
     {
         m_bIsRunning = true;
-        set<SceneManager>(*this);
+        set<StateMachine>(*this);
         set<ResourceManager>();
         set<InputManager>();
+        m_pWorld = new_scope<World>();
 
         get_world().add_phase(game::OnStart);
         get_world().add_phase(ecs::OnSceneEnable);
@@ -94,15 +97,17 @@ namespace fox
             fFixedDeltaTime += fDeltaTime;
             while (fFixedDeltaTime >= fFixedTimeStep)
             {
-                get<SceneManager>()->fix_update();
+                // get<SceneManager>()->fix_update();
                 Time::fixed_delta_time = fFixedDeltaTime;
                 fFixedDeltaTime -= fFixedTimeStep;
             }
             Time::factor_physics = fFixedDeltaTime / fFixedTimeStep;
 
-            get<SceneManager>()->update();
+            get<StateMachine>()->Update();
+
             graphic_ctx.draw();
         }
+        m_pWorld.reset();
         remove<ResourceManager>();
     }
 }

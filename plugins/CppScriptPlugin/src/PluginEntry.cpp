@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <Core/Managers/PluginManager.hpp>
+#include <Core/Managers/SceneManager.hpp>
 #include "PluginEntry.hpp"
 
 namespace fox

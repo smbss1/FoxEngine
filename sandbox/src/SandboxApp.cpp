@@ -2,6 +2,8 @@
 
 #include <Core/Input/InputManager.hpp>
 #include <Core/Logger/Logger.hpp>
+#include <Core/State.hpp>
+#include <Core/Managers/StateMachine.hpp>
 #include "SandboxApp.hpp"
 #include "ScriptableBehaviour.hpp"
 #include "NativeScript.hpp"
@@ -63,24 +65,22 @@ protected:
     int i = 0;
 };
 
-class ExampleScene : public fox::Scene
+class ExampleScene : public fox::State
 {
 public:
-    ExampleScene() { }
-    ExampleScene(const std::string& name) : fox::Scene(name) { }
-    ~ExampleScene() { }
+    ExampleScene() : fox::State("ExampleScene") { }
+    ~ExampleScene() = default;
 
-    virtual void on_create(fox::Application& app) override { }
-
-    virtual void on_enable(fox::Application& app) override
+    void OnEnter() override
     {
-        get_world().new_entity().add<NativeScript>(Test());
+        GetWorld().new_entity().add<NativeScript>(Test());
     }
 
-    void on_destroy(fox::Application& app) override { }
-    void on_update(fox::Application& app) override
-    {
-    }
+    void OnExit() override
+    {}
+
+    void OnUpdate() override
+    {}
 };
 
 EditorApp::EditorApp(int argc, char** argv) : fox::Application(argc, argv)
@@ -91,9 +91,8 @@ EditorApp::~EditorApp() { }
 
 void EditorApp::init()
 {
-    fox::SceneManager& sceneManager = get<fox::SceneManager>().value();
-    sceneManager.add<ExampleScene>("Example");
-    sceneManager.switch_to("Example");
+    fox::StateMachine& sceneManager = get<fox::StateMachine>().value();
+    sceneManager.PushState(new ExampleScene);
 }
 
 fox::Application* CreateApp(int argc, char** argv)

@@ -19,6 +19,7 @@
 #include "api.hpp"
 #include "Plugin/IPlugin.hpp"
 #include "Core/Input/KeyCodes.hpp"
+#include "Core/Managers/ResourceManager.hpp"
 
 namespace fox
 {

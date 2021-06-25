@@ -8,10 +8,6 @@ namespace fox
     {
     }
 
-    SpriteManager::~SpriteManager()
-    {
-    }
-
     bool SpriteManager::Add(const std::string& strAssetName, const std::string& strAssetPath) noexcept
     {
         if (!Exists(strAssetName))

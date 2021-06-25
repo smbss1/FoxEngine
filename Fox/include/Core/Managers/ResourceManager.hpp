@@ -13,7 +13,7 @@ namespace fox
 	class IAssetManager
 	{
 	public:
-		virtual ~IAssetManager() = 0;
+		virtual ~IAssetManager() { };
 		virtual bool Add(const std::string& strAssetName, const std::string& strAssetPath) noexcept = 0;
 		virtual void* Get(const std::string& strAssetName) = 0;
 		virtual bool Remove(const std::string& strAssetName) noexcept = 0;
@@ -23,10 +23,10 @@ namespace fox
 	class AAssetManager : public IAssetManager
 	{
 	public:
-		AAssetManager(ResourceManager& oResourceManager) : m_oResourceManager(oResourceManager)
+		explicit AAssetManager(ResourceManager& oResourceManager) : m_oResourceManager(oResourceManager)
 		{
 		}
-		virtual ~AAssetManager() = 0;
+		~AAssetManager() override {};
 		virtual bool Add(const std::string& strAssetName, const std::string& strAssetPath) noexcept = 0;
 		virtual void* Get(const std::string& strAssetName) = 0;
 		virtual bool Remove(const std::string& strAssetName) noexcept = 0;

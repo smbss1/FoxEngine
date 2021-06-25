@@ -12,8 +12,8 @@ namespace fox
 	class TextureManager : public AAssetManager<sf::Texture>
 	{
 	public:
-		TextureManager(ResourceManager&);
-		~TextureManager();
+		explicit TextureManager(ResourceManager&);
+		~TextureManager() override = default;
 	
 		bool Add(const std::string& strAssetName, const std::string& strAssetPath) noexcept override;
 		void* Get(const std::string& strAssetName) override;
