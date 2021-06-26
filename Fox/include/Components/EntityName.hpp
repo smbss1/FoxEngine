@@ -30,6 +30,11 @@ namespace fox
             return m_strName;
         }
 
+        void set(const std::string& name)
+        {
+            m_strName = name;
+        }
+
     private:
         std::string m_strName;
     };
@@ -50,6 +55,11 @@ namespace fox
         std::string get() const
         {
             return m_strName;
+        }
+
+        void set(const std::string& name)
+        {
+            m_strName = name;
         }
 
     private:

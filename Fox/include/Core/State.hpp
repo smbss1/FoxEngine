@@ -46,6 +46,11 @@ namespace fox
             m_pApp = &app;
         }
 
+        fox::Application& GetApp() const
+        {
+            return *m_pApp;
+        }
+
     protected:
         std::string m_strDebugName;
         fox::Application* m_pApp = nullptr;

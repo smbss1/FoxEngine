@@ -50,6 +50,7 @@ namespace fox
             e.add<fox::EntityName>(name);
         else
             e.add<fox::EntityName>("GameObject");
+        e.add<fox::EntityTag>("Undefined");
         return e;
     }
 
@@ -145,5 +146,15 @@ namespace fox
             m_pCompManager->EntityDestroyed(e);
             m_pEntityManager->DestroyEntity(e);
         }
+    }
+
+    void World::each(const std::function<void(EntityId)>& fn)
+    {
+        m_pEntityManager->ForEach([&fn](EntityId e){ fn(e); return false; });
+    }
+
+    void World::each(const std::function<bool(EntityId)>& fn)
+    {
+        m_pEntityManager->ForEach(fn);
     }
 }

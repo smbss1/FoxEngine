@@ -9,6 +9,11 @@ class World;
 
 namespace fox
 {
+    class Texture2D;
+    class Framebuffer;
+    class Camera;
+    class EditorCamera;
+
     class IPlugin
     {
     public:
@@ -25,6 +30,11 @@ namespace fox
     public:
         virtual void poll_event() = 0;
         virtual void draw() = 0;
+        virtual ref<Texture2D> create_texture(uint32_t width, uint32_t height) = 0;
+        virtual ref<Texture2D> create_texture(const std::string& path) = 0;
+        virtual ref<Framebuffer> create_frame_buffer(uint32_t width, uint32_t height) = 0;
+        virtual ref<Camera> create_camera() = 0;
+        virtual ref<EditorCamera> create_editor_camera() = 0;
     };
 }
 

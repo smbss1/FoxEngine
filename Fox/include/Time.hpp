@@ -17,4 +17,12 @@ public:
     static float factor_physics;
 };
 
+struct TimeInfo
+{
+    float time;
+    float delta_time;
+    float fixed_delta_time;
+    float factor_physics;
+};
+
 #endif

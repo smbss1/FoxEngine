@@ -77,6 +77,11 @@ namespace fox
             return m_oMouse.GetScroll();
         }
 
+        float GetMouseScrollDelta() const
+        {
+            return m_oMouse.GetScrollDelta();
+        }
+
         void Reset()
         {
             m_oKeyboard.Clear();

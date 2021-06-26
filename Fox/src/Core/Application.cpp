@@ -20,6 +20,7 @@ namespace fox
         set<StateMachine>(*this);
         set<ResourceManager>();
         set<InputManager>();
+        set<TimeInfo>();
         m_pWorld = new_scope<World>();
 
         get_world().add_phase(game::OnStart);
@@ -93,15 +94,19 @@ namespace fox
             if (Time::delta_time > 0.25)
                 Time::delta_time = 0.25;
             Time::time += fDeltaTime;
+            get<TimeInfo>()->delta_time = Time::delta_time;
+            get<TimeInfo>()->time = Time::time;
 
             fFixedDeltaTime += fDeltaTime;
             while (fFixedDeltaTime >= fFixedTimeStep)
             {
                 // get<SceneManager>()->fix_update();
                 Time::fixed_delta_time = fFixedDeltaTime;
+                get<TimeInfo>()->time = Time::fixed_delta_time;
                 fFixedDeltaTime -= fFixedTimeStep;
             }
             Time::factor_physics = fFixedDeltaTime / fFixedTimeStep;
+            get<TimeInfo>()->factor_physics = Time::factor_physics;
 
             get<StateMachine>()->Update();
 

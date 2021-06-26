@@ -266,6 +266,9 @@ namespace fox
          */
         void deleted_entities();
 
+        void each(const std::function<void(EntityId)>& fn);
+        void each(const std::function<bool(EntityId)>& fn);
+
         /**
          * @brief Add a component to the entity
          *

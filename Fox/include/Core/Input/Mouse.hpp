@@ -34,6 +34,7 @@ namespace fox
     {
         float x;
         float y;
+        float delta;
     };
 
     struct MouseEvent
@@ -57,6 +58,7 @@ namespace fox
         const Vec2 &GetMovement() const;
 
         const Vec2 &GetScroll() const;
+        float GetScrollDelta() const;
 
         void HandleEvent(const MouseEvent &event);
 
@@ -70,6 +72,7 @@ namespace fox
         Vec2 m_oPos {0.0f, 0.0f};
         Vec2 m_oMovement {0.0f, 0.0f};
         Vec2 m_oScroll {0.0f, 0.0f};
+        float m_oScrollDelta = 0.0f;
     };
 }
 

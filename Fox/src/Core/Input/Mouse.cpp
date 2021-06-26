@@ -28,6 +28,11 @@ namespace fox
         return m_oScroll;
     }
 
+    float Mouse::GetScrollDelta() const
+    {
+        return m_oScrollDelta;
+    }
+
     void Mouse::HandleEvent(const MouseEvent &event)
     {
         switch (event.type) {
@@ -58,5 +63,6 @@ namespace fox
     void Mouse::HandleEvent(const MouseScrollEvent &event)
     {
         m_oScroll = {event.x, event.y};
+        m_oScrollDelta = event.delta;
     }
 }
