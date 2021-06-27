@@ -8,6 +8,7 @@
 #include <Core/Managers/ResourceManager.hpp>
 #include <Renderer/RendererAPI.hpp>
 #include <Renderer/RendererCommand.hpp>
+#include <Core/Input/Input.hpp>
 #include "Core/Input/InputManager.hpp"
 #include "Core/Application.hpp"
 #include "Core/Logger/Logger.hpp"
@@ -100,22 +101,16 @@ namespace fox
 
         m_pWindow = plugin_manager.GetWindowPlugin()->CreateWindow(WindowProps());
         m_pWindow->SetEventCallback(FOX_BIND_EVENT_FN(Application::OnEvent));
+        Input::SetWindow(m_pWindow.get());
 
         plugin_manager.InitializePlugins(*this);
 
         RendererCommand::SetRendererAPI(graphic_ctx.CreateRenderer());
 
-//        auto texture = graphic_ctx.create_texture("_fail_.png");
-//        texture->Bind();
-//
-//        shader->SetUniform("u_Texture", 0);
-
         init();
         fox::info("Application is running");
         while (m_bIsRunning)
         {
-//            graphic_ctx.poll_event();
-
             auto now = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> elapsed = now - lastUpdate;
             lastUpdate = now;
@@ -148,6 +143,11 @@ namespace fox
         }
         m_pWorld.reset();
         remove<ResourceManager>();
+    }
+
+    Window* Application::GetWindow() const
+    {
+        return m_pWindow.get();
     }
 
     bool Application::OnWindowClose(WindowCloseEvent& e)

@@ -196,6 +196,21 @@ void GlfwWindow::SetNativeWindow(void *data)
     m_pWindow = static_cast<GLFWwindow*>(data);
 }
 
-void GlfwWindow::SetKeyCallback(const fox::Window::KeyCallbackFn &callback)
+bool GlfwWindow::IsKeyPressed(const fox::Key key)
 {
+    auto state = glfwGetKey(m_pWindow, static_cast<int32_t>(key));
+    return state == GLFW_PRESS || state == GLFW_REPEAT;
+}
+
+bool GlfwWindow::IsMouseButtonPressed(const fox::MouseButton button)
+{
+    auto state = glfwGetMouseButton(m_pWindow, static_cast<int32_t>(button));
+    return state == GLFW_PRESS;
+}
+
+glm::vec2 GlfwWindow::GetMousePosition()
+{
+    double xpos, ypos;
+    glfwGetCursorPos(m_pWindow, &xpos, &ypos);
+    return { (float)xpos, (float)ypos };
 }

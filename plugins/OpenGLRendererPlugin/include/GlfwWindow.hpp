@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <Core/Window.hpp>
 #include <Renderer/GraphicsContext.hpp>
+#include <Core/Application.hpp>
 #include "GLFW/glfw3.h"
 
 static std::unordered_map<int, fox::Key> GLFW_TO_KEYBOARD_KEYS = {
@@ -146,13 +147,16 @@ public:
 
     // Window attributes
     void SetEventCallback(const EventCallbackFn& callback) override;
-    void SetKeyCallback(const KeyCallbackFn& callback) override;
 
     void SetVSync(bool enabled) override;
     [[nodiscard]] bool IsVSync() const override;
 
     [[nodiscard]] void* GetNativeWindow() const override;
     void SetNativeWindow(void* data) override;
+
+    bool IsKeyPressed(const fox::Key key) override;
+    bool IsMouseButtonPressed(const fox::MouseButton button) override;
+    glm::vec2 GetMousePosition() override;
 
 private:
 

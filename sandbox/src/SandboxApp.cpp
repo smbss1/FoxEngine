@@ -20,6 +20,7 @@
 #include "Events/KeyEvent.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <Core/Input/Input.hpp>
 
 class Test : public ScriptableBehaviour
 {
@@ -85,9 +86,6 @@ class ExampleScene : public fox::State
     float m_fCameraMoveSpeed = 10.0f;
     float m_fCameraRotSpeed = 500.0f;
 
-    glm::vec3 m_TrianglePos;
-    float m_fTriangleMoveSpeed = 10.0f;
-
     fox::ref<fox::VertexArray> va;
     fox::ref<fox::Shader> shader;
 
@@ -129,7 +127,7 @@ public:
         auto ib = fox::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
         va->SetIndexBuffer(ib);
 
-        shader = fox::Shader::Create("plugins/SFMLPlugin/assets/shaders/Basic.shader");
+        shader = fox::Shader::Create("plugins/OpenGLRendererPlugin/assets/shaders/Basic.shader");
         shader->Bind();
     }
 
@@ -138,15 +136,6 @@ public:
 
     bool OnKeyPressed(fox::KeyPressedEvent& event)
     {
-        if (event.GetKeyCode() == fox::Key::A)
-        {
-            fox::info("A Pressed");
-        }
-
-        if (event.GetKeyCode() == fox::Key::V)
-        {
-            fox::info("V Pressed");
-        }
         return false;
     }
 
@@ -158,29 +147,19 @@ public:
 
     void OnUpdate() override
     {
-        auto& inputManager = GetApp().get<fox::InputManager>().value();
-        if (inputManager.GetKeyDown(fox::Key::Left))
+        if (fox::Input::IsKeyPressed(fox::Key::Left))
             m_CameraPos.x += m_fCameraMoveSpeed * Time::delta_time;
-        else if (inputManager.GetKeyDown(fox::Key::Right))
+        else if (fox::Input::IsKeyPressed(fox::Key::Right))
             m_CameraPos.x -= m_fCameraMoveSpeed * Time::delta_time;
-        if (inputManager.GetKeyDown(fox::Key::Up))
+        if (fox::Input::IsKeyPressed(fox::Key::Up))
             m_CameraPos.y -= m_fCameraMoveSpeed * Time::delta_time;
-        else if (inputManager.GetKeyDown(fox::Key::Down))
+        else if (fox::Input::IsKeyPressed(fox::Key::Down))
             m_CameraPos.y += m_fCameraMoveSpeed * Time::delta_time;
 
-        if (inputManager.GetKey(fox::Key::A))
+        if (fox::Input::IsKeyPressed(fox::Key::A))
             m_CameraRot -= m_fCameraRotSpeed * Time::delta_time;
-        else if (inputManager.GetKey(fox::Key::E))
+        else if (fox::Input::IsKeyPressed(fox::Key::E))
             m_CameraRot += m_fCameraRotSpeed * Time::delta_time;
-
-        if (inputManager.GetKeyDown(fox::Key::J))
-            m_TrianglePos.x -= m_fCameraMoveSpeed * Time::delta_time;
-        else if (inputManager.GetKeyDown(fox::Key::L))
-            m_TrianglePos.x += m_fCameraMoveSpeed * Time::delta_time;
-        if (inputManager.GetKeyDown(fox::Key::I))
-            m_TrianglePos.y += m_fCameraMoveSpeed * Time::delta_time;
-        else if (inputManager.GetKeyDown(fox::Key::K))
-            m_TrianglePos.y -= m_fCameraMoveSpeed * Time::delta_time;
 
         m_Camera.SetPosition(m_CameraPos);
         m_Camera.SetRotation(m_CameraRot);
@@ -190,8 +169,7 @@ public:
 
         fox::Renderer::BeginScene(m_Camera);
 
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_TrianglePos);
-        fox::Renderer::Submit(shader, va, transform);
+        fox::Renderer::Submit(shader, va);
         fox::Renderer::EndScene();
     }
 };
@@ -205,7 +183,7 @@ SandboxApp::~SandboxApp() { }
 void SandboxApp::init()
 {
     fox::StateMachine& sceneManager = get<fox::StateMachine>().value();
-//    sceneManager.PushState(new ExampleScene);
+    sceneManager.PushState(new ExampleScene);
 }
 
 fox::Application* CreateApp(int argc, char** argv)

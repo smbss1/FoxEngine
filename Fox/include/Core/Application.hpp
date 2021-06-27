@@ -67,6 +67,8 @@ namespace fox
             return *m_pWorld;
         }
 
+        Window* GetWindow() const;
+
     private:
         bool OnWindowClose(WindowCloseEvent& e);
         bool OnWindowResize(WindowResizeEvent& e);

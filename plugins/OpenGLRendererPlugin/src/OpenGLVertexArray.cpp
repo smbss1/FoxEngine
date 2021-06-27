@@ -53,7 +53,7 @@ namespace fox
 
     void OpenGLVertexArray::AddVertexBuffer(const ref<VertexBuffer> &vertexBuffer)
     {
-        FOX_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().empty(), "Vertex Buffer has no layout!");
+        FOX_CORE_ASSERT(!vertexBuffer->GetLayout().GetElements().empty(), "Vertex Buffer has no layout!");
         GLCall(glBindVertexArray(m_RendererID));
         vertexBuffer->Bind();
 

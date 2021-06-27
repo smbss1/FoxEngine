@@ -8,8 +8,10 @@
 #include <string>
 #include <functional>
 #include <Core/Input/KeyCodes.hpp>
-#include "Events/Event.hpp"
+#include <Core/Input/MouseCodes.hpp>
 #include "common.hpp"
+#include "Events/Event.hpp"
+#include "glm/glm.hpp"
 
 namespace fox
 {
@@ -32,7 +34,6 @@ namespace fox
     {
     public:
         using EventCallbackFn = std::function<void(Event&)>;
-        using KeyCallbackFn = std::function<bool(Key)>;
 
         virtual ~Window() = default;
 
@@ -53,14 +54,18 @@ namespace fox
          * @brief Set the callback for key event without pooling
          * @param callback the callback
          */
-        virtual void SetKeyCallback(const KeyCallbackFn& callback) = 0;
+        virtual bool IsKeyPressed(const Key key) = 0;
+        virtual bool IsMouseButtonPressed(const MouseButton button) = 0;
+        virtual glm::vec2 GetMousePosition() = 0;
+
+
         virtual void SetVSync(bool enabled) = 0;
         virtual bool IsVSync() const = 0;
 
         virtual void* GetNativeWindow() const = 0;
         virtual void SetNativeWindow(void* data) = 0;
 
-        static scope<Window> Create(const WindowProps& props = WindowProps());
+        static scope<Window> Create(const WindowProps& props);
     };
 }
 

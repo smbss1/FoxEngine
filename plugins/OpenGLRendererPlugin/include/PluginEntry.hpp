@@ -9,9 +9,6 @@
 #define LIBSFML_H_
 
 #include <unordered_map>
-#include <SFML/Window/Event.hpp>
-#include <SFML/Window/Keyboard.hpp>
-#include <SFML/Graphics.hpp>
 
 #include <Core/Application.hpp>
 #include <Plugin/IGraphic.hpp>
@@ -29,19 +26,16 @@
 
 namespace fox
 {
-    class SFMLPlugin : public GraphicPlugin
+    class OpenGLRendererPlugin : public GraphicPlugin
     {
     public:
-        static std::unordered_map<sf::Keyboard::Key, fox::Key> SFMLKeyEventMap;
-
-        SFMLPlugin() = default;
-        ~SFMLPlugin();
+        OpenGLRendererPlugin() = default;
+        ~OpenGLRendererPlugin();
 
         void plug(Application& app) override;
         void unplug(Application& app) override;
         const std::string &get_name() const override;
         int get_version() const override;
-        void poll_event() override;
         void update() override;
 
         scope<GraphicsContext> CreateGraphicsContext(void* window) override;
@@ -59,38 +53,23 @@ namespace fox
         void set_vsync(bool value);
         bool is_vsync();
 
-        void SetRenderTexture(sf::RenderTexture& texture);
-        void SetEditorCamera(sf::View& view);
-
-        sf::RenderTexture& GetRenderTexture();
-        sf::View& GetEditorCamera();
 
         Application& GetApp() const { return *m_oApp; }
         // sf::RenderWindow& GetWindow() { return m_oWindow; }
 
     private:
-        sf::RenderWindow m_oWindow;
-        sf::Event m_oEvent;
-
         // sf::Font m_font;
 
         bool m_bIsVSync;
         Application* m_oApp = nullptr;
-        sf::Clock deltaClock;
-        sf::RenderTexture* m_RenderTexture = nullptr;
-        sf::View* m_EditorCamera = nullptr;
-
-        ref<IndexBuffer> ib;
-        ref<VertexBuffer> vb;
-        scope<VertexArray> va;
-        scope<OpenGLShader> shader;
-        scope<Texture2D> texture;
-        glm::mat4 proj;
-        glm::mat4 view;
-        glm::vec3 translationA;
-        glm::vec3 translationB;
     };
 
+    /**
+     * @brief Window Plugin for OpenGL
+     * @note I would like to set it in a separate dll library but
+     * I can't because using gladLoad && glfwMakeContextCurrent
+     * we create two OpenGL Context so can't to separate this two plugins
+     */
     class GLFWPlugin : public WindowPlugin
     {
     public:
@@ -99,7 +78,7 @@ namespace fox
 
         void plug(Application& app) override;
         void unplug(Application &app) override;
-        ref<Window> CreateWindow(const WindowProps& props = WindowProps()) override;
+        ref<Window> CreateWindow(const WindowProps& props) override;
 
         const std::string &get_name() const override;
         [[nodiscard]] int get_version() const override;
@@ -109,30 +88,10 @@ namespace fox
     };
 
 
-
-    class SFMLTexture2D : public Texture2D
-    {
-    public:
-        SFMLTexture2D(uint32_t width, uint32_t height);
-        explicit SFMLTexture2D(const std::string& path);
-
-        [[nodiscard]] uint32_t GetWidth() const override { return m_Texture->getSize().x; };
-        [[nodiscard]] uint32_t GetHeight() const override { return m_Texture->getSize().y; };
-        [[nodiscard]] uint32_t GetRendererID() const override { return m_Texture->getNativeHandle(); };
-
-        void SetData(void* data, uint32_t size) override { }
-
-        void Bind(uint32_t slot = 0) const override { }
-
-        bool operator==(const Texture& other) const override { return false; }
-    private:
-        scope<sf::Texture> m_Texture;
-    };
-
     class SFMLFrameBuffer : public Framebuffer
     {
     public:
-        SFMLFrameBuffer(SFMLPlugin& plugin, uint32_t width, uint32_t height);
+        SFMLFrameBuffer(OpenGLRendererPlugin& plugin, uint32_t width, uint32_t height);
 
         void Bind() override;
         void Unbind() override;
@@ -145,13 +104,12 @@ namespace fox
 //
 //        virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const override;
     private:
-        scope<sf::RenderTexture> m_Texture;
     };
 
     class SFMLEditorCamera : public EditorCamera
     {
     public:
-        explicit SFMLEditorCamera(SFMLPlugin& plugin);
+        explicit SFMLEditorCamera(OpenGLRendererPlugin& plugin);
         // SFMLEditorCamera(float fov, float aspectRatio, float nearClip, float farClip);
 
         void OnZoom(float factor) override;
@@ -159,8 +117,7 @@ namespace fox
         void OnMove(const Vec2& offset) override;
     private:
 
-        SFMLPlugin& m_oPlugin;
-        sf::View m_View;
+        OpenGLRendererPlugin& m_oPlugin;
     };
 }
 
