@@ -6,7 +6,7 @@
 #include <Core/Managers/StateMachine.hpp>
 #include <Core/Managers/PluginManager.hpp>
 #include <Renderer/EditorCamera.hpp>
-#include "SandboxApp.hpp"
+#include "EditorApp.hpp"
 #include "Animator.hpp"
 #include "ImGui/imgui.h"
 #include "Renderer/Framebuffer.hpp"
@@ -134,13 +134,13 @@ namespace fox
     };
 }
 
-SandboxApp::SandboxApp(int argc, char** argv) : fox::Application(argc, argv)
+EditorApp::EditorApp(int argc, char** argv) : fox::Application(argc, argv)
 {
 }
 
-SandboxApp::~SandboxApp() { }
+EditorApp::~EditorApp() { }
 
-void SandboxApp::init()
+void EditorApp::init()
 {
     fox::StateMachine& sceneManager = get<fox::StateMachine>().value();
     sceneManager.PushState(new fox::EditorLayer());
@@ -148,5 +148,5 @@ void SandboxApp::init()
 
 fox::Application* CreateApp(int argc, char** argv)
 {
-    return new SandboxApp(argc, argv);
+    return new EditorApp(argc, argv);
 }

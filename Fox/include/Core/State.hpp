@@ -23,6 +23,9 @@ namespace fox
         virtual void OnExit()
         {}
 
+        virtual void OnEvent(Event& event)
+        {}
+
         virtual void OnUpdate()
         {}
 

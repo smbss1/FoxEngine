@@ -23,6 +23,9 @@ namespace fox
     class RendererAPI;
     class Shader;
 
+    class Window;
+    class WindowProps;
+
     class IPlugin
     {
     public:
@@ -32,6 +35,12 @@ namespace fox
         virtual const std::string &get_name() const = 0;
 
         virtual int get_version() const = 0;
+    };
+
+    class WindowPlugin : public IPlugin
+    {
+    public:
+        virtual ref<Window> CreateWindow(const WindowProps& props) = 0;
     };
 
     class GraphicPlugin : public IPlugin

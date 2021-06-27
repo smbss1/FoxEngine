@@ -5,20 +5,22 @@
 #ifndef FOXENGINE_CAMERA_HPP
 #define FOXENGINE_CAMERA_HPP
 
+#include "glm/glm.hpp"
+
 namespace fox
 {
     class Camera
     {
     public:
         Camera() = default;
-//        Camera(const glm::mat4& projection)
-//                : m_Projection(projection) {}
+        explicit Camera(const glm::mat4& projection)
+                : m_Projection(projection) {}
 
         virtual ~Camera() = default;
 
-//        const glm::mat4& GetProjection() const { return m_Projection; }
+        [[nodiscard]] const glm::mat4& GetProjection() const { return m_Projection; }
     protected:
-//        glm::mat4 m_Projection = glm::mat4(1.0f);
+        glm::mat4 m_Projection = glm::mat4(1.0f);
     };
 }
 

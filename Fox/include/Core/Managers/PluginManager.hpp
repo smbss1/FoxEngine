@@ -60,6 +60,16 @@ namespace fox
             return m_oGraphicService;
         }
 
+        ref<fox::WindowPlugin> GetWindowPlugin()
+        {
+            return m_pWindowPlugin;
+        }
+
+        void SetWindowPlugin(const ref<fox::WindowPlugin>& pPlugin)
+        {
+            m_pWindowPlugin = pPlugin;
+        }
+
         void InitializePlugins(fox::Application& app)
         {
             fox::info("Initialize plugins");
@@ -77,6 +87,8 @@ namespace fox
 
         /// Manages graphics-related tasks for the engine
         GraphicsService m_oGraphicService;
+
+        ref<fox::WindowPlugin> m_pWindowPlugin;
     };
 }
 

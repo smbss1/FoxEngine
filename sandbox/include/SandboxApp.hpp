@@ -10,11 +10,11 @@
 
 #include "FoxEngine.hpp"
 
-class EditorApp : public fox::Application
+class SandboxApp : public fox::Application
 {
     public:
-        EditorApp(int argc, char** argv);
-        ~EditorApp();
+        SandboxApp(int argc, char** argv);
+        ~SandboxApp();
         void init() override;
 
     protected:

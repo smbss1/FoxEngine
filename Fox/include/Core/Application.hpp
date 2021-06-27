@@ -2,10 +2,13 @@
 #ifndef FOX_APP_HPP_
 #define FOX_APP_HPP_
 
+#include <Renderer/OrthographicCamera.hpp>
+#include <Events/ApplicationEvent.hpp>
 #include "FoxEcs.hpp"
 #include "Core/Managers/SceneManager.hpp"
 #include "Core/Managers/ResourceManager.hpp"
 #include "Core.hpp"
+#include "Window.hpp"
 
 namespace fox
 {
@@ -22,6 +25,7 @@ namespace fox
         virtual void init();
         void run();
         void quit();
+        void OnEvent(Event& e);
 
         void LoadConfig();
 
@@ -64,12 +68,18 @@ namespace fox
         }
 
     private:
+        bool OnWindowClose(WindowCloseEvent& e);
+        bool OnWindowResize(WindowResizeEvent& e);
+
         bool m_bIsRunning;
+        bool m_bIsMinimized = false;
 
     protected:
         std::unique_ptr<World> m_pWorld;
         fox::AnyContainer m_vAny;
         scope<json::Value> m_oConfigFile;
+
+        ref<Window> m_pWindow;
     };
 }
 

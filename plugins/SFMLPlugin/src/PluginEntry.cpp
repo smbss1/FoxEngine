@@ -33,7 +33,7 @@ namespace fox
 {
     SFMLPlugin::~SFMLPlugin()
     {
-        m_oWindow.close();
+//        m_oWindow.close();
     }
 
     void SFMLPlugin::plug(Application &app)
@@ -41,17 +41,17 @@ namespace fox
         m_oApp = &app;
         std::cout << "[SFMLPlugin] Init!" << std::endl;
 
-        sf::ContextSettings settings;
+//        sf::ContextSettings settings;
+//
+//        settings.majorVersion = 3;
+//        settings.minorVersion = 2;
+//        settings.attributeFlags = 1;
+//
+//        settings.depthBits = 24;
+//        settings.stencilBits = 8;
+//        settings.antialiasingLevel = 2;
 
-        settings.majorVersion = 3;
-        settings.minorVersion = 2;
-        settings.attributeFlags = 1;
-
-        settings.depthBits = 24;
-        settings.stencilBits = 8;
-        settings.antialiasingLevel = 2;
-
-        m_oWindow.create({1280, 720}, "FoxEngine", sf::Style::Default, settings);
+//        m_oWindow.create({1280, 720}, "FoxEngine", sf::Style::Default, settings);
         // activate the window
 //        m_oWindow.setActive(true);
 
@@ -59,7 +59,8 @@ namespace fox
         if (!gladLoadGL())
             exit(84);
 
-        // m_oWindow.setKeyRepeatEnabled(false);
+//        m_oWindow.setKeyRepeatEnabled(false);
+//        m_oWindow.setVerticalSyncEnabled(false);
 
         fox::info("OpenGL Info:");
         fox::info("   Vendor: %", glGetString(GL_VENDOR));
@@ -67,8 +68,8 @@ namespace fox
         fox::info("   Version: %", glGetString(GL_VERSION));
 
         // Stuff for init ImGui in SFML
-        ImGui::SFML::Init(m_oWindow);
-        ImGui_ImplOpenGL3_Init();
+//        ImGui::SFML::Init(m_oWindow);
+//        ImGui_ImplOpenGL3_Init();
 //        ImGuiIO& io = ImGui::GetIO();
 //        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 //        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -132,8 +133,8 @@ namespace fox
 //                2, 3, 0
 //        };
 
-        GLCall(glEnable(GL_BLEND));
-        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+//        GLCall(glEnable(GL_BLEND));
+//        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
 //        va = new_scope<OpenGLVertexArray>();
 //        vb = new_ref<OpenGLVertexBuffer>(positions, sizeof(positions));
@@ -172,8 +173,8 @@ namespace fox
 
     void SFMLPlugin::unplug(Application &app)
     {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui::SFML::Shutdown();
+//        ImGui_ImplOpenGL3_Shutdown();
+//        ImGui::SFML::Shutdown();
         ib.reset();
         vb.reset();
         shader.reset();
@@ -181,156 +182,172 @@ namespace fox
 
     void SFMLPlugin::poll_event()
     {
-        InputManager& oInputManager = m_oApp->get<InputManager>().value();
-        oInputManager.Reset();
-        while (m_oWindow.pollEvent(m_oEvent))
-        {
-            ImGui::SFML::ProcessEvent(m_oEvent);
-            switch (m_oEvent.type)
-            {
-            case sf::Event::Closed:
-                m_oApp->quit();
-                break;
+//        InputManager& oInputManager = m_oApp->get<InputManager>().value();
+//        oInputManager.Reset();
+//        while (m_oWindow.pollEvent(m_oEvent))
+//        {
+//            ImGui::SFML::ProcessEvent(m_oEvent);
+//            switch (m_oEvent.type)
+//            {
+//            case sf::Event::Closed:
+//                m_oApp->quit();
+//                break;
+//
+//        //     case sf::Event::Resized:
+//        //     {
+//        //         sf::FloatRect visibleArea(0, 0, m_oEvent.size.width, m_oEvent.size.height);
+//        //         m_oWindow.setView(sf::View(visibleArea));
+//        //         break;
+//        //     }
+//
+//             case sf::Event::MouseButtonPressed:
+//             {
+//                 InputEvent event{};
+//                 MouseEvent oMouseEvent {};
+//                 MouseButtonEvent oMouseBtnEvent{};
+//
+//                 // Set the type of the event is Mouse
+//                 event.type = InputEventType::MOUSE;
+//
+//                 // Set that it's a button event
+//                 oMouseEvent.type = MouseEventType::BUTTON;
+//                 // Set that it's a click
+//                 oMouseBtnEvent.state = InputState::PRESSED;
+//
+//                 // Is Left Click ?
+//                 if (m_oEvent.mouseButton.button == sf::Mouse::Button::Left)
+//                     oMouseBtnEvent.button = MouseButton::ButtonLeft;
+//                 // Is Right Click ?
+//                 else if (m_oEvent.mouseButton.button == sf::Mouse::Button::Right)
+//                     oMouseBtnEvent.button = MouseButton::ButtonRight;
+//                 // Is Wheel Click ?
+//                 else if (m_oEvent.mouseButton.button == sf::Mouse::Button::Middle)
+//                     oMouseBtnEvent.button = MouseButton::ButtonMiddle;
+//                 oMouseEvent.button = oMouseBtnEvent;
+//                 event.mouse = oMouseEvent;
+//                 oInputManager.PushEvent(event);
+//                 break;
+//             }
+//
+//             case sf::Event::MouseButtonReleased:
+//             {
+//                 InputEvent event{};
+//                 MouseEvent oMouseEvent {};
+//                 MouseButtonEvent oMouseBtnEvent{};
+//
+//                 // Set the type of the event is Mouse
+//                 event.type = InputEventType::MOUSE;
+//
+//                 // Set that it's a button event
+//                 oMouseEvent.type = MouseEventType::BUTTON;
+//                 // Set that it's a click
+//                 oMouseBtnEvent.state = InputState::RELEASED;
+//
+//                 // Is Left Click ?
+//                 if (m_oEvent.mouseButton.button == sf::Mouse::Button::Left)
+//                     oMouseBtnEvent.button = MouseButton::ButtonLeft;
+//                     // Is Right Click ?
+//                 else if (m_oEvent.mouseButton.button == sf::Mouse::Button::Right)
+//                     oMouseBtnEvent.button = MouseButton::ButtonRight;
+//                     // Is Wheel Click ?
+//                 else if (m_oEvent.mouseButton.button == sf::Mouse::Button::Middle)
+//                     oMouseBtnEvent.button = MouseButton::ButtonMiddle;
+//                 oMouseEvent.button = oMouseBtnEvent;
+//                 event.mouse = oMouseEvent;
+//                 oInputManager.PushEvent(event);
+//                 break;
+//             }
+//
+//            case sf::Event::MouseMoved:
+//            {
+//                InputEvent event{};
+//                MouseEvent oMouseEvent {};
+//                MouseMoveEvent oMouseMoveEvent{};
+//
+//                // Set the type of the event is Mouse
+//                event.type = InputEventType::MOUSE;
+//
+//                // Set that it's a move event
+//                oMouseEvent.type = MouseEventType::MOVE;
+//                // Set the position of the mouse
+//                oMouseMoveEvent.x = m_oEvent.mouseMove.x;
+//                oMouseMoveEvent.y = m_oEvent.mouseMove.y;
+//
+//                oMouseEvent.pos = oMouseMoveEvent;
+//                event.mouse = oMouseEvent;
+//                oInputManager.PushEvent(event);
+//                break;
+//            }
+//
+//            case sf::Event::MouseWheelScrolled:
+//            {
+//                InputEvent event{};
+//                MouseEvent oMouseEvent {};
+//                MouseScrollEvent oMouseScrollEvent{};
+//
+//                // Set the type of the event is Mouse
+//                event.type = InputEventType::MOUSE;
+//
+//                // Set that it's a scroll event
+//                oMouseEvent.type = MouseEventType::SCROLL;
+//                // Set the position of the mouse wheel scroll
+//                oMouseScrollEvent.x = m_oEvent.mouseWheelScroll.x;
+//                oMouseScrollEvent.y = m_oEvent.mouseWheelScroll.y;
+//                oMouseScrollEvent.delta = m_oEvent.mouseWheelScroll.delta;
+//
+//                oMouseEvent.scroll = oMouseScrollEvent;
+//                event.mouse = oMouseEvent;
+//                oInputManager.PushEvent(event);
+//                break;
+//            }
+//
+//            case sf::Event::KeyReleased:
+//            {
+//                InputEvent event{};
+//                event.type = InputEventType::KEYBOARD;
+//                event.keyboard = {SFMLKeyEventMap[m_oEvent.key.code], InputState::RELEASED};
+//                oInputManager.PushEvent(event);
+//                break;
+//            }
+//
+//            case sf::Event::KeyPressed:
+//            {
+//                InputEvent event{};
+//                event.type = InputEventType::KEYBOARD;
+//                event.keyboard = {SFMLKeyEventMap[m_oEvent.key.code], InputState::PRESSED};
+//                oInputManager.PushEvent(event);
+//                break;
+//            }
+//
+//            default:
+//                break;
+//            }
+//        }
 
-        //     case sf::Event::Resized:
-        //     {
-        //         sf::FloatRect visibleArea(0, 0, m_oEvent.size.width, m_oEvent.size.height);
-        //         m_oWindow.setView(sf::View(visibleArea));
-        //         break;
-        //     }
-
-             case sf::Event::MouseButtonPressed:
-             {
-                 InputEvent event{};
-                 MouseEvent oMouseEvent {};
-                 MouseButtonEvent oMouseBtnEvent{};
-
-                 // Set the type of the event is Mouse
-                 event.type = InputEventType::MOUSE;
-
-                 // Set that it's a button event
-                 oMouseEvent.type = MouseEventType::BUTTON;
-                 // Set that it's a click
-                 oMouseBtnEvent.state = InputState::PRESSED;
-
-                 // Is Left Click ?
-                 if (m_oEvent.mouseButton.button == sf::Mouse::Button::Left)
-                     oMouseBtnEvent.button = MouseButton::ButtonLeft;
-                 // Is Right Click ?
-                 else if (m_oEvent.mouseButton.button == sf::Mouse::Button::Right)
-                     oMouseBtnEvent.button = MouseButton::ButtonRight;
-                 // Is Wheel Click ?
-                 else if (m_oEvent.mouseButton.button == sf::Mouse::Button::Middle)
-                     oMouseBtnEvent.button = MouseButton::ButtonMiddle;
-                 oMouseEvent.button = oMouseBtnEvent;
-                 event.mouse = oMouseEvent;
-                 oInputManager.PushEvent(event);
-                 break;
-             }
-
-             case sf::Event::MouseButtonReleased:
-             {
-                 InputEvent event{};
-                 MouseEvent oMouseEvent {};
-                 MouseButtonEvent oMouseBtnEvent{};
-
-                 // Set the type of the event is Mouse
-                 event.type = InputEventType::MOUSE;
-
-                 // Set that it's a button event
-                 oMouseEvent.type = MouseEventType::BUTTON;
-                 // Set that it's a click
-                 oMouseBtnEvent.state = InputState::RELEASED;
-
-                 // Is Left Click ?
-                 if (m_oEvent.mouseButton.button == sf::Mouse::Button::Left)
-                     oMouseBtnEvent.button = MouseButton::ButtonLeft;
-                     // Is Right Click ?
-                 else if (m_oEvent.mouseButton.button == sf::Mouse::Button::Right)
-                     oMouseBtnEvent.button = MouseButton::ButtonRight;
-                     // Is Wheel Click ?
-                 else if (m_oEvent.mouseButton.button == sf::Mouse::Button::Middle)
-                     oMouseBtnEvent.button = MouseButton::ButtonMiddle;
-                 oMouseEvent.button = oMouseBtnEvent;
-                 event.mouse = oMouseEvent;
-                 oInputManager.PushEvent(event);
-                 break;
-             }
-
-            case sf::Event::MouseMoved:
-            {
-                InputEvent event{};
-                MouseEvent oMouseEvent {};
-                MouseMoveEvent oMouseMoveEvent{};
-
-                // Set the type of the event is Mouse
-                event.type = InputEventType::MOUSE;
-
-                // Set that it's a move event
-                oMouseEvent.type = MouseEventType::MOVE;
-                // Set the position of the mouse
-                oMouseMoveEvent.x = m_oEvent.mouseMove.x;
-                oMouseMoveEvent.y = m_oEvent.mouseMove.y;
-
-                oMouseEvent.pos = oMouseMoveEvent;
-                event.mouse = oMouseEvent;
-                oInputManager.PushEvent(event);
-                break;
-            }
-
-            case sf::Event::MouseWheelScrolled:
-            {
-                InputEvent event{};
-                MouseEvent oMouseEvent {};
-                MouseScrollEvent oMouseScrollEvent{};
-
-                // Set the type of the event is Mouse
-                event.type = InputEventType::MOUSE;
-
-                // Set that it's a scroll event
-                oMouseEvent.type = MouseEventType::SCROLL;
-                // Set the position of the mouse wheel scroll
-                oMouseScrollEvent.x = m_oEvent.mouseWheelScroll.x;
-                oMouseScrollEvent.y = m_oEvent.mouseWheelScroll.y;
-                oMouseScrollEvent.delta = m_oEvent.mouseWheelScroll.delta;
-
-                oMouseEvent.scroll = oMouseScrollEvent;
-                event.mouse = oMouseEvent;
-                oInputManager.PushEvent(event);
-                break;
-            }
-
-            case sf::Event::KeyReleased:
-            {
-                InputEvent event{};
-                event.type = InputEventType::KEYBOARD;
-                event.keyboard = {SFMLKeyEventMap[m_oEvent.key.code], InputState::RELEASED};
-                oInputManager.PushEvent(event);
-                break;
-            }
-
-            case sf::Event::KeyPressed:
-            {
-                InputEvent event{};
-                event.type = InputEventType::KEYBOARD;
-                event.keyboard = {SFMLKeyEventMap[m_oEvent.key.code], InputState::PRESSED};
-                oInputManager.PushEvent(event);
-                break;
-            }
-
-            default:
-                break;
-            }
-        }
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+//            puts("key up pressed");
+//            _Events.at(_KEY_UP) = true;
+//        }
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+//            puts("key down pressed");
+//            _Events.at(_KEY_DOWN) = true;
+//        }
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+//            puts("key left pressed");
+//            _Events.at(_KEY_LEFT ) = true;
+//        }
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+//            puts("key right pressed");
+//            _Events.at(_KEY_RIGHT) = true;
     }
 
     void SFMLPlugin::update()
     {
-        ImGui::SFML::Update(m_oWindow, deltaClock.restart());
+//        ImGui::SFML::Update(m_oWindow, deltaClock.restart());
 //
 //        renderer->Clear();
 
-        ImGui_ImplOpenGL3_NewFrame();
+//        ImGui_ImplOpenGL3_NewFrame();
 
         {
 //            glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
@@ -360,8 +377,12 @@ namespace fox
 //        }
 //        ImGui::End();
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+//        ImGui::Render();
+//        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+
 //        m_oApp->get_world().run_phase(ecs::OnStore);
 //
 //        m_oApp->get<fox::StateMachine>()->UpdateImGui();
@@ -374,7 +395,7 @@ namespace fox
 //            glfwMakeContextCurrent(backup_current_context);
 //        }
 
-        m_oWindow.display();
+//        m_oWindow.display();
     }
 
     ref<Texture2D> SFMLPlugin::create_texture(uint32_t width, uint32_t height)

@@ -42,6 +42,8 @@ namespace fox
         virtual void SetUniform(const std::string &name, const glm::mat2& value) = 0;
         virtual void SetUniform(const std::string &name, const glm::mat3& value) = 0;
         virtual void SetUniform(const std::string &name, const glm::mat4& value) = 0;
+
+        static ref<Shader> Create(const std::string& path);
     };
 }
 
