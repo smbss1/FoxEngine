@@ -2,13 +2,20 @@
 // Created by samuel on 26/06/2021.
 //
 
-#include <Renderer.hpp>
 #include <Core/Logger/Logger.hpp>
+#include <glad/glad.h>
+#include <OpenGLRendererAPI.hpp>
 #include "VertexBuffer.hpp"
 
 namespace fox
 {
-    VertexBuffer::VertexBuffer(const void *data, unsigned int size)
+    OpenGLVertexBuffer::OpenGLVertexBuffer()
+        : m_oLayout()
+    {
+
+    }
+
+    OpenGLVertexBuffer::OpenGLVertexBuffer(const void *data, unsigned int size)
     {
         fox::info("Construct VertexBuffer");
 
@@ -20,19 +27,29 @@ namespace fox
         GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
     }
 
-    VertexBuffer::~VertexBuffer()
+    OpenGLVertexBuffer::~OpenGLVertexBuffer()
     {
         fox::info("Destroy VertexBuffer");
         GLCall(glDeleteBuffers(1, &m_RendererID));
     }
 
-    void VertexBuffer::Bind() const
+    void OpenGLVertexBuffer::Bind() const
     {
         GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
     }
 
-    void VertexBuffer::Unbind() const
+    void OpenGLVertexBuffer::Unbind() const
     {
         GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    }
+
+    const BufferLayout &OpenGLVertexBuffer::GetLayout() const
+    {
+        return m_oLayout;
+    }
+
+    void OpenGLVertexBuffer::SetLayout(const BufferLayout &layout)
+    {
+        m_oLayout = layout;
     }
 }

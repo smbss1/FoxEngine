@@ -14,17 +14,16 @@
 #include <glad/glad.h>
 #include <Time.hpp>
 #include <fstream>
-#include <VertexBufferLayout.hpp>
-#include <Shader.hpp>
+#include <OpenGLShader.hpp>
 #include <OpenGLTexture.hpp>
 #include <ImGui/imgui_impl_opengl3.h>
+#include <OpenGLRendererAPI.hpp>
 #include "Core/Input/InputManager.hpp"
 #include "Core/Managers/ResourceManager.hpp"
 #include "TextureManager.hpp"
 #include "SpriteManager.hpp"
 #include "Components.hpp"
 #include "PluginEntry.hpp"
-#include "Renderer.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "glm/glm.hpp"
@@ -61,6 +60,11 @@ namespace fox
             exit(84);
 
         // m_oWindow.setKeyRepeatEnabled(false);
+
+        fox::info("OpenGL Info:");
+        fox::info("   Vendor: %", glGetString(GL_VENDOR));
+        fox::info("   Renderer: %", glGetString(GL_RENDERER));
+        fox::info("   Version: %", glGetString(GL_VERSION));
 
         // Stuff for init ImGui in SFML
         ImGui::SFML::Init(m_oWindow);
@@ -116,51 +120,54 @@ namespace fox
 //                        m_oWindow.draw(*sprite);
 //                 });
 
-        float positions[] = {
-                -50.0f,  -50.0f, 0.0f, 0.0f, // 0
-                50.0f, -50.0f, 1.0f, 0.0f, // 1
-                50.0f, 50.0f, 1.0f, 1.0f, // 2
-                -50.0f, 50.0f, 0.0f, 1.0f // 3
-        };
-
-        unsigned int indices[] = {
-                0, 1, 2,
-                2, 3, 0
-        };
+//        float positions[] = {
+//                -50.0f,  -50.0f, 0.0f, 0.0f, // 0
+//                50.0f, -50.0f, 1.0f, 0.0f, // 1
+//                50.0f, 50.0f, 1.0f, 1.0f, // 2
+//                -50.0f, 50.0f, 0.0f, 1.0f // 3
+//        };
+//
+//        unsigned int indices[] = {
+//                0, 1, 2,
+//                2, 3, 0
+//        };
 
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-        va = new_scope<VertexArray>();
-        vb = new_scope<VertexBuffer>(positions, sizeof(positions));
-
-        VertexBufferLayout layout;
-        layout.Push<float>(2);
-        layout.Push<float>(2);
-        va->AddBuffer(*vb, layout);
-
-        ib = new_scope<IndexBuffer>(indices, 6);
-        renderer = new_scope<Renderer>();
-
-        proj = glm::ortho(0.0f, 1280.0f, 0.0f, 720.0f, -1.0f, 1.0f);
-        view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-        translationA = glm::vec3(200, 200, 0);
-        translationB = glm::vec3(400, 200, 0);
-
-        shader = new_scope<Shader>("plugins/SFMLPlugin/assets/shaders/Basic.shader");
-        shader->Bind();
-
-//        shader->SetUniform("u_Color", 1.0f, 1.0f, 0.0f, 0.0f);
-
-        texture = new_scope<OpenGLTexture>("_fail_.png");
-        texture->Bind();
-
-        shader->SetUniform("u_Texture", 0);
-
-        va->Unbind();
-        shader->Unbind();
-        vb->Unbind();
-        ib->Unbind();
+//        va = new_scope<OpenGLVertexArray>();
+//        vb = new_ref<OpenGLVertexBuffer>(positions, sizeof(positions));
+//
+//        BufferLayout layout = {
+//            {ShaderDataType::Float2, "position"},
+//            {ShaderDataType::Float2, "texCoords"}
+//        };
+//
+//        vb->SetLayout(layout);
+//        va->AddVertexBuffer(vb);
+//
+//        ib = new_ref<OpenGLIndexBuffer>(indices, 6);
+//        va->SetIndexBuffer(ib);
+//
+//        proj = glm::ortho(0.0f, 1280.0f, 0.0f, 720.0f, -1.0f, 1.0f);
+//        view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+//        translationA = glm::vec3(200, 200, 0);
+//        translationB = glm::vec3(400, 200, 0);
+//
+//        shader = new_scope<Shader>("plugins/SFMLPlugin/assets/shaders/Basic.shader");
+//        shader->Bind();
+//
+////        shader->SetUniform("u_Color", 1.0f, 1.0f, 0.0f, 0.0f);
+//
+//        texture = new_scope<OpenGLTexture>("_fail_.png");
+//        texture->Bind();
+//
+//        shader->SetUniform("u_Texture", 0);
+//
+//        va->Unbind();
+//        shader->Unbind();
+//        vb->Unbind();
+//        ib->Unbind();
     }
 
     void SFMLPlugin::unplug(Application &app)
@@ -317,28 +324,28 @@ namespace fox
         }
     }
 
-    void SFMLPlugin::draw()
+    void SFMLPlugin::update()
     {
         ImGui::SFML::Update(m_oWindow, deltaClock.restart());
-
-        renderer->Clear();
+//
+//        renderer->Clear();
 
         ImGui_ImplOpenGL3_NewFrame();
 
         {
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
-            glm::mat4 mvp = proj * view * model;
-            shader->Bind();
-            shader->SetUniform("u_MVP", mvp);
-            renderer->Draw(*va, *ib, *shader);
+//            glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
+//            glm::mat4 mvp = proj * view * model;
+//            shader->Bind();
+//            shader->SetUniform("u_MVP", mvp);
+//            renderer->Draw(*va, *ib, *shader);
         }
 
         {
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), translationB);
-            glm::mat4 mvp = proj * view * model;
-            shader->Bind();
-            shader->SetUniform("u_MVP", mvp);
-            renderer->Draw(*va, *ib, *shader);
+//            glm::mat4 model = glm::translate(glm::mat4(1.0f), translationB);
+//            glm::mat4 mvp = proj * view * model;
+//            shader->Bind();
+//            shader->SetUniform("u_MVP", mvp);
+//            renderer->Draw(*va, *ib, *shader);
         }
 //         m_oWindow.clear();
 //
@@ -346,12 +353,12 @@ namespace fox
 
 
 
-        ImGui::Begin("scsc");
-        {
-            ImGui::SliderFloat3("TranslationA", &translationA.x, 0.0f, 1280.0f);
-            ImGui::SliderFloat3("TranslationB", &translationB.x, 0.0f, 1280.0f);
-        }
-        ImGui::End();
+//        ImGui::Begin("scsc");
+//        {
+//            ImGui::SliderFloat3("TranslationA", &translationA.x, 0.0f, 1280.0f);
+//            ImGui::SliderFloat3("TranslationB", &translationB.x, 0.0f, 1280.0f);
+//        }
+//        ImGui::End();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -394,6 +401,32 @@ namespace fox
     {
         return new_ref<SFMLEditorCamera>(*this);
     }
+
+    ref<IndexBuffer> SFMLPlugin::CreateIndexBuffer(uint32_t* indices, uint32_t size)
+    {
+        return fox::new_ref<OpenGLIndexBuffer>(indices, size);
+    }
+
+    ref<VertexBuffer> SFMLPlugin::CreateVertexBuffer(float* vertices, uint32_t size)
+    {
+        return fox::new_ref<OpenGLVertexBuffer>(vertices, size);
+    }
+
+    ref<VertexArray> SFMLPlugin::CreateVertexArray()
+    {
+        return fox::new_ref<OpenGLVertexArray>();
+    }
+
+    ref<RendererAPI> SFMLPlugin::CreateRenderer()
+    {
+        return new_ref<OpenGLRendererAPI>();
+    }
+
+    ref<Shader> SFMLPlugin::CreateShader(const std::string &filepath)
+    {
+        return new_ref<OpenGLShader>(filepath);
+    }
+
 
     void SFMLPlugin::set_vsync(bool value)
     {

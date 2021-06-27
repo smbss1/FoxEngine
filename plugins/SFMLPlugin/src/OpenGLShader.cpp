@@ -4,10 +4,10 @@
 
 #include <fstream>
 #include <glad/glad.h>
-#include <Renderer.hpp>
 #include <Core/Logger/Logger.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Shader.hpp"
+#include <OpenGLRendererAPI.hpp>
+#include "OpenGLShader.hpp"
 
 namespace fox
 {
@@ -17,138 +17,138 @@ namespace fox
         std::string FragmentSource;
     };
 
-    Shader::Shader(const std::string &filepath)
+    OpenGLShader::OpenGLShader(const std::string &filepath)
         : m_RendererID(0), m_strFilepath(filepath)
     {
         ShaderProgramSource source = ParseShader(m_strFilepath);
         m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
     }
 
-    Shader::~Shader()
+    OpenGLShader::~OpenGLShader()
     {
         GLCall(glDeleteProgram(m_RendererID));
     }
 
-    void Shader::Bind() const
+    void OpenGLShader::Bind() const
     {
         GLCall(glUseProgram(m_RendererID));
     }
 
-    void Shader::Unbind() const
+    void OpenGLShader::Unbind() const
     {
         GLCall(glUseProgram(0));
     }
 
-    void Shader::SetUniform(const std::string &name, float v0)
+    void OpenGLShader::SetUniform(const std::string &name, float v0)
     {
         GLCall(glUniform1f(GetUniformLocation(name), v0));
     }
 
-    void Shader::SetUniform(const std::string &name, float v0, float v1)
+    void OpenGLShader::SetUniform(const std::string &name, float v0, float v1)
     {
         GLCall(glUniform2f(GetUniformLocation(name), v0, v1));
     }
 
-    void Shader::SetUniform(const std::string &name, float v0, float v1, float v2)
+    void OpenGLShader::SetUniform(const std::string &name, float v0, float v1, float v2)
     {
         GLCall(glUniform3f(GetUniformLocation(name), v0, v1, v2));
     }
 
-    void Shader::SetUniform(const std::string &name, float v0, float v1, float v2, float v3)
+    void OpenGLShader::SetUniform(const std::string &name, float v0, float v1, float v2, float v3)
     {
         GLCall(glUniform4f(GetUniformLocation(name), v0, v1, v2, v3));
     }
 
-    void Shader::SetUniform(const std::string &name, float* v, uint32_t count)
+    void OpenGLShader::SetUniform(const std::string &name, float* v, uint32_t count)
     {
         GLCall(glUniform1fv(GetUniformLocation(name), count, v));
     }
 
 
-    void Shader::SetUniform(const std::string &name, double v0)
+    void OpenGLShader::SetUniform(const std::string &name, double v0)
     {
         GLCall(glUniform1d(GetUniformLocation(name), v0));
     }
 
-    void Shader::SetUniform(const std::string &name, double v0, double v1)
+    void OpenGLShader::SetUniform(const std::string &name, double v0, double v1)
     {
         GLCall(glUniform2d(GetUniformLocation(name), v0, v1));
     }
 
-    void Shader::SetUniform(const std::string &name, double v0, double v1, double v2)
+    void OpenGLShader::SetUniform(const std::string &name, double v0, double v1, double v2)
     {
         GLCall(glUniform3d(GetUniformLocation(name), v0, v1, v2));
     }
 
-    void Shader::SetUniform(const std::string &name, double v0, double v1, double v2, double v3)
+    void OpenGLShader::SetUniform(const std::string &name, double v0, double v1, double v2, double v3)
     {
         GLCall(glUniform4d(GetUniformLocation(name), v0, v1, v2, v3));
     }
 
-    void Shader::SetUniform(const std::string &name, double* v, uint32_t count)
+    void OpenGLShader::SetUniform(const std::string &name, double* v, uint32_t count)
     {
         GLCall(glUniform1dv(GetUniformLocation(name), count, v));
     }
 
 
-    void Shader::SetUniform(const std::string &name, int v0)
+    void OpenGLShader::SetUniform(const std::string &name, int v0)
     {
         GLCall(glUniform1i(GetUniformLocation(name), v0));
     }
 
-    void Shader::SetUniform(const std::string &name, int v0, int v1)
+    void OpenGLShader::SetUniform(const std::string &name, int v0, int v1)
     {
         GLCall(glUniform2i(GetUniformLocation(name), v0, v1));
     }
 
-    void Shader::SetUniform(const std::string &name, int v0, int v1, int v2)
+    void OpenGLShader::SetUniform(const std::string &name, int v0, int v1, int v2)
     {
         GLCall(glUniform3i(GetUniformLocation(name), v0, v1, v2));
     }
 
-    void Shader::SetUniform(const std::string &name, int v0, int v1, int v2, int v3)
+    void OpenGLShader::SetUniform(const std::string &name, int v0, int v1, int v2, int v3)
     {
         GLCall(glUniform4i(GetUniformLocation(name), v0, v1, v2, v3));
     }
 
-    void Shader::SetUniform(const std::string &name, int* v, uint32_t count)
+    void OpenGLShader::SetUniform(const std::string &name, int* v, uint32_t count)
     {
         GLCall(glUniform1iv(GetUniformLocation(name), count, v));
     }
 
 
-    void Shader::SetUniform(const std::string &name, const glm::vec2& value)
+    void OpenGLShader::SetUniform(const std::string &name, const glm::vec2& value)
     {
         SetUniform(name, value.x, value.y);
     }
 
-    void Shader::SetUniform(const std::string &name, const glm::vec3& value)
+    void OpenGLShader::SetUniform(const std::string &name, const glm::vec3& value)
     {
         SetUniform(name, value.x, value.y, value.z);
     }
 
-    void Shader::SetUniform(const std::string &name, const glm::vec4& value)
+    void OpenGLShader::SetUniform(const std::string &name, const glm::vec4& value)
     {
         SetUniform(name, value.x, value.y, value.z, value.w);
     }
 
-    void Shader::SetUniform(const std::string &name, const glm::mat2& value)
+    void OpenGLShader::SetUniform(const std::string &name, const glm::mat2& value)
     {
         GLCall(glUniformMatrix2fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)));
     }
 
-    void Shader::SetUniform(const std::string &name, const glm::mat3& value)
+    void OpenGLShader::SetUniform(const std::string &name, const glm::mat3& value)
     {
         GLCall(glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)));
     }
 
-    void Shader::SetUniform(const std::string &name, const glm::mat4& value)
+    void OpenGLShader::SetUniform(const std::string &name, const glm::mat4& value)
     {
         GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)));
     }
 
 
-    int Shader::GetUniformLocation(const std::string &name) const
+    int OpenGLShader::GetUniformLocation(const std::string &name) const
     {
         if (m_LocationCache.find(name) != m_LocationCache.end())
             return m_LocationCache[name];
@@ -160,7 +160,7 @@ namespace fox
         return location;
     }
 
-    ShaderProgramSource Shader::ParseShader(const std::string& filepath)
+    ShaderProgramSource OpenGLShader::ParseShader(const std::string& filepath)
     {
         std::ifstream stream(filepath);
 
@@ -190,7 +190,7 @@ namespace fox
         return {ss[0].str(), ss[1].str()};
     }
 
-    unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
+    unsigned int OpenGLShader::CompileShader(unsigned int type, const std::string& source)
     {
         // Gen a id as a type of shader
         GLCall(unsigned int id = glCreateShader(type));
@@ -216,7 +216,7 @@ namespace fox
         return id;
     }
 
-    int Shader::CreateShader(const std::string& vertexShader, const std::string& fragShader)
+    int OpenGLShader::CreateShader(const std::string& vertexShader, const std::string& fragShader)
     {
         GLCall(unsigned int program = glCreateProgram());
         unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);

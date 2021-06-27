@@ -5,6 +5,9 @@
 #ifndef ECS_IPLUGIN_HPP
 #define ECS_IPLUGIN_HPP
 
+#include <string>
+#include "common.hpp"
+
 class World;
 
 namespace fox
@@ -13,6 +16,12 @@ namespace fox
     class Framebuffer;
     class Camera;
     class EditorCamera;
+    class Application;
+    class IndexBuffer;
+    class VertexBuffer;
+    class VertexArray;
+    class RendererAPI;
+    class Shader;
 
     class IPlugin
     {
@@ -29,12 +38,17 @@ namespace fox
     {
     public:
         virtual void poll_event() = 0;
-        virtual void draw() = 0;
+        virtual void update() = 0;
         virtual ref<Texture2D> create_texture(uint32_t width, uint32_t height) = 0;
         virtual ref<Texture2D> create_texture(const std::string& path) = 0;
         virtual ref<Framebuffer> create_frame_buffer(uint32_t width, uint32_t height) = 0;
         virtual ref<Camera> create_camera() = 0;
         virtual ref<EditorCamera> create_editor_camera() = 0;
+        virtual ref<IndexBuffer> CreateIndexBuffer(uint32_t* indices, uint32_t size) = 0;
+        virtual ref<VertexBuffer> CreateVertexBuffer(float* vertices, uint32_t size) = 0;
+        virtual ref<VertexArray> CreateVertexArray() = 0;
+        virtual ref<RendererAPI> CreateRenderer() = 0;
+        virtual ref<Shader> CreateShader(const std::string &filepath) = 0;
     };
 }
 

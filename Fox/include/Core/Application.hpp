@@ -13,7 +13,7 @@ namespace fox
     {
         class Value;
     }
-    class Application
+    class FOX_API Application
     {
     public:
         Application(int ac, char** av);

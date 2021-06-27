@@ -5,22 +5,28 @@
 #ifndef FOXENGINE_VERTEXBUFFER_HPP
 #define FOXENGINE_VERTEXBUFFER_HPP
 
+#include <Renderer/Buffer.hpp>
+
 namespace fox
 {
-    class VertexBuffer
+    class OpenGLVertexBuffer : public VertexBuffer
     {
     public:
-        VertexBuffer() = default;
-        VertexBuffer(const void *data, unsigned int size);
+        OpenGLVertexBuffer();
+        OpenGLVertexBuffer(const void *data, unsigned int size);
 
-        ~VertexBuffer();
+        ~OpenGLVertexBuffer() override;
 
-        void Bind() const;
+        void Bind() const override;
 
-        void Unbind() const;
+        void Unbind() const override;
+
+        [[nodiscard]] const BufferLayout& GetLayout() const override;
+        void SetLayout(const BufferLayout& layout) override;
 
     private:
         unsigned int m_RendererID{};
+        BufferLayout m_oLayout;
     };
 }
 

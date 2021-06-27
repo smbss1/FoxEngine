@@ -2,7 +2,8 @@
 // Created by samuel on 26/06/2021.
 //
 
-#include <Renderer.hpp>
+#include <glad/glad.h>
+#include <OpenGLRendererAPI.hpp>
 #include "stb_image.h"
 #include "OpenGLTexture.hpp"
 

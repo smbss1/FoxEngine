@@ -25,8 +25,7 @@
 #include "Renderer/EditorCamera.hpp"
 #include "IndexBuffer.hpp"
 #include "VertexBuffer.hpp"
-#include "VertexArray.hpp"
-#include "Renderer.hpp"
+#include "OpenGLVertexArray.hpp"
 
 namespace fox
 {
@@ -43,12 +42,17 @@ namespace fox
         const std::string &get_name() const override;
         int get_version() const override;
         void poll_event() override;
-        void draw() override;
+        void update() override;
         ref<Texture2D> create_texture(uint32_t width, uint32_t height) override;
         ref<Texture2D> create_texture(const std::string& path) override;
         ref<Framebuffer> create_frame_buffer(uint32_t width, uint32_t height) override;
         ref<Camera> create_camera() override;
         ref<EditorCamera> create_editor_camera() override;
+        ref<IndexBuffer> CreateIndexBuffer(uint32_t* indices, uint32_t size) override;
+        ref<VertexBuffer> CreateVertexBuffer(float* vertices, uint32_t size) override;
+        ref<VertexArray> CreateVertexArray() override;
+        ref<RendererAPI> CreateRenderer() override;
+        ref<Shader> CreateShader(const std::string &filepath) override;
 
         void set_vsync(bool value);
         bool is_vsync();
@@ -74,11 +78,10 @@ namespace fox
         sf::RenderTexture* m_RenderTexture = nullptr;
         sf::View* m_EditorCamera = nullptr;
 
-        scope<IndexBuffer> ib;
-        scope<VertexBuffer> vb;
+        ref<IndexBuffer> ib;
+        ref<VertexBuffer> vb;
         scope<VertexArray> va;
-        scope<Shader> shader;
-        scope<Renderer> renderer;
+        scope<OpenGLShader> shader;
         scope<Texture2D> texture;
         glm::mat4 proj;
         glm::mat4 view;

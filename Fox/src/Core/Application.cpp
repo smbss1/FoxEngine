@@ -6,6 +6,13 @@
 #include <Utils/FileSystem.hpp>
 #include <Core/Managers/StateMachine.hpp>
 #include <Core/Managers/ResourceManager.hpp>
+#include <Renderer/RendererAPI.hpp>
+#include <Renderer/RendererCommand.hpp>
+#include <Renderer/Renderer.hpp>
+#include <Renderer/Buffer.hpp>
+#include <Renderer/VertexArray.hpp>
+#include <Renderer/Texture.hpp>
+#include <Renderer/Shader.hpp>
 #include "Plugin/IGraphic.hpp"
 #include "Core/Input/InputManager.hpp"
 #include "Core/Application.hpp"
@@ -77,8 +84,46 @@ namespace fox
             throw std::runtime_error("Cannot run the application because no Graphics Plugins found");
 
         plugin_manager.InitializePlugins(*this);
-
         GraphicPlugin& graphic_ctx = plugin_manager.GetGraphics().GetPlugin(0);
+        RendererAPI::SetGraphicPlugin(&graphic_ctx);
+        RendererCommand::SetRendererAPI(graphic_ctx.CreateRenderer());
+
+
+        float vertices[3 * 7] = {
+                -0.5f,  -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f, // 0
+                0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f, // 1
+                0.5f, 0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f // 2
+        };
+
+        unsigned int indices[] = {
+                0, 1, 2,
+        };
+
+        auto va = graphic_ctx.CreateVertexArray();
+        auto vb = graphic_ctx.CreateVertexBuffer(vertices, sizeof(vertices));
+
+        BufferLayout layout = {
+//                {ShaderDataType::Float2, "position"},
+//                {ShaderDataType::Float2, "texCoords"}
+
+                {ShaderDataType::Float3, "a_Position"},
+                {ShaderDataType::Float4, "a_Color"}
+        };
+
+        vb->SetLayout(layout);
+        va->AddVertexBuffer(vb);
+
+        auto ib = graphic_ctx.CreateIndexBuffer(indices, sizeof(indices) / sizeof(uint32_t));
+        va->SetIndexBuffer(ib);
+
+        ref<Shader> shader = graphic_ctx.CreateShader("plugins/SFMLPlugin/assets/shaders/Basic.shader");
+        shader->Bind();
+
+//        auto texture = graphic_ctx.create_texture("_fail_.png");
+//        texture->Bind();
+
+//        shader->SetUniform("u_Texture", 0);
+
         init();
         fox::info("Application is running");
         while (m_bIsRunning)
@@ -110,7 +155,16 @@ namespace fox
 
             get<StateMachine>()->Update();
 
-            graphic_ctx.draw();
+            RendererCommand::SetClearColor({0, 0, 0, 1});
+            RendererCommand::Clear();
+
+            Renderer::BeginScene();
+
+            shader->Bind();
+            Renderer::Submit(va);
+            Renderer::EndScene();
+
+            graphic_ctx.update();
         }
         m_pWorld.reset();
         remove<ResourceManager>();

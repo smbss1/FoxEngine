@@ -5,21 +5,23 @@
 #ifndef FOXENGINE_INDEXBUFFER_HPP
 #define FOXENGINE_INDEXBUFFER_HPP
 
+#include <Renderer/Buffer.hpp>
+
 namespace fox
 {
-    class IndexBuffer
+    class OpenGLIndexBuffer  : public IndexBuffer
     {
     public:
-        IndexBuffer() = default;
-        IndexBuffer(const unsigned int* data, unsigned int count);
+        OpenGLIndexBuffer() = default;
+        OpenGLIndexBuffer(const uint32_t* data, unsigned int count);
 
-        ~IndexBuffer();
+        ~OpenGLIndexBuffer() override;
 
-        void Bind() const;
+        void Bind() const override;
 
-        void Unbind() const;
+        void Unbind() const override;
 
-        [[nodiscard]] unsigned int GetCount() const;
+        [[nodiscard]] unsigned int GetCount() const override;
 
     private:
         unsigned int m_RendererID{};

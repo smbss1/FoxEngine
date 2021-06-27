@@ -1,14 +1,11 @@
 //
-// Created by samuel on 26/06/2021.
+// Created by samuel on 27/06/2021.
 //
 
-#include <string>
-#include <iostream>
-#include "Renderer.hpp"
-#include "VertexArray.hpp"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
-#include "Shader.hpp"
+#include "OpenGLRendererAPI.hpp"
+#include "Renderer/VertexArray.hpp"
+#include "Renderer/Buffer.hpp"
+#include "glad/glad.h"
 
 void GLClearError()
 {
@@ -52,18 +49,18 @@ bool GLLogCall(const char *function, const char *file, int line)
 
 namespace fox
 {
-    void Renderer::Draw(const fox::VertexArray &va, const fox::IndexBuffer &ib, const fox::Shader &shader)
+    void OpenGLRendererAPI::SetClearColor(const glm::vec4 &color)
     {
-        shader.Bind();
-
-        va.Bind();
-        ib.Bind();
-        GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
+        GLCall(glClearColor(color.r, color.g, color.b, color.a));
     }
 
-    void Renderer::Clear() const
+    void OpenGLRendererAPI::Clear()
     {
-//        GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    }
+
+    void OpenGLRendererAPI::DrawIndexed(const ref<VertexArray> &pVertexArray)
+    {
+        glDrawElements(GL_TRIANGLES, pVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 }
