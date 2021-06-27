@@ -7,6 +7,7 @@
 
 #include <string>
 #include <glm/glm.hpp>
+#include <unordered_map>
 
 namespace fox
 {
@@ -15,6 +16,7 @@ namespace fox
     public:
         virtual ~Shader() = default;
 
+        virtual const std::string& GetName() const = 0;
         virtual void Bind() const = 0;
         virtual void Unbind() const = 0;
 
@@ -44,6 +46,21 @@ namespace fox
         virtual void SetUniform(const std::string &name, const glm::mat4& value) = 0;
 
         static ref<Shader> Create(const std::string& path);
+        static ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragSrc);
+    };
+
+    class ShaderLibrary
+    {
+    public:
+        void Add(const ref<Shader>& pShader);
+        void Add(const std::string& name, const ref<Shader>& pShader);
+        ref<Shader> Load(const std::string& filepath);
+        ref<Shader> Load(const std::string& name, const std::string& filepath);
+
+        ref<Shader> Get(const std::string& name);
+        bool Exists(const std::string& name);
+    private:
+        std::unordered_map<std::string, ref<Shader>> m_vShaders;
     };
 }
 

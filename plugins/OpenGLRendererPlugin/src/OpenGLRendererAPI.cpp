@@ -49,6 +49,12 @@ bool GLLogCall(const char *function, const char *file, int line)
 
 namespace fox
 {
+    void OpenGLRendererAPI::Init()
+    {
+        GLCall(glEnable(GL_BLEND));
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    }
+
     void OpenGLRendererAPI::SetClearColor(const glm::vec4 &color)
     {
         GLCall(glClearColor(color.r, color.g, color.b, color.a));

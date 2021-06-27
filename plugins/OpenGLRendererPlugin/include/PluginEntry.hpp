@@ -48,7 +48,8 @@ namespace fox
         ref<VertexBuffer> CreateVertexBuffer(float* vertices, uint32_t size) override;
         ref<VertexArray> CreateVertexArray() override;
         ref<RendererAPI> CreateRenderer() override;
-        ref<Shader> CreateShader(const std::string &filepath) override;
+        ref<Shader> CreateShader(const std::string &path) override;
+        ref<Shader> CreateShader(const std::string &name, const std::string &vertexSrc, const std::string &fragSrc) override;
 
         void set_vsync(bool value);
         bool is_vsync();

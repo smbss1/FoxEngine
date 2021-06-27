@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <string>
+#include "common.hpp"
 
 namespace fox
 {
@@ -29,8 +30,8 @@ namespace fox
     class Texture2D : public Texture
     {
 //    public:
-//        static ref<Texture2D> Create(uint32_t width, uint32_t height);
-//        static ref<Texture2D> Create(const std::string& path);
+        static ref<Texture2D> Create(uint32_t width, uint32_t height);
+        static ref<Texture2D> Create(const std::string& path);
     };
 }
 

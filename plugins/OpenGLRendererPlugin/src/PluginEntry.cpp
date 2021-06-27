@@ -104,10 +104,6 @@ namespace fox
 //                     else
 //                        m_oWindow.draw(*sprite);
 //                 });
-
-
-//        GLCall(glEnable(GL_BLEND));
-//        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     }
 
     void OpenGLRendererPlugin::unplug(Application &app)
@@ -195,9 +191,14 @@ namespace fox
         return new_ref<OpenGLRendererAPI>();
     }
 
-    ref<Shader> OpenGLRendererPlugin::CreateShader(const std::string &filepath)
+    ref<Shader> OpenGLRendererPlugin::CreateShader(const std::string &path)
     {
-        return new_ref<OpenGLShader>(filepath);
+        return new_ref<OpenGLShader>(path);
+    }
+
+    ref<Shader> OpenGLRendererPlugin::CreateShader(const std::string& name, const std::string& vertexSrc, const std::string& fragSrc)
+    {
+        return new_ref<OpenGLShader>(name, vertexSrc, fragSrc);
     }
 
 

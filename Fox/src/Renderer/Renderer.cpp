@@ -12,6 +12,11 @@ namespace fox
 {
     Renderer::SceneData Renderer::m_SceneData = Renderer::SceneData();
 
+    void Renderer::Init()
+    {
+        RendererCommand::Init();
+    }
+
     void Renderer::BeginScene(OrthographicCamera& camera)
     {
         m_SceneData.ViewProjectionMatrix = camera.GetViewProjectionMatrix();

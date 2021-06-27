@@ -54,7 +54,8 @@ namespace fox
         virtual ref<VertexBuffer> CreateVertexBuffer(float* vertices, uint32_t size) = 0;
         virtual ref<VertexArray> CreateVertexArray() = 0;
         virtual ref<RendererAPI> CreateRenderer() = 0;
-        virtual ref<Shader> CreateShader(const std::string &filepath) = 0;
+        virtual ref<Shader> CreateShader(const std::string &path) = 0;
+        virtual ref<Shader> CreateShader(const std::string &name, const std::string &vertexSrc, const std::string &fragSrc) = 0;
 
         virtual ref<Texture2D> create_texture(uint32_t width, uint32_t height) = 0;
         virtual ref<Texture2D> create_texture(const std::string& path) = 0;

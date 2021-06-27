@@ -14,13 +14,16 @@ namespace fox
     class OpenGLShader : public Shader
     {
     public:
-        explicit OpenGLShader(const std::string &filepath);
+        explicit OpenGLShader(const std::string& path);
+        explicit OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragSrc);
 
         ~OpenGLShader() override;
 
         void Bind() const override;
 
         void Unbind() const override;
+
+        const std::string& GetName() const override { return m_strName; }
 
         void SetUniform(const std::string &name, float v0) override;
         void SetUniform(const std::string &name, float v0, float v1) override;
@@ -49,10 +52,12 @@ namespace fox
 
     private:
         int GetUniformLocation(const std::string& name) const;
-        int CreateShader(const std::string& vertexShader, const std::string& fragShader);
-        unsigned int CompileShader(unsigned int type, const std::string& source);
-        ShaderProgramSource ParseShader(const std::string& filepath);
 
+        std::string ReadFile(const std::string& filepath);
+        void CompileShader(const std::unordered_map<GLenum, std::string>& shaderSources);
+        std::unordered_map<GLenum, std::string> ParseShader(const std::string& source);
+
+        std::string m_strName;
         std::string m_strFilepath;
         unsigned int m_RendererID;
         mutable std::unordered_map<std::string, int> m_LocationCache;

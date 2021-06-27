@@ -9,6 +9,7 @@
 #include <Renderer/RendererAPI.hpp>
 #include <Renderer/RendererCommand.hpp>
 #include <Core/Input/Input.hpp>
+#include <Renderer/Renderer.hpp>
 #include "Core/Input/InputManager.hpp"
 #include "Core/Application.hpp"
 #include "Core/Logger/Logger.hpp"
@@ -106,6 +107,7 @@ namespace fox
         plugin_manager.InitializePlugins(*this);
 
         RendererCommand::SetRendererAPI(graphic_ctx.CreateRenderer());
+        Renderer::Init();
 
         init();
         fox::info("Application is running");

@@ -127,7 +127,7 @@ public:
         auto ib = fox::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
         va->SetIndexBuffer(ib);
 
-        shader = fox::Shader::Create("plugins/OpenGLRendererPlugin/assets/shaders/Basic.shader");
+        shader = fox::Shader::Create("assets/shaders/Basic.glsl");
         shader->Bind();
     }
 
