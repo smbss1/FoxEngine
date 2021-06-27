@@ -95,12 +95,14 @@ namespace fox
         if(plugin_manager.GetWindowPlugin() == nullptr)
             throw std::runtime_error("Cannot run the application because no Window Plugin found");
 
+        GraphicPlugin& graphic_ctx = plugin_manager.GetGraphics().GetPlugin(0);
+        RendererAPI::SetGraphicPlugin(&graphic_ctx);
+
         m_pWindow = plugin_manager.GetWindowPlugin()->CreateWindow(WindowProps());
         m_pWindow->SetEventCallback(FOX_BIND_EVENT_FN(Application::OnEvent));
 
         plugin_manager.InitializePlugins(*this);
-        GraphicPlugin& graphic_ctx = plugin_manager.GetGraphics().GetPlugin(0);
-        RendererAPI::SetGraphicPlugin(&graphic_ctx);
+
         RendererCommand::SetRendererAPI(graphic_ctx.CreateRenderer());
 
 //        auto texture = graphic_ctx.create_texture("_fail_.png");
@@ -108,7 +110,7 @@ namespace fox
 //
 //        shader->SetUniform("u_Texture", 0);
 
-//        init();
+        init();
         fox::info("Application is running");
         while (m_bIsRunning)
         {
@@ -137,9 +139,10 @@ namespace fox
             Time::factor_physics = fFixedDeltaTime / fFixedTimeStep;
             get<TimeInfo>()->factor_physics = Time::factor_physics;
 
-            if (!m_bIsMinimized) {
-//            get<StateMachine>()->Update();
-//            graphic_ctx.update();
+            if (!m_bIsMinimized)
+            {
+                get<StateMachine>()->Update();
+                graphic_ctx.update();
             }
             m_pWindow->OnUpdate();
         }

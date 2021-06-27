@@ -13,7 +13,7 @@ namespace fox
     class KeyEvent : public Event
     {
     public:
-        Key GetKeyCode() const { return m_KeyCode; }
+        [[nodiscard]] Key GetKeyCode() const { return m_KeyCode; }
 
         EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
     protected:

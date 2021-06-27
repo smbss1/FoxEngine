@@ -3,8 +3,12 @@
 //
 
 #include <Core/Logger/Logger.hpp>
+#include "glad/glad.h"
+
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include "GlfwWindow.hpp"
+
+#include "../include/GlfwWindow.hpp"
 #include "Events/ApplicationEvent.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
@@ -14,6 +18,11 @@ static uint8_t s_GLFWWindowCount = 0;
 static void GLFWErrorCallback(int error, const char* description)
 {
     throw std::runtime_error("GLFW Error (" + std::to_string(error) + "): " + description);
+}
+
+extern "C" void* libGetProcAddress(const char *name)
+{
+    return (void*) glfwGetProcAddress(name);
 }
 
 GlfwWindow::GlfwWindow(const fox::WindowProps& props)
@@ -34,7 +43,9 @@ GlfwWindow::GlfwWindow(const fox::WindowProps& props)
     m_pWindow = glfwCreateWindow((int)m_oData.width, (int)m_oData.height, m_oData.Title.c_str(), nullptr, nullptr);
     ++s_GLFWWindowCount;
 
-    glfwMakeContextCurrent(m_pWindow);
+    m_pContext = fox::GraphicsContext::Create(m_pWindow);
+    m_pContext->Init();
+
     glfwSetWindowUserPointer(m_pWindow, &m_oData);
     SetVSync(true);
 
@@ -64,19 +75,19 @@ GlfwWindow::GlfwWindow(const fox::WindowProps& props)
         {
             case GLFW_PRESS:
             {
-                fox::KeyPressedEvent event(static_cast<const fox::Key>(key), 0);
+                fox::KeyPressedEvent event(GLFW_TO_KEYBOARD_KEYS[key], 0);
                 data.EventCallback(event);
                 break;
             }
             case GLFW_RELEASE:
             {
-                fox::KeyReleasedEvent event(static_cast<const fox::Key>(key));
+                fox::KeyReleasedEvent event(GLFW_TO_KEYBOARD_KEYS[key]);
                 data.EventCallback(event);
                 break;
             }
             case GLFW_REPEAT:
             {
-                fox::KeyPressedEvent event(static_cast<const fox::Key>(key), 1);
+                fox::KeyPressedEvent event(GLFW_TO_KEYBOARD_KEYS[key], 1);
                 data.EventCallback(event);
                 break;
             }
@@ -87,7 +98,7 @@ GlfwWindow::GlfwWindow(const fox::WindowProps& props)
     {
         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
-        fox::KeyTypedEvent event(static_cast<const fox::Key>(keycode));
+        fox::KeyTypedEvent event(GLFW_TO_KEYBOARD_KEYS[keycode]);
         data.EventCallback(event);
     });
 
@@ -183,4 +194,8 @@ void *GlfwWindow::GetNativeWindow() const
 void GlfwWindow::SetNativeWindow(void *data)
 {
     m_pWindow = static_cast<GLFWwindow*>(data);
+}
+
+void GlfwWindow::SetKeyCallback(const fox::Window::KeyCallbackFn &callback)
+{
 }

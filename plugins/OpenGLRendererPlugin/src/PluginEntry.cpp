@@ -18,6 +18,8 @@
 #include <OpenGLTexture.hpp>
 #include <ImGui/imgui_impl_opengl3.h>
 #include <OpenGLRendererAPI.hpp>
+#include <OpenGLContext.hpp>
+#include "GlfwWindow.hpp"
 #include "Core/Input/InputManager.hpp"
 #include "Core/Managers/ResourceManager.hpp"
 #include "TextureManager.hpp"
@@ -56,16 +58,20 @@ namespace fox
 //        m_oWindow.setActive(true);
 
         // Init glad library
-        if (!gladLoadGL())
-            exit(84);
+//        if (!gladLoadGL())
+//            throw std::runtime_error("Failed to initialize Glad!");
+//        fox::info("OpenGL Info:");
+//        fox::info("   Vendor: %", glGetString(GL_VENDOR));
+//        fox::info("   Renderer: %", glGetString(GL_RENDERER));
+//        fox::info("   Version: %", glGetString(GL_VERSION));
 
 //        m_oWindow.setKeyRepeatEnabled(false);
 //        m_oWindow.setVerticalSyncEnabled(false);
 
-        fox::info("OpenGL Info:");
-        fox::info("   Vendor: %", glGetString(GL_VENDOR));
-        fox::info("   Renderer: %", glGetString(GL_RENDERER));
-        fox::info("   Version: %", glGetString(GL_VERSION));
+//        fox::info("OpenGL Info:");
+//        fox::info("   Vendor: %", glGetString(GL_VENDOR));
+//        fox::info("   Renderer: %", glGetString(GL_RENDERER));
+//        fox::info("   Version: %", glGetString(GL_VERSION));
 
         // Stuff for init ImGui in SFML
 //        ImGui::SFML::Init(m_oWindow);
@@ -398,6 +404,11 @@ namespace fox
 //        m_oWindow.display();
     }
 
+    scope<GraphicsContext> SFMLPlugin::CreateGraphicsContext(void* window)
+    {
+        return fox::new_scope<OpenGLContext>(static_cast<GLFWwindow*>(window));
+    }
+
     ref<Texture2D> SFMLPlugin::create_texture(uint32_t width, uint32_t height)
     {
         return new_ref<SFMLTexture2D>(width, height);
@@ -564,11 +575,40 @@ namespace fox
         pan = t * pan;
         m_View.move(pan * m_oPlugin.GetApp().get<TimeInfo>()->delta_time);
     }
+
+
+    void GLFWPlugin::plug(Application &app)
+    {
+        m_oApp = &app;
+        std::cout << "[GLFWPlugin] Init!" << std::endl;
+    }
+
+    void GLFWPlugin::unplug(Application &app)
+    {
+    }
+
+    ref<Window> GLFWPlugin::CreateWindow(const WindowProps& props)
+    {
+        return fox::new_ref<GlfwWindow>(props);
+    }
+
+    const std::string &GLFWPlugin::get_name() const
+    {
+        return "GLFW";
+    }
+
+    int GLFWPlugin::get_version() const
+    {
+        return 1;
+    }
 }
 
 extern "C" void RegisterPlugin(fox::PluginManager &pm)
 {
-    fox::ref<fox::SFMLPlugin> plugin = fox::new_ref<fox::SFMLPlugin>();
-    pm.AddPlugin(plugin);
-    pm.GetGraphics().AddGraphicsPlugin(std::move(plugin));
+    fox::ref<fox::SFMLPlugin> renderer_plugin = fox::new_ref<fox::SFMLPlugin>();
+    fox::ref<fox::GLFWPlugin> window_plugin = fox::new_ref<fox::GLFWPlugin>();
+    pm.AddPlugin(renderer_plugin);
+    pm.AddPlugin(window_plugin);
+    pm.SetWindowPlugin(window_plugin);
+    pm.GetGraphics().AddGraphicsPlugin(std::move(renderer_plugin));
 }

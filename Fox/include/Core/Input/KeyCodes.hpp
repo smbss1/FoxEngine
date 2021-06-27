@@ -4,16 +4,16 @@
 
 namespace fox
 {
-    enum class Key
+    enum Key
 	{
-        Space               = 0,
-        Apostrophe, 			/* ' */
-        Comma, 					/* , */
-        Minus,					/* - */
-        Period,					/* . */
-        Slash,					/* / */
+        Space               = 32,
+        Apostrophe          = 39, /* ' */
+        Comma               = 44, /* , */
+        Minus               = 45, /* - */
+        Period              = 46, /* . */
+        Slash               = 47, /* / */
 
-        D0,						/* 0 */
+        D0                  = 48, /* 0 */
         D1,						/* 1 */
         D2,						/* 2 */
         D3,						/* 3 */
@@ -24,10 +24,10 @@ namespace fox
         D8,						/* 8 */
         D9,						/* 9 */
 
-        Semicolon,				/* ; */
-        Equal,					/* = */
+        Semicolon           = 59, /* ; */
+        Equal               = 61, /* = */
 
-        A,
+        A                   = 65,
         B,
         C,
         D,
@@ -59,11 +59,11 @@ namespace fox
         RightBracket,  			/* ] */
         GraveAccent,  			/* ` */
 
-        World1,					/* non-US #1 */
-        World2,					/* non-US #2 */
+        World1              = 161, /* non-US #1 */
+        World2              = 162, /* non-US #2 */
 
         /* Function keys */
-        Escape,
+        Escape              = 256,
         Enter,
         Tab,
         Backspace,
@@ -77,12 +77,12 @@ namespace fox
         PageDown,
         Home,
         End,
-        CapsLock,
+        CapsLock            = 280,
         ScrollLock,
         NumLock,
         PrintScreen,
         Pause,
-        F1,
+        F1                  = 290,
         F2,
         F3,
         F4,
@@ -109,7 +109,7 @@ namespace fox
         F25,
 
         /* Keypad */
-        KP0,
+        KP0                 = 320,
         KP1,
         KP2,
         KP3,
@@ -127,7 +127,7 @@ namespace fox
         KPEnter,
         KPEqual,
 
-        LeftShift,
+        LeftShift               = 340,
         LeftControl,
         LeftAlt,
         LeftSuper,

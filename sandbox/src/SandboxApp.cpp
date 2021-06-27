@@ -17,6 +17,8 @@
 #include "NativeScript.hpp"
 #include "Animator.hpp"
 
+#include "Events/KeyEvent.hpp"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 class Test : public ScriptableBehaviour
@@ -134,6 +136,26 @@ public:
     void OnExit() override
     {}
 
+    bool OnKeyPressed(fox::KeyPressedEvent& event)
+    {
+        if (event.GetKeyCode() == fox::Key::A)
+        {
+            fox::info("A Pressed");
+        }
+
+        if (event.GetKeyCode() == fox::Key::V)
+        {
+            fox::info("V Pressed");
+        }
+        return false;
+    }
+
+    void OnEvent(fox::Event& event) override
+    {
+        fox::EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<fox::KeyPressedEvent>(FOX_BIND_EVENT_FN(ExampleScene::OnKeyPressed));
+    }
+
     void OnUpdate() override
     {
         auto& inputManager = GetApp().get<fox::InputManager>().value();
@@ -183,7 +205,7 @@ SandboxApp::~SandboxApp() { }
 void SandboxApp::init()
 {
     fox::StateMachine& sceneManager = get<fox::StateMachine>().value();
-    sceneManager.PushState(new ExampleScene);
+//    sceneManager.PushState(new ExampleScene);
 }
 
 fox::Application* CreateApp(int argc, char** argv)

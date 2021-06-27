@@ -7,6 +7,7 @@
 
 #include <string>
 #include <functional>
+#include <Core/Input/KeyCodes.hpp>
 #include "Events/Event.hpp"
 #include "common.hpp"
 
@@ -31,6 +32,7 @@ namespace fox
     {
     public:
         using EventCallbackFn = std::function<void(Event&)>;
+        using KeyCallbackFn = std::function<bool(Key)>;
 
         virtual ~Window() = default;
 
@@ -40,7 +42,18 @@ namespace fox
         virtual uint32_t GetHeight() const = 0;
 
         // Window attributes
+
+        /**
+         * @brief Set the event callback for event with pooling
+         * @param callback the callback
+         */
         virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+
+        /**
+         * @brief Set the callback for key event without pooling
+         * @param callback the callback
+         */
+        virtual void SetKeyCallback(const KeyCallbackFn& callback) = 0;
         virtual void SetVSync(bool enabled) = 0;
         virtual bool IsVSync() const = 0;
 

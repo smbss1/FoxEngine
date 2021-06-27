@@ -23,6 +23,8 @@ namespace fox
     class RendererAPI;
     class Shader;
 
+    class GraphicsContext;
+
     class Window;
     class WindowProps;
 
@@ -48,6 +50,7 @@ namespace fox
     public:
         virtual void poll_event() = 0;
         virtual void update() = 0;
+        virtual scope<GraphicsContext> CreateGraphicsContext(void* window) = 0;
         virtual ref<Texture2D> create_texture(uint32_t width, uint32_t height) = 0;
         virtual ref<Texture2D> create_texture(const std::string& path) = 0;
         virtual ref<Framebuffer> create_frame_buffer(uint32_t width, uint32_t height) = 0;
