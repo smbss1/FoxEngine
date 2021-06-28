@@ -22,7 +22,7 @@ namespace fox
         m_bIsRunning = true;
         set<StateMachine>(*this);
         set<ResourceManager>();
-        set<InputManager>();
+//        set<InputManager>();
         set<TimeInfo>();
         m_pWorld = new_scope<World>();
 
@@ -36,6 +36,10 @@ namespace fox
 
     Application::~Application()
     {
+        m_pWorld.reset();
+        remove<ResourceManager>();
+        remove<StateMachine>();
+        RendererCommand::Shutdown();
     }
 
     void Application::init()
@@ -143,10 +147,6 @@ namespace fox
             }
             m_pWindow->OnUpdate();
         }
-        m_pWorld.reset();
-        remove<ResourceManager>();
-        remove<StateMachine>();
-        RendererCommand::Shutdown();
     }
 
     Window* Application::GetWindow() const

@@ -5,6 +5,7 @@
 #ifndef FOXENGINE_MOUSEEVENT_HPP
 #define FOXENGINE_MOUSEEVENT_HPP
 
+#include <sstream>
 #include "Event.hpp"
 #include "Core/Input/MouseCodes.hpp"
 

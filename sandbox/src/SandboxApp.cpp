@@ -20,16 +20,16 @@
 #include "Events/KeyEvent.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <Core/Input/Input.hpp>
+#include <Renderer/OrthographicCameraController.hpp>
 
 class Test : public ScriptableBehaviour
 {
     float value;
 public:
-	virtual ~Test() {}
+	~Test() override = default;
 
 protected:
-	virtual void on_create() override
+	void on_create() override
 	{
 		std::cout << "OnCreate!" << std::endl;
 
@@ -46,55 +46,51 @@ protected:
         anim.get<float>(0).apply(value);
 	}
 
-	virtual void on_update() override
+	void on_update() override
 	{
 		// std::cout << "OnUpdate!"  << i++ << std::endl;
-        fox::InputManager& input = get_app().get<fox::InputManager>().value();
-
-        if (input.GetKeyDown(fox::Key::A))
-        {
-            fox::info("A pressed");
-        }
-
-        if (input.GetMouseButtonDown(fox::MouseButton::ButtonLeft))
-        {
-            fox::info("Left pressed");
-        }
-
-        if (input.GetMouseButtonUp(fox::MouseButton::ButtonLeft))
-        {
-            fox::info("Left released");
-        }
-
-        if (input.GetMouseButtonDown(fox::MouseButton::ButtonRight))
-        {
-            fox::info("Right pressed");
-        }
+//        fox::InputManager& input = get_app().get<fox::InputManager>().value();
+//
+//        if (input.GetKeyDown(fox::Key::A))
+//        {
+//            fox::info("A pressed");
+//        }
+//
+//        if (input.GetMouseButtonDown(fox::MouseButton::ButtonLeft))
+//        {
+//            fox::info("Left pressed");
+//        }
+//
+//        if (input.GetMouseButtonUp(fox::MouseButton::ButtonLeft))
+//        {
+//            fox::info("Left released");
+//        }
+//
+//        if (input.GetMouseButtonDown(fox::MouseButton::ButtonRight))
+//        {
+//            fox::info("Right pressed");
+//        }
 //        fox::info("%", input.GetMousePosition());
 //        fox::info("Scroll: %", input.GetMouseScroll());
 	}
 
-	virtual void on_destroy() override { }
+	void on_destroy() override { }
     int i = 0;
 };
 
 class ExampleScene : public fox::State
 {
-    fox::OrthographicCamera m_Camera;
-    glm::vec3 m_CameraPos;
-    float m_CameraRot;
-    float m_fCameraMoveSpeed = 10.0f;
-    float m_fCameraRotSpeed = 500.0f;
+    fox::OrthographicCameraController m_Camera;
 
     fox::ref<fox::VertexArray> va;
     fox::ref<fox::Shader> shader;
 
 public:
     ExampleScene()
-    : m_Camera(-1.0f, 1.0f, -1.0f, 1.0f)
+    : m_Camera(1280.f / 720.f, true)
     , fox::State("ExampleScene") { }
 
-    ~ExampleScene() = default;
+    ~ExampleScene() override = default;
 
     void OnEnter() override
     {
@@ -134,40 +130,19 @@ public:
     void OnExit() override
     {}
 
-    bool OnKeyPressed(fox::KeyPressedEvent& event)
-    {
-        return false;
-    }
-
     void OnEvent(fox::Event& event) override
     {
-        fox::EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<fox::KeyPressedEvent>(FOX_BIND_EVENT_FN(ExampleScene::OnKeyPressed));
+        m_Camera.OnEvent(event);
     }
 
     void OnUpdate() override
     {
-        if (fox::Input::IsKeyPressed(fox::Key::Left))
-            m_CameraPos.x += m_fCameraMoveSpeed * Time::delta_time;
-        else if (fox::Input::IsKeyPressed(fox::Key::Right))
-            m_CameraPos.x -= m_fCameraMoveSpeed * Time::delta_time;
-        if (fox::Input::IsKeyPressed(fox::Key::Up))
-            m_CameraPos.y -= m_fCameraMoveSpeed * Time::delta_time;
-        else if (fox::Input::IsKeyPressed(fox::Key::Down))
-            m_CameraPos.y += m_fCameraMoveSpeed * Time::delta_time;
-
-        if (fox::Input::IsKeyPressed(fox::Key::A))
-            m_CameraRot -= m_fCameraRotSpeed * Time::delta_time;
-        else if (fox::Input::IsKeyPressed(fox::Key::E))
-            m_CameraRot += m_fCameraRotSpeed * Time::delta_time;
-
-        m_Camera.SetPosition(m_CameraPos);
-        m_Camera.SetRotation(m_CameraRot);
+        m_Camera.OnUpdate();
 
         fox::RendererCommand::SetClearColor({0, 0, 0, 1});
         fox::RendererCommand::Clear();
 
-        fox::Renderer::BeginScene(m_Camera);
+        fox::Renderer::BeginScene(m_Camera.GetCamera());
 
         fox::Renderer::Submit(shader, va);
         fox::Renderer::EndScene();

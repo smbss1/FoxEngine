@@ -79,25 +79,24 @@ namespace fox
 
     void EditorCamera::OnUpdate(Application& app)
     {
-        InputManager& inputManager = app.get<InputManager>().value();
-        const Vec2& mouse = inputManager.GetMousePosition();
-        Vec2 delta = (mouse - m_InitialMousePosition);
-        m_InitialMousePosition = mouse;
-
-        if(inputManager.GetKey(Key::Z))
-            panUp();
-        if(inputManager.GetKey(Key::S))
-            panDown();
-        if(inputManager.GetKey(Key::Q))
-            panLeft();
-        if(inputManager.GetKey(Key::D))
-            panRight();
-
-        if (inputManager.GetMouseScroll() != Vec2())
-            MouseZoom(inputManager.GetMouseScrollDelta());
-
-        OnMove(m_Pan);
-        m_Pan = Vec2();
+//        const Vec2& mouse = Input::GetMousePosition();
+//        Vec2 delta = (mouse - m_InitialMousePosition);
+//        m_InitialMousePosition = mouse;
+//
+//        if(inputManager.GetKey(Key::Z))
+//            panUp();
+//        if(inputManager.GetKey(Key::S))
+//            panDown();
+//        if(inputManager.GetKey(Key::Q))
+//            panLeft();
+//        if(inputManager.GetKey(Key::D))
+//            panRight();
+//
+//        if (inputManager.GetMouseScroll() != Vec2())
+//            MouseZoom(inputManager.GetMouseScrollDelta());
+//
+//        OnMove(m_Pan);
+//        m_Pan = Vec2();
     }
 
     void EditorCamera::MousePan(const Vec2& delta)
