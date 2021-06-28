@@ -17,6 +17,7 @@ namespace fox
     {
     public:
         static void Init();
+        static void Shutdown();
         static void SetClearColor(const glm::vec4& color);
         static void Clear();
         static void DrawIndexed(const ref<VertexArray>& pVertexArray);

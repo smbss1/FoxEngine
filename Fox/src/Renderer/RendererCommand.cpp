@@ -15,6 +15,11 @@ namespace fox
         m_spRenderer->Init();
     }
 
+    void RendererCommand::Shutdown()
+    {
+        m_spRenderer = nullptr;
+    }
+
     void RendererCommand::SetClearColor(const glm::vec4 &color)
     {
         m_spRenderer->SetClearColor(color);

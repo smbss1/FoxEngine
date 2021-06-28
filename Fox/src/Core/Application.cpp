@@ -145,6 +145,8 @@ namespace fox
         }
         m_pWorld.reset();
         remove<ResourceManager>();
+        remove<StateMachine>();
+        RendererCommand::Shutdown();
     }
 
     Window* Application::GetWindow() const
