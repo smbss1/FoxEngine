@@ -40,9 +40,9 @@ void Example2DState::OnUpdate()
 //    fox::Renderer2D::EndScene();
 //
 //    fox::Renderer2D::BeginScene(m_Camera.GetCamera());
-    for (float y = -50.0f; y < 50.0f; y += 0.5f)
+    for (float y = -5.0f; y < 5.0f; y += 0.5f)
     {
-        for (float x = -50.0f; x < 50.0f; x += 0.5f)
+        for (float x = -5.0f; x < 5.0f; x += 0.5f)
         {
             glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.5f };
             fox::Renderer2D::DrawQuad({x, y}, {0.45f, 0.45f}, color);
@@ -57,6 +57,7 @@ void Example2DState::OnImGui()
 
     auto stats = fox::Renderer2D::GetStats();
     ImGui::Text("Renderer2D Stats:");
+    ImGui::Text("Delta time: %f", Time::delta_time);
     ImGui::Text("Draw Calls: %d", stats.DrawCalls);
     ImGui::Text("Quads: %d", stats.QuadCount);
     ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());

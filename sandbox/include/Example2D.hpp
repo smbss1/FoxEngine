@@ -2,8 +2,8 @@
 // Created by samuel on 28/06/2021.
 //
 
-#ifndef FOXENGINE_FIRSTTRIANGLE_HPP
-#define FOXENGINE_FIRSTTRIANGLE_HPP
+#ifndef FOXENGINE_EXAMPLE_HPP
+#define FOXENGINE_EXAMPLE_HPP
 
 #include "FoxEngine.hpp"
 
@@ -28,4 +28,4 @@ private:
 };
 
 
-#endif //FOXENGINE_FIRSTTRIANGLE_HPP
+#endif //FOXENGINE_EXAMPLE_HPP
