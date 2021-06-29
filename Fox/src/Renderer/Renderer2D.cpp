@@ -17,13 +17,16 @@ namespace fox
         glm::vec3 oPosition;
         glm::vec4 oColor;
         glm::vec2 oTexCoord;
+        float fTexIndex;
+        float fTilingFactor;
     };
 
     struct Renderer2DData
     {
-        const uint32_t  MaxQuads = 10000;
-        const uint32_t  MaxVertices = MaxQuads * 4;
-        const uint32_t  MaxIndices = MaxQuads * 6;
+        static const uint32_t  MaxQuads = 10000;
+        static const uint32_t  MaxVertices = MaxQuads * 4;
+        static const uint32_t  MaxIndices = MaxQuads * 6;
+        static const uint32_t MaxTextureSlots = 32; // TODO: RenderCaps
 
         ref<VertexArray> pQuadVertexArray;
         ref<VertexBuffer> pQuadVertexBuffer;
@@ -33,6 +36,9 @@ namespace fox
         uint32_t QuadIndexCount = 0;
         QuadVertex* QuadVertexBufferBase = nullptr;
         QuadVertex* QuadVertexBufferPtr = nullptr;
+
+        std::array<ref<Texture2D>, MaxTextureSlots> TextureSlots;
+        uint32_t TextureSlotIndex = 1; // 0 = white texture
     };
 
     static Renderer2DData s_Data;
@@ -41,20 +47,14 @@ namespace fox
     {
         s_Data.pQuadVertexArray = fox::VertexArray::Create();
 
-
-//        float vertices[] = {
-//                -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  // 0
-//                0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // 1
-//                0.5f, 0.5f, 0.0f, 1.0f, 1.0f,  // 2
-//                -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,  // 3
-//        };
-
         s_Data.pQuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
 
         s_Data.pQuadVertexBuffer->SetLayout({
               {fox::ShaderDataType::Float3, "a_Position"},
               {fox::ShaderDataType::Float4, "a_Color"},
               {fox::ShaderDataType::Float2, "a_TexCoord"},
+              {fox::ShaderDataType::Float, "a_TexIndex"},
+              {fox::ShaderDataType::Float, "a_TilingFactor"},
           });
         s_Data.pQuadVertexArray->AddVertexBuffer(s_Data.pQuadVertexBuffer);
 
@@ -81,13 +81,23 @@ namespace fox
         uint32_t whiteTextureData = 0xffffffff;
         s_Data.pWhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
+        int32_t samplers[s_Data.MaxTextureSlots];
+        for (uint32_t i = 0; i < s_Data.MaxTextureSlots; ++i)
+            samplers[i] = i;
+
         s_Data.pTextureShader = fox::Shader::Create("assets/shaders/Texture.glsl");
         s_Data.pTextureShader->Bind();
-        s_Data.pTextureShader->SetUniform("u_Texture", 0);
+        s_Data.pTextureShader->SetUniform("u_Textures", samplers, s_Data.MaxTextureSlots);
+
+        // Set first texture slot to 0
+        s_Data.TextureSlots[0] = s_Data.pWhiteTexture;
     }
 
     void Renderer2D::Shutdown()
     {
+        for (uint32_t i = 0; i < s_Data.MaxTextureSlots; ++i)
+            s_Data.TextureSlots[i].reset();
+        s_Data.pQuadVertexBuffer.reset();
         s_Data.pTextureShader.reset();
         s_Data.pQuadVertexArray.reset();
         s_Data.pWhiteTexture.reset();
@@ -101,6 +111,8 @@ namespace fox
 
         s_Data.QuadIndexCount = 0;
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+        s_Data.TextureSlotIndex = 1;
     }
 
     void Renderer2D::EndScene()
@@ -112,6 +124,8 @@ namespace fox
 
     void Renderer2D::Flush()
     {
+        for (uint32_t i = 0; i < s_Data.TextureSlotIndex; ++i)
+            s_Data.TextureSlots[i]->Bind(i);
         RendererCommand::DrawIndexed(s_Data.pQuadVertexArray, s_Data.QuadIndexCount);
     }
 
@@ -122,24 +136,35 @@ namespace fox
 
     void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &color)
     {
+        const float textureIndex = 0.0f; // White texture
+        const float tilingFactor = 1.0f; // White texture
+
         s_Data.QuadVertexBufferPtr->oPosition = position;
         s_Data.QuadVertexBufferPtr->oColor = color;
         s_Data.QuadVertexBufferPtr->oTexCoord = { 0.0f, 0.0f };
+        s_Data.QuadVertexBufferPtr->fTexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->fTilingFactor = tilingFactor;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->oPosition = { position.x + size.x, position.y, 0.0f };
         s_Data.QuadVertexBufferPtr->oColor = color;
         s_Data.QuadVertexBufferPtr->oTexCoord = { 1.0f, 0.0f };
+        s_Data.QuadVertexBufferPtr->fTexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->fTilingFactor = tilingFactor;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->oPosition = { position.x + size.x, position.y + size.y, 0.0f };
         s_Data.QuadVertexBufferPtr->oColor = color;
         s_Data.QuadVertexBufferPtr->oTexCoord = { 1.0f, 1.0f };
+        s_Data.QuadVertexBufferPtr->fTexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->fTilingFactor = tilingFactor;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->oPosition = { position.x, position.y + size.y, 0.0f };
         s_Data.QuadVertexBufferPtr->oColor = color;
         s_Data.QuadVertexBufferPtr->oTexCoord = { 0.0f, 1.0f };
+        s_Data.QuadVertexBufferPtr->fTexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->fTilingFactor = tilingFactor;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadIndexCount += 6;
@@ -166,6 +191,55 @@ namespace fox
     void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const ref<Texture2D> &texture,
                               const glm::vec4 &tintColor, float tilingFactor)
     {
+        constexpr glm::vec4 color = glm::vec4(1.0f);
+
+        float textureIndex = 0.0f;
+        for (int i = 0; i < s_Data.TextureSlotIndex; ++i)
+        {
+            if (*s_Data.TextureSlots[i] == *texture)
+            {
+                textureIndex = static_cast<float>(i);
+                break;
+            }
+        }
+
+        if (textureIndex == 0.0f)
+        {
+            textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
+            s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+            s_Data.TextureSlotIndex++;
+        }
+
+        s_Data.QuadVertexBufferPtr->oPosition = position;
+        s_Data.QuadVertexBufferPtr->oColor = color;
+        s_Data.QuadVertexBufferPtr->oTexCoord = { 0.0f, 0.0f };
+        s_Data.QuadVertexBufferPtr->fTexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->fTilingFactor = tilingFactor;
+        s_Data.QuadVertexBufferPtr++;
+
+        s_Data.QuadVertexBufferPtr->oPosition = { position.x + size.x, position.y, 0.0f };
+        s_Data.QuadVertexBufferPtr->oColor = color;
+        s_Data.QuadVertexBufferPtr->oTexCoord = { 1.0f, 0.0f };
+        s_Data.QuadVertexBufferPtr->fTexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->fTilingFactor = tilingFactor;
+        s_Data.QuadVertexBufferPtr++;
+
+        s_Data.QuadVertexBufferPtr->oPosition = { position.x + size.x, position.y + size.y, 0.0f };
+        s_Data.QuadVertexBufferPtr->oColor = color;
+        s_Data.QuadVertexBufferPtr->oTexCoord = { 1.0f, 1.0f };
+        s_Data.QuadVertexBufferPtr->fTexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->fTilingFactor = tilingFactor;
+        s_Data.QuadVertexBufferPtr++;
+
+        s_Data.QuadVertexBufferPtr->oPosition = { position.x, position.y + size.y, 0.0f };
+        s_Data.QuadVertexBufferPtr->oColor = color;
+        s_Data.QuadVertexBufferPtr->oTexCoord = { 0.0f, 1.0f };
+        s_Data.QuadVertexBufferPtr->fTexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->fTilingFactor = tilingFactor;
+        s_Data.QuadVertexBufferPtr++;
+
+        s_Data.QuadIndexCount += 6;
+#if 0
         s_Data.pTextureShader->SetUniform("u_Color", tintColor);
         s_Data.pTextureShader->SetUniform("u_TilingFactor", tilingFactor);
 
@@ -177,6 +251,7 @@ namespace fox
 
         s_Data.pQuadVertexArray->Bind();
         RendererCommand::DrawIndexed(s_Data.pQuadVertexArray);
+#endif
     }
 
     void Renderer2D::ResetStats()

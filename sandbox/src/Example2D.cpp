@@ -27,6 +27,6 @@ void Example2DState::OnUpdate()
     fox::Renderer2D::BeginScene(m_Camera.GetCamera());
     fox::Renderer2D::DrawQuad({-1, 0}, {0.8f, 0.8f}, {1.f, 0.f, 0.f, 1.f});
     fox::Renderer2D::DrawQuad({0.5f, -0.5f}, {0.5f, 0.75f}, {0.2f, 0.3f, 0.8f, 1.f});
-//    fox::Renderer2D::DrawQuad({0.2f, 0.5f}, {0.5f, 0.5f}, m_pEpitechLogo);
+    fox::Renderer2D::DrawQuad({0.2f, 0.5f}, {0.5f, 0.5f}, m_pEpitechLogo);
     fox::Renderer2D::EndScene();
 }

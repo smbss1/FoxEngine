@@ -112,6 +112,6 @@ namespace fox
 
     bool OpenGLTexture::operator==(const Texture &other) const
     {
-        return false;
+        return m_RendererID == other.GetRendererID();
     }
 }
