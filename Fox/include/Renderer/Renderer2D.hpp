@@ -10,6 +10,7 @@
 
 namespace fox
 {
+    class QuadVertex;
     class Renderer2D
     {
     public:
@@ -21,6 +22,8 @@ namespace fox
         static void BeginScene(const OrthographicCamera& camera); // TODO: Remove
         static void EndScene();
         static void Flush();
+
+        static void AddToVertexBuffer(const QuadVertex& vertex);
 
         // Primitives
         static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
@@ -51,8 +54,8 @@ namespace fox
         static Statistics GetStats();
 
     private:
-//        static void StartBatch();
-//        static void NextBatch();
+        static void StartBatch();
+        static void NextBatch();
     };
 }
 

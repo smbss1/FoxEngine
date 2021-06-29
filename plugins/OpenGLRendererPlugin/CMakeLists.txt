@@ -13,7 +13,5 @@ add_library(${PROJECT_NAME} SHARED ${SRCS})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-    "include"
-)
+target_include_directories(${PROJECT_NAME} PUBLIC "include")
 target_link_libraries(${PROJECT_NAME} PRIVATE fox_engine glfw)

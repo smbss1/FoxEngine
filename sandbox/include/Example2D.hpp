@@ -19,6 +19,7 @@ public:
     void OnExit() override;
     void OnEvent(fox::Event& event) override;
     void OnUpdate() override;
+    void OnImGui() override;
 
 private:
     fox::OrthographicCameraController m_Camera;

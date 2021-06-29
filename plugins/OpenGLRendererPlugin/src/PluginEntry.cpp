@@ -122,7 +122,7 @@ namespace fox
 
 //        m_oApp->get_world().run_phase(ecs::OnStore);
 //
-//        m_oApp->get<fox::StateMachine>()->UpdateImGui();
+        m_oApp->get<fox::StateMachine>()->UpdateImGui();
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize = ImVec2((float)m_oApp->GetWindow()->GetWidth(), (float)m_oApp->GetWindow()->GetHeight());
 
