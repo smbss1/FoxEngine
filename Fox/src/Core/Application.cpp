@@ -10,6 +10,7 @@
 #include <Renderer/RendererCommand.hpp>
 #include <Core/Input/Input.hpp>
 #include <Renderer/Renderer.hpp>
+#include <Renderer/Renderer2D.hpp>
 #include "Core/Input/InputManager.hpp"
 #include "Core/Application.hpp"
 #include "Core/Logger/Logger.hpp"
@@ -39,6 +40,7 @@ namespace fox
         m_pWorld.reset();
         remove<ResourceManager>();
         remove<StateMachine>();
+        Renderer2D::Shutdown();
         RendererCommand::Shutdown();
     }
 
@@ -169,7 +171,7 @@ namespace fox
         }
 
         m_bIsMinimized = false;
-//        Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+        Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
         return false;
     }

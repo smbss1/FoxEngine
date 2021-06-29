@@ -99,6 +99,7 @@ namespace fox
         uint32_t m_iStride;
     };
 
+    // Currently Fox only supports 32-bit index buffers
     class IndexBuffer
     {
     public:
@@ -121,6 +122,9 @@ namespace fox
         virtual const BufferLayout& GetLayout() const = 0;
         virtual void SetLayout(const BufferLayout& layout) = 0;
 
+        virtual void SetData(const void *data, uint32_t size) = 0;
+
+        static ref<VertexBuffer> Create(uint32_t size);
         static ref<VertexBuffer> Create(float* vertices, uint32_t size);
     };
 }

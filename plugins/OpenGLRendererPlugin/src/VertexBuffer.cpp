@@ -12,10 +12,18 @@ namespace fox
     OpenGLVertexBuffer::OpenGLVertexBuffer()
         : m_oLayout()
     {
-
     }
 
-    OpenGLVertexBuffer::OpenGLVertexBuffer(const void *data, unsigned int size)
+    OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)
+    {
+        fox::info("Construct VertexBuffer");
+
+        GLCall(glGenBuffers(1, &m_RendererID));
+        GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
+        GLCall(glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW));
+    }
+
+    OpenGLVertexBuffer::OpenGLVertexBuffer(const void *data, uint32_t size)
     {
         fox::info("Construct VertexBuffer");
 
@@ -51,5 +59,11 @@ namespace fox
     void OpenGLVertexBuffer::SetLayout(const BufferLayout &layout)
     {
         m_oLayout = layout;
+    }
+
+    void OpenGLVertexBuffer::SetData(const void *data, uint32_t size)
+    {
+        GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
+        GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
     }
 }

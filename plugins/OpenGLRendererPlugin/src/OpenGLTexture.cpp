@@ -4,31 +4,72 @@
 
 #include <glad/glad.h>
 #include <OpenGLRendererAPI.hpp>
+#include <Core/Assert.hpp>
 #include "stb_image.h"
 #include "OpenGLTexture.hpp"
 
 namespace fox
 {
-    OpenGLTexture::OpenGLTexture(const std::string &path)
-        : m_strFilepath(path), m_pLocalBuffer(nullptr), m_iWidth(0)
-        , m_iHeight(0), m_BPP(0)
+    OpenGLTexture::OpenGLTexture(uint32_t width, uint32_t height)
+            : m_uWidth(width), m_uHeight(height)
     {
+        m_InternalFormat = GL_RGBA8;
+        m_DataFormat = GL_RGBA;
+
+        GLCall(glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID));
+        GLCall(glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_uWidth, m_uHeight));
+
+        GLCall(glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        GLCall(glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+
+        GLCall(glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT));
+        GLCall(glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT));
+    }
+
+    OpenGLTexture::OpenGLTexture(const std::string &path)
+        : m_strFilepath(path), m_uWidth(0)
+        , m_uHeight(0)
+    {
+        int width, height, channels;
         stbi_set_flip_vertically_on_load(1);
-        m_pLocalBuffer = stbi_load(path.c_str(), &m_iWidth, &m_iHeight, &m_BPP, 4);
+        stbi_uc* data = nullptr;
+        {
+//            HZ_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
+            data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+        }
+        FOX_CORE_ASSERT(data, "Failed to load image!");
+        m_uWidth = width;
+        m_uHeight = height;
 
-        GLCall(glGenTextures(1, &m_RendererID));
-        GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
+        GLenum internalFormat = 0, dataFormat = 0;
+        if (channels == 4)
+        {
+            internalFormat = GL_RGBA8;
+            dataFormat = GL_RGBA;
+        }
+        else if (channels == 3)
+        {
+            internalFormat = GL_RGB8;
+            dataFormat = GL_RGB;
+        }
 
-        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        m_InternalFormat = internalFormat;
+        m_DataFormat = dataFormat;
 
-        GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_iWidth, m_iHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_pLocalBuffer));
-        Unbind();
+        FOX_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
 
-        if (m_pLocalBuffer)
-            stbi_image_free(m_pLocalBuffer);
+        GLCall(glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID));
+        GLCall(glTextureStorage2D(m_RendererID, 1, internalFormat, m_uWidth, m_uHeight));
+
+        GLCall(glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        GLCall(glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+
+        GLCall(glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT));
+        GLCall(glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT));
+
+        GLCall(glTextureSubImage2D(m_RendererID, 0, 0, 0, m_uWidth, m_uHeight, dataFormat, GL_UNSIGNED_BYTE, data));
+
+        stbi_image_free(data);
     }
 
     OpenGLTexture::~OpenGLTexture()
@@ -38,12 +79,12 @@ namespace fox
 
     uint32_t OpenGLTexture::GetWidth() const
     {
-        return m_iWidth;
+        return m_uWidth;
     }
 
     uint32_t OpenGLTexture::GetHeight() const
     {
-        return m_iHeight;
+        return m_uHeight;
     }
 
     uint32_t OpenGLTexture::GetRendererID() const
@@ -53,7 +94,9 @@ namespace fox
 
     void OpenGLTexture::SetData(void *data, uint32_t size)
     {
-
+        uint32_t bpp = m_DataFormat == GL_RGBA ? 4 : 3;
+        FOX_CORE_ASSERT(size == m_uWidth * m_uHeight * bpp, "Data must be entire texture");
+        GLCall(glTextureSubImage2D(m_RendererID, 0, 0, 0, m_uWidth, m_uHeight, m_DataFormat, GL_UNSIGNED_BYTE, data));
     }
 
     void OpenGLTexture::Bind(uint32_t slot) const

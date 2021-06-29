@@ -44,8 +44,13 @@ namespace fox
         return RendererAPI::GetGraphicPlugin()->CreateVertexBuffer(vertices, size);
     }
 
-    ref<IndexBuffer> IndexBuffer::Create(uint32_t *indices, uint32_t size)
+    ref<VertexBuffer> VertexBuffer::Create(uint32_t size)
     {
-        return RendererAPI::GetGraphicPlugin()->CreateIndexBuffer(indices, size);
+        return RendererAPI::GetGraphicPlugin()->CreateVertexBuffer(size);
+    }
+
+    ref<IndexBuffer> IndexBuffer::Create(uint32_t *indices, uint32_t count)
+    {
+        return RendererAPI::GetGraphicPlugin()->CreateIndexBuffer(indices, count);
     }
 }

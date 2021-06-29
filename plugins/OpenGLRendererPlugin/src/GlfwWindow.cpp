@@ -154,7 +154,7 @@ GlfwWindow::~GlfwWindow()
 void GlfwWindow::OnUpdate()
 {
     glfwPollEvents();
-    glfwSwapBuffers(m_pWindow);
+    m_pContext->SwapBuffers();
 }
 
 uint32_t GlfwWindow::GetWidth() const

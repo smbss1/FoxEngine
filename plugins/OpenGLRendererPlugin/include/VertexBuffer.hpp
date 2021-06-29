@@ -13,16 +13,18 @@ namespace fox
     {
     public:
         OpenGLVertexBuffer();
-        OpenGLVertexBuffer(const void *data, unsigned int size);
+        explicit OpenGLVertexBuffer(uint32_t size);
+        OpenGLVertexBuffer(const void *data, uint32_t size);
 
         ~OpenGLVertexBuffer() override;
 
         void Bind() const override;
-
         void Unbind() const override;
 
         [[nodiscard]] const BufferLayout& GetLayout() const override;
         void SetLayout(const BufferLayout& layout) override;
+
+        void SetData(const void *data, uint32_t size) override;
 
     private:
         unsigned int m_RendererID{};

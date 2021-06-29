@@ -50,7 +50,8 @@ namespace fox
     public:
         virtual void update() = 0;
         virtual scope<GraphicsContext> CreateGraphicsContext(void* window) = 0;
-        virtual ref<IndexBuffer> CreateIndexBuffer(uint32_t* indices, uint32_t size) = 0;
+        virtual ref<IndexBuffer> CreateIndexBuffer(uint32_t* indices, uint32_t count) = 0;
+        virtual ref<VertexBuffer> CreateVertexBuffer(uint32_t size) = 0;
         virtual ref<VertexBuffer> CreateVertexBuffer(float* vertices, uint32_t size) = 0;
         virtual ref<VertexArray> CreateVertexArray() = 0;
         virtual ref<RendererAPI> CreateRenderer() = 0;

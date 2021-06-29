@@ -29,7 +29,7 @@ namespace fox
 
     class Texture2D : public Texture
     {
-//    public:
+    public:
         static ref<Texture2D> Create(uint32_t width, uint32_t height);
         static ref<Texture2D> Create(const std::string& path);
     };

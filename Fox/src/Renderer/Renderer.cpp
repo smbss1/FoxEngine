@@ -4,6 +4,7 @@
 
 #include <Plugin/IPlugin.hpp>
 #include <Renderer/RendererCommand.hpp>
+#include <Renderer/Renderer2D.hpp>
 #include "Renderer/Renderer.hpp"
 #include "Renderer/Shader.hpp"
 #include "Renderer/VertexArray.hpp"
@@ -15,6 +16,7 @@ namespace fox
     void Renderer::Init()
     {
         RendererCommand::Init();
+        Renderer2D::Init();
     }
 
     void Renderer::BeginScene(OrthographicCamera& camera)
@@ -34,5 +36,10 @@ namespace fox
 
         pVertexArray->Bind();
         RendererCommand::DrawIndexed(pVertexArray);
+    }
+
+    void Renderer::OnWindowResize(unsigned int width, unsigned int height)
+    {
+        RendererCommand::SetViewport(0, 0, width, height);
     }
 }

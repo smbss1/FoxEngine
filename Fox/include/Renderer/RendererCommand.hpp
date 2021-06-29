@@ -20,9 +20,12 @@ namespace fox
         static void Shutdown();
         static void SetClearColor(const glm::vec4& color);
         static void Clear();
-        static void DrawIndexed(const ref<VertexArray>& pVertexArray);
+        static void DrawIndexed(const ref<VertexArray>& pVertexArray, uint32_t uIndexCount = 0);
 
         static void SetRendererAPI(const ref<RendererAPI>& pRendererAPI);
+
+        static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+
     private:
         static ref<RendererAPI> m_spRenderer;
     };

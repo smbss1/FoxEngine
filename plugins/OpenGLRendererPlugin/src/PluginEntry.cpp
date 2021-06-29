@@ -126,8 +126,6 @@ namespace fox
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize = ImVec2((float)m_oApp->GetWindow()->GetWidth(), (float)m_oApp->GetWindow()->GetHeight());
 
-        ImGui::ShowDemoWindow();
-
         // Rendering
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -148,7 +146,7 @@ namespace fox
 
     ref<Texture2D> OpenGLRendererPlugin::create_texture(uint32_t width, uint32_t height)
     {
-        return nullptr; // new_ref<OpenGLTexture>(width, height);
+        return new_ref<OpenGLTexture>(width, height);
     }
 
     ref<Texture2D> OpenGLRendererPlugin::create_texture(const std::string& path)
@@ -179,6 +177,11 @@ namespace fox
     ref<VertexBuffer> OpenGLRendererPlugin::CreateVertexBuffer(float* vertices, uint32_t size)
     {
         return fox::new_ref<OpenGLVertexBuffer>(vertices, size);
+    }
+
+    ref<VertexBuffer> OpenGLRendererPlugin::CreateVertexBuffer(uint32_t size)
+    {
+        return fox::new_ref<OpenGLVertexBuffer>(size);
     }
 
     ref<VertexArray> OpenGLRendererPlugin::CreateVertexArray()

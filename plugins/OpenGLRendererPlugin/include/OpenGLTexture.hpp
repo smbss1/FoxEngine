@@ -11,6 +11,7 @@ namespace fox
     class OpenGLTexture : public Texture2D
     {
     public:
+        OpenGLTexture(uint32_t width, uint32_t height);
         explicit OpenGLTexture(const std::string& path);
         ~OpenGLTexture() override;
 
@@ -27,9 +28,9 @@ namespace fox
 
     private:
         std::string m_strFilepath;
-        unsigned char* m_pLocalBuffer;
         uint32_t m_RendererID{};
-        int m_iWidth, m_iHeight, m_BPP;
+        uint32_t m_uWidth, m_uHeight;
+        GLenum m_InternalFormat, m_DataFormat;
     };
 }
 

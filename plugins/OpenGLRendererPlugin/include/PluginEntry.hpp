@@ -45,6 +45,7 @@ namespace fox
         ref<Camera> create_camera() override;
         ref<EditorCamera> create_editor_camera() override;
         ref<IndexBuffer> CreateIndexBuffer(uint32_t* indices, uint32_t size) override;
+        ref<VertexBuffer> CreateVertexBuffer(uint32_t size) override;
         ref<VertexBuffer> CreateVertexBuffer(float* vertices, uint32_t size) override;
         ref<VertexArray> CreateVertexArray() override;
         ref<RendererAPI> CreateRenderer() override;
