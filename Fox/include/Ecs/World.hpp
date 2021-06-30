@@ -687,7 +687,7 @@ namespace fox
             return;
         Entity ent(&m_oWorld, e);
         try {
-            m_oFunc(ent, ent.get<Cs>().value()...);
+            m_oFunc(ent, m_oWorld.template get_component<Cs>(e).value()...);
         } catch (const std::exception& e) {
             std::cerr << e.what() << std::endl;
         }

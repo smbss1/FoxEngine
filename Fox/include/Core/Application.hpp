@@ -5,7 +5,6 @@
 #include <Renderer/OrthographicCamera.hpp>
 #include <Events/ApplicationEvent.hpp>
 #include "FoxEcs.hpp"
-#include "Core/Managers/SceneManager.hpp"
 #include "Core/Managers/ResourceManager.hpp"
 #include "Core.hpp"
 #include "Window.hpp"

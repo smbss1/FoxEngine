@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <Core/Managers/PluginManager.hpp>
-#include <Core/Managers/SceneManager.hpp>
 #include "PluginEntry.hpp"
 
 namespace fox
@@ -17,24 +16,29 @@ namespace fox
         m_oApp = &app;
         std::cout << "[CppScriptPlugin] Init!" << std::endl;
 
-        app.get_world().system<NativeScript>().kind(ecs::OnUpdate)
-            .each([&](Entity& e, NativeScript& script)
-                  {
-                      script.on_update();
-                  });
-
-        app.get_world().system<NativeScript>().kind(ecs::OnAdd)
-            .each([&](Entity& e, NativeScript& script)
-                  {
-                      script.m_pWorld = e.get_world();
-                      script.on_create_all(e.get_id(), app, *app.get<SceneManager>()->get_active());
-                  });
-
-        app.get_world().system<NativeScript>().kind(ecs::OnAddScript)
-            .each([&](Entity& e, NativeScript& script)
-              {
-                  script.on_create(e.get_id(), app, *app.get<SceneManager>()->get_active());
-              });
+//        app.get_world().system<NativeScript>().kind(ecs::OnUpdate)
+//            .each([&](Entity& e, NativeScript& script)
+//                  {
+//                fox::info("Native Update");
+//                      script.on_update();
+//                  });
+//
+//        app.get_world().system<NativeScript>().kind(ecs::OnAdd)
+//            .each([&](Entity& e, NativeScript& script)
+//                  {
+//                      fox::info("Native OnAdd");
+//
+//                      script.m_pWorld = e.get_world();
+//                      script.on_create_all(e.get_id(), app);
+//                  });
+//
+//        app.get_world().system<NativeScript>().kind(ecs::OnAddScript)
+//            .each([&](Entity& e, NativeScript& script)
+//              {
+//                  fox::info("Native OnAddScript");
+//
+//                  script.on_create(e.get_id(), app);
+//              });
     }
 
     void CppScriptPlugin::unplug(Application &app)
@@ -54,6 +58,6 @@ namespace fox
 
 extern "C" void RegisterPlugin(fox::PluginManager &pm)
 {
-    fox::ref<fox::CppScriptPlugin> plugin = fox::new_ref<fox::CppScriptPlugin>();
-    pm.AddPlugin(plugin);
+//    fox::ref<fox::CppScriptPlugin> plugin = fox::new_ref<fox::CppScriptPlugin>();
+//    pm.AddPlugin(plugin);
 }

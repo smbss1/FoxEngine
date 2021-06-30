@@ -23,6 +23,8 @@ namespace fox
     class RendererAPI;
     class Shader;
 
+    struct FramebufferSpecification;
+
     class GraphicsContext;
 
     class Window;
@@ -60,9 +62,8 @@ namespace fox
 
         virtual ref<Texture2D> create_texture(uint32_t width, uint32_t height) = 0;
         virtual ref<Texture2D> create_texture(const std::string& path) = 0;
-        virtual ref<Framebuffer> create_frame_buffer(uint32_t width, uint32_t height) = 0;
+        virtual ref<Framebuffer> CreateFramebuffer(const FramebufferSpecification& spec) = 0;
         virtual ref<Camera> create_camera() = 0;
-        virtual ref<EditorCamera> create_editor_camera() = 0;
     };
 }
 

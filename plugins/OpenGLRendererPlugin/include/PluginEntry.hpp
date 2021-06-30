@@ -41,9 +41,8 @@ namespace fox
         scope<GraphicsContext> CreateGraphicsContext(void* window) override;
         ref<Texture2D> create_texture(uint32_t width, uint32_t height) override;
         ref<Texture2D> create_texture(const std::string& path) override;
-        ref<Framebuffer> create_frame_buffer(uint32_t width, uint32_t height) override;
+        ref<Framebuffer> CreateFramebuffer(const FramebufferSpecification& spec) override;
         ref<Camera> create_camera() override;
-        ref<EditorCamera> create_editor_camera() override;
         ref<IndexBuffer> CreateIndexBuffer(uint32_t* indices, uint32_t size) override;
         ref<VertexBuffer> CreateVertexBuffer(uint32_t size) override;
         ref<VertexBuffer> CreateVertexBuffer(float* vertices, uint32_t size) override;
@@ -52,17 +51,9 @@ namespace fox
         ref<Shader> CreateShader(const std::string &path) override;
         ref<Shader> CreateShader(const std::string &name, const std::string &vertexSrc, const std::string &fragSrc) override;
 
-        void set_vsync(bool value);
-        bool is_vsync();
-
-
         Application& GetApp() const { return *m_oApp; }
-        // sf::RenderWindow& GetWindow() { return m_oWindow; }
 
     private:
-        // sf::Font m_font;
-
-        bool m_bIsVSync;
         Application* m_oApp = nullptr;
     };
 
@@ -87,39 +78,6 @@ namespace fox
 
     private:
         Application* m_oApp = nullptr;
-    };
-
-
-    class SFMLFrameBuffer : public Framebuffer
-    {
-    public:
-        SFMLFrameBuffer(OpenGLRendererPlugin& plugin, uint32_t width, uint32_t height);
-
-        void Bind() override;
-        void Unbind() override;
-
-        void Resize(uint32_t width, uint32_t height) override;
-        uint32_t GetRendererID() const override;
-//        virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) = 0;
-//
-//        virtual void ClearAttachment(uint32_t attachmentIndex, int value) override;
-//
-//        virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const override;
-    private:
-    };
-
-    class SFMLEditorCamera : public EditorCamera
-    {
-    public:
-        explicit SFMLEditorCamera(OpenGLRendererPlugin& plugin);
-        // SFMLEditorCamera(float fov, float aspectRatio, float nearClip, float farClip);
-
-        void OnZoom(float factor) override;
-        void OnResize(const Vec2& size) override;
-        void OnMove(const Vec2& offset) override;
-    private:
-
-        OpenGLRendererPlugin& m_oPlugin;
     };
 }
 

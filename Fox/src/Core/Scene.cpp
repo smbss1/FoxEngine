@@ -5,56 +5,49 @@
 ** Scene.cpp
 */
 
+#include <Renderer/Camera.hpp>
+#include <Components/CameraComponent.hpp>
+#include <Renderer/Renderer2D.hpp>
+#include <Components/NativeScript.hpp>
 #include "Core/Scene.hpp"
 #include "Components.hpp"
 #include "Core/Application.hpp"
 
 namespace fox
 {
-    Scene::Scene(const std::string& strName): m_strName(strName)
+    Scene::Scene(Application& app) : m_oApp(app)
     {
+        // Draw Systems
+        m_oWorld.system<TransformComponent, SpriteRenderer>().kind(ecs::OnStore)
+                .each([](Entity& e, TransformComponent& transform, SpriteRenderer& sprite)
+                      {
+                          Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)e.get_id());
+                      });
+
+
+        // Native Script Systems
+        m_oWorld.system<NativeScript>().kind(ecs::OnUpdate)
+                .each([&](Entity& e, NativeScript& script)
+                      {
+                          script.on_update();
+                      });
+
+        m_oWorld.system<NativeScript>().kind(ecs::OnAdd)
+                .each([&](Entity& e, NativeScript& script)
+                      {
+                          script.m_pWorld = e.get_world();
+                          script.on_create_all(e.get_id(), app);
+                      });
+
+        m_oWorld.system<NativeScript>().kind(ecs::OnAddScript)
+                .each([&](Entity& e, NativeScript& script)
+                      {
+                          script.on_create(e.get_id(), app);
+                      });
     }
 
-    void Scene::enable(Application& app)
-    {
-        on_enable(app);
-        get_world().run_phase(game::OnStart);
-    }
-    void Scene::on_enable(Application& app) { }
-
-    void Scene::disable(Application& app)
-    {
-        on_disable(app);
-
-        if (!m_bIsPaused)
-            get_world().clear_entities();
-    }
-    void Scene::on_disable(Application& app) { }
-
-    void Scene::update(Application& app)
-    {
-        get_world().run_phase(ecs::PreUpdate);
-        on_update(app);
-        get_world().run_phase(ecs::OnUpdate);
-        get_world().run_phase(ecs::OnValidate);
-        get_world().run_phase(ecs::PostUpdate);
-        get_world().run_phase(ecs::PreStore);
-        get_world().deleted_entities();
-    }
-
-    void Scene::fix_update()
-    {
-        get_world().run_phase(ecs::PreFixUpdate);
-        get_world().run_phase(ecs::PostFixUpdate);
-    }
-
-    void Scene::draw()
-    {
-        get_world().run_phase(ecs::OnStore);
-    }
-
-    void Scene::init_systems()
-    {
+//    void Scene::init_systems()
+//    {
 //        get_world().system<NativeScript, BoxCollider>()
 //                .kind(ecs::OnAdd)
 //                .each([](Entity e, NativeScript& script, BoxCollider& shape)
@@ -227,20 +220,77 @@ namespace fox
 //                  {
 //                      box.Draw();
 //                  });
+//    }
+
+    Entity Scene::NewEntity(const std::string &name)
+    {
+        Entity e = m_oWorld.new_entity(name);
+        e.add<TransformComponent>();
+        return e;
     }
 
-    World& Scene::get_world()
+    void Scene::DestroyEntity(Entity entity)
     {
-        return m_pApp->get_world();
+        m_oWorld.delete_entity(entity.get_id());
     }
 
-    std::string Scene::name() const
+    void Scene::OnUpdateRuntime()
     {
-        return m_strName;
+        m_oWorld.run_phase(ecs::PreUpdate);
+        m_oWorld.run_phase(ecs::OnUpdate);
+        m_oWorld.run_phase(ecs::OnValidate);
+        m_oWorld.run_phase(ecs::PostUpdate);
+        m_oWorld.run_phase(ecs::PreStore);
+        m_oWorld.deleted_entities();
+
+        // Render 2D
+        Camera* mainCamera = nullptr;
+        glm::mat4 cameraTransform;
+        {
+             auto view = m_oWorld.get_entities_with<TransformComponent, CameraComponent>();
+             for (auto entity : view)
+             {
+                 auto& transform = entity.get<TransformComponent>().value();
+                 auto& camera = entity.get<CameraComponent>().value();
+
+                 if (camera.Primary)
+                 {
+                     mainCamera = &camera.camera;
+                     cameraTransform = transform.GetTransform();
+                     break;
+                 }
+             }
+        }
+
+        if (mainCamera)
+        {
+             Renderer2D::BeginScene(*mainCamera, cameraTransform);
+             m_oWorld.run_phase(ecs::OnStore);
+             Renderer2D::EndScene();
+        }
     }
 
-    void Scene::set_application(Application &app)
+    void Scene::OnViewportResize(uint32_t width, uint32_t height)
     {
-        m_pApp = &app;
+        m_ViewportHeight = height;
+        m_ViewportWidth = width;
+
+        auto view = m_oWorld.get_entities_with<CameraComponent>();
+        for (auto e : view)
+        {
+            auto& cameraComponent = e.get<CameraComponent>().value();
+            if (!cameraComponent.FixedAspectRatio)
+                cameraComponent.camera.SetViewportSize(width, height);
+        }
+    }
+
+    Entity Scene::GetPrimaryCameraEntity()
+    {
+        return Entity();
+    }
+
+    World &Scene::GetWorld()
+    {
+        return m_oWorld;
     }
 }// namespace fox

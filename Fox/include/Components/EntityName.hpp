@@ -12,58 +12,46 @@
 
 namespace fox
 {
-    class EntityName
+    struct EntityName
     {
-    public:
+        std::string name;
         /**
-         * @brief Constructor
-         * @param name the name
+         * @brief Default Constructor
+         * @param tag the tag
          */
-        EntityName(const std::string& name) : m_strName(name) {}
+        EntityName() = default;
 
         /**
-         * @brief Get the name
-         * @return the name
+         * @brief Default Copy Constructor
          */
-        std::string get() const
-        {
-            return m_strName;
-        }
+        EntityName(const EntityName&) = default;
 
-        void set(const std::string& name)
-        {
-            m_strName = name;
-        }
-
-    private:
-        std::string m_strName;
-    };
-
-    class EntityTag
-    {
-    public:
         /**
          * @brief Constructor
          * @param tag the tag
          */
-        EntityTag(const std::string& tag) : m_strName(tag) {}
+        explicit EntityName(const std::string& strName) : name(strName) {}
+    };
+
+    struct EntityTag
+    {
+        std::string tag;
+        /**
+         * @brief Default Constructor
+         * @param tag the tag
+         */
+        EntityTag() = default;
 
         /**
-         * @brief Get the tag
-         * @return the tag
+         * @brief Default Copy Constructor
          */
-        std::string get() const
-        {
-            return m_strName;
-        }
+        EntityTag(const EntityTag&) = default;
 
-        void set(const std::string& name)
-        {
-            m_strName = name;
-        }
-
-    private:
-        std::string m_strName;
+        /**
+         * @brief Constructor
+         * @param tag the tag
+         */
+        explicit EntityTag(const std::string& strTag) : tag(strTag) {}
     };
 }
 #endif

@@ -17,6 +17,7 @@
 #include "Renderer/RendererCommand.hpp"
 #include "Renderer/Buffer.hpp"
 #include "Renderer/VertexArray.hpp"
+#include "Renderer/Framebuffer.hpp"
 #include "Renderer/Texture.hpp"
 #include "Renderer/SubTexture2D.hpp"
 #include "Renderer/Shader.hpp"

@@ -19,6 +19,7 @@
 #include <OpenGLRendererAPI.hpp>
 #include <OpenGLContext.hpp>
 #include <ImGui/imgui_impl_glfw.h>
+#include <OpenGLFrameBuffer.hpp>
 #include "GlfwWindow.hpp"
 #include "Core/Input/InputManager.hpp"
 #include "Core/Managers/ResourceManager.hpp"
@@ -154,19 +155,14 @@ namespace fox
         return new_ref<OpenGLTexture>(path);
     }
 
-    ref<Framebuffer> OpenGLRendererPlugin::create_frame_buffer(uint32_t width, uint32_t height)
+    ref<Framebuffer> OpenGLRendererPlugin::CreateFramebuffer(const FramebufferSpecification &spec)
     {
-        return new_ref<SFMLFrameBuffer>(*this, width, height);
+        return new_ref<OpenGLFrameBuffer>(spec);
     }
 
     ref<Camera> OpenGLRendererPlugin::create_camera()
     {
         return new_ref<Camera>();
-    }
-
-    ref<EditorCamera> OpenGLRendererPlugin::create_editor_camera()
-    {
-        return new_ref<SFMLEditorCamera>(*this);
     }
 
     ref<IndexBuffer> OpenGLRendererPlugin::CreateIndexBuffer(uint32_t* indices, uint32_t size)
@@ -204,17 +200,6 @@ namespace fox
         return new_ref<OpenGLShader>(name, vertexSrc, fragSrc);
     }
 
-
-    void OpenGLRendererPlugin::set_vsync(bool value)
-    {
-        m_bIsVSync = value;
-    }
-
-    bool OpenGLRendererPlugin::is_vsync()
-    {
-        return m_bIsVSync;
-    }
-
     const std::string &OpenGLRendererPlugin::get_name() const
     {
         return "SFML";
@@ -224,92 +209,6 @@ namespace fox
     {
         return 1;
     }
-//
-//    void OpenGLRendererPlugin::SetRenderTexture(sf::RenderTexture &texture)
-//    {
-//        m_RenderTexture = &texture;
-//    }
-//
-//    void OpenGLRendererPlugin::SetEditorCamera(sf::View &view)
-//    {
-//        m_EditorCamera = &view;
-//    }
-//
-//    sf::RenderTexture &OpenGLRendererPlugin::GetRenderTexture()
-//    {
-//        return *m_RenderTexture;
-//    }
-//
-//    sf::View &OpenGLRendererPlugin::GetEditorCamera()
-//    {
-//        return *m_EditorCamera;
-//    }
-
-    SFMLFrameBuffer::SFMLFrameBuffer(OpenGLRendererPlugin& plugin, uint32_t width, uint32_t height)
-    {
-//        m_Texture->create(width, height);
-//        plugin.SetRenderTexture(*m_Texture);
-//        m_Texture->clear(sf::Color::Transparent);
-    }
-
-    void SFMLFrameBuffer::Bind()
-    {
-//        m_Texture->display();
-    }
-
-    void SFMLFrameBuffer::Unbind()
-    {
-//        m_Texture->clear(sf::Color::Blue);
-    }
-
-    void SFMLFrameBuffer::Resize(uint32_t width, uint32_t height)
-    {
-//        m_Texture->create(width, height);
-    }
-
-    uint32_t SFMLFrameBuffer::GetRendererID() const
-    {
-        return 0;
-    }
-
-    SFMLEditorCamera::SFMLEditorCamera(OpenGLRendererPlugin& plugin) : m_oPlugin(plugin)
-    {
-//        m_View = plugin.GetRenderTexture().getDefaultView();
-//        m_View.setCenter(0, 0);
-//        plugin.SetEditorCamera(m_View);
-    }
-
-//    SFMLEditorCamera::SFMLEditorCamera(float fov, float aspectRatio, float nearClip, float farClip)
-//            : EditorCamera(fov, aspectRatio, nearClip, farClip)
-//    {
-//    }
-
-    void SFMLEditorCamera::OnZoom(float factor)
-    {
-//        sf::Vector2i mouse = { static_cast<int>(m_InitialMousePosition.x), static_cast<int>(m_InitialMousePosition.y)};
-//        m_View.zoom(factor);
-//        m_View.move(((sf::Vector2f(m_oPlugin.GetRenderTexture().mapPixelToCoords(mouse) - m_View.getCenter())).x) * factor,
-//      ((sf::Vector2f(m_oPlugin.GetRenderTexture().mapPixelToCoords(mouse) - m_View.getCenter()).y)) * factor);
-    }
-
-    void SFMLEditorCamera::OnResize(const Vec2& size)
-    {
-//        sf::FloatRect visibleArea(m_View.getCenter().x * 2, m_View.getCenter().y * 2, size.x, size.y);
-//        m_View = sf::View(visibleArea);
-//        m_View.setCenter(m_View.getCenter());
-//        m_View.setSize(size.x, size.y);
-    }
-
-    void SFMLEditorCamera::OnMove(const Vec2& offset)
-    {
-//        sf::Vector2f pan = {offset.x, offset.y};
-//
-//        sf::Transform t;
-//        // t.rotate(m_Rotation);
-//        pan = t * pan;
-//        m_View.move(pan * m_oPlugin.GetApp().get<TimeInfo>()->delta_time);
-    }
-
 
     void GLFWPlugin::plug(Application &app)
     {

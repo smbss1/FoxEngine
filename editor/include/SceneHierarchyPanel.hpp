@@ -13,9 +13,9 @@ namespace fox
     {
     public:
         explicit SceneHierarchyPanel() = default;
-        explicit SceneHierarchyPanel(World* context);
+        explicit SceneHierarchyPanel(const ref<Scene>& context);
 
-        void SetContext(World* context);
+        void SetContext(const ref<Scene>& context);
 
         void OnImGui();
 
@@ -23,8 +23,11 @@ namespace fox
         void DrawEntityNode(Entity& e);
         void DrawComponents(Entity& entity);
 
+        template<typename T>
+        void DrawComponent(const std::string& name, std::function<void(T& component)> callback);
+
     private:
-        World* m_pContext = nullptr;
+        ref<Scene> m_pContext = nullptr;
         Entity m_SelectedEntity;
     };
 }

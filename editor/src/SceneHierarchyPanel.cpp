@@ -2,19 +2,22 @@
 // Created by samuel on 25/06/2021.
 //
 
+#include <glm/gtc/type_ptr.hpp>
 #include <ImGui/imgui.h>
 #include <Components/EntityName.hpp>
 #include <Components/Transform.hpp>
+#include <Components/CameraComponent.hpp>
+#include <Components/SpriteRenderer.hpp>
 #include "SceneHierarchyPanel.hpp"
 
 namespace fox
 {
-    SceneHierarchyPanel::SceneHierarchyPanel(World* context)
+    SceneHierarchyPanel::SceneHierarchyPanel(const ref<Scene>& context)
     {
         SetContext(context);
     }
 
-    void SceneHierarchyPanel::SetContext(World* context)
+    void SceneHierarchyPanel::SetContext(const ref<Scene>& context)
     {
         m_pContext = context;
     }
@@ -22,9 +25,9 @@ namespace fox
     void SceneHierarchyPanel::OnImGui()
     {
         ImGui::Begin("Scene Hierarchy");
-        m_pContext->each([&](auto entityid)
+        m_pContext->GetWorld().each([&](auto entityid)
          {
-            fox::Entity entity {m_pContext, entityid};
+            fox::Entity entity {&m_pContext->GetWorld(), entityid};
              DrawEntityNode(entity);
          });
 
@@ -44,7 +47,7 @@ namespace fox
     {
         auto &name = entity.get<EntityName>().value();
         ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_OpenOnArrow : 0) | ImGuiTreeNodeFlags_Selected;
-        bool expanded = ImGui::TreeNodeEx((void*)entity.get_id(), flags, "%s", name.get().c_str());
+        bool expanded = ImGui::TreeNodeEx((void*)entity.get_id(), flags, "%s", name.name.c_str());
         if (ImGui::IsItemClicked())
         {
             m_SelectedEntity = entity;
@@ -63,40 +66,89 @@ namespace fox
         {
             char buffer[256];
             memset(buffer, 0, sizeof(buffer));
-            strcpy(buffer, has_name->get().c_str());
+            strcpy(buffer, has_name->name.c_str());
 
             if (ImGui::InputText("Name", buffer, sizeof(buffer)))
-            {
-                has_name->set(buffer);
-            }
+                has_name->name = buffer;
         }
 
-        auto has_transform = entity.get<fox::Transform>();
-        if (has_transform)
+        DrawComponent<fox::TransformComponent>("Transform", [](fox::TransformComponent& transform)
         {
-            if (ImGui::TreeNodeEx((void*)m_pContext->get_type_idx<fox::Transform>(), ImGuiTreeNodeFlags_DefaultOpen, "Transform")) {
+            ImGui::DragFloat3("Position", glm::value_ptr(transform.position), 0.1f);
+            ImGui::DragFloat3("Rotation", glm::value_ptr(transform.rotation), 0.1f);
+            ImGui::DragFloat3("Scale", glm::value_ptr(transform.scale), 0.1f);
+        });
 
-                float vPos[3] = {has_transform->position.x, has_transform->position.y, has_transform->position.z};
-                if (ImGui::DragFloat3("Position", vPos, 0.1f)) {
-                    has_transform->position.x = vPos[0];
-                    has_transform->position.y = vPos[1];
-                    has_transform->position.z = vPos[2];
+        DrawComponent<CameraComponent>("Camera", [](CameraComponent& cameraComp)
+        {
+            auto& camera = cameraComp.camera;
+
+            ImGui::Checkbox("Primary", &cameraComp.Primary);
+
+            const char* projectionTypeString[] = { "Perspective", "Orthographic" };
+            const char* currentProjectionTypeString = projectionTypeString[(int)camera.GetProjectionType()];
+            if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
+            {
+                for (int i = 0; i < 2; ++i)
+                {
+                    bool isSelected = currentProjectionTypeString == projectionTypeString[i];
+                    if (ImGui::Selectable(projectionTypeString[i], isSelected))
+                    {
+                        currentProjectionTypeString = projectionTypeString[i];
+                        camera.SetProjectionType((SceneCamera::ProjectionType)i);
+                    }
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();
                 }
+                ImGui::EndCombo();
+            }
 
-                float vRot[3] = {has_transform->rotation.x, has_transform->rotation.y, has_transform->rotation.z};
-                if (ImGui::DragFloat3("Rotation", vRot, 0.1f)) {
-                    has_transform->rotation.x = vRot[0];
-                    has_transform->rotation.y = vRot[1];
-                    has_transform->rotation.z = vRot[2];
-                }
+            if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
+            {
+                float size = camera.GetOrthographicSize();
+                if (ImGui::DragFloat("Size", &size))
+                    camera.SetOrthographicSize(size);
 
-                float vScale[3] = {has_transform->scale.x, has_transform->scale.y, has_transform->scale.z};
-                if (ImGui::DragFloat3("Scale", vScale, 0.1f)) {
-                    has_transform->scale.x = vScale[0];
-                    has_transform->scale.y = vScale[1];
-                    has_transform->scale.z = vScale[2];
-                }
+                float near = camera.GetOrthographicNearClip();
+                if (ImGui::DragFloat("Near", &near))
+                    camera.SetOrthographicNearClip(near);
 
+                float far = camera.GetOrthographicFarClip();
+                if (ImGui::DragFloat("Far", &far))
+                    camera.SetOrthographicFarClip(far);
+
+                ImGui::Checkbox("Fixed Aspect Ratio", &cameraComp.FixedAspectRatio);
+            }
+            else if (camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
+            {
+                float fov = glm::degrees(camera.GetPerspectiveVerticalFOV());
+                if (ImGui::DragFloat("Size", &fov))
+                    camera.SetPerspectiveVerticalFOV(glm::radians(fov));
+
+                float near = camera.GetPerspectiveNearClip();
+                if (ImGui::DragFloat("Near", &near))
+                    camera.SetPerspectiveNearClip(near);
+
+                float far = camera.GetPerspectiveFarClip();
+                if (ImGui::DragFloat("Far", &far))
+                    camera.SetPerspectiveFarClip(far);
+            }
+        });
+
+        DrawComponent<SpriteRenderer>("Sprite Renderer", [](SpriteRenderer& renderer)
+        {
+            ImGui::ColorEdit4("Color", glm::value_ptr(renderer.Color));
+        });
+    }
+
+    template<typename T>
+    void SceneHierarchyPanel::DrawComponent(const std::string &name, std::function<void(T &)> callback)
+    {
+        auto has_component = m_SelectedEntity.get<T>();
+        if (has_component)
+        {
+            if (ImGui::TreeNodeEx((void*)typeid(T).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, name.c_str())) {
+                callback(*has_component);
                 ImGui::TreePop();
             }
         }

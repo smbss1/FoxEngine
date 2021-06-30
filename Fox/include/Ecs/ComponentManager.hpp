@@ -141,10 +141,9 @@ namespace fox
          * @return fox::Option<T&> an optionnal value
          */
         template<typename T>
-        fox::Option<T &> GetComponent(EntityId entity)
+        fox::Option<T&> GetComponent(EntityId entity)
         {
-            if (!ComponentIsRegistered<T>())
-                return {};
+            assert(ComponentIsRegistered<T>());
             return GetComponentArray<T>()->GetData(entity);
         }
 

@@ -4,16 +4,21 @@
 #define FOX_SPRITE_RENDERER_HPP_
 
 #include <string>
+#include <glm/glm.hpp>
 
 struct SpriteRenderer
 {
-    SpriteRenderer(const std::string& strPath, const std::string& strId, int d)
-        : m_strPath(strPath), m_strId(strId), depth(d)
+    SpriteRenderer() = default;
+    SpriteRenderer(const SpriteRenderer&) = default;
+    explicit SpriteRenderer(const glm::vec4& color) : Color(color) {}
+    SpriteRenderer(const std::string& strPath, const std::string& strId, int order)
+        : Filepath(strPath), FileId(strId), Depth(order)
     {
     }
-    std::string m_strPath;
-    std::string m_strId;
-    int depth = 0;
+    std::string Filepath;
+    std::string FileId;
+    int Depth = 0;
+    glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 };
 
 #endif
