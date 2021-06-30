@@ -117,7 +117,7 @@ namespace fox
         return !ent.empty();
     }
 
-    DynamicArray<EntityId>& World::get_entities() const
+    std::vector<EntityId>& World::get_entities() const
     {
         return m_pEntityManager->m_vEntity;
     }

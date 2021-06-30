@@ -45,7 +45,7 @@ namespace fox
             EntityId id = mAvailableEntities.front();
             mAvailableEntities.pop();
             ++mLivingEntityCount;
-            m_vEntity.push(id);
+            m_vEntity.push_back(id);
             m_vSignatures.emplace(id, std::move(bitset()));
 
             return id;
@@ -74,7 +74,7 @@ namespace fox
 
             m_vSignatures[entity].reset();
             mAvailableEntities.push(entity);
-            m_vEntity.remove(entity);
+            m_vEntity.erase(std::remove(m_vEntity.begin(), m_vEntity.end(), entity));
             --mLivingEntityCount;
         }
 
@@ -145,7 +145,7 @@ namespace fox
     public:
         std::queue<EntityId> mAvailableEntities;
         std::unordered_map<EntityId, CompSignature> m_vSignatures;
-        DynamicArray<EntityId> m_vEntity;
+        std::vector<EntityId> m_vEntity;
         uint32_t mLivingEntityCount;
     };
 }

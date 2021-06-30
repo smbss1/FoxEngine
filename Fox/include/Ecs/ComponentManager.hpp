@@ -48,9 +48,6 @@ namespace fox
         template<typename T>
         CompId GetComponentType()
         {
-            if (!ComponentIsRegistered<T>())
-                RegisterComponent<T>();
-
             return m_vComponentTypes[typeid(T).hash_code()];
         }
 
@@ -89,8 +86,6 @@ namespace fox
         template<typename T, typename... Args>
         T &AddComponent(EntityId entity, Args &&... args)
         {
-            if (!ComponentIsRegistered<T>())
-                RegisterComponent<T>();
             GetComponentArray<T>()->InsertData(entity, std::forward<Args>(args)...);
             return GetComponentArray<T>()->GetData(entity).value();
         }
@@ -104,8 +99,6 @@ namespace fox
         template<typename T>
         T &AddComponent(EntityId entity)
         {
-            if (!ComponentIsRegistered<T>())
-                RegisterComponent<T>();
             GetComponentArray<T>()->InsertData(entity);
             return GetComponentArray<T>()->GetData(entity).value();
         }
@@ -119,8 +112,7 @@ namespace fox
         template<typename T>
         void RemoveComponent(EntityId entity)
         {
-            if (ComponentIsRegistered<T>())
-                GetComponentArray<T>()->RemoveData(entity);
+            GetComponentArray<T>()->RemoveData(entity);
         }
 
         /**
@@ -143,7 +135,6 @@ namespace fox
         template<typename T>
         fox::Option<T&> GetComponent(EntityId entity)
         {
-            assert(ComponentIsRegistered<T>());
             return GetComponentArray<T>()->GetData(entity);
         }
 

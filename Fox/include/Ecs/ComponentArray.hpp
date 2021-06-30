@@ -77,11 +77,9 @@ namespace fox
         {
             auto it = m_vComponents.find(entity);
 
-            if (it != m_vComponents.end()) {
+            if (it != m_vComponents.end())
                 return just(it->second);
-            } else {
-                return {};
-            }
+            return {};
         }
 
         /**
@@ -94,11 +92,9 @@ namespace fox
         {
             auto it = m_vComponents.find(entity);
 
-            if (it != m_vComponents.end()) {
+            if (it != m_vComponents.end())
                 return just(it->second);
-            } else {
-                return {};
-            }
+            return {};
         }
 
         /**

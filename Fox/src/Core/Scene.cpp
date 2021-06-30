@@ -9,19 +9,27 @@
 #include <Components/CameraComponent.hpp>
 #include <Renderer/Renderer2D.hpp>
 #include <Components/NativeScript.hpp>
+#include <Components/EntityName.hpp>
 #include "Core/Scene.hpp"
 #include "Components.hpp"
 #include "Core/Application.hpp"
 
 namespace fox
 {
-    Scene::Scene(Application& app) : m_oApp(app)
+    Scene::Scene(Application& app) : m_oApp(app), m_oWorld()
     {
+        m_oWorld.RegisterComponent<TransformComponent>();
+        m_oWorld.RegisterComponent<SpriteRenderer>();
+        m_oWorld.RegisterComponent<NativeScript>();
+        m_oWorld.RegisterComponent<CameraComponent>();
+        m_oWorld.RegisterComponent<EntityTag>();
+        m_oWorld.RegisterComponent<EntityName>();
+
         // Draw Systems
         m_oWorld.system<TransformComponent, SpriteRenderer>().kind(ecs::OnStore)
                 .each([](Entity& e, TransformComponent& transform, SpriteRenderer& sprite)
                       {
-                          Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)e.get_id());
+                          Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int) e.get_id());
                       });
 
 
@@ -292,5 +300,39 @@ namespace fox
     World &Scene::GetWorld()
     {
         return m_oWorld;
+    }
+
+    template<typename T>
+    void Scene::OnComponentAdded(Entity &e, T &component) { }
+
+    template<>
+    void Scene::OnComponentAdded<TransformComponent>(Entity &e, TransformComponent& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<SpriteRenderer>(Entity &e, SpriteRenderer& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<NativeScript>(Entity &e, NativeScript& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<EntityName>(Entity &e, EntityName& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<EntityTag>(Entity &e, EntityTag& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CameraComponent>(Entity &e, CameraComponent& component)
+    {
+        component.camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
     }
 }// namespace fox

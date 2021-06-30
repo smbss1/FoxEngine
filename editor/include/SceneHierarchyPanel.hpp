@@ -24,7 +24,7 @@ namespace fox
         void DrawComponents(Entity& entity);
 
         template<typename T>
-        void DrawComponent(const std::string& name, std::function<void(T& component)> callback);
+        void DrawComponent(const std::string& name, Entity entity, std::function<void(T& component)> callback);
 
     private:
         ref<Scene> m_pContext = nullptr;

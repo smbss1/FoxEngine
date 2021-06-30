@@ -26,6 +26,20 @@ namespace fox
         Entity NewEntity(const std::string& name = std::string());
         void DestroyEntity(Entity entity);
 
+        template<typename T, typename... Args>
+        T &AddComponent(Entity e, Args&&... args)
+        {
+            return m_oWorld.template add_component<T>(e, args...);
+        }
+
+        template<typename T>
+        T &AddComponent(Entity e)
+        {
+            T& comp = m_oWorld.template add_component<T>(e);
+            OnComponentAdded(e, comp);
+            return comp;
+        }
+
         void OnUpdateRuntime();
         // void OnUpdateEditor(EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
@@ -34,6 +48,10 @@ namespace fox
         Entity GetPrimaryCameraEntity();
 
         World& GetWorld();
+    private:
+        template<typename T>
+        void OnComponentAdded(Entity &e, T &component);
+
     private:
         Application& m_oApp;
         World m_oWorld {};

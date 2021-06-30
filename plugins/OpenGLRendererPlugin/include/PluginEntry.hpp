@@ -54,6 +54,9 @@ namespace fox
         Application& GetApp() const { return *m_oApp; }
 
     private:
+        void SetDarkThemeColors();
+
+
         Application* m_oApp = nullptr;
     };
 

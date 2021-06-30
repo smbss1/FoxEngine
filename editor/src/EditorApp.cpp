@@ -8,6 +8,8 @@
 #include <Renderer/EditorCamera.hpp>
 #include <Components/CameraComponent.hpp>
 #include <Core/Input/Input.hpp>
+#include <Core/SceneSerializer.hpp>
+#include <Utils/PlatformUtils.hpp>
 #include "EditorApp.hpp"
 #include "Animator.hpp"
 #include "ImGui/imgui.h"
@@ -73,14 +75,17 @@ namespace fox
 //            m_EditorCamera = graphic_ctx.create_editor_camera();
             m_SceneHierarchyPanel.SetContext(m_pActiveScene);
 
-            m_pActiveScene->NewEntity()
-                    .add<TransformComponent>()
-                    .add<SpriteRenderer>(glm::vec4{0.0f, 0.3f, 0.2f, 1.0f});
-
-            auto m_CameraEntity = m_pActiveScene->NewEntity("Camera");
-            m_CameraEntity.add<CameraComponent>();
-            m_CameraEntity.get<CameraComponent>()->Primary = true;
-            m_CameraEntity.add<NativeScript>(Test());
+//            auto e1 = m_pActiveScene->NewEntity();
+//            e1.add<TransformComponent>();
+//            e1.add<SpriteRenderer>(glm::vec4{0.0f, 0.3f, 0.2f, 1.0f});
+//            auto e2 = m_pActiveScene->NewEntity();
+//            e2.add<TransformComponent>(glm::vec3{1, 1, 0});
+//            e2.add<SpriteRenderer>(glm::vec4{0.2f, 0.3f, 0.5f, 1.0f});
+//
+//            auto m_CameraEntity = m_pActiveScene->NewEntity("Camera");
+//            m_CameraEntity.add<CameraComponent>();
+//            m_CameraEntity.get<CameraComponent>()->Primary = true;
+//            m_CameraEntity.add<NativeScript>(Test());
         }
 
         void OnExit() override
@@ -89,6 +94,9 @@ namespace fox
         void OnEvent(fox::Event& event) override
         {
             m_CameraController.OnEvent(event);
+
+            EventDispatcher dispatcher(event);
+            dispatcher.Dispatch<KeyPressedEvent>(FOX_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
         }
 
         void OnUpdate() override
@@ -97,9 +105,7 @@ namespace fox
                 m_CameraController.OnUpdate();
 
             fox::Renderer2D::ResetStats();
-
             m_Framebuffer->Bind();
-
             fox::RendererCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1});
             fox::RendererCommand::Clear();
 
@@ -161,7 +167,39 @@ namespace fox
 
             style.WindowMinSize.x = minWinSizeX;
 
+            if (ImGui::BeginMenuBar())
+            {
+                if (ImGui::BeginMenu("File"))
+                {
+                    if (ImGui::MenuItem("New", "Ctrl+N"))
+                        NewScene();
+
+                    if (ImGui::MenuItem("Open...", "Ctrl+O"))
+                        OpenScene();
+
+                    if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+                        SaveSceneAs();
+
+                    if (ImGui::MenuItem("Exit"))
+                        m_pApp->quit();
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMenuBar();
+            }
+
             m_SceneHierarchyPanel.OnImGui();
+
+            ImGui::Begin("Stats");
+            {
+                auto stats = fox::Renderer2D::GetStats();
+                ImGui::Text("Renderer2D Stats:");
+                ImGui::Text("Delta time: %f", Time::delta_time);
+                ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+                ImGui::Text("Quads: %d", stats.QuadCount);
+                ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+                ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+            }
+            ImGui::End();
 
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
             ImGui::Begin("Viewport");
@@ -191,20 +229,69 @@ namespace fox
             ImGui::End();
             ImGui::PopStyleVar();
 
+            ImGui::End();
+        }
 
-            ImGui::Begin("Stats");
+    private:
+
+        bool OnKeyPressed(KeyPressedEvent& e)
+        {
+            bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+            bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+
+            switch (e.GetKeyCode())
             {
-                auto stats = fox::Renderer2D::GetStats();
-                ImGui::Text("Renderer2D Stats:");
-                ImGui::Text("Delta time: %f", Time::delta_time);
-                ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-                ImGui::Text("Quads: %d", stats.QuadCount);
-                ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-                ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-            }
-            ImGui::End();
+                case Key::N:
+                {
+                    if (control)
+                        NewScene();
+                }
+                break;
 
-            ImGui::End();
+                case Key::O:
+                {
+                    if (control)
+                        OpenScene();
+                }
+                break;
+
+                case Key::S:
+                {
+                    if (control && shift)
+                        SaveSceneAs();
+                }
+                break;
+            }
+        }
+
+        void NewScene()
+        {
+            m_pActiveScene = new_ref<Scene>(GetApp());
+            m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+            m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
+        }
+
+        void OpenScene()
+        {
+            auto filepath = FileDialogs::OpenFile({"Fox Scene (*.foxscene)", "*.foxscene"});
+            if (!filepath.empty()) {
+                m_pActiveScene = new_ref<Scene>(GetApp());
+                m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+                m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
+
+                SceneSerializer serializer(m_pActiveScene);
+                serializer.Deserialize(filepath);
+            }
+        }
+
+        void SaveSceneAs()
+        {
+            auto filepath = FileDialogs::SaveFile({"Fox Scene (*.foxscene)", "*.foxscene"});
+            if (!filepath.empty())
+            {
+                SceneSerializer serializer(m_pActiveScene);
+                serializer.Serialize(filepath);
+            }
         }
 
     private:

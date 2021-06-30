@@ -232,7 +232,7 @@ namespace fox
          * @brief Get Entity list
          * @return the array of entity
          */
-        DynamicArray<EntityId>& get_entities() const;
+        std::vector<EntityId>& get_entities() const;
 
         /**
          * @brief Add a component to a signature
@@ -269,6 +269,12 @@ namespace fox
         void each(const std::function<void(EntityId)>& fn);
         void each(const std::function<bool(EntityId)>& fn);
 
+        template<typename T>
+        void RegisterComponent()
+        {
+            m_pCompManager->template RegisterComponent<T>();
+        }
+
         /**
          * @brief Add a component to the entity
          *
@@ -282,6 +288,7 @@ namespace fox
         T &add_component(EntityId e, Args &&... args)
         {
             T &comp = m_pCompManager->AddComponent<T>(e, std::forward<Args>(args)...);
+
             auto &signature = m_pEntityManager->GetSignature(e);
             signature.set(m_pCompManager->GetComponentType<T>(), true);
             m_pSysManager->EntitySignatureChanged(e, signature);
@@ -504,6 +511,8 @@ namespace fox
         bool operator==(const Entity &e) const;
 
         bool operator!=(const Entity &other) const;
+        operator bool () const { return m_iId != -1; }
+        operator EntityId () const { return m_iId; }
 
         Entity &operator=(const Entity &other)
         {
@@ -544,11 +553,9 @@ namespace fox
          * @return Enity& the class itself
          */
         template<typename T, typename... Args>
-        Entity &add(Args &&... args)
+        T &add(Args &&... args)
         {
-            if (m_oWld)
-                m_oWld->add_component<T>(m_iId, std::forward<Args>(args)...);
-            return *this;
+            return m_oWld->add_component<T>(m_iId, std::forward<Args>(args)...);
         }
 
         /**
@@ -557,11 +564,9 @@ namespace fox
          * @return Enity& the class itself
          */
         template<typename T>
-        Entity &add()
+        T &add()
         {
-            if (m_oWld)
-                m_oWld->add_component<T>(m_iId);
-            return *this;
+            return m_oWld->add_component<T>(m_iId);
         }
 
         /**
@@ -688,8 +693,8 @@ namespace fox
         Entity ent(&m_oWorld, e);
         try {
             m_oFunc(ent, m_oWorld.template get_component<Cs>(e).value()...);
-        } catch (const std::exception& e) {
-            std::cerr << e.what() << std::endl;
+        } catch (const std::exception& ex) {
+            std::cerr << ex.what() << std::endl;
         }
     }
 
