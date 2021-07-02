@@ -1,0 +1,38 @@
+Scene: Untitled
+Entities:
+  - Entity: 0
+    NameComponent:
+      Name: GameObject
+    TransformComponent:
+      Position: [-2.29999995, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0, 0.300000012, 0.200000003, 1]
+  - Entity: 1
+    NameComponent:
+      Name: GameObject
+    TransformComponent:
+      Position: [-4.80000019, 1, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.200000003, 0.300000012, 0.5, 1]
+  - Entity: 2
+    NameComponent:
+      Name: Camera
+    TransformComponent:
+      Position: [-2, 0, 9.30000019]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false

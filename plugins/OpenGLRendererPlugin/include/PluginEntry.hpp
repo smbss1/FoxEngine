@@ -23,6 +23,7 @@
 #include "IndexBuffer.hpp"
 #include "VertexBuffer.hpp"
 #include "OpenGLVertexArray.hpp"
+#include "ImGuiState.hpp"
 
 namespace fox
 {
@@ -54,8 +55,10 @@ namespace fox
         Application& GetApp() const { return *m_oApp; }
 
     private:
-        void SetDarkThemeColors();
 
+        // The ImGui state is here because I cannot set it in Engine library
+        // because of the init of the glfw window
+        ImGuiState* m_pImGuiState = nullptr;
 
         Application* m_oApp = nullptr;
     };

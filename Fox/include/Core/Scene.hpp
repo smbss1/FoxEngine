@@ -9,6 +9,7 @@
 #define FOX_SCENE_HPP_
 
 #include "Ecs/World.hpp"
+#include "Renderer/EditorCamera.hpp"
 
 namespace fox
 {
@@ -41,7 +42,7 @@ namespace fox
         }
 
         void OnUpdateRuntime();
-        // void OnUpdateEditor(EditorCamera& camera);
+        void OnUpdateEditor(EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
 //        void set_application(Application& app);
 

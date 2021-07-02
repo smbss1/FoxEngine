@@ -8,6 +8,8 @@
 #include <Renderer/Texture.hpp>
 #include <Components/SpriteRenderer.hpp>
 #include <Renderer/Camera.hpp>
+#include <Renderer/EditorCamera.hpp>
+
 #include "OrthographicCamera.hpp"
 #include "SubTexture2D.hpp"
 
@@ -23,6 +25,7 @@ namespace fox
 //        static void BeginScene(const Camera& camera, const glm::mat4& transform);
 //        static void BeginScene(const EditorCamera& camera);
         static void BeginScene(const Camera& camera, const glm::mat4& transform);
+        static void BeginScene(const EditorCamera& camera);
         static void BeginScene(const OrthographicCamera& camera); // TODO: Remove
         static void EndScene();
         static void Flush();

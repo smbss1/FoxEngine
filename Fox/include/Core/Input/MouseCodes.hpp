@@ -4,7 +4,7 @@
 
 namespace fox
 {
-    enum class MouseButton
+    enum class Mouse
     {
         // From glfw3.h
         Button0                = 0,

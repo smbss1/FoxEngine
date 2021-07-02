@@ -16,7 +16,7 @@ namespace fox
     public:
         static bool IsKeyPressed(Key key);
 
-        static bool IsMouseButtonPressed(MouseButton button);
+        static bool IsMouseButtonPressed(Mouse button);
         static glm::vec2 GetMousePosition();
         static float GetMouseX();
         static float GetMouseY();

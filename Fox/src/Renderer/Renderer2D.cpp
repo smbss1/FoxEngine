@@ -138,6 +138,15 @@ namespace fox
         StartBatch();
     }
 
+    void Renderer2D::BeginScene(const EditorCamera &camera)
+    {
+        glm::mat4 ViewProjection = camera.GetViewProjection();
+        s_Data.pTextureShader->Bind();
+        s_Data.pTextureShader->SetUniform("u_ViewProjection", ViewProjection);
+
+        StartBatch();
+    }
+
     void Renderer2D::EndScene()
     {
         uint32_t dataSize = (uint8_t *)s_Data.QuadVertexBufferPtr - (uint8_t *)s_Data.QuadVertexBufferBase;

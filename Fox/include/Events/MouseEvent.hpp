@@ -58,20 +58,20 @@ namespace fox
     class MouseButtonEvent : public Event
     {
     public:
-        MouseButton GetMouseButton() const { return m_Button; }
+        Mouse GetMouseButton() const { return m_Button; }
 
         EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput | EventCategoryMouseButton)
     protected:
-        MouseButtonEvent(const MouseButton button)
+        MouseButtonEvent(const Mouse button)
                 : m_Button(button) {}
 
-        MouseButton m_Button;
+        Mouse m_Button;
     };
 
     class MouseButtonPressedEvent : public MouseButtonEvent
     {
     public:
-        MouseButtonPressedEvent(const MouseButton button)
+        MouseButtonPressedEvent(const Mouse button)
                 : MouseButtonEvent(button) {}
 
         std::string ToString() const override
@@ -87,7 +87,7 @@ namespace fox
     class MouseButtonReleasedEvent : public MouseButtonEvent
     {
     public:
-        MouseButtonReleasedEvent(const MouseButton button)
+        MouseButtonReleasedEvent(const Mouse button)
                 : MouseButtonEvent(button) {}
 
         std::string ToString() const override

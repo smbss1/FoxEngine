@@ -13,7 +13,7 @@ namespace fox
         return s_Window->IsKeyPressed(key);
     }
 
-    bool Input::IsMouseButtonPressed(MouseButton button)
+    bool Input::IsMouseButtonPressed(Mouse button)
     {
         return s_Window->IsMouseButtonPressed(button);
     }

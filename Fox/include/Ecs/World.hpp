@@ -260,11 +260,11 @@ namespace fox
          * @param e the entity to remove
          */
         void delete_entity(EntityId e);
-
-        /**
-         * @brief Called at the end of the frame to remove all entity to be removed
-         */
-        void deleted_entities();
+//
+//        /**
+//         * @brief Called at the end of the frame to remove all entity to be removed
+//         */
+//        void deleted_entities();
 
         void each(const std::function<void(EntityId)>& fn);
         void each(const std::function<bool(EntityId)>& fn);
@@ -481,7 +481,6 @@ namespace fox
         ComponentManager::Ptr m_pCompManager;
         EntityManager::Ptr m_pEntityManager;
         Pipeline::SPtr m_pPipeline;
-        std::vector<EntityId> m_vRemoved;
     };
 
     class Entity

@@ -242,6 +242,22 @@ namespace fox
         m_oWorld.delete_entity(entity.get_id());
     }
 
+    void Scene::OnUpdateEditor(EditorCamera &camera)
+    {
+        Renderer2D::BeginScene(camera);
+
+        auto view = m_oWorld.get_entities_with<TransformComponent, SpriteRenderer>();
+        for (auto entity : view)
+        {
+            auto& transform = entity.get<TransformComponent>().value();
+            auto& sprite = entity.get<SpriteRenderer>().value();
+
+            Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+        }
+
+        Renderer2D::EndScene();
+    }
+
     void Scene::OnUpdateRuntime()
     {
         m_oWorld.run_phase(ecs::PreUpdate);
@@ -249,7 +265,7 @@ namespace fox
         m_oWorld.run_phase(ecs::OnValidate);
         m_oWorld.run_phase(ecs::PostUpdate);
         m_oWorld.run_phase(ecs::PreStore);
-        m_oWorld.deleted_entities();
+        // m_oWorld.deleted_entities();
 
         // Render 2D
         Camera* mainCamera = nullptr;
@@ -294,7 +310,14 @@ namespace fox
 
     Entity Scene::GetPrimaryCameraEntity()
     {
-        return Entity();
+        auto view = m_oWorld.get_entities_with<CameraComponent>();
+        for (auto e : view)
+        {
+            auto& cameraComponent = e.get<CameraComponent>().value();
+            if (cameraComponent.Primary)
+                return e;
+        }
+        return {};
     }
 
     World &Scene::GetWorld()

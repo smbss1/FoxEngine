@@ -28,15 +28,20 @@ namespace fox
 
         void ClearAttachment(uint32_t attachmentIndex, int value) override;
 
-        uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const override;
+        [[nodiscard]] uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const override;
 
         [[nodiscard]] const FramebufferSpecification& GetSpecification() const override;
+
     private:
 
         uint32_t m_RendererID = 0;
-        uint32_t m_ColorAttachment = 0;
-        uint32_t m_DepthAttachment = 0;
         FramebufferSpecification m_oSpecs;
+
+        std::vector<FramebufferTextureSpecification> m_vColorAttachmentSpecs;
+        FramebufferTextureSpecification m_oDepthAttachmentSpec = FramebufferTextureFormat::None;
+
+        std::vector<uint32_t> m_vColorAttachments;
+        uint32_t m_uDepthAttachment = 0;
     };
 }
 

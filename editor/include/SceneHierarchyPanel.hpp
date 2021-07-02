@@ -19,6 +19,8 @@ namespace fox
 
         void OnImGui();
 
+        const Entity& GetSelectedEntity() const { return m_SelectedEntity; }
+
     private:
         void DrawEntityNode(Entity& e);
         void DrawComponents(Entity& entity);

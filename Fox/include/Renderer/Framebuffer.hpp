@@ -5,6 +5,7 @@
 #ifndef FOXENGINE_FRAMEBUFFER_HPP
 #define FOXENGINE_FRAMEBUFFER_HPP
 
+#include <vector>
 #include "common.hpp"
 
 namespace fox
@@ -27,7 +28,7 @@ namespace fox
     struct FramebufferTextureSpecification
     {
         FramebufferTextureSpecification() = default;
-        explicit FramebufferTextureSpecification(FramebufferTextureFormat format)
+        FramebufferTextureSpecification(FramebufferTextureFormat format)
                 : TextureFormat(format) {}
 
         FramebufferTextureFormat TextureFormat = FramebufferTextureFormat::None;
@@ -39,6 +40,10 @@ namespace fox
         FramebufferAttachmentSpecification() = default;
         FramebufferAttachmentSpecification(std::initializer_list<FramebufferTextureSpecification> attachments)
                 : Attachments(attachments) {}
+//        FramebufferAttachmentSpecification& operator=(std::initializer_list<FramebufferTextureSpecification> attachments)
+//        {
+//            Attachments = attachments;
+//        }
 
         std::vector<FramebufferTextureSpecification> Attachments{};
     };
@@ -71,6 +76,7 @@ namespace fox
 
         static ref<Framebuffer> Create(const FramebufferSpecification& spec);
     };
+
 }
 
 

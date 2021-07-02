@@ -4,6 +4,7 @@
 
 #include <Renderer/OrthographicCamera.hpp>
 #include <Events/ApplicationEvent.hpp>
+
 #include "FoxEcs.hpp"
 #include "Core/Managers/ResourceManager.hpp"
 #include "Core.hpp"
@@ -15,7 +16,7 @@ namespace fox
     {
         class Value;
     }
-    class FOX_API Application
+    class Application
     {
     public:
         Application(int ac, char** av);
@@ -68,6 +69,8 @@ namespace fox
 
         Window* GetWindow() const;
 
+        bool IsWindowMinized() const { return m_bIsMinimized; }
+
     private:
         bool OnWindowClose(WindowCloseEvent& e);
         bool OnWindowResize(WindowResizeEvent& e);
@@ -79,7 +82,6 @@ namespace fox
         std::unique_ptr<World> m_pWorld;
         fox::AnyContainer m_vAny;
         scope<json::Value> m_oConfigFile;
-
         ref<Window> m_pWindow;
     };
 }

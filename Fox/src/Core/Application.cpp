@@ -145,6 +145,8 @@ namespace fox
             if (!m_bIsMinimized)
             {
                 get<StateMachine>()->Update();
+
+
                 graphic_ctx.update();
             }
             m_pWindow->OnUpdate();

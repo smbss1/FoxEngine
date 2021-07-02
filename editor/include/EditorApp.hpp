@@ -5,8 +5,8 @@
 ** Sandbox
 */
 
-#ifndef FOX_SANDBOX_HPP_
-#define FOX_SANDBOX_HPP_
+#ifndef FOX_EDITOR_APP_HPP_
+#define FOX_EDITOR_APP_HPP_
 
 #include "FoxEngine.hpp"
 
@@ -21,4 +21,4 @@ class EditorApp : public fox::Application
     private:
 };
 
-#endif /* !FOX_SANDBOX_HPP_ */
+#endif /* !FOX_EDITOR_APP_HPP_ */

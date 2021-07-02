@@ -155,7 +155,7 @@ public:
     void SetNativeWindow(void* data) override;
 
     bool IsKeyPressed(const fox::Key key) override;
-    bool IsMouseButtonPressed(const fox::MouseButton button) override;
+    bool IsMouseButtonPressed(const fox::Mouse button) override;
     glm::vec2 GetMousePosition() override;
 
 private:

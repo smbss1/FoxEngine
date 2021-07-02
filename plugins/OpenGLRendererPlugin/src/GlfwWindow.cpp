@@ -110,13 +110,13 @@ GlfwWindow::GlfwWindow(const fox::WindowProps& props)
         {
             case GLFW_PRESS:
             {
-                fox::MouseButtonPressedEvent event(static_cast<const fox::MouseButton>(button));
+                fox::MouseButtonPressedEvent event(static_cast<const fox::Mouse>(button));
                 data.EventCallback(event);
                 break;
             }
             case GLFW_RELEASE:
             {
-                fox::MouseButtonReleasedEvent event(static_cast<const fox::MouseButton>(button));
+                fox::MouseButtonReleasedEvent event(static_cast<const fox::Mouse>(button));
                 data.EventCallback(event);
                 break;
             }
@@ -202,7 +202,7 @@ bool GlfwWindow::IsKeyPressed(const fox::Key key)
     return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
-bool GlfwWindow::IsMouseButtonPressed(const fox::MouseButton button)
+bool GlfwWindow::IsMouseButtonPressed(const fox::Mouse button)
 {
     auto state = glfwGetMouseButton(m_pWindow, static_cast<int32_t>(button));
     return state == GLFW_PRESS;

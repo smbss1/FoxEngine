@@ -131,22 +131,27 @@ namespace fox
 
     void World::delete_entity(EntityId e)
     {
-        m_vRemoved.push_back(e);
+        auto &signature = m_pEntityManager->GetSignature(e);
+        signature.reset();
+        signature.set(EcsDisable, true);
+        m_pSysManager->EntitySignatureChanged(e, signature);
+        m_pCompManager->EntityDestroyed(e);
+        m_pEntityManager->DestroyEntity(e);
     }
 
-    void World::deleted_entities()
-    {
-        auto copy = m_vRemoved;
-        m_vRemoved.clear();
-        for (auto e : copy) {
-            auto &signature = m_pEntityManager->GetSignature(e);
-            signature.reset();
-            signature.set(EcsDisable, true);
-            m_pSysManager->EntitySignatureChanged(e, signature);
-            m_pCompManager->EntityDestroyed(e);
-            m_pEntityManager->DestroyEntity(e);
-        }
-    }
+//    void World::deleted_entities()
+//    {
+//        auto copy = m_vRemoved;
+//        m_vRemoved.clear();
+//        for (auto e : copy) {
+//            auto &signature = m_pEntityManager->GetSignature(e);
+//            signature.reset();
+//            signature.set(EcsDisable, true);
+//            m_pSysManager->EntitySignatureChanged(e, signature);
+//            m_pCompManager->EntityDestroyed(e);
+//            m_pEntityManager->DestroyEntity(e);
+//        }
+//    }
 
     void World::each(const std::function<void(EntityId)>& fn)
     {
