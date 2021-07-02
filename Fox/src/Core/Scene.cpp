@@ -252,7 +252,7 @@ namespace fox
             auto& transform = entity.get<TransformComponent>().value();
             auto& sprite = entity.get<SpriteRenderer>().value();
 
-            Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+            Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity.get_id());
         }
 
         Renderer2D::EndScene();

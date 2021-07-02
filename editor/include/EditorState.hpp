@@ -59,6 +59,8 @@ namespace fox
         int m_iGizmoType = -1;
 
         glm::vec2 m_vViewportBounds[2];
+
+        Entity m_oHoveredEntity;
     };
 }
 

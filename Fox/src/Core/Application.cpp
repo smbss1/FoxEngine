@@ -73,7 +73,7 @@ namespace fox
         fox::info("Starting load config.json....");
         json::Value oConfigTemp;
         std::string out;
-        if (fox::file::ReadFile("config.json", out))
+        if (fox::file::ReadFile(FOX_PLUGIN_DIRECTORY"config.json", out))
             oConfigTemp = json::parse(out);
         else
             fox::error("Cannot read config.json");
@@ -96,7 +96,7 @@ namespace fox
         LoadConfig();
 
         PluginManager& plugin_manager = get_or_create<fox::PluginManager>().value();
-        plugin_manager.FindAndLoadPlugins((*m_oConfigFile)["plugins directory"].get<std::string>());
+        plugin_manager.FindAndLoadPlugins(FOX_PLUGIN_DIRECTORY + (*m_oConfigFile)["plugins directory"].get<std::string>());
         if(plugin_manager.GetGraphics().GetCount() <= 0)
             throw std::runtime_error("Cannot run the application because no Graphics Plugins found");
 

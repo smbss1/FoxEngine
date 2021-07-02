@@ -31,7 +31,8 @@ namespace fox
         void Unbind() const override;
 
     private:
-        unsigned int m_RendererID{};
+        uint32_t m_RendererID = 0;
+        uint32_t m_uVertexBufferIndex = 0;
         std::vector<ref<VertexBuffer>> m_vVerticesBuffers;
         ref<IndexBuffer> m_pIndexBuffer;
     };

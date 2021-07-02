@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <Math/Math.hpp>
 #include <Renderer/Framebuffer.hpp>
+#include <Components/EntityName.hpp>
 
 #include "EditorState.hpp"
 
@@ -104,7 +105,7 @@ namespace fox
         if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
         {
             int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-            // m_HoveredEntity = pixelData == -1 ? Entity() : Entity(&m_pActiveScene->GetWorld(), (EntityId)pixelData);
+            m_oHoveredEntity = pixelData == -1 ? Entity() : Entity(&m_pActiveScene->GetWorld(), (EntityId)pixelData);
         }
 
         m_Framebuffer->Unbind();
@@ -186,6 +187,11 @@ namespace fox
 
         ImGui::Begin("Stats");
         {
+            std::string name = "None";
+            if (m_oHoveredEntity)
+                name = m_oHoveredEntity.get<EntityName>()->name;
+            ImGui::Text("Hovered Entity: %s", name.c_str());
+
             auto stats = fox::Renderer2D::GetStats();
             ImGui::Text("Renderer2D Stats:");
             ImGui::Text("Draw Calls: %d", stats.DrawCalls);

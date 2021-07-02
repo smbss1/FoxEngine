@@ -19,6 +19,9 @@ namespace fox
         glm::vec2 oTexCoord;
         float fTexIndex;
         float fTilingFactor;
+
+        // Editor only
+        int EntityID;
     };
 
     struct Renderer2DData
@@ -66,6 +69,7 @@ namespace fox
               {fox::ShaderDataType::Float2, "a_TexCoord"},
               {fox::ShaderDataType::Float, "a_TexIndex"},
               {fox::ShaderDataType::Float, "a_TilingFactor"},
+              {fox::ShaderDataType::Int, "a_EntityID"},
           });
         s_Data.pQuadVertexArray->AddVertexBuffer(s_Data.pQuadVertexBuffer);
 
@@ -173,6 +177,7 @@ namespace fox
         s_Data.QuadVertexBufferPtr->oTexCoord = vertex.oTexCoord;
         s_Data.QuadVertexBufferPtr->fTexIndex = vertex.fTexIndex;
         s_Data.QuadVertexBufferPtr->fTilingFactor = vertex.fTilingFactor;
+        s_Data.QuadVertexBufferPtr->EntityID = vertex.EntityID;
         s_Data.QuadVertexBufferPtr++;
     }
 
@@ -479,13 +484,13 @@ namespace fox
 
         for (size_t i = 0; i < quadVertexCount; i++)
         {
-//            s_Data.QuadVertexBufferPtr->EntityID = entityID;
             AddToVertexBuffer({
                   .oPosition = transform * s_Data.QuadVertexPositions[i],
                   .oColor = color,
                   .oTexCoord = textureCoords[i],
                   .fTexIndex = textureIndex,
-                  .fTilingFactor = tilingFactor
+                  .fTilingFactor = tilingFactor,
+                  .EntityID = entityID
             });
         }
 
@@ -529,9 +534,9 @@ namespace fox
                   .oColor = tintColor,
                   .oTexCoord = textureCoords[i],
                   .fTexIndex = textureIndex,
-                  .fTilingFactor = tilingFactor
+                  .fTilingFactor = tilingFactor,
+                  .EntityID = entityID
             });
-//            s_Data.QuadVertexBufferPtr->EntityID = entityID;
         }
 
         s_Data.QuadIndexCount += 6;
@@ -541,7 +546,7 @@ namespace fox
 
     void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRenderer& src, int entityID)
     {
-        DrawQuad(transform, src.Color);
+        DrawQuad(transform, src.Color, entityID);
     }
 
 

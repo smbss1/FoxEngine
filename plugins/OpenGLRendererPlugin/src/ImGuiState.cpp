@@ -29,8 +29,8 @@ namespace fox
         //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
         //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-        io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Bold.ttf", 18.0f);
-        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Regular.ttf", 18.0f);
+        io.Fonts->AddFontFromFileTTF(FOX_PLUGIN_DIRECTORY"assets/fonts/OpenSans-Bold.ttf", 18.0f);
+        io.FontDefault = io.Fonts->AddFontFromFileTTF(FOX_PLUGIN_DIRECTORY"assets/fonts/OpenSans-Regular.ttf", 18.0f);
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();

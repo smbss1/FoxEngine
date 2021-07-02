@@ -67,6 +67,60 @@ namespace fox
                               element.m_bNormalized ? GL_TRUE:GL_FALSE, layout.GetStride(),
                               (const void*) element.m_uOffset));
             index++;
+
+            switch (element.m_eType)
+            {
+                case ShaderDataType::Float:
+                case ShaderDataType::Float2:
+                case ShaderDataType::Float3:
+                case ShaderDataType::Float4:
+                {
+                    glEnableVertexAttribArray(m_uVertexBufferIndex);
+                    glVertexAttribPointer(m_uVertexBufferIndex,
+                                          element.GetComponentCount(),
+                                          ShaderDataTypeToOpenGLType(element.m_eType),
+                                          element.m_bNormalized ? GL_TRUE : GL_FALSE,
+                                          layout.GetStride(),
+                                          (const void*)element.m_uOffset);
+                    m_uVertexBufferIndex++;
+                    break;
+                }
+                case ShaderDataType::Int:
+                case ShaderDataType::Int2:
+                case ShaderDataType::Int3:
+                case ShaderDataType::Int4:
+                case ShaderDataType::Bool:
+                {
+                    glEnableVertexAttribArray(m_uVertexBufferIndex);
+                    glVertexAttribIPointer(m_uVertexBufferIndex,
+                                           element.GetComponentCount(),
+                                           ShaderDataTypeToOpenGLType(element.m_eType),
+                                           layout.GetStride(),
+                                           (const void*)element.m_uOffset);
+                    m_uVertexBufferIndex++;
+                    break;
+                }
+                case ShaderDataType::Mat3:
+                case ShaderDataType::Mat4:
+                {
+                    uint8_t count = element.GetComponentCount();
+                    for (uint8_t i = 0; i < count; i++)
+                    {
+                        glEnableVertexAttribArray(m_uVertexBufferIndex);
+                        glVertexAttribPointer(m_uVertexBufferIndex,
+                                              count,
+                                              ShaderDataTypeToOpenGLType(element.m_eType),
+                                              element.m_bNormalized ? GL_TRUE : GL_FALSE,
+                                              layout.GetStride(),
+                                              (const void*)(element.m_uOffset + sizeof(float) * count * i));
+                        glVertexAttribDivisor(m_uVertexBufferIndex, 1);
+                        m_uVertexBufferIndex++;
+                    }
+                    break;
+                }
+                default:
+                    FOX_CORE_ASSERT(false, "Unknown ShaderDataType!");
+            }
         }
         m_vVerticesBuffers.push_back(vertexBuffer);
     }
