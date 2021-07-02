@@ -42,25 +42,7 @@ namespace fox
 //            m_CameraEntity.add<NativeScript>(Test());
     }
 
-    void EditorState::OnExit()
-    {}
-
-    void EditorState::OnEvent(fox::Event& event)
-    {
-        m_CameraController.OnEvent(event);
-        m_oEditorCamera.OnEvent(event);
-
-        EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<KeyPressedEvent>(FOX_BIND_EVENT_FN(EditorState::OnKeyPressed));
-
-        // Because I cannot access the ImGuState instance, I set the block event here
-        if (!m_bViewportFocused && !m_bViewportHovered)
-        {
-            ImGuiIO& io = ImGui::GetIO();
-            event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
-            event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
-        }
-    }
+    void EditorState::OnExit() {}
 
     void EditorState::OnUpdate()
     {
@@ -209,7 +191,7 @@ namespace fox
             ImGui::BeginChild("GameRender");
             auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
             auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-            auto viewportOffset = ImGui::GetWindowPos(); // Includes tab bar
+            auto viewportOffset = ImGui::GetWindowPos();
 
             m_vViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
             m_vViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
@@ -282,6 +264,27 @@ namespace fox
         ImGui::End();
     }
 
+    ////////////////////////////////////////////
+    /// Events
+    ////////////////////////////////////////////
+    void EditorState::OnEvent(fox::Event& event)
+    {
+        m_CameraController.OnEvent(event);
+        m_oEditorCamera.OnEvent(event);
+
+        EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<KeyPressedEvent>(FOX_BIND_EVENT_FN(EditorState::OnKeyPressed));
+        dispatcher.Dispatch<MouseButtonPressedEvent>(FOX_BIND_EVENT_FN(EditorState::OnMouseButtonPressed));
+
+        // Because I cannot access the ImGuState instance, I set the block event here
+        if (!m_bViewportFocused && !m_bViewportHovered)
+        {
+            ImGuiIO& io = ImGui::GetIO();
+            event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+            event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+        }
+    }
+
     bool EditorState::OnKeyPressed(KeyPressedEvent& e)
     {
         bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
@@ -327,6 +330,19 @@ namespace fox
         }
     }
 
+    bool EditorState::OnMouseButtonPressed(MouseButtonPressedEvent& e)
+    {
+        if (e.GetMouseButton() == Mouse::ButtonLeft)
+        {
+            if (m_bViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
+                m_SceneHierarchyPanel.SetSelectedEntity(m_oHoveredEntity);
+        }
+        return false;
+    }
+
+    ////////////////////////////////////////////
+    /// Scene File
+    ////////////////////////////////////////////
     void EditorState::NewScene()
     {
         m_pActiveScene = new_ref<Scene>(GetApp());
