@@ -68,6 +68,7 @@ namespace fox
         }
 
         Window* GetWindow() const;
+        json::Value& GetConfigs() const;
 
         bool IsWindowMinized() const { return m_bIsMinimized; }
 

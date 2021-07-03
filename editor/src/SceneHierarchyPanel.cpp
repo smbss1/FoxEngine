@@ -13,15 +13,48 @@
 
 namespace fox
 {
-    SceneHierarchyPanel::SceneHierarchyPanel(const ref<Scene>& context)
+    SceneHierarchyPanel::SceneHierarchyPanel() : m_pScriptLib(new_scope<SharedLib>())
+    {
+    }
+
+    SceneHierarchyPanel::SceneHierarchyPanel(const ref<Scene>& context) : SceneHierarchyPanel()
     {
         SetContext(context);
+    }
+
+    SceneHierarchyPanel::~SceneHierarchyPanel()
+    {
+        m_pContext.reset();
+        m_pScriptLib.reset();
     }
 
     void SceneHierarchyPanel::SetContext(const ref<Scene>& context)
     {
         m_pContext = context;
         m_SelectedEntity = {};
+
+        if (m_pScriptLib->GetHandle())
+            m_pScriptLib->close();
+
+        std::unordered_map<size_t, std::string> (*GetScriptsNames)();
+        std::unordered_map<size_t, ScriptCreator> (*GetScripts)();
+        fox::info("Open the native script library");
+
+        try {
+            m_pScriptLib->open("../Project/libfox_native_script" DL_EXT);
+            m_pScriptLib->sym("GetScriptsNames", GetScriptsNames);
+            m_pScriptLib->sym("GetScripts", GetScripts);
+            m_vScriptsNames = GetScriptsNames();
+            m_vScripts = GetScripts();
+            for (auto name : m_vScriptsNames)
+            {
+                fox::info("Script: '%'", name.second);
+            }
+        }
+        catch (std::exception& e)
+        {
+            fox::error("%", e.what());
+        }
     }
 
     void SceneHierarchyPanel::OnImGui()
@@ -192,6 +225,21 @@ namespace fox
                 m_pContext->AddComponent<SpriteRenderer>(m_SelectedEntity);
                 ImGui::CloseCurrentPopup();
             }
+
+            for (auto script : m_vScriptsNames)
+            {
+                const std::string& name = script.second;
+                const std::size_t& tag = script.first;
+                if (ImGui::MenuItem(name.c_str()))
+                {
+                    auto has_native_script = m_pContext->GetWorld().get_component<NativeScript>(m_SelectedEntity);
+                    if (!has_native_script)
+                        m_pContext->AddComponent<NativeScript>(m_SelectedEntity);
+                    has_native_script = m_pContext->GetWorld().get_component<NativeScript>(m_SelectedEntity);
+                    has_native_script->add(tag, std::move(m_vScripts[tag]()));
+                    ImGui::CloseCurrentPopup();
+                }
+            }
             ImGui::EndPopup();
         }
         ImGui::PopItemWidth();
@@ -265,6 +313,10 @@ namespace fox
         {
             ImGui::ColorEdit4("Color", glm::value_ptr(renderer.Color));
         });
+
+        DrawScripts(entity, [](ScriptableBehaviour& script)
+        {
+        });
     }
 
     template<typename T>
@@ -311,4 +363,49 @@ namespace fox
         }
     }
 
+    void SceneHierarchyPanel::DrawScripts(Entity entity, std::function<void(ScriptableBehaviour&)> callback)
+    {
+        const ImGuiTreeNodeFlags treeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
+                                             ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap;
+        auto has_component = entity.get<NativeScript>();
+
+        if (has_component)
+        {
+            for (auto& script : has_component->m_vScripts)
+            {
+                ImVec2 contentRegionAvail = ImGui::GetContentRegionAvail();
+
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4});
+                float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+                ImGui::Separator();
+                bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeFlags, m_vScriptsNames[script.first].c_str());
+                ImGui::PopStyleVar();
+
+                ImGui::SameLine(contentRegionAvail.x - lineHeight * 0.5f);
+                if (ImGui::Button("...", ImVec2{ lineHeight, lineHeight }))
+                {
+                    ImGui::OpenPopup("ComponentSettings");
+                }
+
+                bool bIsDeleted = false; // Is the component removed ?
+                if (ImGui::BeginPopup("ComponentSettings"))
+                {
+                    if (ImGui::MenuItem("Remove Component"))
+                        bIsDeleted = true;
+                    ImGui::EndPopup();
+                }
+
+                if (open)
+                {
+                    callback(*script.second);
+                    ImGui::TreePop();
+                }
+
+                if (bIsDeleted)
+                {
+                    has_component->remove(script.first);
+                }
+            }
+        }
+    }
 }

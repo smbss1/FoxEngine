@@ -319,7 +319,7 @@ namespace fox
          * @return fox::Option<T&> an optionnal value
          */
         template<typename T>
-        fox::Option<T &> get_component(EntityId e)
+        fox::Option<T&> get_component(EntityId e)
         {
             return m_pCompManager->GetComponent<T>(e);
         }

@@ -11,23 +11,56 @@
 #include <Math/Math.hpp>
 #include <Renderer/Framebuffer.hpp>
 #include <Components/EntityName.hpp>
+#include <Utils/Path.hpp>
+#include <FPaths.hpp>
+#include <Utils/FileSystem.hpp>
 
 #include "EditorState.hpp"
 
 namespace fox
 {
+    EditorState::~EditorState()
+    {
+        m_Framebuffer.reset();
+        m_pActiveScene.reset();
+    }
+
     void EditorState::OnEnter()
     {
+        json::Value oConfigTemp;
+        std::string out;
+        if (fox::file::ReadFile("./editor_config.json", out))
+            oConfigTemp = json::parse(out);
+        if (!oConfigTemp.is_null()) {
+            m_oEditorConfig = json::Value(oConfigTemp);
+            fox::info("editor_config.json load successfully");
+        }
+        else
+            fox::error("Wrong configuration format for 'editor_config.json'");
+
+        if (!m_oEditorConfig["LastOpenedProject"].is_null()) {
+            // Set the project directory
+            FPaths::SetProjectDir(m_oEditorConfig["LastOpenedProject"].get<std::string>());
+            // Notify the content panel that the project directory changed
+            m_ContentBrowserPanel.OnProjectOpen();
+        }
+
         fox::FramebufferSpecification fbSpec;
         fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
         fbSpec.Width = 1280;
         fbSpec.Height = 720;
         m_Framebuffer = fox::Framebuffer::Create(fbSpec);
 
-        m_pActiveScene = new_ref<Scene>(GetApp());
-
         m_oEditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
+
+        m_pActiveScene = new_ref<Scene>(GetApp());
         m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+
+        if (!m_oEditorConfig["LastOpenedScene"].is_null())
+        {
+            SceneSerializer serializer(m_pActiveScene);
+            serializer.Deserialize(m_oEditorConfig["LastOpenedScene"].get<std::string>());
+        }
 
 //            auto e1 = m_pActiveScene->NewEntity();
 //            e1.add<TransformComponent>();
@@ -42,7 +75,12 @@ namespace fox
 //            m_CameraEntity.add<NativeScript>(Test());
     }
 
-    void EditorState::OnExit() {}
+    void EditorState::OnExit()
+    {
+        m_oEditorConfig["LastOpenedProject"] = FPaths::ProjectDir();
+        if (!fox::file::WriteFile("./editor_config.json", m_oEditorConfig.dump()))
+            fox::error("Failed to write to 'editor_config.json'");
+    }
 
     void EditorState::OnUpdate()
     {
@@ -149,22 +187,37 @@ namespace fox
         {
             if (ImGui::BeginMenu("File"))
             {
-                if (ImGui::MenuItem("New", "Ctrl+N"))
+                if (ImGui::MenuItem("New Project"))
+                    NewProject();
+
+                if (ImGui::MenuItem("Open Project", "Ctrl+O"))
+                    OpenProject();
+
+                if (ImGui::MenuItem("New Scene", "Ctrl+N"))
                     NewScene();
 
-                if (ImGui::MenuItem("Open...", "Ctrl+O"))
+                if (ImGui::MenuItem("Open Scene...", "Ctrl+O"))
                     OpenScene();
 
-                if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+                if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
                     SaveSceneAs();
 
                 if (ImGui::MenuItem("Exit"))
                     m_pApp->quit();
                 ImGui::EndMenu();
             }
+
+            if (ImGui::BeginMenu("Assets"))
+            {
+                if (ImGui::MenuItem("Create Script"))
+                    NewScript();
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMenuBar();
         }
 
+        m_ContentBrowserPanel.OnImGui();
         m_SceneHierarchyPanel.OnImGui();
 
         ImGui::Begin("Stats");
@@ -328,6 +381,7 @@ namespace fox
                 m_iGizmoType = ImGuizmo::OPERATION::SCALE;
                 break;
         }
+        return false;
     }
 
     bool EditorState::OnMouseButtonPressed(MouseButtonPressedEvent& e)
@@ -338,6 +392,91 @@ namespace fox
                 m_SceneHierarchyPanel.SetSelectedEntity(m_oHoveredEntity);
         }
         return false;
+    }
+
+    void CreateClass(const std::string& path, const std::string& strName)
+    {
+        const std::string& hpp_filepath = path + "/" + strName + ".hpp";
+        const std::string& cpp_filepath = path + "/" + strName + ".cpp";
+
+        // Create the HPP Class
+        file::WriteFile(hpp_filepath, "\n#include <Components/NativeScript.hpp>\n"
+                                      "\nclass " + strName + " : public ScriptableBehaviour\n{\n"
+                                         "public:\n"
+                                         "protected:\n"
+                                          "    void on_create() override;\n"
+                                          "    void on_update() override;\n"
+                                         "private:\n"
+                                         "};");
+
+        // Create the CPP Class
+        file::WriteFile(cpp_filepath, "\n#include <FoxEngine.hpp>\n"
+                                      "#include \"" + strName + ".hpp\""
+                                    "\n\n"
+                                    "\nvoid " + strName + "::on_create()\n{\n}\n"
+                                    "\nvoid " + strName + "::on_update()\n{\n}\n"
+         );
+
+        fox::info("Create Cpp File in '%'", cpp_filepath);
+        fox::info("Create Hpp File in '%'", hpp_filepath);
+    }
+
+    ////////////////////////////////////////////
+    /// Asset File
+    ////////////////////////////////////////////
+    void EditorState::NewScript()
+    {
+        auto filepath = FileDialogs::SaveFile({"C++ (*.cpp)", "*.cpp"});
+        if (!filepath.empty())
+        {
+            Path path(filepath);
+            const std::string& root_path = path.parent_path().string();
+            const std::string& filename = path.basename();
+
+            CreateClass(root_path, filename);
+        }
+    }
+
+    ////////////////////////////////////////////
+    /// Project File
+    ////////////////////////////////////////////
+    void EditorState::NewProject()
+    {
+        auto filepath = FileDialogs::SaveFile({"Fox Project (*.foxproject)", "*.foxproject"});
+        if (!filepath.empty())
+        {
+            Path path(filepath);
+            const std::string& project_root = path.parent_path().string();
+            const std::string& sample_scene = project_root + "/assets/Scenes/Sample.foxscene";
+
+            std::filesystem::create_directories(project_root + "/assets/Scenes/");
+            file::WriteFile(filepath, "{\n}");
+            file::WriteFile(sample_scene, "");
+
+            m_pActiveScene = new_ref<Scene>(GetApp());
+            m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+
+            SceneSerializer serializer(m_pActiveScene);
+            serializer.Deserialize(sample_scene);
+
+            m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
+
+            FPaths::SetProjectDir(path.parent_path().string());
+            m_ContentBrowserPanel.OnProjectOpen();
+        }
+    }
+
+    void EditorState::OpenProject()
+    {
+        auto filepath = FileDialogs::OpenFile({"Fox Project (*.foxproject)", "*.foxproject"});
+        if (!filepath.empty()) {
+            m_pActiveScene = new_ref<Scene>(GetApp());
+            m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+
+            Path path(filepath);
+            FPaths::SetProjectDir(path.parent_path().string());
+            m_ContentBrowserPanel.OnProjectOpen();
+        }
     }
 
     ////////////////////////////////////////////
@@ -360,6 +499,8 @@ namespace fox
             SceneSerializer serializer(m_pActiveScene);
             serializer.Deserialize(filepath);
 
+            m_oEditorConfig["LastOpenedScene"] = filepath;
+
             m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
         }
     }
@@ -369,6 +510,8 @@ namespace fox
         auto filepath = FileDialogs::SaveFile({"Fox Scene (*.foxscene)", "*.foxscene"});
         if (!filepath.empty())
         {
+            m_oEditorConfig["LastOpenedScene"] = filepath;
+
             SceneSerializer serializer(m_pActiveScene);
             serializer.Serialize(filepath);
         }

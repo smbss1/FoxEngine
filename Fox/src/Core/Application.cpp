@@ -151,11 +151,17 @@ namespace fox
             }
             m_pWindow->OnUpdate();
         }
+        m_pWorld.reset();
     }
 
     Window* Application::GetWindow() const
     {
         return m_pWindow.get();
+    }
+
+    json::Value &Application::GetConfigs() const
+    {
+        return *m_oConfigFile;
     }
 
     bool Application::OnWindowClose(WindowCloseEvent& e)
@@ -177,5 +183,4 @@ namespace fox
 
         return false;
     }
-
 }

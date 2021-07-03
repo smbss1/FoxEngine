@@ -89,6 +89,9 @@ namespace fox
         */
         std::string getError() const;
         std::string getPath() const;
+        DL_TYPE GetHandle() const;
+
+        void reload();
 
     public:
     protected:

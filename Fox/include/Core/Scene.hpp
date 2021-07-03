@@ -41,6 +41,12 @@ namespace fox
             return comp;
         }
 
+        template<typename T>
+        fox::Option<T&> GetComponent(Entity e)
+        {
+            return m_oWorld.template get_component<T>(e);
+        }
+
         void OnUpdateRuntime();
         void OnUpdateEditor(EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);

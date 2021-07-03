@@ -12,10 +12,10 @@
 
 struct NativeScript
 {
-    using BehaviourContainer
-    = std::unordered_map<std::type_index, std::unique_ptr<ScriptableBehaviour>>;
+    using ScriptPtr = std::unique_ptr<ScriptableBehaviour>;
+    using Container = std::unordered_map<std::size_t, ScriptPtr>;
 
-    BehaviourContainer m_vScripts;
+    Container m_vScripts;
     ScriptableBehaviour* m_pLastRegistered = nullptr;
     fox::World* m_pWorld = nullptr;
 
@@ -33,41 +33,63 @@ struct NativeScript
     template <typename S>
     void add(S scriptable)
     {
-        m_vScripts.insert({
-            typeid(S),
-            std::make_unique<S>(std::move(scriptable)),
-       });
-        m_pLastRegistered = m_vScripts[typeid(S)].get();
+        add(typeid(S).hash_code(), std::make_unique<S>(std::move(scriptable)));
+    }
+
+    template <typename S>
+    void remove()
+    {
+        remove(typeid(S).hash_code());
+    }
+
+    template <typename S>
+    S* get()
+    {
+        auto ptr = get(typeid(S).hash_code());
+        return ptr ? ptr : nullptr;
+    }
+
+    template <typename S>
+    const S* get() const
+    {
+        auto ptr = get(typeid(S).hash_code());
+        return ptr ? ptr : nullptr;
+    }
+
+    void add(std::size_t tag, ScriptPtr scriptable)
+    {
+        m_vScripts.insert({ tag, std::move(scriptable) });
+        m_pLastRegistered = m_vScripts[tag].get();
         // This line will not be called in the constructor because it set to null
         // but later when the user add a new script it will works fine
         if (m_pWorld)
             m_pWorld->run_phase(fox::ecs::OnAddScript);
     }
 
-    template <typename S>
-    void remove()
+    void remove(std::size_t tag)
     {
-        m_vScripts[typeid(S)]->on_destroy();
-        m_vScripts.erase(typeid(S));
+        auto it = m_vScripts.find(tag);
+        if (it != m_vScripts.end()) {
+            it->second->on_destroy();
+            m_vScripts.erase(it);
+        }
     }
 
-    template <typename S>
-    S* get()
+    ScriptableBehaviour* get(std::size_t tag)
     {
-        auto iter = m_vScripts.find(typeid(S));
+        auto iter = m_vScripts.find(tag);
 
         if (iter != m_vScripts.end())
-            return reinterpret_cast<S*>(iter->second.get());
+            return iter->second.get();
         return nullptr;
     }
 
-    template <typename S>
-    const S* get() const
+    const ScriptableBehaviour* get(std::size_t tag) const
     {
-        auto iter = m_vScripts.find(typeid(S));
+        auto iter = m_vScripts.find(tag);
 
         if (iter != m_vScripts.end())
-            return reinterpret_cast<const S*>(iter->second.get());
+            return iter->second.get();
         return nullptr;
     }
 
@@ -110,5 +132,21 @@ struct NativeScript
         }
     }
 };
+
+using ScriptCreator = std::unique_ptr<ScriptableBehaviour> (*)();
+using StringHash = std::hash<std::string>;
+
+template <typename script_class>
+std::unique_ptr<ScriptableBehaviour> CreateScript()
+{
+    return std::make_unique<script_class>();
+}
+
+bool RegisterScript(size_t tag, ScriptCreator func);
+bool RegisterScriptName(const char* name);
+
+#define REGISTER_SCRIPT(type) \
+bool reg {RegisterScript(StringHash()(#type), CreateScript<type>)}; \
+bool name{ RegisterScriptName(#type)}; \
 
 #endif //ECS_NATIVESCRIPT_HPP

@@ -9,9 +9,12 @@
 #define FOX_EDITOR_STATE_HPP_
 
 #include <Utils/Vec2.hpp>
+#include <json.hpp>
+
 #include "FoxEngine.hpp"
 #include "SceneHierarchyPanel.hpp"
 #include "Renderer/EditorCamera.hpp"
+#include "ContentBrowserPanel.hpp"
 
 namespace fox
 {
@@ -22,7 +25,7 @@ namespace fox
                 : m_CameraController(1280.f / 720.f), State("Editor")
         {}
 
-        ~EditorState() override = default;
+        ~EditorState() override;
 
         void OnEnter() override;
 
@@ -39,11 +42,14 @@ namespace fox
         bool OnKeyPressed(KeyPressedEvent &e);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 
+        void NewProject();
+        void OpenProject();
+
         void NewScene();
-
         void OpenScene();
-
         void SaveSceneAs();
+
+        void NewScript();
 
     private:
         fox::OrthographicCameraController m_CameraController;
@@ -52,8 +58,9 @@ namespace fox
         fox::ref<Framebuffer> m_Framebuffer;
         bool m_bViewportFocused = false;
         bool m_bViewportHovered = false;
-        SceneHierarchyPanel m_SceneHierarchyPanel;
         ref<Scene> m_pActiveScene;
+        ContentBrowserPanel m_ContentBrowserPanel;
+        SceneHierarchyPanel m_SceneHierarchyPanel;
 
         EditorCamera m_oEditorCamera;
 
@@ -62,6 +69,8 @@ namespace fox
         glm::vec2 m_vViewportBounds[2];
 
         Entity m_oHoveredEntity;
+
+        json::Value m_oEditorConfig;
     };
 }
 

@@ -50,6 +50,13 @@ namespace fox
         m_pHandle = nullptr;
     }
 
+    void SharedLib::reload()
+    {
+        if (m_pHandle)
+            close();
+        open(m_strPath);
+    }
+
     std::string SharedLib::getPath() const
     {
         return m_strPath;
@@ -58,6 +65,11 @@ namespace fox
     std::string SharedLib::getError() const
     {
         return m_strError;
+    }
+
+    DL_TYPE SharedLib::GetHandle() const
+    {
+        return m_pHandle;
     }
 
     /* PRIVATE */
