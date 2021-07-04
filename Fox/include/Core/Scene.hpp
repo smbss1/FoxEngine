@@ -47,6 +47,7 @@ namespace fox
             return m_oWorld.template get_component<T>(e);
         }
 
+        void OnStartRuntime();
         void OnUpdateRuntime();
         void OnUpdateEditor(EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
@@ -55,6 +56,7 @@ namespace fox
         Entity GetPrimaryCameraEntity();
 
         World& GetWorld();
+        Application& GetApp();
     private:
         template<typename T>
         void OnComponentAdded(Entity &e, T &component);

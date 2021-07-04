@@ -5,10 +5,12 @@
 #include <Core/Assert.hpp>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
+#include <Core/Application.hpp>
 #include <Components/EntityName.hpp>
 #include <Components/Transform.hpp>
 #include <Components/CameraComponent.hpp>
 #include <Components/SpriteRenderer.hpp>
+#include <Components/NativeScript.hpp>
 #include "Core/SceneSerializer.hpp"
 
 
@@ -156,6 +158,23 @@ namespace fox
             out << YAML::EndMap; // SpriteRendererComponent
         }
 
+        auto oNativeScript = entity.get<NativeScript>();
+        if (oNativeScript)
+        {
+            out << YAML::Key << "NativeScriptComponent";
+            out << YAML::BeginMap; // NativeScriptComponent
+            for (auto& script : oNativeScript->m_vScripts)
+            {
+                out << YAML::Key << "Script" << YAML::Value << script.first;
+                // out << YAML::BeginMap; // Script
+
+                // out << YAML::Key << "ID" <<
+
+                // out << YAML::EndMap; // Script
+            }
+            out << YAML::EndMap; // NativeScriptComponent
+        }
+
         out << YAML::EndMap; // Entity
     }
 
@@ -245,6 +264,21 @@ namespace fox
             {
                 auto& src = deserializedEntity.add<SpriteRenderer>();
                 src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+            }
+
+            auto oNativeScriptComponent = entity["NativeScriptComponent"];
+            if (oNativeScriptComponent)
+            {
+                auto& src = deserializedEntity.add<NativeScript>();
+
+                for (auto script : oNativeScriptComponent)
+                {
+                    auto tag = script.second.as<std::size_t>();
+                    fox::info("Script Name: %", script.first.as<std::string>());
+                    fox::info("Script Tag: %", script.second.as<std::size_t>());
+                    ScriptCreator func = m_pScene->GetApp().GetScripts()[tag];
+                    src.add(tag, func());
+                }
             }
         }
 

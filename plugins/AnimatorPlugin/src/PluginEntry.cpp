@@ -16,11 +16,11 @@ namespace fox
         m_oApp = &app;
         std::cout << "[AnimatorPlugin] Init!" << std::endl;
 
-        app.get_world().system<Animator>()
-            .each([](Entity& e, Animator& anim)
-            {
-                anim.run();
-            });
+//        app.get_world().system<Animator>()
+//            .each([](Entity& e, Animator& anim)
+//            {
+//                anim.run();
+//            });
     }
 
     void AnimatorPlugin::unplug(Application &app)
@@ -40,6 +40,6 @@ namespace fox
 
 extern "C" void RegisterPlugin(fox::PluginManager &pm)
 {
-    fox::ref<fox::AnimatorPlugin> plugin = fox::new_ref<fox::AnimatorPlugin>();
-    pm.AddPlugin(plugin);
+//    fox::ref<fox::AnimatorPlugin> plugin = fox::new_ref<fox::AnimatorPlugin>();
+//    pm.AddPlugin(plugin);
 }

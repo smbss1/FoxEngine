@@ -42,7 +42,7 @@ namespace fox
          * @brief Get the ECS World
          * @return ECS World
          */
-        World& GetWorld();
+//        World& GetWorld();
 
         void SetApplication(fox::Application& app)
         {

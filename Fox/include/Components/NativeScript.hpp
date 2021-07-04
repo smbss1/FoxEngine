@@ -94,6 +94,17 @@ struct NativeScript
     }
 
     /**
+     * @brief Call the OnStart function of all script
+     */
+    void OnStart()
+    {
+        for (auto& script : m_vScripts)
+        {
+            script.second->OnStart();
+        }
+    }
+
+    /**
      * @brief Call the on_update function of all script
      */
     void on_update()
@@ -113,7 +124,7 @@ struct NativeScript
             m_pLastRegistered->set_entity(id);
             m_pLastRegistered->set_world(*m_pWorld);
             m_pLastRegistered->set_app(app);
-            m_pLastRegistered->on_create();
+//            m_pLastRegistered->on_create();
         }
         m_pLastRegistered = nullptr;
     }
@@ -128,7 +139,7 @@ struct NativeScript
             script.second->set_entity(id);
             script.second->set_world(*m_pWorld);
             script.second->set_app(app);
-            script.second->on_create();
+//            script.second->on_create();
         }
     }
 };
@@ -146,7 +157,9 @@ bool RegisterScript(size_t tag, ScriptCreator func);
 bool RegisterScriptName(const char* name);
 
 #define REGISTER_SCRIPT(type) \
-bool reg {RegisterScript(StringHash()(#type), CreateScript<type>)}; \
-bool name{ RegisterScriptName(#type)}; \
+bool reg { RegisterScript(StringHash()(#type), CreateScript<type>) }; \
+bool name{ RegisterScriptName(#type) }; \
+
+#define REGISTER_CLASS_MEMBER(type, name)
 
 #endif //ECS_NATIVESCRIPT_HPP

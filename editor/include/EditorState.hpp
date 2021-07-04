@@ -71,6 +71,8 @@ namespace fox
         Entity m_oHoveredEntity;
 
         json::Value m_oEditorConfig;
+
+        bool m_bIsRunning = false;
     };
 }
 

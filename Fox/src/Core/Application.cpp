@@ -25,19 +25,10 @@ namespace fox
         set<ResourceManager>();
 //        set<InputManager>();
         set<TimeInfo>();
-        m_pWorld = new_scope<World>();
-
-        get_world().add_phase(game::OnStart);
-        get_world().add_phase(ecs::OnSceneEnable);
-        get_world().add_phase(ecs::OnSceneDisable);
-        get_world().add_phase(ecs::PostFixUpdate);
-        get_world().add_phase(ecs::PreFixUpdate);
-        get_world().add_phase(ecs::OnAddScript);
     }
 
     Application::~Application()
     {
-        m_pWorld.reset();
         remove<ResourceManager>();
         remove<StateMachine>();
         Renderer2D::Shutdown();
@@ -151,7 +142,6 @@ namespace fox
             }
             m_pWindow->OnUpdate();
         }
-        m_pWorld.reset();
     }
 
     Window* Application::GetWindow() const
@@ -182,5 +172,15 @@ namespace fox
         Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
         return false;
+    }
+
+    std::unordered_map<size_t, ScriptCreator> &Application::GetScripts()
+    {
+        return m_vScripts;
+    }
+
+    void Application::SetScriptsArray(const std::unordered_map<size_t, ScriptCreator> &scripts)
+    {
+        m_vScripts = scripts;
     }
 }

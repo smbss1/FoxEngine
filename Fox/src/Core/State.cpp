@@ -11,8 +11,8 @@ namespace fox
     {
     }
 
-    World &State::GetWorld()
-    {
-        return m_pApp->get_world();
-    }
+//    World &State::GetWorld()
+//    {
+//        return m_pApp->get_world();
+//    }
 }

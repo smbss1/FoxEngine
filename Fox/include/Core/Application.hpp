@@ -4,6 +4,7 @@
 
 #include <Renderer/OrthographicCamera.hpp>
 #include <Events/ApplicationEvent.hpp>
+#include <Components/NativeScript.hpp>
 
 #include "FoxEcs.hpp"
 #include "Core/Managers/ResourceManager.hpp"
@@ -16,6 +17,7 @@ namespace fox
     {
         class Value;
     }
+
     class Application
     {
     public:
@@ -62,15 +64,14 @@ namespace fox
             m_vAny.remove<T>();
         }
 
-        World& get_world()
-        {
-            return *m_pWorld;
-        }
-
         Window* GetWindow() const;
         json::Value& GetConfigs() const;
 
         bool IsWindowMinized() const { return m_bIsMinimized; }
+
+        void SetScriptsArray(const std::unordered_map<size_t, ScriptCreator>& scripts);
+
+        std::unordered_map<size_t, ScriptCreator>& GetScripts();
 
     private:
         bool OnWindowClose(WindowCloseEvent& e);
@@ -80,10 +81,12 @@ namespace fox
         bool m_bIsMinimized = false;
 
     protected:
-        std::unique_ptr<World> m_pWorld;
         fox::AnyContainer m_vAny;
         scope<json::Value> m_oConfigFile;
         ref<Window> m_pWindow;
+
+
+        std::unordered_map<size_t, ScriptCreator> m_vScripts;
     };
 }
 

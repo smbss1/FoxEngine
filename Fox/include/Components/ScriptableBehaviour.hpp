@@ -11,11 +11,11 @@
 #include <Core/Scene.hpp>
 #include "Utils/Option.hpp"
 #include "Ecs/World.hpp"
-#include "Core/Application.hpp"
 
 namespace fox
 {
     class Collider;
+    class Application;
 }
 
 class ScriptableBehaviour
@@ -28,6 +28,11 @@ public:
      * @brief Called when the script is added in the entity
      */
     virtual void on_create() {}
+
+    /**
+     * @brief Called when the scene start
+     */
+    virtual void OnStart() {}
 
     /**
      * @brief Called every frame
@@ -116,10 +121,7 @@ public:
      * @brief Set the application reference
      * @param app the application reference
      */
-    void set_app(fox::Application& app)
-    {
-        m_pApp = &app;
-    }
+    void set_app(fox::Application& app);
 
     /**
      * @brief Set the scene reference
@@ -134,10 +136,7 @@ public:
      * @brief Get the application
      * @return the application
      */
-    fox::Application& get_app()
-    {
-        return *m_pApp;
-    }
+    fox::Application& get_app();
 
     /**
      * @brief Get the scene

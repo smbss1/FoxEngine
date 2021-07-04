@@ -4,12 +4,86 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include <ImGui/imgui.h>
+#include <Core/Application.hpp>
 #include <Components/EntityName.hpp>
 #include <Components/Transform.hpp>
 #include <Components/CameraComponent.hpp>
 #include <Components/SpriteRenderer.hpp>
 #include <ImGui/imgui_internal.h>
 #include "SceneHierarchyPanel.hpp"
+
+//const float toolbarSize = 10;
+//float menuBarHeight = 100;
+//
+//void DockSpaceUI()
+//{
+//    ImGuiViewport* viewport = ImGui::GetMainViewport();
+//    ImVec2 pos = {viewport->Pos.x, viewport->Pos.y + toolbarSize};
+//    ImVec2 size = {viewport->Size.x, viewport->Size.y - toolbarSize};
+//    ImGui::SetNextWindowPos(pos);
+//    ImGui::SetNextWindowSize(size);
+//    ImGui::SetNextWindowViewport(viewport->ID);
+//    ImGuiWindowFlags window_flags = 0
+//                                    | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
+//                                    | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
+//                                    | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
+//                                    | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+//
+//    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+//    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+//    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+//    ImGui::Begin("Master DockSpace", NULL, window_flags);
+//    ImGuiID dockMain = ImGui::GetID("MyDockspace");
+//
+//    // Save off menu bar height for later.
+//    menuBarHeight = ImGui::GetCurrentWindow()->MenuBarHeight();
+//
+//    ImGui::DockSpace(dockMain);
+//    ImGui::End();
+//    ImGui::PopStyleVar(3);
+//}
+//
+//void ToolbarUI()
+//{
+//    ImGuiViewport* viewport = ImGui::GetMainViewport();
+//    ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + menuBarHeight));
+//    ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, toolbarSize));
+//    ImGui::SetNextWindowViewport(viewport->ID);
+//
+//    ImGuiWindowFlags window_flags = 0
+//                                    | ImGuiWindowFlags_NoDocking
+//                                    | ImGuiWindowFlags_NoTitleBar
+//                                    | ImGuiWindowFlags_NoResize
+//                                    | ImGuiWindowFlags_NoMove
+//                                    | ImGuiWindowFlags_NoScrollbar
+//                                    | ImGuiWindowFlags_NoSavedSettings
+//    ;
+//    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+//    ImGui::Begin("TOOLBAR", NULL, window_flags);
+//    ImGui::PopStyleVar();
+//
+//    ImGui::Button("Toolbar goes here", ImVec2(0, 37));
+//
+//    ImGui::End();
+//}
+//
+//void UndockWidget(ImVec2 icon_size, ImGuiAxis axis)
+//{
+//    ImGuiWindow* window = ImGui::GetCurrentWindow();
+//
+//    ImVec2 size = icon_size;
+//    size[axis] = ImFloor(size[axis] * 0.30f);
+//    ImVec2 p = ImGui::GetCursorScreenPos();
+//    ImGui::InvisibleButton("##Undock", size);
+//
+//    const bool is_hovered = ImGui::IsItemHovered();
+//    const bool is_active = ImGui::IsItemActive();
+//    if (is_active)
+//        ImGui::StartMouseMovingWindowOrNode(window, window->DockNode, true);
+//
+//    const ImU32 col = ImGui::GetColorU32(is_active ? ImGuiCol_ButtonActive : is_hovered ? ImGuiCol_ButtonHovered : ImGuiCol_TextDisabled, 0.4f);
+//    window->DrawList->AddRectFilled(p, {p.x + size.x, p.y + size.y}, col);
+//}
 
 namespace fox
 {
@@ -46,6 +120,7 @@ namespace fox
             m_pScriptLib->sym("GetScripts", GetScripts);
             m_vScriptsNames = GetScriptsNames();
             m_vScripts = GetScripts();
+            context->GetApp().SetScriptsArray(m_vScripts);
             for (auto name : m_vScriptsNames)
             {
                 fox::info("Script: '%'", name.second);

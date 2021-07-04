@@ -25,6 +25,12 @@ namespace fox
         m_oWorld.RegisterComponent<EntityTag>();
         m_oWorld.RegisterComponent<EntityName>();
 
+        m_oWorld.add_phase(game::OnStart);
+        m_oWorld.add_phase(ecs::OnAddScript);
+        m_oWorld.add_phase(ecs::PostFixUpdate);
+        m_oWorld.add_phase(ecs::PreFixUpdate);
+
+
         // Draw Systems
         m_oWorld.system<TransformComponent, SpriteRenderer>().kind(ecs::OnStore)
                 .each([](Entity& e, TransformComponent& transform, SpriteRenderer& sprite)
@@ -51,6 +57,12 @@ namespace fox
                 .each([&](Entity& e, NativeScript& script)
                       {
                           script.on_create(e.get_id(), app);
+                      });
+
+        m_oWorld.system<NativeScript>().kind(game::OnStart)
+                .each([&](Entity& e, NativeScript& script)
+                      {
+                          script.OnStart();
                       });
     }
 
@@ -258,6 +270,11 @@ namespace fox
         Renderer2D::EndScene();
     }
 
+    void Scene::OnStartRuntime()
+    {
+        m_oWorld.run_phase(game::OnStart);
+    }
+
     void Scene::OnUpdateRuntime()
     {
         m_oWorld.run_phase(ecs::PreUpdate);
@@ -323,6 +340,11 @@ namespace fox
     World &Scene::GetWorld()
     {
         return m_oWorld;
+    }
+
+    Application &Scene::GetApp()
+    {
+        return m_oApp;
     }
 
     template<typename T>
