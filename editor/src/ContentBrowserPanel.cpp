@@ -9,6 +9,9 @@
 
 namespace fox
 {
+    static float padding = 16.0f; // Padding between folders and files
+    static float thumbnailSize = 90.f; // Size of the thumbnail (icon)
+
     ContentBrowserPanel::ContentBrowserPanel()
         : m_oCurrentDirectory(FPaths::AssetsDir())
     {
@@ -20,16 +23,14 @@ namespace fox
     {
         ImGui::Begin("Content Browser");
 
-        if (!m_oCurrentDirectory.empty()) {
-
+        if (!m_oCurrentDirectory.empty())
+        {
             if (m_oCurrentDirectory != std::filesystem::path(FPaths::AssetsDir())) {
                 if (ImGui::Button("<")) {
                     m_oCurrentDirectory = m_oCurrentDirectory.parent_path();
                 }
             }
 
-            static float padding = 16.0f;
-            static float thumbnailSize = 90.f;
             float cellSize = thumbnailSize + padding;
 
             float panelWidth = ImGui::GetContentRegionAvail().x;

@@ -11,6 +11,7 @@
 #include <Components/SpriteRenderer.hpp>
 #include <ImGui/imgui_internal.h>
 #include <Utils/Path.hpp>
+#include <FPaths.hpp>
 #include "SceneHierarchyPanel.hpp"
 
 //const float toolbarSize = 10;
@@ -115,7 +116,8 @@ namespace fox
             fox::info("Open the native script library");
 
             try {
-                m_pScriptLib->open("../Project/libfox_native_script" DL_EXT);
+                std::string strLibPath = FPaths::ProjectDir() + "/libfox_native_script" DL_EXT;
+                m_pScriptLib->open(strLibPath);
                 m_pScriptLib->sym("GetScriptsNames", GetScriptsNames);
                 m_pScriptLib->sym("GetScripts", GetScripts);
                 m_vScriptsNames = GetScriptsNames();
