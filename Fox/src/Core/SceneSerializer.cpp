@@ -154,6 +154,7 @@ namespace fox
 
             auto& spriteRendererComponent = *oSpriteRenderer;
             out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
+            out << YAML::Key << "Sprite" << YAML::Value << spriteRendererComponent.m_strFilepath;
 
             out << YAML::EndMap; // SpriteRendererComponent
         }
@@ -266,6 +267,11 @@ namespace fox
             {
                 auto& src = deserializedEntity.add<SpriteRenderer>();
                 src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+                auto strFilepath = spriteRendererComponent["Sprite"].as<std::string>();
+                if (!strFilepath.empty()) {
+                    src.m_pSprite = Texture2D::Create(strFilepath);
+                    src.m_strFilepath = filepath;
+                }
             }
 
             auto oNativeScriptComponent = entity["NativeScriptComponent"];

@@ -154,7 +154,7 @@ namespace fox
         ImGui::End();
 
         ImGui::Begin("Properties");
-        if (m_SelectedEntity != Entity())
+        if (m_SelectedEntity)
         {
             DrawComponents(m_SelectedEntity);
         }
@@ -399,8 +399,6 @@ namespace fox
                     camera.SetPerspectiveFarClip(far);
             }
         });
-
-        ImGui::ShowDemoWindow();
 
         DrawComponent<SpriteRenderer>("Sprite Renderer", entity,[](SpriteRenderer& sprite)
         {

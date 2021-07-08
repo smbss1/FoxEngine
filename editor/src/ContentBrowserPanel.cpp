@@ -60,13 +60,13 @@ namespace fox
                  * TODO: Instead of doing this if for every file image format, it could be better to save a list in a json file or in a static temporary char*
                  */
                 if (path.extension() == ".png")
-                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
-                {
-                    std::string texturePath = path.string();
-                    ImGui::SetDragDropPayload("TEXTURE_HANDLE_ID", texturePath.data(), sizeof(char) * texturePath.size());
-                    ImGui::Text(texturePath.c_str());
-                    ImGui::EndDragDropSource();
-                }
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+                    {
+                        std::string texturePath = path.string();
+                        ImGui::SetDragDropPayload("TEXTURE_HANDLE_ID", texturePath.data(), sizeof(char) * texturePath.size());
+                        ImGui::Text(texturePath.c_str());
+                        ImGui::EndDragDropSource();
+                    }
 
                 ImGui::TextWrapped(strFilenamePath.c_str());
 
