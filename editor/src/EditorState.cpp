@@ -4,9 +4,7 @@
 #include <Core/Input/Input.hpp>
 #include <Utils/PlatformUtils.hpp>
 #include <Core/SceneSerializer.hpp>
-#include <Time.hpp>
 #include <ImGuizmo/ImGuizmo.h>
-#include <Components/CameraComponent.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <Math/Math.hpp>
 #include <Renderer/Framebuffer.hpp>
@@ -15,6 +13,7 @@
 #include <FPaths.hpp>
 #include <Utils/FileSystem.hpp>
 #include <ImGui/imgui_internal.h>
+#include <EditorEvent.hpp>
 
 #include "EditorState.hpp"
 
@@ -126,17 +125,25 @@ namespace fox
             m_ContentBrowserPanel.OnProjectOpen();
         }
 
+        // Add Callback to the eventsystem
+        event::EventSystem::Get().On<RuntimeStartEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStart));
+        event::EventSystem::Get().On<RuntimeStopEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStop));
+
+        // Create frame buffer
         fox::FramebufferSpecification fbSpec;
         fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
         fbSpec.Width = 1280;
         fbSpec.Height = 720;
         m_Framebuffer = fox::Framebuffer::Create(fbSpec);
 
+        // Init Editor Camera
         m_oEditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
+        // Create a new Scene
         m_pActiveScene = new_ref<Scene>(GetApp());
         m_SceneHierarchyPanel.SetContext(m_pActiveScene);
 
+        // If we have opened a scene last time so deserialize it to the active scene
         if (!m_oEditorConfig["LastOpenedScene"].is_null())
         {
             SceneSerializer serializer(m_pActiveScene);
@@ -288,6 +295,9 @@ namespace fox
                 if (ImGui::MenuItem("Open Scene...", "Ctrl+O"))
                     OpenScene();
 
+                if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+                    SaveScene();
+
                 if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
                     SaveSceneAs();
 
@@ -311,11 +321,6 @@ namespace fox
 
         ImGui::Begin("Stats");
         {
-            std::string name = "None";
-            if (m_oHoveredEntity)
-                name = m_oHoveredEntity.get<EntityName>()->name;
-            ImGui::Text("Hovered Entity: %s", name.c_str());
-
             auto stats = fox::Renderer2D::GetStats();
             ImGui::Text("Renderer2D Stats:");
             ImGui::Text("Draw Calls: %d", stats.DrawCalls);
@@ -410,15 +415,47 @@ namespace fox
 
             if (toolbar_axis == ImGuiAxis_X)
                 ImGui::SameLine();
+
+            // If not running disable the Play button and enable Stop button
+            if (m_bIsRunning)
+            {
+                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            }
+
             if (ImGui::Button("Play")) {
-                m_bIsRunning = true;
-                m_pActiveScene->OnStartRuntime();
+                event::EventSystem::Get().Emit(RuntimeStartEvent());
+
+                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            }
+            if (m_bIsRunning)
+            {
+                ImGui::PopItemFlag();
+                ImGui::PopStyleVar();
+            }
+
+            // If not running disable the Stop button and enable Play button
+            if (!m_bIsRunning)
+            {
+                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
             }
 
             if (toolbar_axis == ImGuiAxis_X)
                 ImGui::SameLine();
-            if (ImGui::Button("Pause"))
-                m_bIsRunning = false;
+            if (ImGui::Button("Stop")) {
+                event::EventSystem::Get().Emit(RuntimeStopEvent());
+
+                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            }
+
+            if (!m_bIsRunning)
+            {
+                ImGui::PopItemFlag();
+                ImGui::PopStyleVar();
+            }
 
             ImGui::PopStyleVar(2);
         });
@@ -510,19 +547,20 @@ namespace fox
 
         // Create the HPP Class
         file::WriteFile(hpp_filepath, "\n#include <Components/NativeScript.hpp>\n"
-                                      "\nclass " + strName + " : public ScriptableBehaviour\n{\n"
+                                      "\nclass "+ strName +" : public ScriptableBehaviour\n{\n"
                                          "public:\n"
                                          "protected:\n"
-                                          "    void on_create() override;\n"
+                                          "    void OnStart() override;\n"
                                           "    void on_update() override;\n"
                                          "private:\n"
-                                         "};");
+                                         "};\n\n"
+                                         "REGISTER_SCRIPT("+ strName +");");
 
         // Create the CPP Class
         file::WriteFile(cpp_filepath, "\n#include <FoxEngine.hpp>\n"
                                       "#include \"" + strName + ".hpp\""
                                     "\n\n"
-                                    "\nvoid " + strName + "::on_create()\n{\n}\n"
+                                    "\nvoid " + strName + "::OnStart()\n{\n}\n"
                                     "\nvoid " + strName + "::on_update()\n{\n}\n"
          );
 
@@ -614,6 +652,12 @@ namespace fox
         }
     }
 
+    void EditorState::SaveScene()
+    {
+        SceneSerializer serializer(m_pActiveScene);
+        serializer.Serialize(m_oEditorConfig["LastOpenedScene"].get<std::string>());
+    }
+
     void EditorState::SaveSceneAs()
     {
         auto filepath = FileDialogs::SaveFile({"Fox Scene (*.foxscene)", "*.foxscene"});
@@ -624,5 +668,34 @@ namespace fox
             SceneSerializer serializer(m_pActiveScene);
             serializer.Serialize(filepath);
         }
+    }
+
+    void EditorState::OnRuntimeStart(const RuntimeStartEvent& e)
+    {
+        m_bIsRunning = true;
+
+        // Create the meta directory
+        std::filesystem::create_directories("metas");
+        // Save the scene in a temp file
+        SceneSerializer serializer(m_pActiveScene);
+        serializer.Serialize("metas/active_scene.foxscene.meta");
+
+        m_pActiveScene->OnStartRuntime();
+    }
+
+    void EditorState::OnRuntimeStop(const RuntimeStopEvent& e)
+    {
+        m_bIsRunning = false;
+
+        // Create a new scene and the context of the scene panel
+        m_pActiveScene = new_ref<Scene>(GetApp());
+        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+
+        // Reload the scene from the temp file
+        SceneSerializer serializer(m_pActiveScene);
+        serializer.Deserialize("metas/active_scene.foxscene.meta");
+
+        // Send the viewport event to set the viewport of the games cameras properly
+        m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
     }
 }

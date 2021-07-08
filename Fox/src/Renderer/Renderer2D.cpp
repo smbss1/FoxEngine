@@ -499,7 +499,7 @@ namespace fox
         s_Data.Stats.QuadCount++;
     }
 
-    void Renderer2D::DrawQuad(const glm::mat4& transform, const ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, int entityID)
+    void Renderer2D::DrawQuad(const glm::mat4& transform, const ref<Texture2D>& texture, const glm::vec4& tintColor, float tilingFactor, int entityID)
     {
         constexpr size_t quadVertexCount = 4;
         constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
@@ -546,7 +546,10 @@ namespace fox
 
     void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRenderer& src, int entityID)
     {
-        DrawQuad(transform, src.Color, entityID);
+        if (src.m_pSprite)
+            DrawQuad(transform, src.m_pSprite, src.Color, 1.0f, entityID);
+        else
+            DrawQuad(transform, src.Color, entityID);
     }
 
 

@@ -157,8 +157,8 @@ bool RegisterScript(size_t tag, ScriptCreator func);
 bool RegisterScriptName(const char* name);
 
 #define REGISTER_SCRIPT(type) \
-bool reg { RegisterScript(StringHash()(#type), CreateScript<type>) }; \
-bool name{ RegisterScriptName(#type) }; \
+bool reg_##type { RegisterScript(StringHash()(#type), CreateScript<type>) }; \
+bool name_##type{ RegisterScriptName(#type) }; \
 
 #define REGISTER_CLASS_MEMBER(type, name)
 

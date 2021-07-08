@@ -10,6 +10,7 @@
 #include <Components/CameraComponent.hpp>
 #include <Components/SpriteRenderer.hpp>
 #include <ImGui/imgui_internal.h>
+#include <Utils/Path.hpp>
 #include "SceneHierarchyPanel.hpp"
 
 //const float toolbarSize = 10;
@@ -107,28 +108,26 @@ namespace fox
         m_pContext = context;
         m_SelectedEntity = {};
 
-        if (m_pScriptLib->GetHandle())
-            m_pScriptLib->close();
+        if (!m_pScriptLib->GetHandle()) {
 
-        std::unordered_map<size_t, std::string> (*GetScriptsNames)();
-        std::unordered_map<size_t, ScriptCreator> (*GetScripts)();
-        fox::info("Open the native script library");
+            std::unordered_map<size_t, std::string> (*GetScriptsNames)();
+            std::unordered_map<size_t, ScriptCreator> (*GetScripts)();
+            fox::info("Open the native script library");
 
-        try {
-            m_pScriptLib->open("../Project/libfox_native_script" DL_EXT);
-            m_pScriptLib->sym("GetScriptsNames", GetScriptsNames);
-            m_pScriptLib->sym("GetScripts", GetScripts);
-            m_vScriptsNames = GetScriptsNames();
-            m_vScripts = GetScripts();
-            context->GetApp().SetScriptsArray(m_vScripts);
-            for (auto name : m_vScriptsNames)
-            {
-                fox::info("Script: '%'", name.second);
+            try {
+                m_pScriptLib->open("../Project/libfox_native_script" DL_EXT);
+                m_pScriptLib->sym("GetScriptsNames", GetScriptsNames);
+                m_pScriptLib->sym("GetScripts", GetScripts);
+                m_vScriptsNames = GetScriptsNames();
+                m_vScripts = GetScripts();
+                context->GetApp().SetScriptsArray(m_vScripts);
+                for (auto name : m_vScriptsNames) {
+                    fox::info("Script: '%'", name.second);
+                }
             }
-        }
-        catch (std::exception& e)
-        {
-            fox::error("%", e.what());
+            catch (std::exception &e) {
+                fox::error("%", e.what());
+            }
         }
     }
 
@@ -191,6 +190,23 @@ namespace fox
 //            if (expanded)
 //                ImGui::TreePop();
             ImGui::TreePop();
+        }
+
+        if (ImGui::BeginDragDropSource())
+        {
+            ImGui::SetDragDropPayload("SceneHierarchy", &entity, sizeof(Entity));
+            ImGui::Text(name.name.c_str());
+            ImGui::EndDragDropSource();
+        }
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SceneHierarchy");
+            if (payload != nullptr) {
+                Entity *e = static_cast<Entity *>(payload->Data);
+                fox::info("Entity name: %", e->get<EntityName>()->name);
+            }
+            ImGui::EndDragDropTarget();
         }
 
         if (bIsDeleted) {
@@ -384,9 +400,34 @@ namespace fox
             }
         });
 
-        DrawComponent<SpriteRenderer>("Sprite Renderer", entity,[](SpriteRenderer& renderer)
+        ImGui::ShowDemoWindow();
+
+        DrawComponent<SpriteRenderer>("Sprite Renderer", entity,[](SpriteRenderer& sprite)
         {
-            ImGui::ColorEdit4("Color", glm::value_ptr(renderer.Color));
+            ImGui::ColorEdit4("Color", glm::value_ptr(sprite.Color));
+
+            if (sprite.m_pSprite)
+            {
+                Path path(sprite.m_strFilepath);
+                auto filename = path.filename();
+                ImGui::InputText("##SpriteRendererTexture", (char*)filename.c_str(), filename.size(), ImGuiInputTextFlags_ReadOnly);
+            }
+            else
+            {
+                ImGui::InputText("##SpriteRendererTexture", "Default Sprite", 14, ImGuiInputTextFlags_ReadOnly);
+            }
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_HANDLE_ID"))
+                {
+                    // TODO: Find a way to check the correct data we receive
+//                    IM_ASSERT(payload->DataSize == sizeof(std::string));
+                    std::string texturePath = (char *)payload->Data;
+                    sprite.m_pSprite = Texture2D::Create(texturePath);
+                    sprite.m_strFilepath = texturePath;
+                }
+                ImGui::EndDragDropTarget();
+            }
         });
 
         DrawScripts(entity, [](ScriptableBehaviour& script)

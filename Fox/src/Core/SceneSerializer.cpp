@@ -166,6 +166,8 @@ namespace fox
             for (auto& script : oNativeScript->m_vScripts)
             {
                 out << YAML::Key << "Script" << YAML::Value << script.first;
+
+                // TODO: Save variables from the script
                 // out << YAML::BeginMap; // Script
 
                 // out << YAML::Key << "ID" <<
@@ -274,8 +276,6 @@ namespace fox
                 for (auto script : oNativeScriptComponent)
                 {
                     auto tag = script.second.as<std::size_t>();
-                    fox::info("Script Name: %", script.first.as<std::string>());
-                    fox::info("Script Tag: %", script.second.as<std::size_t>());
                     ScriptCreator func = m_pScene->GetApp().GetScripts()[tag];
                     src.add(tag, func());
                 }

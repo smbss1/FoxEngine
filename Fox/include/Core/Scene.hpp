@@ -51,7 +51,6 @@ namespace fox
         void OnUpdateRuntime();
         void OnUpdateEditor(EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
-//        void set_application(Application& app);
 
         Entity GetPrimaryCameraEntity();
 

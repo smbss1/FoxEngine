@@ -16,6 +16,9 @@
 #include "Renderer/EditorCamera.hpp"
 #include "ContentBrowserPanel.hpp"
 
+class RuntimeStartEvent;
+class RuntimeStopEvent;
+
 namespace fox
 {
     class EditorState : public State
@@ -47,9 +50,22 @@ namespace fox
 
         void NewScene();
         void OpenScene();
+        void SaveScene();
         void SaveSceneAs();
 
         void NewScript();
+
+        /**
+         * @brief On runtime start, this function will be called from EventSystem
+         * @param e the event
+         */
+        void OnRuntimeStart(const RuntimeStartEvent& e);
+
+        /**
+         * @brief On runtime stop, this function will be called from EventSystem
+         * @param e the event
+         */
+        void OnRuntimeStop(const RuntimeStopEvent& e);
 
     private:
         fox::OrthographicCameraController m_CameraController;

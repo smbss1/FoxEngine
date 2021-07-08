@@ -6,6 +6,7 @@
 #define FOXENGINE_CONTENTBROWSERPANEL_HPP
 
 #include <filesystem>
+#include <Renderer/Texture.hpp>
 
 namespace fox
 {
@@ -19,6 +20,9 @@ namespace fox
 
     private:
         std::filesystem::path m_oCurrentDirectory;
+
+        ref<Texture2D> m_pFolderIcon = nullptr;
+        ref<Texture2D> m_pFileIcon = nullptr;
     };
 }
 
