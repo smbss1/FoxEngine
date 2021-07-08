@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
 
-set(CMAKE_MODULE_PATH "../cmake")
-
 file(GLOB_RECURSE CORE_SRCS "src/*.cpp")
 
 # set(THREADS_PREFER_PTHREAD_FLAG ON)
