@@ -13,7 +13,6 @@
 #include <functional>
 #include <algorithm>
 
-
 namespace fox
 {
     template <typename signature>
@@ -65,7 +64,8 @@ namespace fox
                                         return size_t(slot.get()) == id;
                                     });
             bool const removed = it != m_vCallbacks.end();
-            m_vCallbacks.erase(it);
+            if (removed)
+                m_vCallbacks.erase(it);
             return removed;
         }
 
@@ -74,9 +74,10 @@ namespace fox
          *
          * @param args the arguments to pass to the subscribers
          */
-        void notifiy(Args... args)
+        void notifiy(Args&&... args)
         {
-            for (auto& slot : m_vCallbacks) {
+            auto copy = m_vCallbacks;
+            for (auto& slot : copy) {
                 if (slot) {
                     (*slot)(args...);
                 }
@@ -89,7 +90,7 @@ namespace fox
          *
          * @return std::size_t the number of connected subscibers.
          */
-        std::size_t size () const
+        std::size_t size() const
         {
             return m_vCallbacks.size();
         }

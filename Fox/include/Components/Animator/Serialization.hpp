@@ -23,14 +23,14 @@ namespace fox
             {
                 value.loop(j["loop"].get<bool>());
                 if (j["tracks"].is_array()) {
-                    value.m_vTracks.reserve(j["tracks"].get<Array>().size());
+                    value.Tracks.get().reserve(j["tracks"].get<Array>().size());
                     for (auto &elem : j["tracks"].get<Array>()) {
                         if (elem["type"].get<std::string>() == "float")
-                            value.m_vTracks.push_back(elem.get<std::unique_ptr<Track<float>>>());
+                            value.Tracks.get().push_back(elem.get<std::unique_ptr<Track<float>>>());
                         else if (elem["type"].get<std::string>() == "Vec3")
-                            value.m_vTracks.push_back(elem.get<std::unique_ptr<Track<Vec3>>>());
+                            value.Tracks.get().push_back(elem.get<std::unique_ptr<Track<Vec3>>>());
                         else if (elem["type"].get<std::string>() == "Quat")
-                            value.m_vTracks.push_back(elem.get<std::unique_ptr<Track<quat>>>());
+                            value.Tracks.get().push_back(elem.get<std::unique_ptr<Track<quat>>>());
 //                        else if (elem["type"].get<std::string>() == "Vec2")
 //                            value.m_vTracks.push_back(elem.get<std::unique_ptr<Track<Vec2>>>());
                     }
@@ -48,6 +48,19 @@ namespace fox
             static void deserialize(const Value& j, std::unique_ptr<T>& value)
             {
                 value = std::make_unique<T>(j.template get<T>());
+            }
+        };
+
+        template <typename T>
+        struct Serializer<std::shared_ptr<T>>
+        {
+            static void serialize(Value& j, const std::shared_ptr<T>& value)
+            {
+            }
+
+            static void deserialize(const Value& j, std::shared_ptr<T>& value)
+            {
+                value = std::make_shared<T>(j.template get<T>());
             }
         };
 

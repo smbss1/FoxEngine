@@ -14,7 +14,7 @@
 
 #include "api.hpp"
 #include "Plugin/IPlugin.hpp"
-#include "Animator.hpp"
+#include "Components/Animator/Animator.hpp"
 
 namespace fox
 {

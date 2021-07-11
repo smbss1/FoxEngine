@@ -3,7 +3,7 @@
 //
 
 #include <Time.hpp>
-#include <ImGui/imgui.h>
+#include <imgui.h>
 #include "SpriteSheet.hpp"
 
 void SpriteSheetState::OnEnter()

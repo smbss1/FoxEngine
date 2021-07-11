@@ -1,10 +1,10 @@
 
 #include <Core/Scene.hpp>
-#include <ImGui/imgui.h>
+#include <imgui.h>
 #include <Core/Input/Input.hpp>
 #include <Utils/PlatformUtils.hpp>
 #include <Core/SceneSerializer.hpp>
-#include <ImGuizmo/ImGuizmo.h>
+#include <ImGuizmo.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <Math/Math.hpp>
 #include <Renderer/Framebuffer.hpp>
@@ -12,7 +12,7 @@
 #include <Utils/Path.hpp>
 #include <FPaths.hpp>
 #include <Utils/FileSystem.hpp>
-#include <ImGui/imgui_internal.h>
+#include <imgui_internal.h>
 #include <EditorEvent.hpp>
 
 #include "EditorState.hpp"
@@ -101,6 +101,7 @@ namespace fox
 {
     EditorState::~EditorState()
     {
+        m_oWatcher.reset();
         m_Framebuffer.reset();
         m_pActiveScene.reset();
     }
@@ -109,6 +110,7 @@ namespace fox
     {
         json::Value oConfigTemp;
         std::string out;
+
         if (fox::file::ReadFile("./editor_config.json", out))
             oConfigTemp = json::parse(out);
         if (!oConfigTemp.is_null()) {
@@ -118,7 +120,7 @@ namespace fox
         else
             fox::error("Wrong configuration format for 'editor_config.json'");
 
-        if (!m_oEditorConfig["LastOpenedProject"].is_null()) {
+        if (!m_oEditorConfig.is_null() && !m_oEditorConfig["LastOpenedProject"].is_null()) {
             // Set the project directory
             FPaths::SetProjectDir(m_oEditorConfig["LastOpenedProject"].get<std::string>());
             // Notify the content panel that the project directory changed
@@ -144,11 +146,13 @@ namespace fox
         m_SceneHierarchyPanel.SetContext(m_pActiveScene);
 
         // If we have opened a scene last time so deserialize it to the active scene
-        if (!m_oEditorConfig["LastOpenedScene"].is_null())
+        if (!m_oEditorConfig.is_null() && !m_oEditorConfig["LastOpenedScene"].is_null())
         {
             SceneSerializer serializer(m_pActiveScene);
             serializer.Deserialize(m_oEditorConfig["LastOpenedScene"].get<std::string>());
         }
+
+        InitFileWatcher();
 
 //            auto e1 = m_pActiveScene->NewEntity();
 //            e1.add<TransformComponent>();
@@ -229,55 +233,56 @@ namespace fox
 
     void EditorState::OnImGui()
     {
-        // Note: Switch this to true to enable dockspace
-        static bool dockspaceOpen = true;
-        static bool opt_fullscreen_persistant = true;
-        bool opt_fullscreen = opt_fullscreen_persistant;
-        static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-
-        // We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
-        // because it would be confusing to have two docking targets within each others.
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-        if (opt_fullscreen)
-        {
-            ImGuiViewport *viewport = ImGui::GetMainViewport();
-            ImGui::SetNextWindowPos(viewport->Pos);
-            ImGui::SetNextWindowSize(viewport->Size);
-            ImGui::SetNextWindowViewport(viewport->ID);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-            window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
-                            ImGuiWindowFlags_NoMove;
-            window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-        }
-
-        // When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
-        if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-            window_flags |= ImGuiWindowFlags_NoBackground;
-
-        // Important: note that we proceed even if Begin() returns false (aka window is collapsed).
-        // This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
-        // all active windows docked into it will lose their parent and become undocked.
-        // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
-        // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-        ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
-        ImGui::PopStyleVar();
-
-        if (opt_fullscreen)
-            ImGui::PopStyleVar(2);
-
-        // DockSpace
+        // Dockspace
         ImGuiIO &io = ImGui::GetIO();
-        ImGuiStyle &style = ImGui::GetStyle();
-        float minWinSizeX = style.WindowMinSize.x;
-        style.WindowMinSize.x = 370.0f;
-        if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-            ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-        }
+        {
+            // Note: Switch this to true to enable dockspace
+            static bool dockspaceOpen = true;
+            static bool opt_fullscreen_persistant = true;
+            bool opt_fullscreen = opt_fullscreen_persistant;
+            static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
-        style.WindowMinSize.x = minWinSizeX;
+            // We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+            // because it would be confusing to have two docking targets within each others.
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+            if (opt_fullscreen) {
+                ImGuiViewport *viewport = ImGui::GetMainViewport();
+                ImGui::SetNextWindowPos(viewport->Pos);
+                ImGui::SetNextWindowSize(viewport->Size);
+                ImGui::SetNextWindowViewport(viewport->ID);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+                window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+                                ImGuiWindowFlags_NoMove;
+                window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+            }
+
+            // When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
+            if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+                window_flags |= ImGuiWindowFlags_NoBackground;
+
+            // Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+            // This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+            // all active windows docked into it will lose their parent and become undocked.
+            // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
+            // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+            ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+            ImGui::PopStyleVar();
+
+            if (opt_fullscreen)
+                ImGui::PopStyleVar(2);
+
+            // DockSpace
+            ImGuiStyle &style = ImGui::GetStyle();
+            float minWinSizeX = style.WindowMinSize.x;
+            style.WindowMinSize.x = 370.0f;
+            if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+                ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+                ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+            }
+            style.WindowMinSize.x = minWinSizeX;
+        }
 
         if (ImGui::BeginMenuBar())
         {
@@ -318,11 +323,13 @@ namespace fox
 
         m_ContentBrowserPanel.OnImGui();
         m_SceneHierarchyPanel.OnImGui();
+        m_AnimatorEditor.OnImGui();
 
         ImGui::Begin("Stats");
         {
             auto stats = fox::Renderer2D::GetStats();
             ImGui::Text("Renderer2D Stats:");
+            ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
             ImGui::Text("Draw Calls: %d", stats.DrawCalls);
             ImGui::Text("Quads: %d", stats.QuadCount);
             ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
@@ -697,5 +704,35 @@ namespace fox
 
         // Send the viewport event to set the viewport of the games cameras properly
         m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
+    }
+
+    void EditorState::InitFileWatcher()
+    {
+        // Create a FileWatcher instance that will check the current folder for changes every 5 seconds
+        m_oWatcher = new_scope<FileWatcher>(FPaths::AssetsDir(), std::chrono::milliseconds(5000));
+
+        // Start monitoring a folder for changes and (in case of changes)
+        // run a user provided lambda function
+        m_oWatcher->start([] (std::string path_to_watch, FileStatus status) {
+            // Process only regular files, all other file types are ignored
+            if(!std::filesystem::is_regular_file(std::filesystem::path(path_to_watch)) && status != FileStatus::erased) {
+                return;
+            }
+
+            switch(status)
+            {
+                case FileStatus::created:
+                    std::cout << "File created: " << path_to_watch << '\n';
+                    break;
+                case FileStatus::modified:
+                    std::cout << "File modified: " << path_to_watch << '\n';
+                    break;
+                case FileStatus::erased:
+                    std::cout << "File erased: " << path_to_watch << '\n';
+                    break;
+                default:
+                    std::cout << "Error! Unknown file status.\n";
+            }
+        });
     }
 }

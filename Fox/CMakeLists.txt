@@ -12,9 +12,11 @@ set( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -fPIC" )
 find_package(foxjson REQUIRED)
 find_package(yamlcpp REQUIRED)
 
+add_subdirectory(vendor)
+
 add_library(fox_engine SHARED ${CORE_SRCS})
 target_include_directories(fox_engine PUBLIC "include")
-target_link_libraries(fox_engine PUBLIC ${CMAKE_DL_LIBS} fox_json yaml-cpp)
+target_link_libraries(fox_engine PUBLIC ${CMAKE_DL_LIBS} fox_json yaml-cpp imgui imgui-gizmo)
 target_compile_definitions(fox_engine PRIVATE FOX_BUILD_LIB=1)
 target_compile_definitions(fox_engine PUBLIC
     $<$<CONFIG:DEBUG>:FOX_DEBUG=1>

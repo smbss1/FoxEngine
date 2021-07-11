@@ -2,10 +2,10 @@
 // Created by samuel on 01/07/2021.
 //
 
-#include <ImGui/imgui.h>
+#include <imgui.h>
 #include <ImGui/imgui_impl_opengl3.h>
 #include <Core/Managers/StateMachine.hpp>
-#include <ImGuizmo/ImGuizmo.h>
+#include <ImGuizmo.h>
 #include <ImGui/imgui_impl_glfw.h>
 #include <GLFW/glfw3.h>
 #include "ImGuiState.hpp"

@@ -3,15 +3,18 @@
 //
 
 #include <glm/gtc/type_ptr.hpp>
-#include <ImGui/imgui.h>
+#include <imgui.h>
 #include <Core/Application.hpp>
 #include <Components/EntityName.hpp>
 #include <Components/Transform.hpp>
 #include <Components/CameraComponent.hpp>
 #include <Components/SpriteRenderer.hpp>
-#include <ImGui/imgui_internal.h>
+#include <imgui_internal.h>
 #include <Utils/Path.hpp>
 #include <FPaths.hpp>
+#include <Components/Animator/Animator.hpp>
+#include <Events/EventSystem.hpp>
+#include <EditorEvent.hpp>
 #include "SceneHierarchyPanel.hpp"
 
 //const float toolbarSize = 10;
@@ -108,6 +111,7 @@ namespace fox
     {
         m_pContext = context;
         m_SelectedEntity = {};
+        event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
 
         if (!m_pScriptLib->GetHandle()) {
 
@@ -142,8 +146,10 @@ namespace fox
              DrawEntityNode(entity);
          });
 
-        if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+        if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
             m_SelectedEntity = {};
+            event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
+        }
 
         // Right-click on blank space
         if (ImGui::BeginPopupContextWindow(0, 1, false))
@@ -173,6 +179,7 @@ namespace fox
         if (ImGui::IsItemClicked())
         {
             m_SelectedEntity = entity;
+            event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
         }
 
         bool bIsDeleted = false; // Is the entity deleted ?
@@ -213,8 +220,10 @@ namespace fox
 
         if (bIsDeleted) {
             entity.destroy();
-            if (m_SelectedEntity == entity)
+            if (m_SelectedEntity == entity) {
                 m_SelectedEntity = {};
+                event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
+            }
         }
     }
 
@@ -316,6 +325,12 @@ namespace fox
             if (ImGui::MenuItem("Sprite Renderer"))
             {
                 m_pContext->AddComponent<SpriteRenderer>(m_SelectedEntity);
+                ImGui::CloseCurrentPopup();
+            }
+
+            if (ImGui::MenuItem("Animator"))
+            {
+                m_pContext->AddComponent<Animator>(m_SelectedEntity);
                 ImGui::CloseCurrentPopup();
             }
 
@@ -427,6 +442,32 @@ namespace fox
                     sprite.m_strFilepath = texturePath;
                 }
                 ImGui::EndDragDropTarget();
+            }
+        });
+
+        DrawComponent<Animator>("Animator", entity,[](Animator& animator)
+        {
+            static int count = 0;
+            int idx = 0;
+            auto& stringToId = animator.GetStringToNodeId();
+            auto& animations = animator.GetGraph();
+            for (auto& id : stringToId)
+            {
+                auto& animation = animations.node(id.second);
+                char buffer[256];
+                memset(buffer, 0, sizeof(buffer));
+                strcpy(buffer, animation->Name.get().c_str());
+
+                char label[256];
+                std::snprintf(label, 256, "Name##%d", idx);
+                if (ImGui::InputText(label, buffer, sizeof(buffer)))
+                    animation->Name = buffer;
+                idx++;
+            }
+
+            if (ImGui::Button("Add"))
+            {
+                animator.add_anim("Anim" + std::to_string(count++));
             }
         });
 

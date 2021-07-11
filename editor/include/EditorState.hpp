@@ -10,11 +10,13 @@
 
 #include <Utils/Vec2.hpp>
 #include <json.hpp>
+#include <FileWatcher.hpp>
 
 #include "FoxEngine.hpp"
 #include "SceneHierarchyPanel.hpp"
 #include "Renderer/EditorCamera.hpp"
 #include "ContentBrowserPanel.hpp"
+#include "AnimatorEditor.hpp"
 
 class RuntimeStartEvent;
 class RuntimeStopEvent;
@@ -67,6 +69,11 @@ namespace fox
          */
         void OnRuntimeStop(const RuntimeStopEvent& e);
 
+        /**
+         * @brief Start init the file watcher for hot reload asset
+         */
+        void InitFileWatcher();
+
     private:
         fox::OrthographicCameraController m_CameraController;
 
@@ -77,6 +84,7 @@ namespace fox
         ref<Scene> m_pActiveScene;
         ContentBrowserPanel m_ContentBrowserPanel;
         SceneHierarchyPanel m_SceneHierarchyPanel;
+        AnimatorEditor m_AnimatorEditor;
 
         EditorCamera m_oEditorCamera;
 
@@ -89,6 +97,8 @@ namespace fox
         json::Value m_oEditorConfig;
 
         bool m_bIsRunning = false;
+
+        scope<FileWatcher> m_oWatcher;
     };
 }
 

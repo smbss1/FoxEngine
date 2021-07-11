@@ -270,7 +270,7 @@ namespace fox
                 auto strFilepath = spriteRendererComponent["Sprite"].as<std::string>();
                 if (!strFilepath.empty()) {
                     src.m_pSprite = Texture2D::Create(strFilepath);
-                    src.m_strFilepath = filepath;
+                    src.m_strFilepath = strFilepath;
                 }
             }
 

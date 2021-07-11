@@ -15,4 +15,13 @@ struct RuntimeStopEvent
 {
 };
 
+// Scene Hierarchy Events
+struct OnSelectedEntityChangeEvent
+{
+    OnSelectedEntityChangeEvent(fox::Entity& entity) : m_oEntity(entity)
+    {
+    }
+    fox::Entity& m_oEntity;
+};
+
 #endif //FOXENGINE_EDITOREVENT_HPP

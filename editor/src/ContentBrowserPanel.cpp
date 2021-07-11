@@ -2,7 +2,7 @@
 // Created by samuel on 02/07/2021.
 //
 
-#include <ImGui/imgui.h>
+#include <imgui.h>
 #include <FPaths.hpp>
 #include <Core/Logger/Logger.hpp>
 #include "ContentBrowserPanel.hpp"

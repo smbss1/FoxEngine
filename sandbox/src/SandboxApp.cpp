@@ -4,9 +4,9 @@
 #include <FirstTriangle.hpp>
 #include <Example2D.hpp>
 #include <SpriteSheet.hpp>
+#include <AnimatorState.hpp>
 
 #include "SandboxApp.hpp"
-#include "Animator.hpp"
 
 SandboxApp::SandboxApp(int argc, char** argv) : fox::Application(argc, argv)
 {
@@ -19,7 +19,8 @@ void SandboxApp::init()
     fox::StateMachine& sceneManager = get<fox::StateMachine>().value();
 //    sceneManager.PushState(new FirstTriangleState);
 //    sceneManager.PushState(new Example2DState);
-    sceneManager.PushState(new SpriteSheetState);
+//    sceneManager.PushState(new SpriteSheetState);
+    sceneManager.PushState(new AnimatorState);
 }
 
 fox::Application* CreateApp(int argc, char** argv)

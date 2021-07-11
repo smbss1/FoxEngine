@@ -12,6 +12,8 @@
 #include "Time.hpp"
 #include "Easing.hpp"
 #include "Track.hpp"
+#include "Core/Base.hpp"
+#include "Core/Property.hpp"
 
 struct Signal
 {
@@ -21,17 +23,28 @@ struct Signal
 
 class Timeline
 {
+    using TrackArray = std::vector<fox::scope<ITrack>>;
 public:
     /**
      * @brief Constructor
      */
-    explicit Timeline() : m_bLoop(false), m_fTime(0) {}
+    explicit Timeline()
+    {
+    }
+
+    explicit Timeline(const std::string& strName) : Timeline()
+    {
+        Name = strName;
+    }
 
     /**
      * @brief Constructor
      * @param loop set to true if the timeline need to loop
      */
-    explicit Timeline(bool loop) : m_bLoop(loop), m_fTime(0) {}
+    explicit Timeline(bool loop) : Timeline()
+    {
+        m_bLoop = loop;
+    }
 
     /**
      * @brief Destructor
@@ -42,19 +55,23 @@ public:
      * @brief Copy Constructor
      */
     Timeline(Timeline&& other)
-            : m_Signals(std::move(other.m_Signals))
-            , m_vTracks(std::move(other.m_vTracks))
+            : Signals(std::move(other.Signals))
+            , Tracks(std::move(other.Tracks))
             , m_bLoop(std::move(other.m_bLoop))
             , m_fTime(std::move(other.m_fTime))
+            , Name(std::move(other.Name))
+            , ID(std::move(other.ID))
     {
     }
 
     Timeline& operator=(Timeline&& rhs)
     {
-        m_Signals = std::move(rhs.m_Signals);
-        m_vTracks = std::move(rhs.m_vTracks);
+        Signals = std::move(rhs.Signals);
+        Tracks = std::move(rhs.Tracks);
         m_bLoop = std::move(rhs.m_bLoop);
         m_fTime = std::move(rhs.m_fTime);
+        Name = std::move(rhs.Name);
+        ID = std::move(rhs.ID);
         return *this;
     }
 
@@ -69,7 +86,8 @@ public:
     {
         Track<T>* result = new Track<T>();
         result->ease(e);
-        m_vTracks.push_back(std::unique_ptr<ITrack>(result));
+        Tracks.get().push_back(std::unique_ptr<ITrack>(result));
+        OnTrackAdded(&Tracks);
         return *result;
     }
 
@@ -82,8 +100,8 @@ public:
     Track<T>& add()
     {
         Track<T>* result = new Track<T>();
-        m_vTracks.push_back(std::unique_ptr<ITrack>(result));
-
+        Tracks.get().push_back(std::unique_ptr<ITrack>(result));
+        OnTrackAdded(&Tracks);
         return *result;
     }
 
@@ -97,7 +115,7 @@ public:
     template<typename T>
     Track<T>& get(std::uint32_t idx)
     {
-        return *static_cast<Track<T>*>(m_vTracks[idx].get());
+        return *static_cast<Track<T>*>(Tracks[idx].get());
     }
 
     /**
@@ -120,7 +138,7 @@ public:
      */
     Timeline& signal(float time, std::function<void()> cb)
     {
-        m_Signals.emplace(time, Signal{cb, false});
+        Signals.get().emplace(time, Signal{cb, false});
         return *this;
     }
 
@@ -129,12 +147,22 @@ public:
      */
     void reset()
     {
+        IsFinish = false;
         m_fSignalTime = 0;
         m_fTime = 0;
 
-        for (auto &sig : m_Signals) {
+        for (auto &sig : Signals.get()) {
             sig.second.m_bCalled = false;
         }
+    }
+
+    void OnTrackAdded(property<TrackArray>* tracks)
+    {
+        for (auto &track : tracks->get()) {
+            m_fEndTime = std::max(m_fEndTime, track->GetEndTime());
+        }
+        if (m_fEndTime <= 0)
+            m_fEndTime = 5.0f;
     }
 
     /**
@@ -142,38 +170,44 @@ public:
      */
     void run()
     {
-        m_fTime += Time::delta_time;
-
         if (m_fSignalTime <= m_fEndTime) {
             m_fSignalTime += Time::delta_time;
+            m_fTime += Time::delta_time;
+
+            for (auto &track : Tracks.get()) {
+                if (track->IsValid()) {
+                    track->Sample(m_fTime, m_bLoop);
+                }
+            }
+
+            for (auto &sig : Signals.get()) {
+                if (!sig.second.m_bCalled && sig.first <= m_fSignalTime) {
+                    sig.second.m_func();
+                    sig.second.m_bCalled = true;
+                }
+            }
         } else {
-            if (m_bLoop && m_fSignalTime >= 0.01) {
+            IsFinish = true;
+            if (m_bLoop) {
                 reset();
-            }
-        }
-
-        for (auto &track : m_vTracks) {
-            if (track->IsValid()) {
-                track->Sample(m_fTime, m_bLoop);
-                m_fEndTime = std::max(m_fEndTime, track->GetEndTime());
-            }
-        }
-
-        for (auto &sig : m_Signals) {
-            if (!sig.second.m_bCalled && sig.first <= m_fSignalTime) {
-                sig.second.m_func();
-                sig.second.m_bCalled = true;
             }
         }
     }
 
+private:
+
 public:
-    std::unordered_map<float, Signal> m_Signals;
-    std::vector<std::unique_ptr<ITrack>> m_vTracks;
-    bool m_bLoop;
+    property<std::string> Name;
+    property<int> ID;
+    property<TrackArray> Tracks;
+    property<std::unordered_map<float, Signal>> Signals;
+    property<bool> IsFinish = false; // Is Finish the animation ?
+
+private:
+    bool m_bLoop = false;
     float m_fTime = 0;
     float m_fSignalTime = 0;
-    float m_fEndTime = 0;
+    float m_fEndTime = 2;
 };
 
 #endif

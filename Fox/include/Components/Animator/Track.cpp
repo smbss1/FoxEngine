@@ -5,7 +5,7 @@
 ** Track.cpp
 */
 
-#include "../include/Track.hpp"
+#include "Components/Animator/Track.hpp"
 
 // template<> Track<float, 1>;
 // template<> Track<Vec3, 3>;
