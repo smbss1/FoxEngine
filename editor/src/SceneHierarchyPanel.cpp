@@ -5,14 +5,10 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 #include <Core/Application.hpp>
-#include <Components/EntityName.hpp>
-#include <Components/Transform.hpp>
-#include <Components/CameraComponent.hpp>
-#include <Components/SpriteRenderer.hpp>
+#include <Components.hpp>
 #include <imgui_internal.h>
 #include <Utils/Path.hpp>
 #include <FPaths.hpp>
-#include <Components/Animator/Animator.hpp>
 #include <Events/EventSystem.hpp>
 #include <EditorEvent.hpp>
 #include "SceneHierarchyPanel.hpp"
@@ -322,15 +318,15 @@ namespace fox
                 ImGui::CloseCurrentPopup();
             }
 
-            if (ImGui::MenuItem("Sprite Renderer"))
+            if (ImGui::MenuItem("SpriteRenderer"))
             {
                 m_pContext->AddComponent<SpriteRenderer>(m_SelectedEntity);
                 ImGui::CloseCurrentPopup();
             }
 
-            if (ImGui::MenuItem("Animator"))
+            if (ImGui::MenuItem("AnimationPlayer"))
             {
-                m_pContext->AddComponent<Animator>(m_SelectedEntity);
+                m_pContext->AddComponent<AnimationPlayer>(m_SelectedEntity);
                 ImGui::CloseCurrentPopup();
             }
 
@@ -351,6 +347,11 @@ namespace fox
             ImGui::EndPopup();
         }
         ImGui::PopItemWidth();
+
+//        for (auto type : rttr::type::get_types())
+//        {
+//            type.
+//        }
 
         DrawComponent<fox::TransformComponent>("Transform", entity, [](fox::TransformComponent& transform)
         {
@@ -445,30 +446,30 @@ namespace fox
             }
         });
 
-        DrawComponent<Animator>("Animator", entity,[](Animator& animator)
+        DrawComponent<AnimationPlayer>("AnimationPlayer", entity,[](AnimationPlayer& oAnimationPlayer)
         {
-            static int count = 0;
-            int idx = 0;
-            auto& stringToId = animator.GetStringToNodeId();
-            auto& animations = animator.GetGraph();
-            for (auto& id : stringToId)
-            {
-                auto& animation = animations.node(id.second);
-                char buffer[256];
-                memset(buffer, 0, sizeof(buffer));
-                strcpy(buffer, animation->Name.get().c_str());
-
-                char label[256];
-                std::snprintf(label, 256, "Name##%d", idx);
-                if (ImGui::InputText(label, buffer, sizeof(buffer)))
-                    animation->Name = buffer;
-                idx++;
-            }
-
-            if (ImGui::Button("Add"))
-            {
-                animator.add_anim("Anim" + std::to_string(count++));
-            }
+//            static int count = 0;
+//            int idx = 0;
+//            auto& stringToId = animator.GetAnimationsIds();
+//            auto& animations = animator.GetGraph();
+//            for (auto& id : stringToId)
+//            {
+//                auto& animation = animations.node(id);
+//                char buffer[256];
+//                memset(buffer, 0, sizeof(buffer));
+//                strcpy(buffer, animation.m_pAnimation->Name.get().c_str());
+//
+//                char label[256];
+//                std::snprintf(label, 256, "Name##%d", idx);
+//                if (ImGui::InputText(label, buffer, sizeof(buffer)))
+//                    animation.m_pAnimation->Name = buffer;
+//                idx++;
+//            }
+//
+//            if (ImGui::Button("Add"))
+//            {
+//                animator.add_anim("Anim" + std::to_string(count++));
+//            }
         });
 
         DrawScripts(entity, [](ScriptableBehaviour& script)

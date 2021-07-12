@@ -96,6 +96,66 @@ private:
 
 
 
+// ===-----------------------------------------------------------------------===
+// ===---                                                                 ---===
+// ===---   DEFAULT PROPERTY POLICY: CONTROLS STORAGE + ACCESS + EVENTS   ---===
+// ===---              NO ACCESS RESTRICTIONS, FIRES EVENTS               ---===
+// ===---                                                                 ---===
+// ===-----------------------------------------------------------------------===
+
+template<typename T>
+struct basic_rw_property_policy
+{
+    using getter_type = std::function<T()>;
+    using setter_type = std::function<void(T)>;
+
+    basic_rw_property_policy(const getter_type& get, const setter_type& set) : m_getter(get), m_setter(set) { }
+    basic_rw_property_policy(getter_type&& get, setter_type&& set) : m_getter(std::move(get)), m_setter(std::move(set)) { }
+    basic_rw_property_policy(const basic_rw_property_policy& property_)
+        : m_getter(property_.m_getter)
+        , m_setter(property_.m_setter)
+    { }
+
+    ~basic_rw_property_policy() = default;
+
+    using update_event_t = std::function<void(basic_property<T>*)>;
+
+    size_t add_update_event(update_event_t proc) { return m_update_events.subscribe(proc); }
+    bool remove_update_event(size_t id) { return m_update_events.unsubscribe(id); }
+
+protected:
+    template<typename U> void validate(const U& v) const {}
+
+    decltype(auto) get() const { return m_getter(); }
+    decltype(auto) get() { return m_getter(); }
+
+    template<typename U> void set(const U& nv)
+    {
+        validate(nv);
+        m_setter(nv);
+        fire_update_event();
+    }
+
+    template<typename U> void set(U&& nv)
+    {
+        validate(nv);
+        m_setter(std::move(nv));
+        fire_update_event();
+    }
+
+private:
+    void fire_update_event()
+    {
+        m_update_events.notifiy((basic_property<T>*)this);
+    }
+
+    getter_type m_getter;
+    setter_type m_setter;
+    fox::EventNotifier<void(basic_property<T>*)> m_update_events;
+};
+
+
+
 
 // ===-----------------------------------------------------------------------------===
 // ===---                                                                       ---===
@@ -108,13 +168,14 @@ template<typename T>
 struct basic_property_read_only_policy
 {
     using getter_type = std::function<T()>;
-    using setter_type = std::function<void(T)>;
 
     ~basic_property_read_only_policy() = default;
 
     basic_property_read_only_policy(const getter_type& v) : m_getter(v) { }
     basic_property_read_only_policy(getter_type&& v) : m_getter(std::move(v)) { }
-    basic_property_read_only_policy(const basic_property_read_only_policy& property_)  = delete;
+    basic_property_read_only_policy(const basic_property_read_only_policy& property_)
+            : m_getter(property_.m_getter)
+    { }
 
 protected:
 
@@ -154,7 +215,9 @@ struct basic_property_write_only_policy
     basic_property_write_only_policy(const setter_type& v) : m_setter(v) { }
     basic_property_write_only_policy(setter_type&& v) : m_setter(std::move(v)) { }
 
-    basic_property_write_only_policy(const basic_property_write_only_policy& property_)  = delete;
+    basic_property_write_only_policy(const basic_property_write_only_policy& property_)
+            : m_setter(property_.m_setter)
+    { }
 
 protected:
 
@@ -677,6 +740,9 @@ inline auto make_property(A&&... a)
 
 template<typename T>
 using property = basic_property<T, basic_property_policy<T>>;
+
+template<typename T>
+using rw_property = basic_property<T, basic_rw_property_policy<T>>;
 
 template<typename T>
 using read_only_property = basic_property<T, basic_property_read_only_policy<T>>;

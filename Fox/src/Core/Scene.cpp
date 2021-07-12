@@ -10,7 +10,6 @@
 #include <Renderer/Renderer2D.hpp>
 #include <Components/NativeScript.hpp>
 #include <Components/EntityName.hpp>
-#include <Components/Animator/Animator.hpp>
 #include "Core/Scene.hpp"
 #include "Components.hpp"
 #include "Core/Application.hpp"
@@ -25,7 +24,7 @@ namespace fox
         m_oWorld.RegisterComponent<CameraComponent>();
         m_oWorld.RegisterComponent<EntityTag>();
         m_oWorld.RegisterComponent<EntityName>();
-        m_oWorld.RegisterComponent<Animator>();
+        m_oWorld.RegisterComponent<AnimationPlayer>();
 
         m_oWorld.add_phase(game::OnStart);
         m_oWorld.add_phase(ecs::OnAddScript);
@@ -378,7 +377,7 @@ namespace fox
     }
 
     template<>
-    void Scene::OnComponentAdded<Animator>(Entity &e, Animator& component)
+    void Scene::OnComponentAdded<AnimationPlayer>(Entity &e, AnimationPlayer& component)
     {
     }
 

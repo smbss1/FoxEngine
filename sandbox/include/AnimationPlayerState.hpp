@@ -6,16 +6,16 @@
 #define FOXENGINE_ANIMATOR_STATE_HPP
 
 #include "FoxEngine.hpp"
-#include <Components/Animator/Animator.hpp>
+#include <Components/Animator/AnimationPlayer.hpp>
 
-class AnimatorState : public fox::State
+class AnimationPlayerState : public fox::State
 {
 public:
-    AnimatorState()
+    AnimationPlayerState()
             : m_Camera(1280.f / 720.f, true)
             , fox::State("Animator") { }
 
-    ~AnimatorState() override = default;
+    ~AnimationPlayerState() override = default;
     void OnEnter() override;
     void OnExit() override;
     void OnEvent(fox::Event& event) override;
@@ -27,7 +27,7 @@ private:
 
     fox::ref<fox::Scene> m_pActiveScene;
 
-    Animator* anim{};
+    fox::AnimationPlayer* m_AnimationPlayer{};
 };
 
 

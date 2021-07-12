@@ -9,8 +9,9 @@
 #define ECS_NATIVESCRIPT_HPP
 
 #include "ScriptableBehaviour.hpp"
+#include "Component.hpp"
 
-struct NativeScript
+struct NativeScript : public ComponentImpl<NativeScript>
 {
     using ScriptPtr = std::unique_ptr<ScriptableBehaviour>;
     using Container = std::unordered_map<std::size_t, ScriptPtr>;

@@ -16,7 +16,6 @@
 #include "SceneHierarchyPanel.hpp"
 #include "Renderer/EditorCamera.hpp"
 #include "ContentBrowserPanel.hpp"
-#include "AnimatorEditor.hpp"
 
 class RuntimeStartEvent;
 class RuntimeStopEvent;
@@ -75,6 +74,8 @@ namespace fox
         void InitFileWatcher();
 
     private:
+        bool m_bIsRunning = false;
+
         fox::OrthographicCameraController m_CameraController;
 
         Vec2 m_oViewportSize = {0, 0};
@@ -84,7 +85,6 @@ namespace fox
         ref<Scene> m_pActiveScene;
         ContentBrowserPanel m_ContentBrowserPanel;
         SceneHierarchyPanel m_SceneHierarchyPanel;
-        AnimatorEditor m_AnimatorEditor;
 
         EditorCamera m_oEditorCamera;
 
@@ -95,8 +95,6 @@ namespace fox
         Entity m_oHoveredEntity;
 
         json::Value m_oEditorConfig;
-
-        bool m_bIsRunning = false;
 
         scope<FileWatcher> m_oWatcher;
     };

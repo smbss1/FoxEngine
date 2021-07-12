@@ -4,7 +4,7 @@
 #include <FirstTriangle.hpp>
 #include <Example2D.hpp>
 #include <SpriteSheet.hpp>
-#include <AnimatorState.hpp>
+#include <AnimationPlayerState.hpp>
 
 #include "SandboxApp.hpp"
 
@@ -20,7 +20,7 @@ void SandboxApp::init()
 //    sceneManager.PushState(new FirstTriangleState);
 //    sceneManager.PushState(new Example2DState);
 //    sceneManager.PushState(new SpriteSheetState);
-    sceneManager.PushState(new AnimatorState);
+    sceneManager.PushState(new AnimationPlayerState);
 }
 
 fox::Application* CreateApp(int argc, char** argv)

@@ -6,11 +6,14 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <Renderer/SubTexture2D.hpp>
+#include <rttr/type>
 
-struct SpriteRenderer
+struct SpriteRenderer : public ComponentImpl<SpriteRenderer>
 {
+    RTTR_ENABLE()
+
+public:
     SpriteRenderer() = default;
-    SpriteRenderer(const SpriteRenderer&) = default;
     explicit SpriteRenderer(const fox::ref<fox::Texture2D>& sprite, const glm::vec4& color) : Color(color), m_pSprite(sprite) {}
     explicit SpriteRenderer(const glm::vec4& color) : Color(color)
     {

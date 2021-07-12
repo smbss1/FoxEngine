@@ -5,47 +5,54 @@
 #include <Time.hpp>
 #include <imgui.h>
 #include <Core/Input/Input.hpp>
-#include "AnimatorState.hpp"
+#include "AnimationPlayerState.hpp"
 
-void AnimatorState::OnEnter()
+void AnimationPlayerState::OnEnter()
 {
     m_pActiveScene = fox::new_ref<fox::Scene>(GetApp());
 
     auto e = m_pActiveScene->NewEntity("");
-    auto& animator = e.add<Animator>();
-    auto& idle = animator.add_anim("Idle");
-    auto& run = animator.add_anim("Run");
-    animator.AddParam("doRun", AnimVarType::TRIGGER);
-    animator.AddTransition(fox::new_ref<TriggerCondition>(*animator.GetParam("doRun")), idle.ID, run.ID);
-    animator.AddTransition(fox::new_ref<Condition>(), run.ID, idle.ID);
+    auto& oAnimPlayer = e.add<fox::AnimationPlayer>();
+    auto& idle = oAnimPlayer.AddAnimation("Idle");
+    auto& run = oAnimPlayer.AddAnimation("Run");
 
-    anim = &animator;
+    m_AnimationPlayer = &oAnimPlayer;
 
-    anim->current.add_update_event([](property<Timeline*>* pAnim)
-       {
-           fox::info("Current Animation: %", (*pAnim)->Name);
-       });
+    fox::info("%", rttr::type::get<fox::AnimationPlayer>().get_name());
+
+
+//    oAnimPlayer.current.add_update_event([](property<Timeline*>* pAnim)
+//       {
+//           fox::info("Current Animation: %", (*pAnim)->Name);
+//       });
 }
 
-void AnimatorState::OnExit()
+void AnimationPlayerState::OnExit()
 {}
 
-void AnimatorState::OnEvent(fox::Event& event)
+void AnimationPlayerState::OnEvent(fox::Event& event)
 {
     m_Camera.OnEvent(event);
 }
 
-void AnimatorState::OnUpdate()
+void AnimationPlayerState::OnUpdate()
 {
     m_Camera.OnUpdate();
     m_pActiveScene->OnUpdateRuntime();
 
-    anim->run();
+    m_AnimationPlayer->run();
+
+//    if (m_AnimationPlayer->Current.get())
+//        fox::info("Current Animation: %", m_AnimationPlayer->Current.get()->Name);
 
     if (fox::Input::IsKeyPressed(fox::Key::G))
-    {
-        anim->SetTrigger("doRun");
-    }
+        m_AnimationPlayer->play("Idle");
+
+    if (fox::Input::IsKeyPressed(fox::Key::H))
+        m_AnimationPlayer->play("Run");
+
+    if (fox::Input::IsKeyPressed(fox::Key::J))
+        m_AnimationPlayer->stop();
 
     fox::Renderer2D::ResetStats();
 
@@ -53,7 +60,7 @@ void AnimatorState::OnUpdate()
     fox::RendererCommand::Clear();
 }
 
-void AnimatorState::OnImGui()
+void AnimationPlayerState::OnImGui()
 {
     ImGui::Begin("Settings");
 
