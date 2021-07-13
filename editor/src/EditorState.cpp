@@ -515,6 +515,8 @@ namespace fox
             {
                 if (control && shift)
                     SaveSceneAs();
+                else if (control)
+                    SaveScene();
             }
             break;
 

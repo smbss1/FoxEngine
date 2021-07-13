@@ -11,7 +11,6 @@
 #include "Components/NativeScript.hpp"
 #include "Components/Animator/AnimationPlayer.hpp"
 
-REFLECT_EXTERN(glm::vec3);
 
 REFLECT_EXTERN(Component);
 REFLECT_EXTERN(fox::TransformComponent);

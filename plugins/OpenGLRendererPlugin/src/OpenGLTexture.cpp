@@ -110,6 +110,12 @@ namespace fox
         GLCall(glBindTexture(GL_TEXTURE_2D, 0));
     }
 
+    const std::string& OpenGLTexture::GetId() const
+    {
+        return m_strFilepath;
+    }
+
+
     bool OpenGLTexture::operator==(const Texture &other) const
     {
         return m_RendererID == other.GetRendererID();

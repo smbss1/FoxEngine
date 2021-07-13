@@ -9,6 +9,7 @@
 #include <rttr/type>
 #include <Reflection.hpp>
 #include <Components/Component.hpp>
+#include <Core/Property.hpp>
 
 class SpriteRenderer : public ComponentImpl<SpriteRenderer>
 {
@@ -16,16 +17,28 @@ class SpriteRenderer : public ComponentImpl<SpriteRenderer>
 
 public:
     SpriteRenderer() = default;
-    explicit SpriteRenderer(const fox::ref<fox::Texture2D>& sprite, const glm::vec4& color) : Color(color), m_pSprite(sprite) {}
-    explicit SpriteRenderer(const glm::vec4& color) : Color(color)
+    explicit SpriteRenderer(const fox::ref<fox::Texture2D>& sprite, const glm::vec4& color) : m_oColor(color), m_pSprite(sprite) {}
+    explicit SpriteRenderer(const glm::vec4& color) : m_oColor(color)
     {
     }
 
-    std::string m_strFilepath;
+
+public:
+    rw_property<fox::ref<fox::Texture2D>> Sprite {
+            GET { return m_pSprite; },
+            SET { m_pSprite = value; }
+    };
+
+    rw_property<glm::vec4> Color {
+            GET { return m_oColor; },
+            SET { m_oColor = value; }
+    };
+
+private:
 
     fox::ref<fox::Texture2D> m_pSprite = nullptr;
     int Depth = 0;
-    glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+    glm::vec4 m_oColor{ 1.0f, 1.0f, 1.0f, 1.0f };
 };
 
 #endif

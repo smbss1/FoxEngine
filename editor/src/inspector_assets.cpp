@@ -9,7 +9,7 @@
 #include <imgui_internal.h>
 #include <filesystem>
 #include <SupportedFileFormat.hpp>
-#include "Inspector/inspector_primitives.hpp"
+#include "Inspector/inspector_assets.hpp"
 
 bool inspector_texture::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {

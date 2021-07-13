@@ -24,6 +24,9 @@ namespace fox
         void Bind(uint32_t slot = 0) const override;
         void Unbind() const;
 
+        const std::string& GetId() const override;
+
+
         bool operator==(const Texture& other) const override;
 
     private:

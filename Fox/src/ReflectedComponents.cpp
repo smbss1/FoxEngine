@@ -10,18 +10,6 @@ REFLECT(Component)
     rttr::registration::class_<Component>("Component");
 }
 
-REFLECT(glm::vec3)
-{
-    rttr::registration::class_<glm::vec3>("vec3")
-//            (
-//                    rttr::metadata("pretty_name", "Transform")
-//            )
-            .property("x", &glm::vec3::x)
-            .property("y", &glm::vec3::y)
-            .property("z", &glm::vec3::z)
-            ;
-}
-
 REFLECT(fox::TransformComponent)
 {
     rttr::registration::class_<fox::TransformComponent>("Transform")
@@ -31,6 +19,7 @@ REFLECT(fox::TransformComponent)
         .constructor<>()(rttr::policy::ctor::as_std_shared_ptr)
             .property("Position", &fox::TransformComponent::position)
             .property("Rotation", &fox::TransformComponent::rotation)
+                    ( rttr::metadata("CONVERT_TO_DEGREE", true) )
             .property("Scale", &fox::TransformComponent::scale)
         ;
 }
@@ -46,7 +35,7 @@ REFLECT(SpriteRenderer)
                     (
                             rttr::metadata("tooltip", "This the texture to display on the screen")
                     )
-            .property("Color", &SpriteRenderer::Color)
+            .property("Color", &SpriteRenderer::m_oColor)
             ;
 }
 

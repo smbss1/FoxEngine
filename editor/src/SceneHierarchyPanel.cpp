@@ -262,10 +262,8 @@ namespace fox
                     auto c = cstructor.invoke();
                     auto c_ptr = c.get_value<ref<Component>>();
 
-                    if(c_ptr) {
-                        fox::info("vComponentsTypes.Size: %", vComponentsTypes.size());
+                    if(c_ptr)
                         m_SelectedEntity.set(c_ptr);
-                    }
 
                     ImGui::CloseCurrentPopup();
                 }
@@ -298,15 +296,6 @@ namespace fox
             DrawComponent(component_ptr, entity);
         }
 
-//
-//        DrawComponent<fox::TransformComponent>("Transform", entity, [](fox::TransformComponent& transform)
-//        {
-//            DrawVec3Control("Position", transform.position);
-//            glm::vec3 rot = glm::degrees(transform.rotation);
-//            DrawVec3Control("Rotation", transform.rotation);
-//            transform.rotation = glm::radians(rot);
-//            DrawVec3Control("Scale", transform.scale, 1.0f);
-//        });
 //
 //        DrawComponent<CameraComponent>("Camera", entity, [](CameraComponent& cameraComp)
 //        {
@@ -363,34 +352,7 @@ namespace fox
 //                    camera.SetPerspectiveFarClip(far);
 //            }
 //        });
-//
-//        DrawComponent<SpriteRenderer>("Sprite Renderer", entity,[](SpriteRenderer& sprite)
-//        {
-//            ImGui::ColorEdit4("Color", glm::value_ptr(sprite.Color));
-//
-//            if (sprite.m_pSprite)
-//            {
-//                Path path(sprite.m_strFilepath);
-//                auto filename = path.filename();
-//                ImGui::InputText("##SpriteRendererTexture", (char*)filename.c_str(), filename.size(), ImGuiInputTextFlags_ReadOnly);
-//            }
-//            else
-//            {
-//                ImGui::InputText("##SpriteRendererTexture", "Default Sprite", 14, ImGuiInputTextFlags_ReadOnly);
-//            }
-//            if (ImGui::BeginDragDropTarget())
-//            {
-//                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_HANDLE_ID"))
-//                {
-//                    // TODO: Find a way to check the correct data we receive
-////                    IM_ASSERT(payload->DataSize == sizeof(std::string));
-//                    std::string texturePath = (char *)payload->Data;
-//                    sprite.m_pSprite = Texture2D::Create(texturePath);
-//                    sprite.m_strFilepath = texturePath;
-//                }
-//                ImGui::EndDragDropTarget();
-//            }
-//        });
+
 //
 //        DrawComponent<AnimationPlayer>("AnimationPlayer", entity,[](AnimationPlayer& oAnimationPlayer)
 //        {

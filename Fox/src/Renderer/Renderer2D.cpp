@@ -546,10 +546,10 @@ namespace fox
 
     void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRenderer& src, int entityID)
     {
-        if (src.m_pSprite)
-            DrawQuad(transform, src.m_pSprite, src.Color, 1.0f, entityID);
+        if (src.Sprite.get())
+            DrawQuad(transform, src.Sprite.get(), src.Color.get(), 1.0f, entityID);
         else
-            DrawQuad(transform, src.Color, entityID);
+            DrawQuad(transform, src.Color.get(), entityID);
     }
 
 
