@@ -262,8 +262,8 @@ namespace fox
         auto view = m_oWorld.get_entities_with<TransformComponent, SpriteRenderer>();
         for (auto entity : view)
         {
-            auto& transform = entity.get<TransformComponent>().value();
-            auto& sprite = entity.get<SpriteRenderer>().value();
+            auto& transform = *entity.get<TransformComponent>();
+            auto& sprite = *entity.get<SpriteRenderer>();
 
             Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity.get_id());
         }
@@ -292,8 +292,8 @@ namespace fox
              auto view = m_oWorld.get_entities_with<TransformComponent, CameraComponent>();
              for (auto entity : view)
              {
-                 auto& transform = entity.get<TransformComponent>().value();
-                 auto& camera = entity.get<CameraComponent>().value();
+                 auto& transform = *entity.get<TransformComponent>();
+                 auto& camera = *entity.get<CameraComponent>();
 
                  if (camera.Primary)
                  {
@@ -320,7 +320,7 @@ namespace fox
         auto view = m_oWorld.get_entities_with<CameraComponent>();
         for (auto e : view)
         {
-            auto& cameraComponent = e.get<CameraComponent>().value();
+            auto& cameraComponent = *e.get<CameraComponent>();
             if (!cameraComponent.FixedAspectRatio)
                 cameraComponent.camera.SetViewportSize(width, height);
         }
@@ -331,7 +331,7 @@ namespace fox
         auto view = m_oWorld.get_entities_with<CameraComponent>();
         for (auto e : view)
         {
-            auto& cameraComponent = e.get<CameraComponent>().value();
+            auto& cameraComponent = *e.get<CameraComponent>();
             if (cameraComponent.Primary)
                 return e;
         }

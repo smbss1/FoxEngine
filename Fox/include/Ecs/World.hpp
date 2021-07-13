@@ -319,9 +319,14 @@ namespace fox
          * @return fox::Option<T&> an optionnal value
          */
         template<typename T>
-        fox::Option<T&> get_component(EntityId e)
+        fox::ref<T> get_component(EntityId e)
         {
             return m_pCompManager->GetComponent<T>(e);
+        }
+
+        std::vector<ref<Component>> GetAllComponents(EntityId entityId)
+        {
+            return m_pCompManager->GetAllComponents(entityId, m_pEntityManager->GetSignature(entityId));
         }
 
         /**
@@ -335,8 +340,17 @@ namespace fox
         {
             auto opt = get_component<T>(e);
             if (opt)
-                opt.value() = value;
+                *opt = value;
             auto &signature = m_pEntityManager->GetSignature(e);
+            signature.set(m_pCompManager->GetComponentType<T>(), true);
+            m_pSysManager->EntitySignatureChanged(e, signature);
+        }
+
+        void set_component(EntityId e, ref<Component> component)
+        {
+            m_pCompManager->SetComponent(e, component);
+            auto &signature = m_pEntityManager->GetSignature(e);
+            signature.set(m_pCompManager->GetComponentType(component), true);
             m_pSysManager->EntitySignatureChanged(e, signature);
         }
 
@@ -354,6 +368,15 @@ namespace fox
             m_pSysManager->EntitySignatureChanged(e, signature);
             m_pCompManager->RemoveComponent<T>(e);
         }
+
+        void remove_component(EntityId e, ref<Component> pComponent)
+        {
+            auto &signature = m_pEntityManager->GetSignature(e);
+            signature.set(m_pCompManager->GetComponentType(pComponent), false);
+            m_pSysManager->EntitySignatureChanged(e, signature);
+            m_pCompManager->RemoveComponent(e, pComponent);
+        }
+
 
         /**
          * @brief Get the index of a registered component
@@ -575,12 +598,20 @@ namespace fox
          * @return fox::Option<T&> an optionnal value
          */
         template<typename T>
-        fox::Option<T &> get()
+        fox::ref<T> get()
         {
             if (m_oWld)
                 return m_oWld->get_component<T>(m_iId);
             return {};
         }
+
+        std::vector<ref<Component>> GetAll()
+        {
+            if (m_oWld)
+                return std::move(m_oWld->GetAllComponents(m_iId));
+            return {};
+        }
+
 
         /**
          * @brief Set the value of a component
@@ -595,6 +626,13 @@ namespace fox
             return *this;
         }
 
+        Entity &set(ref<Component> component)
+        {
+            if (m_oWld)
+                m_oWld->set_component(m_iId, component);
+            return *this;
+        }
+
         /**
          * @brief remove a component to an entity
          *
@@ -605,6 +643,12 @@ namespace fox
         {
             if (m_oWld)
                 m_oWld->remove_component<T>(m_iId);
+        }
+
+        void remove(ref<Component> pComponent)
+        {
+            if (m_oWld)
+                m_oWld->remove_component(m_iId, pComponent);
         }
 
         /**
@@ -648,7 +692,7 @@ namespace fox
                 vec.push_back({&m_oWorld, e});
             std::sort(vec.begin(), vec.end(), [&](Entity& e1, Entity& e2)
             {
-                return m_oOrderByFunc(e1.get<Cs>().value()..., e2.get<Cs>().value()...);
+                return m_oOrderByFunc(*e1.get<Cs>()..., *e2.get<Cs>()...);
             });
             m_vEntities.clear();
             for (auto e : vec)
@@ -691,7 +735,7 @@ namespace fox
             return;
         Entity ent(&m_oWorld, e);
         try {
-            m_oFunc(ent, m_oWorld.template get_component<Cs>(e).value()...);
+            m_oFunc(ent, *m_oWorld.template get_component<Cs>(e)...);
         } catch (const std::exception& ex) {
             std::cerr << ex.what() << std::endl;
         }

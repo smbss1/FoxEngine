@@ -29,8 +29,7 @@ namespace fox
         void DrawEntityNode(Entity& e);
         void DrawComponents(Entity& entity);
 
-        template<typename T>
-        void DrawComponent(const std::string& name, Entity entity, std::function<void(T& component)> callback);
+        void DrawComponent(const ref<Component> &component_ptr, Entity entity);
 
         void DrawScripts(Entity entity, std::function<void(ScriptableBehaviour&)> callback);
 

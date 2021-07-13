@@ -69,7 +69,7 @@ namespace fox
         EntityId ent = -1;
         m_pEntityManager->ForEach([&](EntityId eId) -> bool
           {
-              fox::Option<fox::EntityName &> ent_name = get_component<fox::EntityName>(eId);
+              fox::ref<fox::EntityName> ent_name = get_component<fox::EntityName>(eId);
               if (ent_name && ent_name->name == name) {
                   ent = eId;
                   return true;
@@ -88,7 +88,7 @@ namespace fox
         EntityId ent = -1;
         m_pEntityManager->ForEach([&](EntityId eId) -> bool
           {
-              fox::Option<fox::EntityTag&> ent_tag = get_component<fox::EntityTag>(eId);
+              fox::ref<fox::EntityTag> ent_tag = get_component<fox::EntityTag>(eId);
               if (ent_tag && ent_tag->tag == tag_name) {
                   ent = eId;
                   return true;
@@ -108,7 +108,7 @@ namespace fox
         ent.clear();
         m_pEntityManager->ForEach([&](EntityId eId) -> bool
           {
-              fox::Option<fox::EntityTag&> ent_tag = get_component<fox::EntityTag>(eId);
+              fox::ref<fox::EntityTag> ent_tag = get_component<fox::EntityTag>(eId);
               if (ent_tag && ent_tag->tag == tag_name) {
                   ent.push_back({this, eId});
               }

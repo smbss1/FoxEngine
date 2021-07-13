@@ -7,10 +7,12 @@
 #include <glm/glm.hpp>
 #include <Renderer/SubTexture2D.hpp>
 #include <rttr/type>
+#include <Reflection.hpp>
+#include <Components/Component.hpp>
 
-struct SpriteRenderer : public ComponentImpl<SpriteRenderer>
+class SpriteRenderer : public ComponentImpl<SpriteRenderer>
 {
-    RTTR_ENABLE()
+    REFLECTABLEV(SpriteRenderer, Component)
 
 public:
     SpriteRenderer() = default;

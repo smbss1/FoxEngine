@@ -9,15 +9,15 @@
 #include <Utils/FileSystem.hpp>
 #include <rttr/type>
 
-
+#include "Reflection.hpp"
 #include "Timeline.hpp"
 #include "Serialization.hpp"
 
 namespace fox
 {
-    class AnimationPlayer
+    class AnimationPlayer : public ComponentImpl<AnimationPlayer>
     {
-        RTTR_ENABLE()
+        REFLECTABLEV(AnimationPlayer, Component)
 
     public:
         explicit AnimationPlayer() : current(nullptr), m_vAnimations()

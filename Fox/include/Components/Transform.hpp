@@ -15,6 +15,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+#include "Reflection.hpp"
 #include "Utils/Vec3.hpp"
 #include "Utils/Quat.hpp"
 
@@ -22,7 +23,7 @@ namespace fox
 {
     struct TransformComponent : public ComponentImpl<TransformComponent>
     {
-        RTTR_ENABLE()
+        REFLECTABLEV(TransformComponent, Component)
 
     public:
         glm::vec3 position = { 0.0f, 0.0f, 0.0f };
@@ -33,32 +34,32 @@ namespace fox
         glm::vec3 local_rotation{};
 
         TransformComponent* parent = nullptr;
-
-        /**
-        * @brief Contructor
-        */
-        TransformComponent() = default;
-
-        /**
-         * @brief Contructor
-         * @param pos the position of the object
-         */
-        explicit TransformComponent(const glm::vec3& pos) : position(pos) {}
-
-        /**
-         * @brief Contructor
-         * @param pos the position of the object
-         * @param sc the scale of the object
-         */
-        TransformComponent(const glm::vec3& pos, const glm::vec3& sc) : position(pos), scale(sc) {}
-
-        /**
-         * @brief Contructor
-         * @param pos the position of the object
-         * @param rot the rotation of the object
-         * @param sc the scale of the object
-         */
-        TransformComponent(const glm::vec3& pos, const glm::vec3& rot, const glm::vec3& sc) : position(pos), rotation(rot), scale(sc) {}
+//
+//        /**
+//        * @brief Contructor
+//        */
+//        TransformComponent() = default;
+//
+//        /**
+//         * @brief Contructor
+//         * @param pos the position of the object
+//         */
+//        explicit TransformComponent(const glm::vec3& pos) : position(pos) {}
+//
+//        /**
+//         * @brief Contructor
+//         * @param pos the position of the object
+//         * @param sc the scale of the object
+//         */
+//        TransformComponent(const glm::vec3& pos, const glm::vec3& sc) : position(pos), scale(sc) {}
+//
+//        /**
+//         * @brief Contructor
+//         * @param pos the position of the object
+//         * @param rot the rotation of the object
+//         * @param sc the scale of the object
+//         */
+//        TransformComponent(const glm::vec3& pos, const glm::vec3& rot, const glm::vec3& sc) : position(pos), rotation(rot), scale(sc) {}
 
         glm::mat4 GetTransform() const
         {

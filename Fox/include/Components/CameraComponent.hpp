@@ -8,10 +8,11 @@
 #include <SceneCamera.hpp>
 #include <rttr/type>
 #include "Component.hpp"
+#include "Reflection.hpp"
 
 struct CameraComponent : public ComponentImpl<CameraComponent>
 {
-    RTTR_ENABLE()
+    REFLECTABLEV(CameraComponent, Component)
 
 public:
     fox::SceneCamera camera;

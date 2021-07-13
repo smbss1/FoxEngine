@@ -6,21 +6,31 @@
 #define FOXENGINE_COMPONENT_HPP
 
 #include <rttr/type>
+#include "common.hpp"
+#include "Reflection.hpp"
+//#include <Ecs/World.hpp>
 
 template <typename C>
 using chandle = std::weak_ptr<C>;
 
 struct Component : public std::enable_shared_from_this<Component>
 {
+    Component() = default;
+    Component(const Component&) { }
+    virtual ~Component() = default;
+
+    REFLECTABLEV(Component);
     virtual CompId Id() const = 0;
 
     /// Owning entity
-    fox::Entity m_oEntity;
+//    fox::Entity m_oEntity;
 };
 
 template <typename T>
 class ComponentImpl : public Component
 {
+//    REFLECTABLEV(Component)
+
 private:
     CompId Id() const override
     {
