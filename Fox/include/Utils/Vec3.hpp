@@ -13,8 +13,8 @@
 
 constexpr float VEC3_EPSILON = 0.000001f;
 
-// namespace fox
-// {
+namespace fox
+{
 	struct Vec3
 	{
 	    float x, y, z;
@@ -145,6 +145,6 @@ constexpr float VEC3_EPSILON = 0.000001f;
 	bool operator!=(const Vec3& l, const Vec3& r);
 
 	std::ostream& operator<<(std::ostream& os, const Vec3& v);
-// } // namespace fox
+} // namespace fox
 
 #endif

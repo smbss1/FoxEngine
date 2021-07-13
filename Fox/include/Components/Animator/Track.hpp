@@ -39,7 +39,7 @@ namespace TrackHelpers
      * @return interpolated value
      */
 	template<>
-	inline Vec3 Interpolate(Vec3 a, Vec3 b, float t) {
+	inline fox::Vec3 Interpolate(fox::Vec3 a, fox::Vec3 b, float t) {
 		return lerp(a, b, t);
 	}
 
@@ -51,8 +51,8 @@ namespace TrackHelpers
      * @return interpolated value
      */
 	template<>
-	inline quat Interpolate(quat a, quat b, float t) {
-		quat result = mix(a, b, t);
+	inline fox::quat Interpolate(fox::quat a, fox::quat b, float t) {
+        fox::quat result = mix(a, b, t);
 		if (dot(a, b) < 0) { // Neighborhood
 			result = mix(a, -b, t);
 		}
@@ -70,14 +70,14 @@ namespace TrackHelpers
     /**
 	 * @brief Hermite helpers
 	 */
-	inline Vec3 AdjustHermiteResult(const Vec3& v) {
+	inline fox::Vec3 AdjustHermiteResult(const fox::Vec3& v) {
 		return v;
 	}
 
     /**
 	 * @brief Hermite helpers
 	 */
-	inline quat AdjustHermiteResult(const quat& q) {
+	inline fox::quat AdjustHermiteResult(const fox::quat& q) {
 		return q.normalized();
 	}
 
@@ -96,7 +96,7 @@ namespace TrackHelpers
      * @param b the second point to compare
      */
 	template<>
-	inline void Neighborhood(quat a, quat b) {
+	inline void Neighborhood(fox::quat a, fox::quat b) {
 		if (dot(a, b) < 0) {
 			b = -b;
 		}

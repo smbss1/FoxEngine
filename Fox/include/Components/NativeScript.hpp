@@ -8,10 +8,15 @@
 #ifndef ECS_NATIVESCRIPT_HPP
 #define ECS_NATIVESCRIPT_HPP
 
+#include <Reflection.hpp>
 #include "ScriptableBehaviour.hpp"
+#include "Component.hpp"
 
-struct NativeScript
+struct NativeScript : public ComponentImpl<NativeScript>
 {
+    REFLECTABLEV(Component)
+
+public:
     using ScriptPtr = std::unique_ptr<ScriptableBehaviour>;
     using Container = std::unordered_map<std::size_t, ScriptPtr>;
 

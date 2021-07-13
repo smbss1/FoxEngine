@@ -96,6 +96,66 @@ private:
 
 
 
+// ===-----------------------------------------------------------------------===
+// ===---                                                                 ---===
+// ===---   DEFAULT PROPERTY POLICY: CONTROLS STORAGE + ACCESS + EVENTS   ---===
+// ===---              NO ACCESS RESTRICTIONS, FIRES EVENTS               ---===
+// ===---                                                                 ---===
+// ===-----------------------------------------------------------------------===
+
+template<typename T>
+struct basic_rw_property_policy
+{
+    using getter_type = std::function<T()>;
+    using setter_type = std::function<void(T)>;
+
+    basic_rw_property_policy(const getter_type& get, const setter_type& set) : m_getter(get), m_setter(set) { }
+    basic_rw_property_policy(getter_type&& get, setter_type&& set) : m_getter(std::move(get)), m_setter(std::move(set)) { }
+    basic_rw_property_policy(const basic_rw_property_policy& property_)
+        : m_getter(property_.m_getter)
+        , m_setter(property_.m_setter)
+    { }
+
+    ~basic_rw_property_policy() = default;
+
+    using update_event_t = std::function<void(basic_property<T>*)>;
+
+    size_t add_update_event(update_event_t proc) { return m_update_events.subscribe(proc); }
+    bool remove_update_event(size_t id) { return m_update_events.unsubscribe(id); }
+
+protected:
+    template<typename U> void validate(const U& v) const {}
+
+    decltype(auto) get() const { return m_getter(); }
+    decltype(auto) get() { return m_getter(); }
+
+    template<typename U> void set(const U& nv)
+    {
+        validate(nv);
+        m_setter(nv);
+        fire_update_event();
+    }
+
+    template<typename U> void set(U&& nv)
+    {
+        validate(nv);
+        m_setter(std::move(nv));
+        fire_update_event();
+    }
+
+private:
+    void fire_update_event()
+    {
+        m_update_events.notifiy((basic_property<T>*)this);
+    }
+
+    getter_type m_getter;
+    setter_type m_setter;
+    fox::EventNotifier<void(basic_property<T>*)> m_update_events;
+};
+
+
+
 
 // ===-----------------------------------------------------------------------------===
 // ===---                                                                       ---===
@@ -108,13 +168,14 @@ template<typename T>
 struct basic_property_read_only_policy
 {
     using getter_type = std::function<T()>;
-    using setter_type = std::function<void(T)>;
 
     ~basic_property_read_only_policy() = default;
 
     basic_property_read_only_policy(const getter_type& v) : m_getter(v) { }
     basic_property_read_only_policy(getter_type&& v) : m_getter(std::move(v)) { }
-    basic_property_read_only_policy(const basic_property_read_only_policy& property_)  = delete;
+    basic_property_read_only_policy(const basic_property_read_only_policy& property_)
+            : m_getter(property_.m_getter)
+    { }
 
 protected:
 
@@ -154,7 +215,9 @@ struct basic_property_write_only_policy
     basic_property_write_only_policy(const setter_type& v) : m_setter(v) { }
     basic_property_write_only_policy(setter_type&& v) : m_setter(std::move(v)) { }
 
-    basic_property_write_only_policy(const basic_property_write_only_policy& property_)  = delete;
+    basic_property_write_only_policy(const basic_property_write_only_policy& property_)
+            : m_setter(property_.m_setter)
+    { }
 
 protected:
 
@@ -568,6 +631,196 @@ public:
 };
 
 
+// ===--------------------------------------------===
+// ===---                                      ---===
+// ===---   PROPERTY WITH GETTER & SETTER      ---===
+// ===---      TEMPLATE IMPLEMENTATION         ---===
+// ===--------------------------------------------===
+
+template<typename T, typename P>
+class basic_rw_property : public P
+{
+public:
+    using PT = P;
+
+    basic_rw_property() = default;
+    ~basic_rw_property() = default;
+
+    using getter_type = std::function<T()>;
+    using setter_type = std::function<void(T)>;
+
+    basic_rw_property(const getter_type& get, const setter_type& set) : PT(get, set) {}
+    basic_rw_property(getter_type&& get, setter_type&& set) : PT(std::move(get), std::move(set)) { }
+
+    basic_rw_property(const basic_rw_property& p) = default;
+    basic_rw_property(basic_rw_property&& p) = default;
+
+
+    basic_rw_property& operator = (const T& v)
+    {
+        set(v);
+        return *this;
+    }
+
+    basic_rw_property& operator = (T&& v)
+    {
+        set(std::move(v));
+        return *this;
+    }
+
+    template<typename U>
+    std::enable_if_t<!is_property_v<U>, basic_rw_property&>
+    operator = (const U& v)
+    {
+        set(v);
+        return *this;
+    }
+
+    template<typename U>
+    std::enable_if_t<!is_property_v<U>, basic_rw_property&>
+    operator = (U&& v)
+    {
+        set(std::forward<U>(v));
+        return *this;
+    }
+
+    basic_rw_property& operator = (const basic_rw_property& p)
+    {
+        if(this != &p)
+            set(p.get());
+        return *this;
+    }
+
+    basic_rw_property& operator = (basic_rw_property&& p)
+    {
+        if(this != &p)
+            set(std::move(p.get()));
+        return *this;
+    }
+
+    template<typename U>
+    basic_rw_property& operator = (const basic_rw_property<U, P>& p)
+    {
+        if(this != (decltype(this))&p)
+            set(p.get());
+        return *this;
+    }
+
+    template<typename U>
+    basic_rw_property& operator = (basic_rw_property<U, P>&& p)
+    {
+        if(this != (decltype(this))&p)
+            set(std::move(p.get()));
+        return *this;
+    }
+
+    template<typename U, typename V>
+    basic_rw_property& operator = (const basic_rw_property<U, V>& p)
+    {
+        if(this != (decltype(this))&p)
+            set(p.get());
+        return *this;
+    }
+
+    template<typename U, typename V>
+    basic_rw_property& operator = (basic_rw_property<U, V>&& p)
+    {
+        if(this != (decltype(this))&p)
+            set(std::move(p.get()));
+        return *this;
+    }
+
+#ifdef PROPERTY_OPERATOR
+    #error "PROPERTY_OPERATOR should not be defined!"
+#endif
+#define PROPERTY_OPERATOR(op) \
+	basic_rw_property& operator op () \
+	{ \
+		auto temp(get()); \
+		op temp; \
+		set(std::move(temp)); \
+		return *this; \
+	} \
+	basic_rw_property operator op (int) \
+	{ \
+		auto temp(*this); \
+		operator op (); \
+		return temp; \
+	}
+    PROPERTY_OPERATOR(++)
+    PROPERTY_OPERATOR(--)
+#undef PROPERTY_OPERATOR
+
+#ifdef PROPERTY_OPERATOR
+    #error "PROPERTY_OPERATOR should not be defined!"
+#endif
+#define PROPERTY_OPERATOR(op) \
+	basic_rw_property& operator op (const T& v) \
+	{ \
+		auto temp(get()); \
+		temp op v; \
+		set(std::move(temp)); \
+		return *this; \
+	} \
+	template<typename U> \
+	basic_rw_property& operator op (const U& v) \
+	{ \
+		auto temp(get()); \
+		temp op v; \
+		set(std::move(temp)); \
+		return *this; \
+	} \
+	basic_rw_property& operator op (const basic_rw_property& p) \
+	{ \
+		auto temp(get()); \
+		temp op p.get(); \
+		set(std::move(temp)); \
+		return *this; \
+	} \
+	template<typename U> \
+	basic_rw_property& operator op (const basic_rw_property<U, P>& p) \
+	{ \
+		auto temp(get()); \
+		temp op p.get(); \
+		set(std::move(temp)); \
+		return *this; \
+	}
+    PROPERTY_OPERATOR(+=)
+    PROPERTY_OPERATOR(-=)
+    PROPERTY_OPERATOR(*=)
+    PROPERTY_OPERATOR(/=)
+    PROPERTY_OPERATOR(&=)
+    PROPERTY_OPERATOR(|=)
+    PROPERTY_OPERATOR(^=)
+    PROPERTY_OPERATOR(%=)
+    PROPERTY_OPERATOR(>>=)
+    PROPERTY_OPERATOR(<<=)
+#undef PROPERTY_OPERATOR
+
+    decltype(auto) get() { return(PT::get()); }
+    decltype(auto) get() const { return(PT::get()); }
+
+    void set(const T& v) { PT::set(v); }
+    void set(T&& v) { PT::set(std::move(v)); }
+
+    explicit operator T& () { return get(); }
+    operator const T& () const { return get(); }
+
+    T& operator -> () { return get(); }
+    const T& operator -> () const { return get(); }
+
+    template<typename U> decltype(auto) operator [] (U&& i) { return(get()[std::forward<U>(i)]); }
+    template<typename U> decltype(auto) operator [] (U&& i) const { return(get()[std::forward<U>(i)]); }
+
+    bool operator==(const T& v) const { return get() == v; }
+    bool operator!=(const T& v) const { return get() != v; }
+
+    template<typename F, typename... A>
+    auto invoke(F&& f, A&&... a) -> std::invoke_result_t<F, T, A...>
+    { return std::invoke(std::forward<F>(f), get(), std::forward<A>(a)...); }
+};
+
+
 
 // ===-----------------------------------------===
 // ===---                                   ---===
@@ -677,6 +930,9 @@ inline auto make_property(A&&... a)
 
 template<typename T>
 using property = basic_property<T, basic_property_policy<T>>;
+
+template<typename T>
+using rw_property = basic_rw_property<T, basic_rw_property_policy<T>>;
 
 template<typename T>
 using read_only_property = basic_property<T, basic_property_read_only_policy<T>>;

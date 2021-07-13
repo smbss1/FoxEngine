@@ -113,7 +113,7 @@ namespace fox
             out << YAML::Key << "TransformComponent";
             out << YAML::BeginMap; // TransformComponent
 
-            auto& tc = oTransform.value();
+            auto& tc = *oTransform;
             out << YAML::Key << "Position" << YAML::Value << tc.position;
             out << YAML::Key << "Rotation" << YAML::Value << tc.rotation;
             out << YAML::Key << "Scale" << YAML::Value << tc.scale;
@@ -153,8 +153,12 @@ namespace fox
             out << YAML::BeginMap; // SpriteRendererComponent
 
             auto& spriteRendererComponent = *oSpriteRenderer;
-            out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
-            out << YAML::Key << "Sprite" << YAML::Value << spriteRendererComponent.m_strFilepath;
+            out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color.get();
+
+            if (spriteRendererComponent.Sprite.get())
+                out << YAML::Key << "Sprite" << YAML::Value << spriteRendererComponent.Sprite.get()->GetId();
+            else
+                out << YAML::Key << "Sprite" << YAML::Value << "";
 
             out << YAML::EndMap; // SpriteRendererComponent
         }
@@ -236,7 +240,7 @@ namespace fox
             if (transformComponent)
             {
                 // Entities always have transforms
-                auto& tc = deserializedEntity.get<TransformComponent>().value();
+                auto& tc = *deserializedEntity.get<TransformComponent>();
                 tc.position = transformComponent["Position"].as<glm::vec3>();
                 tc.rotation = transformComponent["Rotation"].as<glm::vec3>();
                 tc.scale = transformComponent["Scale"].as<glm::vec3>();
@@ -269,8 +273,7 @@ namespace fox
                 src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
                 auto strFilepath = spriteRendererComponent["Sprite"].as<std::string>();
                 if (!strFilepath.empty()) {
-                    src.m_pSprite = Texture2D::Create(strFilepath);
-                    src.m_strFilepath = strFilepath;
+                    src.Sprite = Texture2D::Create(strFilepath);
                 }
             }
 

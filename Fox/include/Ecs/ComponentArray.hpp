@@ -28,6 +28,7 @@ namespace fox
          * @param entity the entity
          */
         virtual void EntityDestroyed(EntityId entity) = 0;
+        virtual Component* Get(EntityId entity) = 0;
 
         /**
          * @brief Clear the component array
@@ -35,8 +36,7 @@ namespace fox
         virtual void clear() = 0;
     };
 
-    template<typename T>
-    class ComponentArray : public IComponentArray
+    class ComponentArray
     {
     public:
          /**
@@ -45,20 +45,30 @@ namespace fox
           * @param entity the index in the array
           * @param args the arguments for constructor of the component
           */
-        template <typename... Args>
-        inline void InsertData(EntityId entity, Args&&... args)
+        template <typename T, typename... Args>
+        inline void Add(EntityId entity, Args&&... args)
         {
-            RemoveData(entity);
+            Add(entity, new_ref<T>(std::forward<Args>(args)...));
+        }
+
+        template <typename T>
+        inline void Add(EntityId entity)
+        {
+            Add(entity, new_ref<T>());
+        }
+
+        void Add(EntityId entity, ref<Component> pComponent)
+        {
             m_vComponents.emplace(
                     std::piecewise_construct, std::forward_as_tuple(entity),
-                    std::forward_as_tuple(std::forward<Args>(args)...));
+                    std::forward_as_tuple(pComponent));
         }
 
         /**
          * @brief Remove a Component at the entity index
          * @param entity the index
          */
-        inline void RemoveData(EntityId entity)
+        inline void Remove(EntityId entity)
         {
             auto it = m_vComponents.find(entity);
             if (it != m_vComponents.end()) {
@@ -73,12 +83,15 @@ namespace fox
          * @param entity the index
          * @return fox::Option<T&> optionnal value
          */
-        inline fox::Option<T&> GetData(EntityId entity)
+        template<typename T>
+        inline fox::ref<T> Get(EntityId entity)
         {
+            static_assert(std::is_base_of<Component, T>::value, "Invalid component type.");
+
             auto it = m_vComponents.find(entity);
 
             if (it != m_vComponents.end())
-                return just(it->second);
+                return std::static_pointer_cast<T>(Get(entity));
             return {};
         }
 
@@ -88,13 +101,45 @@ namespace fox
          * @param entity the index
          * @return fox::Option<T&> optionnal value
          */
-        inline fox::Option<const T&> GetData(EntityId entity) const
+        template<typename T>
+        inline fox::ref<T> Get(EntityId entity) const
+        {
+            static_assert(std::is_base_of<Component, T>::value, "Invalid component type.");
+
+            auto it = m_vComponents.find(entity);
+
+            if (it != m_vComponents.end())
+                return std::static_pointer_cast<T>(Get(entity));
+            return {};
+        }
+
+        ref<Component> Get(EntityId entity)
         {
             auto it = m_vComponents.find(entity);
 
             if (it != m_vComponents.end())
-                return just(it->second);
-            return {};
+                return it->second;
+            return nullptr;
+        }
+
+        ref<Component> Get(EntityId entity) const
+        {
+            auto it = m_vComponents.find(entity);
+
+            if (it != m_vComponents.end())
+                return it->second;
+            return nullptr;
+        }
+
+
+        void Set(EntityId entity, ref<Component> pComponent)
+        {
+            auto it = m_vComponents.find(entity);
+
+            if (it != m_vComponents.end())
+                it->second = pComponent;
+            else
+                Add(entity, pComponent);
         }
 
         /**
@@ -102,15 +147,15 @@ namespace fox
          *
          * @param entity the entity
          */
-        inline void EntityDestroyed(EntityId entity) override
+        inline void EntityDestroyed(EntityId entity)
         {
-            RemoveData(entity);
+            Remove(entity);
         }
 
         /**
          * @brief Clear the component array
          */
-        virtual void clear() override
+        void clear()
         {
             if (m_vComponents.empty())
                 return;
@@ -118,6 +163,6 @@ namespace fox
         }
 
     private:
-        std::unordered_map<std::size_t, T> m_vComponents;
+        std::unordered_map<EntityId, ref<Component>> m_vComponents;
     };
 }

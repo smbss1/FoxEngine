@@ -10,7 +10,6 @@
 #include <Renderer/Renderer2D.hpp>
 #include <Components/NativeScript.hpp>
 #include <Components/EntityName.hpp>
-#include <Components/Animator/Animator.hpp>
 #include "Core/Scene.hpp"
 #include "Components.hpp"
 #include "Core/Application.hpp"
@@ -25,7 +24,7 @@ namespace fox
         m_oWorld.RegisterComponent<CameraComponent>();
         m_oWorld.RegisterComponent<EntityTag>();
         m_oWorld.RegisterComponent<EntityName>();
-        m_oWorld.RegisterComponent<Animator>();
+        m_oWorld.RegisterComponent<AnimationPlayer>();
 
         m_oWorld.add_phase(game::OnStart);
         m_oWorld.add_phase(ecs::OnAddScript);
@@ -263,8 +262,8 @@ namespace fox
         auto view = m_oWorld.get_entities_with<TransformComponent, SpriteRenderer>();
         for (auto entity : view)
         {
-            auto& transform = entity.get<TransformComponent>().value();
-            auto& sprite = entity.get<SpriteRenderer>().value();
+            auto& transform = *entity.get<TransformComponent>();
+            auto& sprite = *entity.get<SpriteRenderer>();
 
             Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity.get_id());
         }
@@ -293,8 +292,8 @@ namespace fox
              auto view = m_oWorld.get_entities_with<TransformComponent, CameraComponent>();
              for (auto entity : view)
              {
-                 auto& transform = entity.get<TransformComponent>().value();
-                 auto& camera = entity.get<CameraComponent>().value();
+                 auto& transform = *entity.get<TransformComponent>();
+                 auto& camera = *entity.get<CameraComponent>();
 
                  if (camera.Primary)
                  {
@@ -321,7 +320,7 @@ namespace fox
         auto view = m_oWorld.get_entities_with<CameraComponent>();
         for (auto e : view)
         {
-            auto& cameraComponent = e.get<CameraComponent>().value();
+            auto& cameraComponent = *e.get<CameraComponent>();
             if (!cameraComponent.FixedAspectRatio)
                 cameraComponent.camera.SetViewportSize(width, height);
         }
@@ -332,7 +331,7 @@ namespace fox
         auto view = m_oWorld.get_entities_with<CameraComponent>();
         for (auto e : view)
         {
-            auto& cameraComponent = e.get<CameraComponent>().value();
+            auto& cameraComponent = *e.get<CameraComponent>();
             if (cameraComponent.Primary)
                 return e;
         }
@@ -378,7 +377,7 @@ namespace fox
     }
 
     template<>
-    void Scene::OnComponentAdded<Animator>(Entity &e, Animator& component)
+    void Scene::OnComponentAdded<AnimationPlayer>(Entity &e, AnimationPlayer& component)
     {
     }
 

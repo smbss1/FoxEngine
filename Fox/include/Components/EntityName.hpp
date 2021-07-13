@@ -12,7 +12,7 @@
 
 namespace fox
 {
-    struct EntityName
+    struct EntityName : public ComponentImpl<EntityName>
     {
         std::string name;
         /**
@@ -33,7 +33,7 @@ namespace fox
         explicit EntityName(const std::string& strName) : name(strName) {}
     };
 
-    struct EntityTag
+    struct EntityTag : public ComponentImpl<EntityName>
     {
         std::string tag;
         /**

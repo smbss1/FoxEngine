@@ -10,17 +10,22 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <rttr/type>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+#include "Reflection.hpp"
 #include "Utils/Vec3.hpp"
 #include "Utils/Quat.hpp"
 
 namespace fox
 {
-    struct TransformComponent
+    struct TransformComponent : public ComponentImpl<TransformComponent>
     {
+        REFLECTABLEV(TransformComponent, Component)
+
+    public:
         glm::vec3 position = { 0.0f, 0.0f, 0.0f };
         glm::vec3 rotation = { 0.0f, 0.0f, 0.0f };
         glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
@@ -34,7 +39,6 @@ namespace fox
         * @brief Contructor
         */
         TransformComponent() = default;
-        TransformComponent(const TransformComponent&) = default;
 
         /**
          * @brief Contructor

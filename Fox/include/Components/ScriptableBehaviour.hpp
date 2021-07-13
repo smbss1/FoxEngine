@@ -93,7 +93,7 @@ public:
      * @return fox::Option<T&> an optionnal value
      */
     template <typename T>
-    fox::Option<T&> get_component()
+    fox::ref<T> get_component()
     {
         assert(m_pWorld);
         return m_pWorld->template get_component<T>(m_eEntity);

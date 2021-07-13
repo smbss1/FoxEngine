@@ -5,6 +5,7 @@
 #include <imgui.h>
 #include <FPaths.hpp>
 #include <Core/Logger/Logger.hpp>
+#include <SupportedFileFormat.hpp>
 #include "ContentBrowserPanel.hpp"
 
 namespace fox
@@ -56,18 +57,20 @@ namespace fox
                         m_oCurrentDirectory /= path.filename();
                 }
 
-                // Drag
-                /*
-                 * TODO: Instead of doing this if for every file image format, it could be better to save a list in a json file or in a static temporary char*
-                 */
-                if (path.extension() == ".png")
-                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
-                    {
+                // Drag for Texture files
+                for (const auto& type : fox::ex::GetSupportedFormats<fox::Texture2D>()) {
+                    // If the extension is not in list continue the for loop
+                    // TODO: Maybe break the loop when the matched extension is found
+                    if (type != path.extension())
+                        continue;
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
                         std::string texturePath = path.string();
-                        ImGui::SetDragDropPayload("TEXTURE_HANDLE_ID", texturePath.data(), sizeof(char) * texturePath.size());
+                        ImGui::SetDragDropPayload(path.extension().string().c_str(), texturePath.data(),
+                                                  sizeof(char) * texturePath.size());
                         ImGui::Text(texturePath.c_str());
                         ImGui::EndDragDropSource();
                     }
+                }
 
                 ImGui::TextWrapped(strFilenamePath.c_str());
 

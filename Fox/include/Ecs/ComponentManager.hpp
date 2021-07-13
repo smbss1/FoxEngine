@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <Components/Component.hpp>
 #include "common.hpp"
 #include "ComponentArray.hpp"
 
@@ -30,11 +31,12 @@ namespace fox
             if (ComponentIsRegistered<T>())
                 throw std::runtime_error("Registering component type more than once.");
 
-            auto pArray = std::make_shared<ComponentArray<T>>();
+            auto pArray = std::make_shared<ComponentArray>();
             if (!pArray)
                 throw std::runtime_error("Component Array allocation failed.");
             m_vComponentTypes.emplace(typeid(T).hash_code(), m_uNextComponentType);
-            m_vComponentArrays.emplace(typeid(T).hash_code(), pArray);
+//            m_vComponentArrays.emplace(typeid(T).hash_code(), pArray);
+            m_vComponentArrays.push_back(pArray);
 
             ++m_uNextComponentType;
         }
@@ -49,6 +51,11 @@ namespace fox
         CompId GetComponentType()
         {
             return m_vComponentTypes[typeid(T).hash_code()];
+        }
+
+        CompId GetComponentType(ref<Component> pComponent)
+        {
+            return m_vComponentTypes[pComponent->Id()];
         }
 
         /**
@@ -86,8 +93,10 @@ namespace fox
         template<typename T, typename... Args>
         T &AddComponent(EntityId entity, Args &&... args)
         {
-            GetComponentArray<T>()->InsertData(entity, std::forward<Args>(args)...);
-            return GetComponentArray<T>()->GetData(entity).value();
+            m_vComponentArrays[GetComponentType<T>()]->template Add<T>(entity, std::forward<Args>(args)...);
+
+//            GetComponentArray<T>()->InsertData(entity);
+            return *m_vComponentArrays[GetComponentType<T>()]->template Get<T>(entity);
         }
 
         /**
@@ -99,8 +108,10 @@ namespace fox
         template<typename T>
         T &AddComponent(EntityId entity)
         {
-            GetComponentArray<T>()->InsertData(entity);
-            return GetComponentArray<T>()->GetData(entity).value();
+            m_vComponentArrays[GetComponentType<T>()]->template Add<T>(entity);
+
+//            GetComponentArray<T>()->InsertData(entity);
+            return *m_vComponentArrays[GetComponentType<T>()]->template Get<T>(entity);
         }
 
         /**
@@ -112,7 +123,22 @@ namespace fox
         template<typename T>
         void RemoveComponent(EntityId entity)
         {
-            GetComponentArray<T>()->RemoveData(entity);
+            m_vComponentArrays[GetComponentType<T>()]->Remove(entity);
+        }
+
+        void RemoveComponent(EntityId entity, ref<Component> pComponent)
+        {
+            m_vComponentArrays[GetComponentType(pComponent)]->Remove(entity);
+        }
+
+        /**
+         * @brief Set component to the entity index, if the enity has not the component, it will be assign
+         * @param entity the entity id
+         * @param pComponent the component object
+         */
+        void SetComponent(EntityId entity, ref<Component> pComponent)
+        {
+            m_vComponentArrays[GetComponentType(pComponent)]->Set(entity, pComponent);
         }
 
         /**
@@ -121,7 +147,8 @@ namespace fox
         void Clear()
         {
             for (auto it : m_vComponentArrays) {
-                it.second->clear();
+//                it.second->clear();
+                it->clear();
             }
         }
 
@@ -133,9 +160,9 @@ namespace fox
          * @return fox::Option<T&> an optionnal value
          */
         template<typename T>
-        fox::Option<T&> GetComponent(EntityId entity)
+        fox::ref<T> GetComponent(EntityId entity)
         {
-            return GetComponentArray<T>()->GetData(entity);
+            return m_vComponentArrays[GetComponentType<T>()]->template Get<T>(entity);
         }
 
         /**
@@ -146,27 +173,29 @@ namespace fox
         void EntityDestroyed(EntityId entity)
         {
             for (auto const &pair : m_vComponentArrays) {
-                auto const &component = pair.second;
+//                auto const &component = pair.second;
 
-                component->EntityDestroyed(entity);
+                pair->EntityDestroyed(entity);
             }
+        }
+
+        std::vector<ref<Component>> GetAllComponents(EntityId entityID, CompSignature entitySig)
+        {
+            std::vector<ref<Component>> vComponents;
+            for (int i = 0; i < m_vComponentArrays.size(); ++i)
+            {
+                if (entitySig.test(i))
+                {
+                    vComponents.push_back(m_vComponentArrays[i]->Get(entityID));
+                }
+            }
+            return vComponents;
         }
 
     private:
         std::unordered_map<std::size_t, CompId> m_vComponentTypes;
-        std::unordered_map<std::size_t, std::shared_ptr<IComponentArray>> m_vComponentArrays;
-        CompId m_uNextComponentType = 1;
+        std::vector<std::shared_ptr<ComponentArray>> m_vComponentArrays;
 
-        /**
-         * @brief Get the Component Array object
-         *
-         * @tparam T the type of the Component
-         * @return std::shared_ptr<ComponentArray<T>> a pointer of the Array of the matched Type T
-         */
-        template<typename T>
-        std::shared_ptr<ComponentArray<T>> GetComponentArray()
-        {
-            return std::static_pointer_cast<ComponentArray<T>>(m_vComponentArrays[typeid(T).hash_code()]);
-        }
+        CompId m_uNextComponentType = 0;
     };
 }

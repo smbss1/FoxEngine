@@ -323,7 +323,6 @@ namespace fox
 
         m_ContentBrowserPanel.OnImGui();
         m_SceneHierarchyPanel.OnImGui();
-        m_AnimatorEditor.OnImGui();
 
         ImGui::Begin("Stats");
         {
@@ -382,7 +381,7 @@ namespace fox
                     glm::mat4 cameraView = m_oEditorCamera.GetViewMatrix();
 
                     // Entity transform
-                    auto& tc = selectedEntity.get<TransformComponent>().value();
+                    auto& tc = *selectedEntity.get<TransformComponent>();
                     glm::mat4 transform = tc.GetTransform();
 
                     // Snapping
@@ -516,6 +515,8 @@ namespace fox
             {
                 if (control && shift)
                     SaveSceneAs();
+                else if (control)
+                    SaveScene();
             }
             break;
 
