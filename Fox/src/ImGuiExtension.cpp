@@ -2,6 +2,7 @@
 // Created by samuel on 13/07/2021.
 //
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
 #include "ImGuiExtension.hpp"
@@ -171,6 +172,78 @@ namespace fox
 
             ImGui::Columns(1);
             ImGui::PopID();
+        }
+
+        void ImageWithAspect(ref<Texture2D> texture, ImVec2 texture_size, ImVec2 size, const ImVec2& _uv0,
+                             const ImVec2& _uv1, const ImVec4& tint_col, const ImVec4& border_col)
+        {
+            ImVec2 uv0 = _uv0;
+            ImVec2 uv1 = _uv1;
+            bool bIsOriginBl = true;
+
+            if(texture)
+            {
+                if(bIsOriginBl)
+                {
+                    uv0 = {0.0f, 1.0f};
+                    uv1 = {1.0f, 0.0f};
+                }
+            }
+
+
+            float w = texture_size.x;
+            float h = texture_size.y;
+            float max_size = ImMax(size.x, size.y);
+            float aspect = w / h;
+            if(w > h)
+            {
+                float m = ImMin(max_size, w);
+
+                size.x = m;
+                size.y = m / aspect;
+            }
+            else if(h > w)
+            {
+                float m = ImMin(max_size, h);
+
+                size.x = m * aspect;
+                size.y = m;
+            }
+
+
+            // Render the image
+            auto pos = ImGui::GetCursorScreenPos();
+            ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+            ImRect bb(window->DC.CursorPos,
+                      ImVec2(window->DC.CursorPos.x + max_size, window->DC.CursorPos.y + max_size));
+            ImGui::ItemSize(bb);
+            ImGui::ItemAdd(bb, 0);
+
+            auto pos2 = ImGui::GetCursorScreenPos();
+
+            if(size.x > size.y)
+                pos.y += (max_size - size.y) * 0.5f;
+            if(size.x < size.y)
+                pos.x += (max_size - size.x) * 0.5f;
+
+            ImGui::SetCursorScreenPos(pos);
+
+            ImGui::Image((ImTextureID)texture->GetRendererID(), size, uv0, uv1, tint_col, border_col);
+
+            ImGui::SetCursorScreenPos(pos2);
+        }
+
+        void RenderFrameEx(ImVec2 p_min, ImVec2 p_max, bool border, float rounding, float thickness)
+        {
+            ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+            if(border)
+            {
+                window->DrawList->AddRect(p_min + ImVec2(1, 1), p_max + ImVec2(1, 1),
+                                          ImGui::GetColorU32(ImGuiCol_BorderShadow), rounding, 15, thickness);
+                window->DrawList->AddRect(p_min, p_max, ImGui::GetColorU32(ImGuiCol_Border), rounding, 15, thickness);
+            }
         }
     }
 }

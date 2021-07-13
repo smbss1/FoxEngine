@@ -21,11 +21,6 @@ public:
     {
     }
 
-//    SpriteRenderer(const std::string& strPath, const std::string& strId, int order)
-//        : Filepath(strPath), FileId(strId), Depth(order)
-//    {
-//    }
-
     std::string m_strFilepath;
 
     fox::ref<fox::Texture2D> m_pSprite = nullptr;

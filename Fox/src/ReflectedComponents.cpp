@@ -2,8 +2,6 @@
 // Created by samuel on 12/07/2021.
 //
 
-#include "ImGuiVisitor.hpp"
-
 #include <rttr/registration>
 #include "Components.hpp"
 
@@ -34,7 +32,7 @@ REFLECT(fox::TransformComponent)
             .property("Position", &fox::TransformComponent::position)
             .property("Rotation", &fox::TransformComponent::rotation)
             .property("Scale", &fox::TransformComponent::scale)
-    ;
+        ;
 }
 
 REFLECT(SpriteRenderer)
@@ -44,6 +42,11 @@ REFLECT(SpriteRenderer)
             rttr::metadata("pretty_name", "Sprite Renderer")
         )
             .constructor<>()(rttr::policy::ctor::as_std_shared_ptr)
+            .property("Sprite", &SpriteRenderer::m_pSprite)
+                    (
+                            rttr::metadata("tooltip", "This the texture to display on the screen")
+                    )
+            .property("Color", &SpriteRenderer::Color)
             ;
 }
 
