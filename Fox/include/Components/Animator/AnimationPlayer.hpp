@@ -20,21 +20,23 @@ namespace fox
         REFLECTABLEV(AnimationPlayer, Component)
 
     public:
-        explicit AnimationPlayer() : current(nullptr), m_vAnimations()
+        explicit AnimationPlayer() : m_vAnimations()
         {
+            Current = nullptr;
         }
 
         ~AnimationPlayer() = default;
 
         AnimationPlayer(AnimationPlayer &&other)
-                : m_vAnimations(std::move(other.m_vAnimations)), current(other.current)
+                : m_vAnimations(std::move(other.m_vAnimations))
         {
+            Current = other.current;
         }
 
         AnimationPlayer &operator=(AnimationPlayer &&rhs)
         {
             m_vAnimations = std::move(rhs.m_vAnimations);
-            current = rhs.current;
+            Current = rhs.current;
             return *this;
         }
 
@@ -45,7 +47,7 @@ namespace fox
             anim->Name = name;
             m_vAnimations.push_back(std::move(anim));
             if (!current)
-                current = ptr;
+                Current = ptr;
             return *ptr;
         }
 
@@ -67,7 +69,7 @@ namespace fox
                 Timeline *ptr = anim.get();
                 m_vAnimations.push_back(std::move(anim));
                 if (!current)
-                    current = ptr;
+                    Current = ptr;
                 return *ptr;
             } else
                 throw std::runtime_error("Cannot find the animation file: " + strFilepath);
@@ -80,13 +82,13 @@ namespace fox
             {
                 if (current)
                     current->reset();
-                current = it;
+                Current = it;
             }
         }
 
         void stop()
         {
-            current = nullptr;
+            Current = nullptr;
         }
 
         void run()
@@ -104,6 +106,7 @@ namespace fox
                 if (it->get()->Name == strName)
                     return it->get();
             }
+            return nullptr;
         }
 
     public:

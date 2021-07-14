@@ -19,15 +19,18 @@ void AnimationPlayerState::OnEnter()
     m_AnimationPlayer = &oAnimPlayer;
 
 //    oAnimPlayer.Current +=
-    fox::event::Delegate<void(*)(int)> d1 = fox::event::MakeDelegate([](int oAnim) -> void
+    fox::event::Delegate<void(int)> d1;
+    d1 += [](int value) -> void
    {
-//       fox::info("Current Animation: %", oAnim->Name);
-   });
+        fox::info("Int: %", value);
+   };
 
-    fox::event::Delegate<void(*)(int)> d([](int oAnim)
-                                         {
-//       fox::info("Current Animation: %", oAnim->Name);
-                                         });
+    d1(14);
+
+    oAnimPlayer.Current += [](fox::properties::rw_property<Timeline*>* oAnim)
+    {
+        fox::info("Current Animation: %", oAnim->get()->Name);
+    };
 }
 
 void AnimationPlayerState::OnExit()
@@ -44,9 +47,6 @@ void AnimationPlayerState::OnUpdate()
     m_pActiveScene->OnUpdateRuntime();
 
     m_AnimationPlayer->run();
-
-//    if (m_AnimationPlayer->Current.get())
-//        fox::info("Current Animation: %", m_AnimationPlayer->Current.get()->Name);
 
     if (fox::Input::IsKeyPressed(fox::Key::G))
         m_AnimationPlayer->play("Idle");

@@ -18,6 +18,7 @@
 #include <cstddef>
 
 #include "EventSystem/Delegate.hpp"
+#include "Logger/Logger.hpp"
 
 namespace fox
 {
@@ -55,24 +56,23 @@ namespace fox
                 temp op p.get(); \
                 set(std::move(temp)); \
                 return *this; \
+            } \
+            template <typename U, std::enable_if_t<!std::is_same_v<T, U>, int> = 0> \
+            basic_property& operator op (const U& v) \
+            { \
+                auto temp(get()); \
+                temp op v; \
+                set(std::move(temp)); \
+                return *this; \
+            } \
+            template<typename U> \
+            basic_property& operator op (const basic_property<U, StoragePolicy>& p) \
+            { \
+                auto temp(get()); \
+                temp op p.get(); \
+                set(std::move(temp)); \
+                return *this; \
             }
-//            template<typename U, std::enable_if_t<!std::is_same_v<T, U> = 0> \
-//            basic_property& operator op (const U& v) \
-//            { \
-//                auto temp(get()); \
-//                temp op v; \
-//                set(std::move(temp)); \
-//                return *this; \
-//            }
-
-//            template<typename U> \
-//            basic_property& operator op (const basic_property<U, StoragePolicy>& p) \
-//            { \
-//                auto temp(get()); \
-//                temp op p.get(); \
-//                set(std::move(temp)); \
-//                return *this; \
-//            }
 
         #define PROPERTY_ARITHMETIC_OPERATOR(op) \
             template<typename T2, typename P2, typename V, std::enable_if_t<!is_property_v<V>, int> = 0> \
@@ -97,7 +97,15 @@ namespace fox
         //--
         //      FORWARD DECLARATION
         //--
-        template<class T, class StoragePolicy>
+        namespace policies
+        {
+            template<class T>
+            class value;
+
+            template<class T>
+            class proxy;
+        }
+        template<class T, class StoragePolicy = policies::value<T>>
         class basic_property;
 
 
@@ -119,6 +127,10 @@ namespace fox
             template<class T>
             class value
             {
+                using prop_type = basic_property<T, policies::value<T>>;
+                // Event Type for the event OnValueChanged
+                using OnValueChangedDelegate = event::Delegate<void(prop_type*)>;
+
             public:
                 /** Default construct */
                 value() {}
@@ -132,8 +144,31 @@ namespace fox
                 const T& get() const { return m_oData; }
 
                 /** Setter */
-                void set(const T &v) { m_oData = v; }
-                void set(T&& v) { m_oData = std::move(v); }
+                void set(const T &v)
+                {
+                    m_oData = v;
+                    m_oOnValueChanged((prop_type*)this);
+                }
+
+                void set(T&& v)
+                {
+                    m_oData = std::move(v);
+                    m_oOnValueChanged((prop_type*)this);
+                }
+
+                template<typename Closure,
+                        std::enable_if_t<!std::is_base_of_v<event::DelegateBase, std::decay_t<Closure>>, int> = 0>
+                void operator += (Closure closure)
+                {
+                    m_oOnValueChanged += closure;
+                }
+
+                template<typename Closure,
+                        std::enable_if_t<!std::is_base_of_v<event::DelegateBase, std::decay_t<Closure>>, int> = 0>
+                void operator -= (Closure closure)
+                {
+                    m_oOnValueChanged -= closure;
+                }
 
             private:
 //                friend class boost::serialization::access;
@@ -144,6 +179,7 @@ namespace fox
 //                    ar & boost::serialization::make_nvp("value", m_oData);
 //                }
                 T m_oData;
+                OnValueChangedDelegate m_oOnValueChanged;
             };
 
 
@@ -151,6 +187,10 @@ namespace fox
             template<class T>
             class proxy
             {
+                using prop_type = basic_property<T, policies::proxy<T>>;
+                // Event Type for the event OnValueChanged
+                using OnValueChangedDelegate = event::Delegate<void(prop_type*)>;
+
             public:
                 /** Prototype of getter function */
                 using get_fnc_type = std::function<T(void)>;
@@ -185,9 +225,37 @@ namespace fox
 
                 /** Setter */
                 void set(const T &v)
-                { m_setter(v); }
+                {
+                    m_setter(v);
+                    m_oOnValueChanged((prop_type*)this);
+                }
+
                 void set(T&& v)
-                { m_setter(std::move(v)); }
+                {
+                    m_setter(std::move(v));
+                    m_oOnValueChanged((prop_type*)this);
+                }
+
+
+                //--
+                //      OPERATORS FOR EVENTS
+                //--
+
+                template<typename Closure,
+                        std::enable_if_t<!std::is_base_of_v<event::DelegateBase, std::decay_t<Closure>>, int> = 0>
+                void operator += (Closure closure)
+                {
+                    fox::info("%", typeid(std::decay_t<Closure>).name());
+                    m_oOnValueChanged += closure;
+                }
+
+                template<typename Closure,
+                        std::enable_if_t<!std::is_base_of_v<event::DelegateBase, std::decay_t<Closure>>, int> = 0>
+                void operator -= (Closure closure)
+                {
+                    m_oOnValueChanged -= closure;
+                }
+
 
             private:
                 static T default_get() { throw std::runtime_error("Proxy getter not bound"); }
@@ -197,17 +265,17 @@ namespace fox
 
                 get_fnc_type m_getter;
                 set_fnc_type m_setter;
+
+                OnValueChangedDelegate m_oOnValueChanged;
             };
         }
 
         /** Read/write policy based property */
-        template<typename T, typename StoragePolicy = policies::value<T>>
+        template<typename T, typename StoragePolicy>
         class basic_property : public StoragePolicy
         {
             using SP = StoragePolicy;
 
-            // Event Type for the event OnValueChanged
-            using OnValueChangedDelegate = event::Delegate<void(const T&)>;
         public:
             /** Default constructor */
             basic_property() = default;
@@ -401,27 +469,17 @@ namespace fox
             decltype(auto) end() const
             { return get().begin(); }
 
-            //--
-            //      OPERATORS FOR EVENTS
-            //--
-            basic_property& operator += (OnValueChangedDelegate delegate)
+            template<typename Closure>
+            basic_property& operator += (Closure closure)
             {
-                m_oOnValueChanged.push_back(delegate);
+                SP::operator += (closure);
                 return *this;
             }
 
-            basic_property& operator += (std::function<void(const T&)> delegate)
+            template<typename Closure>
+            basic_property& operator -= (Closure closure)
             {
-                m_oOnValueChanged.push_back(delegate);
-                return *this;
-            }
-
-            basic_property& operator -= (const OnValueChangedDelegate& delegate)
-            {
-                m_oOnValueChanged.erase(std::remove_if(m_oOnValueChanged.begin(), m_oOnValueChanged.end(),
-               [&](auto delegate_item){
-                    return delegate_item.tag() == delegate.tag();
-                }));
+                SP::operator -= (closure);
                 return *this;
             }
 
@@ -433,7 +491,6 @@ namespace fox
 //            {
 //                ar & boost::serialization::make_nvp("storage", _s);
 //            }
-            std::vector<OnValueChangedDelegate> m_oOnValueChanged;
         };
         //-- class basic_property
 
