@@ -6,7 +6,7 @@
 #define FOXENGINE_SERIALIZATION_HPP
 
 #include "json.hpp"
-#include "Utils/Vec2.hpp"
+#include "Math/Vec2.hpp"
 
 namespace fox
 {

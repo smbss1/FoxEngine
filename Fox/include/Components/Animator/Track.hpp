@@ -12,8 +12,8 @@
 #include <cstring>
 #include <iostream>
 #include "Frame.hpp"
-#include "Utils/Vec3.hpp"
-#include "Utils/Quat.hpp"
+#include "Math/Vec3.hpp"
+#include "Math/Quat.hpp"
 #include "Easing.hpp"
 
 namespace TrackHelpers

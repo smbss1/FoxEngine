@@ -5,11 +5,8 @@
 #include <ImGuiExtension.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
-#include <Utils/Path.hpp>
-#include <imgui_internal.h>
 #include <filesystem>
-#include <SupportedFileFormat.hpp>
-#include <Core/Logger/Logger.hpp>
+#include <Logger/Logger.hpp>
 #include "Inspector/inspector_primitives.hpp"
 
 bool inspector_vec2::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)

@@ -2,9 +2,9 @@
 // Created by samuel on 28/06/2021.
 //
 
-#include <Time.hpp>
+#include <Utils/Time.hpp>
 #include <imgui.h>
-#include <Core/Input/Input.hpp>
+#include <Input/Input.hpp>
 #include "AnimationPlayerState.hpp"
 
 void AnimationPlayerState::OnEnter()
@@ -18,13 +18,16 @@ void AnimationPlayerState::OnEnter()
 
     m_AnimationPlayer = &oAnimPlayer;
 
-    fox::info("%", rttr::type::get<fox::AnimationPlayer>().get_name());
+//    oAnimPlayer.Current +=
+    fox::event::Delegate<void(*)(int)> d1 = fox::event::MakeDelegate([](int oAnim) -> void
+   {
+//       fox::info("Current Animation: %", oAnim->Name);
+   });
 
-
-//    oAnimPlayer.current.add_update_event([](property<Timeline*>* pAnim)
-//       {
-//           fox::info("Current Animation: %", (*pAnim)->Name);
-//       });
+    fox::event::Delegate<void(*)(int)> d([](int oAnim)
+                                         {
+//       fox::info("Current Animation: %", oAnim->Name);
+                                         });
 }
 
 void AnimationPlayerState::OnExit()

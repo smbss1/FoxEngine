@@ -2,7 +2,7 @@
 // Created by samuel on 05/07/2021.
 //
 
-#include "Events/EventSystem.hpp"
+#include "EventSystem/EventSystem.hpp"
 
 namespace fox::event
 {

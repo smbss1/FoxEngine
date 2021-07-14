@@ -5,7 +5,7 @@
 
 #include <string>
 #include <glm/glm.hpp>
-#include <Renderer/SubTexture2D.hpp>
+#include <Assets/SubTexture2D.hpp>
 #include <rttr/type>
 #include <Reflection.hpp>
 #include <Components/Component.hpp>

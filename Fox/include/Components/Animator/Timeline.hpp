@@ -9,7 +9,7 @@
 #define FOX_TIMELINE_HPP_
 
 #include <unordered_map>
-#include "Time.hpp"
+#include "Utils/Time.hpp"
 #include "Easing.hpp"
 #include "Track.hpp"
 #include "Core/Base.hpp"

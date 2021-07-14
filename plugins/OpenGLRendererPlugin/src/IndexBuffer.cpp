@@ -3,7 +3,7 @@
 //
 
 #include <cassert>
-#include <Core/Logger/Logger.hpp>
+#include <Logger/Logger.hpp>
 #include <glad/glad.h>
 #include <OpenGLRendererAPI.hpp>
 #include "IndexBuffer.hpp"

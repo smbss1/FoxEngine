@@ -6,7 +6,7 @@
 #define FOXENGINE_KEYEVENT_HPP
 
 #include "Event.hpp"
-#include "Core/Input/KeyCodes.hpp"
+#include "Input/KeyCodes.hpp"
 
 namespace fox
 {

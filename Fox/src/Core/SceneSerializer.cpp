@@ -11,7 +11,7 @@
 #include <Components/CameraComponent.hpp>
 #include <Components/SpriteRenderer.hpp>
 #include <Components/NativeScript.hpp>
-#include "Core/SceneSerializer.hpp"
+#include "Scene/SceneSerializer.hpp"
 
 
 namespace YAML {

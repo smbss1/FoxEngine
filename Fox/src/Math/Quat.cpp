@@ -5,7 +5,7 @@
 ** Quat.cpp
 */
 
-#include "Utils/Quat.hpp"
+#include "Math/Quat.hpp"
 #include <iostream>
 
 namespace fox

@@ -3,9 +3,9 @@
 //
 
 #include <imgui.h>
-#include <FPaths.hpp>
-#include <Core/Logger/Logger.hpp>
-#include <SupportedFileFormat.hpp>
+#include <FileSystem/FPaths.hpp>
+#include <Logger/Logger.hpp>
+#include <FileSystem/SupportedFileFormat.hpp>
 #include "ContentBrowserPanel.hpp"
 
 namespace fox

@@ -5,13 +5,13 @@
 #ifndef FOXENGINE_RENDERER2D_HPP
 #define FOXENGINE_RENDERER2D_HPP
 
-#include <Renderer/Texture.hpp>
+#include <Assets/Texture.hpp>
 #include <Components/SpriteRenderer.hpp>
 #include <Renderer/Camera.hpp>
 #include <Renderer/EditorCamera.hpp>
 
 #include "OrthographicCamera.hpp"
-#include "SubTexture2D.hpp"
+#include "Assets/SubTexture2D.hpp"
 
 namespace fox
 {

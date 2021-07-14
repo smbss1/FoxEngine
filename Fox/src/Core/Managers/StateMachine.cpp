@@ -3,7 +3,7 @@
 //
 
 #include <algorithm>
-#include "Core/Managers/StateMachine.hpp"
+#include "Core/StateMachine.hpp"
 
 namespace fox
 {

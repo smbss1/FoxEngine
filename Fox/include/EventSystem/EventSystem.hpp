@@ -10,7 +10,7 @@
 #include <iostream>
 #include <mutex>
 #include "common.hpp"
-#include "TypedMap.hpp"
+#include "Events/TypedMap.hpp"
 
 namespace fox
 {

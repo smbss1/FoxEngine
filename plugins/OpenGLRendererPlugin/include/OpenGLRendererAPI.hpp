@@ -7,7 +7,7 @@
 
 #include "Renderer/RendererAPI.hpp"
 #include <glad/glad.h>
-#include "DebugBreak.hpp"
+#include "Utils/DebugBreak.hpp"
 
 #define ASSERT(x) if (!(x)) debug_break();
 #define GLCall(x) GLClearError();\

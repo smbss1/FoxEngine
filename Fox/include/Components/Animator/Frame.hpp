@@ -8,7 +8,7 @@
 #ifndef _FOX_FRAME_HPP_
 #define _FOX_FRAME_HPP_
 
-#include "Core/EventNotifier.hpp"
+#include "EventSystem/EventNotifier.hpp"
 
 /***
  * @brief This struct store the key frame of the animation

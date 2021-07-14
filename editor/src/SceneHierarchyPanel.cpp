@@ -6,9 +6,9 @@
 #include <Core/Application.hpp>
 #include <Components.hpp>
 #include <imgui_internal.h>
-#include <Utils/Path.hpp>
-#include <FPaths.hpp>
-#include <Events/EventSystem.hpp>
+#include <FileSystem/Path.hpp>
+#include <FileSystem/FPaths.hpp>
+#include <EventSystem/EventSystem.hpp>
 #include <EditorEvent.hpp>
 #include <Inspector/inspectors.hpp>
 #include "SceneHierarchyPanel.hpp"

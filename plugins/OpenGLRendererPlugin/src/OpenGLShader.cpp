@@ -4,11 +4,11 @@
 
 #include <fstream>
 #include <glad/glad.h>
-#include <Core/Logger/Logger.hpp>
+#include <Logger/Logger.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <OpenGLRendererAPI.hpp>
 #include <Core/Assert.hpp>
-#include <Utils/Path.hpp>
+#include <FileSystem/Path.hpp>
 #include "OpenGLShader.hpp"
 
 namespace fox

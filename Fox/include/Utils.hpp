@@ -9,11 +9,14 @@
 #define FOX_UTILS_HPP_
 
 #include "Utils/Any.hpp"
+#include "Utils/AnyContainer.hpp"
+#include "Utils/DebugBreak.hpp"
+#include "Utils/NameUtils.hpp"
 #include "Utils/bitsets.hpp"
 #include "Utils/DynamicArray.hpp"
 #include "Utils/Option.hpp"
-#include "Utils/Quat.hpp"
-#include "Utils/Vec2.hpp"
-#include "Utils/Vec3.hpp"
+#include "Math/Quat.hpp"
+#include "Math/Vec2.hpp"
+#include "Utils/Time.hpp"
 
 #endif

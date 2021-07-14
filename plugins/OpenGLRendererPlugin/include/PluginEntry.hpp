@@ -15,9 +15,9 @@
 
 #include "api.hpp"
 #include "Plugin/IPlugin.hpp"
-#include "Core/Input/KeyCodes.hpp"
-#include "Core/Managers/ResourceManager.hpp"
-#include "Renderer/Texture.hpp"
+#include "Input/KeyCodes.hpp"
+#include "Assets/ResourceManager.hpp"
+#include "Assets/Texture.hpp"
 #include "Renderer/Framebuffer.hpp"
 #include "Renderer/EditorCamera.hpp"
 #include "IndexBuffer.hpp"

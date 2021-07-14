@@ -4,7 +4,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <Core/Assert.hpp>
-#include "SceneCamera.hpp"
+#include "Scene/SceneCamera.hpp"
 
 namespace fox
 {

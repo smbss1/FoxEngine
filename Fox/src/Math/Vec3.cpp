@@ -5,8 +5,8 @@
 ** Vec3.cpp
 */
 
-#include <Utils/Vec2.hpp>
-#include "Utils/Vec3.hpp"
+#include <Math/Vec2.hpp>
+#include "Math/Vec3.hpp"
 
 namespace fox
 {

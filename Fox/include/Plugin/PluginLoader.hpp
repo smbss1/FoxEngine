@@ -6,7 +6,7 @@
 #define ECS_PLUGINLOADER_HPP
 
 #include "SharedLib.hpp"
-#include "Core.hpp"
+#include "Core/Core.hpp"
 
 namespace fox
 {

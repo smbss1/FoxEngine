@@ -6,11 +6,10 @@
 
 #include "Core/Application.hpp"
 #include "Core/Window.hpp"
-#include "Core/EventNotifier.hpp"
-#include "Core/Input/InputManager.hpp"
-#include "Core/Logger/Logger.hpp"
+#include "EventSystem/EventNotifier.hpp"
+#include "Logger/Logger.hpp"
 #include "Core/State.hpp"
-#include "Core/Managers/StateMachine.hpp"
+#include "Core/StateMachine.hpp"
 
 #include "Renderer/Renderer.hpp"
 #include "Renderer/Renderer2D.hpp"
@@ -18,8 +17,8 @@
 #include "Renderer/Buffer.hpp"
 #include "Renderer/VertexArray.hpp"
 #include "Renderer/Framebuffer.hpp"
-#include "Renderer/Texture.hpp"
-#include "Renderer/SubTexture2D.hpp"
+#include "Assets/Texture.hpp"
+#include "Assets/SubTexture2D.hpp"
 #include "Renderer/Shader.hpp"
 #include "Renderer/OrthographicCameraController.hpp"
 

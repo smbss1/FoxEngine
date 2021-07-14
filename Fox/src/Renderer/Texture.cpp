@@ -3,7 +3,7 @@
 //
 
 #include <Renderer/RendererAPI.hpp>
-#include "Renderer/Texture.hpp"
+#include "Assets/Texture.hpp"
 
 namespace fox
 {

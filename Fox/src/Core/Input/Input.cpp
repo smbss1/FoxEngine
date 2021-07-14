@@ -2,7 +2,7 @@
 // Created by samuel on 27/06/2021.
 //
 
-#include "Core/Input/Input.hpp"
+#include "Input/Input.hpp"
 
 namespace fox
 {

@@ -2,7 +2,7 @@
 // Created by samuel on 27/06/2021.
 //
 
-#include <Core/Logger/Logger.hpp>
+#include <Logger/Logger.hpp>
 #include "glad/glad.h"
 
 #define GLFW_INCLUDE_NONE

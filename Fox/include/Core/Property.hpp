@@ -17,7 +17,7 @@
 #include <ios>
 #include <cstddef>
 
-#include "Core/EventNotifier.hpp"
+#include "EventSystem/Delegate.hpp"
 
 namespace fox
 {
@@ -48,30 +48,31 @@ namespace fox
                 temp op v; \
                 set(std::move(temp)); \
                 return *this; \
-            } \
-            template<typename U> \
-            basic_property& operator op (const U& v) \
-            { \
-                auto temp(get()); \
-                temp op v; \
-                set(std::move(temp)); \
-                return *this; \
-            } \
+            }                         \
             basic_property& operator op (const basic_property& p) \
             { \
                 auto temp(get()); \
                 temp op p.get(); \
                 set(std::move(temp)); \
                 return *this; \
-            } \
-            template<typename U> \
-            basic_property& operator op (const basic_property<U, StoragePolicy>& p) \
-            { \
-                auto temp(get()); \
-                temp op p.get(); \
-                set(std::move(temp)); \
-                return *this; \
             }
+//            template<typename U, std::enable_if_t<!std::is_same_v<T, U> = 0> \
+//            basic_property& operator op (const U& v) \
+//            { \
+//                auto temp(get()); \
+//                temp op v; \
+//                set(std::move(temp)); \
+//                return *this; \
+//            }
+
+//            template<typename U> \
+//            basic_property& operator op (const basic_property<U, StoragePolicy>& p) \
+//            { \
+//                auto temp(get()); \
+//                temp op p.get(); \
+//                set(std::move(temp)); \
+//                return *this; \
+//            }
 
         #define PROPERTY_ARITHMETIC_OPERATOR(op) \
             template<typename T2, typename P2, typename V, std::enable_if_t<!is_property_v<V>, int> = 0> \
@@ -142,7 +143,6 @@ namespace fox
 //                {
 //                    ar & boost::serialization::make_nvp("value", m_oData);
 //                }
-
                 T m_oData;
             };
 
@@ -205,6 +205,9 @@ namespace fox
         class basic_property : public StoragePolicy
         {
             using SP = StoragePolicy;
+
+            // Event Type for the event OnValueChanged
+            using OnValueChangedDelegate = event::Delegate<void(const T&)>;
         public:
             /** Default constructor */
             basic_property() = default;
@@ -398,6 +401,30 @@ namespace fox
             decltype(auto) end() const
             { return get().begin(); }
 
+            //--
+            //      OPERATORS FOR EVENTS
+            //--
+            basic_property& operator += (OnValueChangedDelegate delegate)
+            {
+                m_oOnValueChanged.push_back(delegate);
+                return *this;
+            }
+
+            basic_property& operator += (std::function<void(const T&)> delegate)
+            {
+                m_oOnValueChanged.push_back(delegate);
+                return *this;
+            }
+
+            basic_property& operator -= (const OnValueChangedDelegate& delegate)
+            {
+                m_oOnValueChanged.erase(std::remove_if(m_oOnValueChanged.begin(), m_oOnValueChanged.end(),
+               [&](auto delegate_item){
+                    return delegate_item.tag() == delegate.tag();
+                }));
+                return *this;
+            }
+
         private:
 //            friend class boost::serialization::access;
 //
@@ -406,6 +433,7 @@ namespace fox
 //            {
 //                ar & boost::serialization::make_nvp("storage", _s);
 //            }
+            std::vector<OnValueChangedDelegate> m_oOnValueChanged;
         };
         //-- class basic_property
 

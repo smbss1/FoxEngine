@@ -4,7 +4,7 @@
 
 #include <imgui.h>
 #include <ImGui/imgui_impl_opengl3.h>
-#include <Core/Managers/StateMachine.hpp>
+#include <Core/StateMachine.hpp>
 #include <ImGuizmo.h>
 #include <ImGui/imgui_impl_glfw.h>
 #include <GLFW/glfw3.h>

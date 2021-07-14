@@ -11,11 +11,9 @@
 #include <unordered_map>
 #include <memory>
 #include <typeindex>
-#include <Utils/AnyContainer.hpp>
-#include <Core/Logger/Logger.hpp>
+#include <Logger/Logger.hpp>
 #include "common.hpp"
-#include "Utils/Option.hpp"
-#include "Utils/Any.hpp"
+#include "Utils.hpp"
 #include "ASystem.hpp"
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"

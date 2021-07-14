@@ -2,7 +2,7 @@
 // Created by samuel on 22/06/2021.
 //
 
-#include "Core/PluginLoader.hpp"
+#include "Plugin/PluginLoader.hpp"
 
 namespace fox
 {

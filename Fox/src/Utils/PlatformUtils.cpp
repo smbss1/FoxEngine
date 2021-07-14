@@ -2,9 +2,9 @@
 // Created by samuel on 30/06/2021.
 //
 
-#include <FPaths.hpp>
+#include <FileSystem/FPaths.hpp>
 #include "Utils/PlatformUtils.hpp"
-#include "portable-file-dialogs.hpp"
+#include "FileSystem/portable-file-dialogs.hpp"
 
 #if _WIN32
 #define DEFAULT_PATH "C:\\"

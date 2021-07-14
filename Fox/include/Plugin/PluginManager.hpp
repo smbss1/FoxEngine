@@ -9,11 +9,11 @@
 #include <memory>
 #include <algorithm>
 #include <map>
-#include <Utils/Path.hpp>
-#include <Core/Logger/Logger.hpp>
+#include <FileSystem/Path.hpp>
+#include <Logger/Logger.hpp>
 #include "Core/Core.hpp"
 #include "Plugin/IGraphic.hpp"
-#include "Core/PluginLoader.hpp"
+#include "Plugin/PluginLoader.hpp"
 #include "Plugin/IPlugin.hpp"
 
 namespace fox

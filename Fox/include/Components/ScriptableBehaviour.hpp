@@ -8,7 +8,7 @@
 #ifndef ECS_SCRIPTABLEBEHAVIOUR_HPP
 #define ECS_SCRIPTABLEBEHAVIOUR_HPP
 
-#include <Core/Scene.hpp>
+#include <Scene/Scene.hpp>
 #include "Utils/Option.hpp"
 #include "Ecs/World.hpp"
 

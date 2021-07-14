@@ -5,7 +5,7 @@
 #ifndef FOXENGINE_CAMERACOMPONENT_HPP
 #define FOXENGINE_CAMERACOMPONENT_HPP
 
-#include <SceneCamera.hpp>
+#include <Scene/SceneCamera.hpp>
 #include <rttr/type>
 #include "Component.hpp"
 #include "Reflection.hpp"

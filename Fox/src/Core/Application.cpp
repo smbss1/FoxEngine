@@ -1,19 +1,18 @@
 
 
-#include <Core/Managers/PluginManager.hpp>
+#include <Plugin/PluginManager.hpp>
 #include <chrono>
-#include <Time.hpp>
-#include <Utils/FileSystem.hpp>
-#include <Core/Managers/StateMachine.hpp>
-#include <Core/Managers/ResourceManager.hpp>
+#include <Utils/Time.hpp>
+#include <FileSystem/FileSystem.hpp>
+#include <Core/StateMachine.hpp>
+#include <Assets/ResourceManager.hpp>
 #include <Renderer/RendererAPI.hpp>
 #include <Renderer/RendererCommand.hpp>
-#include <Core/Input/Input.hpp>
+#include <Input/Input.hpp>
 #include <Renderer/Renderer.hpp>
 #include <Renderer/Renderer2D.hpp>
-#include "Core/Input/InputManager.hpp"
 #include "Core/Application.hpp"
-#include "Core/Logger/Logger.hpp"
+#include "Logger/Logger.hpp"
 #include "json.hpp"
 
 namespace fox

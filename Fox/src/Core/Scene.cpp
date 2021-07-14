@@ -10,7 +10,7 @@
 #include <Renderer/Renderer2D.hpp>
 #include <Components/NativeScript.hpp>
 #include <Components/EntityName.hpp>
-#include "Core/Scene.hpp"
+#include "Scene/Scene.hpp"
 #include "Components.hpp"
 #include "Core/Application.hpp"
 

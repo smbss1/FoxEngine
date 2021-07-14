@@ -1,17 +1,17 @@
 
-#include <Core/Scene.hpp>
 #include <imgui.h>
-#include <Core/Input/Input.hpp>
+#include <Scene/Scene.hpp>
+#include <Input/Input.hpp>
 #include <Utils/PlatformUtils.hpp>
-#include <Core/SceneSerializer.hpp>
+#include <Scene/SceneSerializer.hpp>
 #include <ImGuizmo.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <Math/Math.hpp>
 #include <Renderer/Framebuffer.hpp>
 #include <Components/EntityName.hpp>
-#include <Utils/Path.hpp>
-#include <FPaths.hpp>
-#include <Utils/FileSystem.hpp>
+#include <FileSystem/Path.hpp>
+#include <FileSystem/FPaths.hpp>
+#include <FileSystem/FileSystem.hpp>
 #include <imgui_internal.h>
 #include <EditorEvent.hpp>
 

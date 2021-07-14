@@ -4,7 +4,7 @@
 
 #include <utility>
 #include "Renderer/EditorCamera.hpp"
-#include <Core/Input/Input.hpp>
+#include <Input/Input.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>

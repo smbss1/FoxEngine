@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <algorithm>
-#include <Core/Logger/Logger.hpp>
+#include <Logger/Logger.hpp>
 #include "Ecs/Pipeline.hpp"
 #include "Ecs/ASystem.hpp"
 namespace fox

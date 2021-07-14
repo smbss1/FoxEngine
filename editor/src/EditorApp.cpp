@@ -1,12 +1,11 @@
 
 
-#include <Core/Input/InputManager.hpp>
 #include <Core/State.hpp>
-#include <Core/Managers/StateMachine.hpp>
+#include <Core/StateMachine.hpp>
 #include <Renderer/EditorCamera.hpp>
 #include <EditorState.hpp>
-#include <Time.hpp>
-#include <Core/Input/Input.hpp>
+#include <Utils/Time.hpp>
+#include <Input/Input.hpp>
 
 #include "EditorApp.hpp"
 

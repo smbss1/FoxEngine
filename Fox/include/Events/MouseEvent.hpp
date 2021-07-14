@@ -7,7 +7,7 @@
 
 #include <sstream>
 #include "Event.hpp"
-#include "Core/Input/MouseCodes.hpp"
+#include "Input/MouseCodes.hpp"
 
 namespace fox
 {

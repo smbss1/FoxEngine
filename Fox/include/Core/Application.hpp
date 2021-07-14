@@ -7,7 +7,7 @@
 #include <Components/NativeScript.hpp>
 
 #include "FoxEcs.hpp"
-#include "Core/Managers/ResourceManager.hpp"
+#include "Assets/ResourceManager.hpp"
 #include "Core.hpp"
 #include "Window.hpp"
 

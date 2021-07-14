@@ -5,7 +5,7 @@
 #ifndef FOXENGINE_EDITOREVENT_HPP
 #define FOXENGINE_EDITOREVENT_HPP
 
-#include "Events/EventSystem.hpp"
+#include "EventSystem/EventSystem.hpp"
 
 struct RuntimeStartEvent
 {

@@ -7,7 +7,7 @@
 
 #include <string>
 #include <glm/vec3.hpp>
-#include <Renderer/Texture.hpp>
+#include <Assets/Texture.hpp>
 #include <imgui.h>
 
 namespace fox

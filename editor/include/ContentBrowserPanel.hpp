@@ -6,7 +6,7 @@
 #define FOXENGINE_CONTENTBROWSERPANEL_HPP
 
 #include <filesystem>
-#include <Renderer/Texture.hpp>
+#include <Assets/Texture.hpp>
 
 namespace fox
 {

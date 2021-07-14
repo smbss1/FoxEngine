@@ -2,7 +2,7 @@
 // Created by samuel on 29/06/2021.
 //
 
-#include "Renderer/SubTexture2D.hpp"
+#include "Assets/SubTexture2D.hpp"
 
 namespace fox
 {

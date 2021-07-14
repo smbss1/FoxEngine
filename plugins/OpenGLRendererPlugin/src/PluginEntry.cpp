@@ -6,9 +6,9 @@
 */
 
 #include <iostream>
-#include <Core/Managers/PluginManager.hpp>
+#include <Plugin/PluginManager.hpp>
 #include <Components/EntityName.hpp>
-#include <Core/Managers/StateMachine.hpp>
+#include <Core/StateMachine.hpp>
 #include <glad/glad.h>
 #include <OpenGLShader.hpp>
 #include <OpenGLTexture.hpp>
@@ -16,7 +16,6 @@
 #include <OpenGLContext.hpp>
 #include <OpenGLFrameBuffer.hpp>
 #include "GlfwWindow.hpp"
-#include "Core/Input/InputManager.hpp"
 #include "TextureManager.hpp"
 #include "SpriteManager.hpp"
 #include "PluginEntry.hpp"

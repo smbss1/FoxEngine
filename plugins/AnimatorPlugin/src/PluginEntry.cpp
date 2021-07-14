@@ -6,7 +6,7 @@
 */
 
 #include <iostream>
-#include <Core/Managers/PluginManager.hpp>
+#include <Plugin/PluginManager.hpp>
 #include "PluginEntry.hpp"
 
 namespace fox

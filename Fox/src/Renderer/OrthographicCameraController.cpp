@@ -2,8 +2,8 @@
 // Created by samuel on 28/06/2021.
 //
 
-#include <Core/Input/Input.hpp>
-#include <Time.hpp>
+#include <Input/Input.hpp>
+#include <Utils/Time.hpp>
 #include "Renderer/OrthographicCameraController.hpp"
 
 namespace fox

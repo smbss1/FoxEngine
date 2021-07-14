@@ -5,7 +5,7 @@
 #ifndef FOXENGINE_OPENGLTEXTURE_HPP
 #define FOXENGINE_OPENGLTEXTURE_HPP
 
-#include "Renderer/Texture.hpp"
+#include "Assets/Texture.hpp"
 namespace fox
 {
     class OpenGLTexture : public Texture2D

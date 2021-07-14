@@ -7,8 +7,8 @@
 
 #include <string>
 #include <functional>
-#include <Core/Input/KeyCodes.hpp>
-#include <Core/Input/MouseCodes.hpp>
+#include <Input/KeyCodes.hpp>
+#include <Input/MouseCodes.hpp>
 #include "common.hpp"
 #include "Events/Event.hpp"
 #include "glm/glm.hpp"
