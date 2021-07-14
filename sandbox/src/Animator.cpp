@@ -18,19 +18,13 @@ void AnimationPlayerState::OnEnter()
 
     m_AnimationPlayer = &oAnimPlayer;
 
-//    oAnimPlayer.Current +=
-    fox::event::Delegate<void(int)> d1;
-    d1 += [](int value) -> void
-   {
-        fox::info("Int: %", value);
-   };
-
-    d1(14);
-
-    oAnimPlayer.Current += [](fox::properties::rw_property<Timeline*>* oAnim)
+    auto fn = [](fox::properties::rw_property<Timeline*>* oAnim)
     {
         fox::info("Current Animation: %", oAnim->get()->Name);
     };
+
+    oAnimPlayer.Current += fn;
+    oAnimPlayer.Current -= fn;
 }
 
 void AnimationPlayerState::OnExit()

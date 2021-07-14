@@ -226,14 +226,18 @@ namespace fox
                 /** Setter */
                 void set(const T &v)
                 {
-                    m_setter(v);
-                    m_oOnValueChanged((prop_type*)this);
+                    if (v != get()) {
+                        m_setter(v);
+                        m_oOnValueChanged((prop_type *) this);
+                    }
                 }
 
                 void set(T&& v)
                 {
-                    m_setter(std::move(v));
-                    m_oOnValueChanged((prop_type*)this);
+                    if (v != get()) {
+                        m_setter(std::move(v));
+                        m_oOnValueChanged((prop_type *) this);
+                    }
                 }
 
 
@@ -245,7 +249,6 @@ namespace fox
                         std::enable_if_t<!std::is_base_of_v<event::DelegateBase, std::decay_t<Closure>>, int> = 0>
                 void operator += (Closure closure)
                 {
-                    fox::info("%", typeid(std::decay_t<Closure>).name());
                     m_oOnValueChanged += closure;
                 }
 
@@ -425,8 +428,8 @@ namespace fox
             //--
             PROPERTY_OPERATOR_INC(++)
             PROPERTY_OPERATOR_INC(--)
-            PROPERTY_OPERATOR(+=)
-            PROPERTY_OPERATOR(-=)
+//            PROPERTY_OPERATOR(+=)
+//            PROPERTY_OPERATOR(-=)
             PROPERTY_OPERATOR(*=)
             PROPERTY_OPERATOR(/=)
 

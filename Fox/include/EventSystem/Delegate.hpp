@@ -53,8 +53,10 @@ namespace fox
 
             Delegate(Delegate const&) = delete;
             void operator=(Delegate const&) = delete;
+
         public:
             Delegate() {}
+
             template <typename T>
             Delegate& operator+= (T&& callback) {
                 m_vCallbacks.emplace_back(new call<T>(std::forward<T>(callback)));
@@ -65,7 +67,8 @@ namespace fox
                 call<T> tmp(std::forward<T>(callback));
                 auto it = std::remove_if(m_vCallbacks.begin(),
                                          m_vCallbacks.end(),
-                                         [&](scope<base>& other) {
+                                         [&](scope<base>& other)
+                                         {
                                              return tmp.compare(other.get());
                                          });
                 m_vCallbacks.erase(it, m_vCallbacks.end());
