@@ -107,7 +107,7 @@ namespace fox
         }
 
     public:
-        rw_property<Timeline*> Current {
+        fox::properties::rw_property<Timeline*> Current {
             GET { return current; },
             SET { current = value; }
         };

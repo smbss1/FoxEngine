@@ -24,12 +24,12 @@ public:
 
 
 public:
-    rw_property<fox::ref<fox::Texture2D>> Sprite {
+    fox::properties::rw_property<fox::ref<fox::Texture2D>> Sprite {
             GET { return m_pSprite; },
             SET { m_pSprite = value; }
     };
 
-    rw_property<glm::vec4> Color {
+    fox::properties::rw_property<glm::vec4> Color {
             GET { return m_oColor; },
             SET { m_oColor = value; }
     };

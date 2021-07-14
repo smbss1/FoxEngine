@@ -26,7 +26,6 @@ namespace fox
 
     OpenGLIndexBuffer::~OpenGLIndexBuffer()
     {
-        fox::info("Destroy IndexBuffer");
         GLCall(glDeleteBuffers(1, &m_RendererID));
     }
 

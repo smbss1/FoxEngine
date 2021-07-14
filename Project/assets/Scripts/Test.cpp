@@ -8,7 +8,7 @@ void Test::OnStart()
 {
     fox::info("The game started!!!");
 
-    transform = &get_component<fox::TransformComponent>().value();
+    transform = get_component<fox::TransformComponent>().get();
 }
 
 void Test::on_update()

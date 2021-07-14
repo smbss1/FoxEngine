@@ -77,7 +77,7 @@ void DockingToolbar(const char* name, ImGuiAxis* p_toolbar_axis, std::function<v
     func(icon_size, toolbar_axis);
 
     // 6. Context-menu to change axis
-    if (node == NULL || !TOOLBAR_AUTO_DIRECTION_WHEN_DOCKED)
+    if (node == nullptr || !TOOLBAR_AUTO_DIRECTION_WHEN_DOCKED)
     {
         if (ImGui::BeginPopupContextWindow())
         {
@@ -116,8 +116,8 @@ namespace fox
         if (!oConfigTemp.is_null()) {
             m_oEditorConfig = json::Value(oConfigTemp);
             fox::info("editor_config.json load successfully");
-        }
-        else
+        } else
+            // TODO: Project Launcher
             fox::error("Wrong configuration format for 'editor_config.json'");
 
         if (!m_oEditorConfig.is_null() && !m_oEditorConfig["LastOpenedProject"].is_null()) {
@@ -152,19 +152,7 @@ namespace fox
             serializer.Deserialize(m_oEditorConfig["LastOpenedScene"].get<std::string>());
         }
 
-        InitFileWatcher();
-
-//            auto e1 = m_pActiveScene->NewEntity();
-//            e1.add<TransformComponent>();
-//            e1.add<SpriteRenderer>(glm::vec4{0.0f, 0.3f, 0.2f, 1.0f});
-//            auto e2 = m_pActiveScene->NewEntity();
-//            e2.add<TransformComponent>(glm::vec3{1, 1, 0});
-//            e2.add<SpriteRenderer>(glm::vec4{0.2f, 0.3f, 0.5f, 1.0f});
-//
-//            auto m_CameraEntity = m_pActiveScene->NewEntity("Camera");
-//            m_CameraEntity.add<CameraComponent>();
-//            m_CameraEntity.get<CameraComponent>()->Primary = true;
-//            m_CameraEntity.add<NativeScript>(Test());
+        // InitFileWatcher();
     }
 
     void EditorState::OnExit()
@@ -429,6 +417,7 @@ namespace fox
                 ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
             }
 
+            // Run the runtime game
             if (ImGui::Button("Play")) {
                 event::EventSystem::Get().Emit(RuntimeStartEvent());
 
@@ -450,6 +439,8 @@ namespace fox
 
             if (toolbar_axis == ImGuiAxis_X)
                 ImGui::SameLine();
+
+            // Stop the runtime game
             if (ImGui::Button("Stop")) {
                 event::EventSystem::Get().Emit(RuntimeStopEvent());
 

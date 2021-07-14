@@ -37,7 +37,6 @@ namespace fox
 
     OpenGLVertexBuffer::~OpenGLVertexBuffer()
     {
-        fox::info("Destroy VertexBuffer");
         GLCall(glDeleteBuffers(1, &m_RendererID));
     }
 

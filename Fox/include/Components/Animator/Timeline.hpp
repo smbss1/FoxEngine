@@ -86,7 +86,7 @@ public:
     {
         Track<T>* result = new Track<T>();
         result->ease(e);
-        Tracks.get().push_back(std::unique_ptr<ITrack>(result));
+        Tracks.get().push_back(std::move(std::unique_ptr<ITrack>(result)));
         OnTrackAdded(&Tracks);
         return *result;
     }
@@ -156,7 +156,7 @@ public:
         }
     }
 
-    void OnTrackAdded(property<TrackArray>* tracks)
+    void OnTrackAdded(fox::properties::property<TrackArray>* tracks)
     {
         for (auto &track : tracks->get()) {
             m_fEndTime = std::max(m_fEndTime, track->GetEndTime());
@@ -197,11 +197,11 @@ public:
 private:
 
 public:
-    property<std::string> Name;
-    property<int> ID;
-    property<TrackArray> Tracks;
-    property<std::unordered_map<float, Signal>> Signals;
-    property<bool> IsFinish = false; // Is Finish the animation ?
+    fox::properties::property<std::string> Name;
+    fox::properties::property<int> ID;
+    fox::properties::property<TrackArray> Tracks;
+    fox::properties::property<std::unordered_map<float, Signal>> Signals;
+    fox::properties::property<bool> IsFinish = false; // Is Finish the animation ?
 
 private:
     bool m_bLoop = false;
