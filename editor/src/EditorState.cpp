@@ -128,8 +128,8 @@ namespace fox
         }
 
         // Add Callback to the eventsystem
-        event::EventSystem::Get().On<RuntimeStartEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStart));
-        event::EventSystem::Get().On<RuntimeStopEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStop));
+//        event::EventSystem::Get().On<RuntimeStartEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStart));
+//        event::EventSystem::Get().On<RuntimeStopEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStop));
 
         // Create frame buffer
         fox::FramebufferSpecification fbSpec;
@@ -151,6 +151,10 @@ namespace fox
             SceneSerializer serializer(m_pActiveScene);
             serializer.Deserialize(m_oEditorConfig["LastOpenedScene"].get<std::string>());
         }
+
+        // Bind Editor Events
+        m_OnRuntimeStart += event::MakeFunc(*this, &EditorState::OnRuntimeStart);
+        m_OnRuntimeStop += event::MakeFunc(*this, &EditorState::OnRuntimeStop);
 
         // InitFileWatcher();
     }
@@ -418,8 +422,10 @@ namespace fox
             }
 
             // Run the runtime game
-            if (ImGui::Button("Play")) {
-                event::EventSystem::Get().Emit(RuntimeStartEvent());
+            if (ImGui::Button("Play"))
+            {
+                // Emit that the runtime is starting
+                m_OnRuntimeStart();
 
                 ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
                 ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -441,8 +447,10 @@ namespace fox
                 ImGui::SameLine();
 
             // Stop the runtime game
-            if (ImGui::Button("Stop")) {
-                event::EventSystem::Get().Emit(RuntimeStopEvent());
+            if (ImGui::Button("Stop"))
+            {
+                // Emit that the runtime is stopped
+                m_OnRuntimeStop();
 
                 ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
                 ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -669,7 +677,7 @@ namespace fox
         }
     }
 
-    void EditorState::OnRuntimeStart(const RuntimeStartEvent& e)
+    void EditorState::OnRuntimeStart()
     {
         m_bIsRunning = true;
 
@@ -682,7 +690,7 @@ namespace fox
         m_pActiveScene->OnStartRuntime();
     }
 
-    void EditorState::OnRuntimeStop(const RuntimeStopEvent& e)
+    void EditorState::OnRuntimeStop()
     {
         m_bIsRunning = false;
 

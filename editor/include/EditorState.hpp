@@ -58,15 +58,13 @@ namespace fox
 
         /**
          * @brief On runtime start, this function will be called from EventSystem
-         * @param e the event
          */
-        void OnRuntimeStart(const RuntimeStartEvent& e);
+        void OnRuntimeStart();
 
         /**
          * @brief On runtime stop, this function will be called from EventSystem
-         * @param e the event
          */
-        void OnRuntimeStop(const RuntimeStopEvent& e);
+        void OnRuntimeStop();
 
         /**
          * @brief Start init the file watcher for hot reload asset
@@ -97,6 +95,13 @@ namespace fox
         json::Value m_oEditorConfig;
 
         scope<FileWatcher> m_oWatcher;
+
+        //--
+        //      DELEGATES
+        //--
+        event::Delegate<void()> m_OnRuntimeStart;
+        event::Delegate<void()> m_OnRuntimeStop;
+
     };
 }
 

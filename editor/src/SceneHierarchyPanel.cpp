@@ -106,8 +106,8 @@ namespace fox
     void SceneHierarchyPanel::SetContext(const ref<Scene>& context)
     {
         m_pContext = context;
-        m_SelectedEntity = {};
-        event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
+        SelectedEntity = Entity{};
+        // m_OnSelectedEntityChange(m_SelectedEntity);
 
         if (!m_pScriptLib->GetHandle()) {
 
@@ -143,8 +143,8 @@ namespace fox
          });
 
         if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
-            m_SelectedEntity = {};
-            event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
+            SelectedEntity = Entity{};
+            // m_OnSelectedEntityChange(m_SelectedEntity);
         }
 
         // Right-click on blank space
@@ -174,8 +174,7 @@ namespace fox
 
         if (ImGui::IsItemClicked())
         {
-            m_SelectedEntity = entity;
-            event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
+            SelectedEntity = entity;
         }
 
         bool bIsDeleted = false; // Is the entity deleted ?
@@ -217,8 +216,7 @@ namespace fox
         if (bIsDeleted) {
             entity.destroy();
             if (m_SelectedEntity == entity) {
-                m_SelectedEntity = {};
-                event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
+                SelectedEntity = Entity{};
             }
         }
     }
@@ -263,7 +261,7 @@ namespace fox
                     auto c_ptr = c.get_value<ref<Component>>();
 
                     if(c_ptr)
-                        m_SelectedEntity.set(c_ptr);
+                        SelectedEntity.get().set(c_ptr);
 
                     ImGui::CloseCurrentPopup();
                 }

@@ -104,6 +104,9 @@ namespace fox
 
             template<class T>
             class proxy;
+
+            template<class T>
+            class read_only;
         }
         template<class T, class StoragePolicy = policies::value<T>>
         class basic_property;
@@ -121,9 +124,16 @@ namespace fox
         template<typename T>
         inline constexpr bool is_property_v = is_property<std::decay_t<T>>::value;
 
+
+        //--
+        //      POLICIES
+        //--
         namespace policies
         {
-            /** Read/write policy with automatic data storage. */
+            //--
+            //      VALUE POLICY, READ & WRITE ACCESS
+            //          + AUTOMATIC DATA STORAGE
+            //--
             template<class T>
             class value
             {
@@ -183,6 +193,9 @@ namespace fox
             };
 
 
+            //--
+            //      PROXY POLICY, READ & WRITE ACCESS (FROM GETTER & SETTER)
+            //--
             /** Storage policy refering to external getter/setter implementations. */
             template<class T>
             class proxy
@@ -218,9 +231,9 @@ namespace fox
                 { m_setter = f; }
 
                 /** Getter */
-                T get()
+                auto get()
                 { return m_getter(); }
-                T get() const
+                const T& get() const
                 { return m_getter(); }
 
                 /** Setter */
@@ -244,7 +257,6 @@ namespace fox
                 //--
                 //      OPERATORS FOR EVENTS
                 //--
-
                 template<typename Closure,
                         std::enable_if_t<!std::is_base_of_v<event::DelegateBase, std::decay_t<Closure>>, int> = 0>
                 void operator += (Closure closure)
@@ -271,7 +283,65 @@ namespace fox
 
                 OnValueChangedDelegate m_oOnValueChanged;
             };
+
+
+            //--
+            //      READONLY POLICY, READ ACCESS ONLY (FROM GETTER)
+            //--
+            /** Storage policy refering to external getter implementations. */
+            template<class T>
+            class read_only
+            {
+            public:
+                /** Prototype of getter function */
+                using get_fnc_type = std::function<const T&(void)>;
+
+                /** Default constructor */
+                read_only()
+                        : m_getter(&read_only<T>::default_get)
+                {}
+
+                /** Construct from bindings */
+                read_only(const get_fnc_type &get_fnc)
+                        : m_getter(get_fnc)
+                {}
+
+                /** Bind getter to read_only */
+                void bind_get(const get_fnc_type &f)
+                { m_getter = f; }
+
+                /** Getter */
+                T& get()
+                { return m_getter(); }
+                const T& get() const
+                { return m_getter(); }
+
+
+                //--
+                //      OPERATORS FOR EVENTS
+                //--
+                template<typename Closure,
+                        std::enable_if_t<!std::is_base_of_v<event::DelegateBase, std::decay_t<Closure>>, int> = 0>
+                void operator += (Closure closure)
+                {
+                }
+
+                template<typename Closure,
+                        std::enable_if_t<!std::is_base_of_v<event::DelegateBase, std::decay_t<Closure>>, int> = 0>
+                void operator -= (Closure closure)
+                {
+                }
+
+
+            private:
+                static T default_get() { throw std::runtime_error("Read Only getter not bound"); }
+
+                // not serializable
+
+                get_fnc_type m_getter;
+            };
         }
+
 
         /** Read/write policy based property */
         template<typename T, typename StoragePolicy>
@@ -570,7 +640,11 @@ namespace fox
         template<typename T>
         using rw_property = basic_property<T, properties::policies::proxy<T>>;
 
-        #define GET [&]()
+        template<typename T>
+        using read_property = basic_property<T, properties::policies::read_only<T>>;
+
+
+        #define GET [&](auto&&... args) -> decltype(auto)
         #define SET [&](const auto& value)
 
         // Undef the macro to not have problems with other libraries

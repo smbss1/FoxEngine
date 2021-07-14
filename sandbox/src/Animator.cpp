@@ -12,19 +12,16 @@ void AnimationPlayerState::OnEnter()
     m_pActiveScene = fox::new_ref<fox::Scene>(GetApp());
 
     auto e = m_pActiveScene->NewEntity("");
-    auto& oAnimPlayer = e.add<fox::AnimationPlayer>();
-    auto& idle = oAnimPlayer.AddAnimation("Idle");
-    auto& run = oAnimPlayer.AddAnimation("Run");
+    auto &oAnimPlayer = e.add<fox::AnimationPlayer>();
+    auto &idle = oAnimPlayer.AddAnimation("Idle");
+    auto &run = oAnimPlayer.AddAnimation("Run");
 
     m_AnimationPlayer = &oAnimPlayer;
 
-    auto fn = [](fox::properties::rw_property<Timeline*>* oAnim)
+    oAnimPlayer.Current += [](fox::properties::rw_property<Timeline *> *oAnim)
     {
         fox::info("Current Animation: %", oAnim->get()->Name);
     };
-
-    oAnimPlayer.Current += fn;
-    oAnimPlayer.Current -= fn;
 }
 
 void AnimationPlayerState::OnExit()
