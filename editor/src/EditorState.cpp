@@ -315,6 +315,8 @@ namespace fox
 
         m_ContentBrowserPanel.OnImGui();
         m_SceneHierarchyPanel.OnImGui();
+        m_AnimationEditor.OnImGui();
+
 
         ImGui::Begin("Stats");
         {

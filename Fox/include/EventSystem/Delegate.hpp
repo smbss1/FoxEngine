@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 #include <atomic>
+#include "common.hpp"
 
 namespace fox
 {
@@ -62,13 +63,7 @@ namespace fox
                     return m_oFunc(std::forward<Args>(args)...);
                 }
             };
-            std::vector<scope<base>> m_vCallbacks;
-
-            //--
-            //      DELETED FUNCTIONS
-            //--
-            Delegate(Delegate const&) = delete;
-            void operator=(Delegate const&) = delete;
+            std::vector<ref<base>> m_vCallbacks;
 
         public:
             Delegate() = default;
@@ -90,7 +85,7 @@ namespace fox
                 call<T> tmp(std::forward<T>(callback));
                 auto it = std::remove_if(m_vCallbacks.begin(),
                                          m_vCallbacks.end(),
-                                         [&](scope<base>& other)
+                                         [&](ref<base>& other)
                                          {
                                              return tmp.compare(other.get());
                                          });

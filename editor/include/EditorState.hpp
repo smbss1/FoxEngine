@@ -16,9 +16,7 @@
 #include "SceneHierarchyPanel.hpp"
 #include "Renderer/EditorCamera.hpp"
 #include "ContentBrowserPanel.hpp"
-
-class RuntimeStartEvent;
-class RuntimeStopEvent;
+#include "AnimationEditor.hpp"
 
 namespace fox
 {
@@ -95,6 +93,8 @@ namespace fox
         json::Value m_oEditorConfig;
 
         scope<FileWatcher> m_oWatcher;
+
+        fox::AnimationEditor m_AnimationEditor;
 
         //--
         //      DELEGATES
