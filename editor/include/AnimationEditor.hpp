@@ -412,13 +412,7 @@ namespace fox
     class AnimationEditor
     {
     public:
-        AnimationEditor() : m_oSequencer(fox::new_scope<SequencerImpl>())
-        {
-            auto line = SequenceItem();
-            line.Name = "sbfdsb";
-            m_oSequencer->m_vItems.push_back(line);
-        }
-
+        AnimationEditor();
         ~AnimationEditor() = default;
         AnimationEditor(AnimationEditor&&) = delete;
         AnimationEditor(const AnimationEditor&) = delete;
@@ -445,6 +439,11 @@ namespace fox
         bool play() const { return _play; }
         auto current_frame() const { return m_iCurrentFrame; }
         void increment() { m_iCurrentFrame++; }
+
+    private:
+
+        void OnAnimAdded(Timeline& oAnim);
+        void OnAnimDeleted(Timeline& oAnim);
 
     private:
         fox::scope<SequencerImpl> m_oSequencer = nullptr;

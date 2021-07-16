@@ -612,14 +612,14 @@ namespace fox
             operator T& () { return get(); }
             operator const T& () const { return get(); }
 
-            //-- ANY CONVERTOR OPERATORS --//
-            template<typename U,
-                    std::enable_if_t<!is_property_v<U>, int> = 0>
-            operator U& () { return get(); }
-
-            template<typename U,
-                    std::enable_if_t<!is_property_v<U>, int> = 0>
-            operator const U& () const { return get(); }
+//            //-- ANY CONVERTOR OPERATORS --//
+//            template<typename U,
+//                    std::enable_if_t<!is_property_v<U>, int> = 0>
+//            operator U& () { return U(get()); }
+//
+//            template<typename U,
+//                    std::enable_if_t<!is_property_v<U>, int> = 0>
+//            operator const U& () const { return U(get()); }
 
 
             //--

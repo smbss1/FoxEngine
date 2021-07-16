@@ -8,6 +8,17 @@
 
 namespace fox
 {
+    AnimationEditor::AnimationEditor()
+        : m_oSequencer(fox::new_scope<SequencerImpl>())
+    {
+        auto line = SequenceItem();
+        line.Name = "sbfdsb";
+        m_oSequencer->m_vItems.push_back(line);
+
+        OnAnimationAdded += event::MakeFunc(*this, &AnimationEditor::OnAnimAdded);
+        OnAnimationDeleted += event::MakeFunc(*this, &AnimationEditor::OnAnimDeleted);
+    }
+
     void AnimationEditor::OnImGui()
     {
         auto&& io = ImGui::GetIO();
@@ -32,8 +43,6 @@ namespace fox
             {
                 Timeline& oNewAnim = m_pAnimationPlayer->AddAnimation("Blank");
                 OnAnimationAdded(oNewAnim);
-
-                m_vAnimationNames.push_back(oNewAnim.Name);
             }
 
             if (ImGui::Button("-") && m_pCurrentAnimation)
@@ -113,4 +122,13 @@ namespace fox
             SetAnimationPlayer(pAnimPlayer.get());
     }
 
+    void AnimationEditor::OnAnimAdded(Timeline& oAnim)
+    {
+        m_vAnimationNames.push_back(oAnim.Name.get());
+    }
+
+    void AnimationEditor::OnAnimDeleted(Timeline& oAnim)
+    {
+        m_vAnimationNames.erase(std::find(m_vAnimationNames.begin(), m_vAnimationNames.end(), oAnim.Name.get()));
+    }
 }
