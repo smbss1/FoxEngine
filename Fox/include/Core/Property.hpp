@@ -149,21 +149,54 @@ namespace fox
                 value(const T &v) : m_oData(v) {}
                 value(T&& v) : m_oData(std::move(v)) {}
 
-                /** Getter */
+            protected:
+
+                //--
+                //      GETTER
+                //--
                 T& get() { return m_oData; }
                 const T& get() const { return m_oData; }
 
-                /** Setter */
+                //--
+                //      SETTER
+                //--
                 void set(const T &v)
                 {
-                    m_oData = v;
-                    m_oOnValueChanged((prop_type*)this);
+                    if (v != get()) {
+                        m_oData = v;
+                        m_oOnValueChanged((prop_type *) this);
+                    }
                 }
 
                 void set(T&& v)
                 {
-                    m_oData = std::move(v);
-                    m_oOnValueChanged((prop_type*)this);
+                    // if (v != get()) {
+                        m_oData = std::move(v);
+                        m_oOnValueChanged((prop_type *) this);
+                    // }
+                }
+
+                //--
+                //      ANY SETTER
+                //--
+                template<typename U,
+                        std::enable_if_t<!is_property_v<U>, int> = 0>
+                void set(const U &v)
+                {
+                    if (v != get()) {
+                        m_oData = v;
+                        m_oOnValueChanged((prop_type *) this);
+                    }
+                }
+
+                template<typename U,
+                        std::enable_if_t<!is_property_v<U>, int> = 0>
+                void set(U&& v)
+                {
+                    if (v != get()) {
+                        m_oData = std::move(v);
+                        m_oOnValueChanged((prop_type *) this);
+                    }
                 }
 
                 template<typename Closure,
@@ -226,17 +259,22 @@ namespace fox
                 void bind_get(const get_fnc_type &f)
                 { m_getter = f; }
 
+            protected:
                 /** Bind setter to proxy */
                 void bind_set(const set_fnc_type &f)
                 { m_setter = f; }
 
-                /** Getter */
+                //--
+                //      GETTER
+                //--
                 auto get()
                 { return m_getter(); }
                 const T& get() const
                 { return m_getter(); }
 
-                /** Setter */
+                //--
+                //      SETTER
+                //--
                 void set(const T &v)
                 {
                     if (v != get()) {
@@ -246,6 +284,29 @@ namespace fox
                 }
 
                 void set(T&& v)
+                {
+                    if (v != get()) {
+                        m_setter(std::move(v));
+                        m_oOnValueChanged((prop_type *) this);
+                    }
+                }
+
+                //--
+                //      ANY SETTER
+                //--
+                template<typename U,
+                        std::enable_if_t<!is_property_v<U>, int> = 0>
+                void set(const U &v)
+                {
+                    if (v != get()) {
+                        m_setter(v);
+                        m_oOnValueChanged((prop_type *) this);
+                    }
+                }
+
+                template<typename U,
+                        std::enable_if_t<!is_property_v<U>, int> = 0>
+                void set(U&& v)
                 {
                     if (v != get()) {
                         m_setter(std::move(v));
@@ -310,8 +371,12 @@ namespace fox
                 void bind_get(const get_fnc_type &f)
                 { m_getter = f; }
 
-                /** Getter */
-                T& get()
+            protected:
+
+                //--
+                //      GETTER
+                //--
+                const T& get()
                 { return m_getter(); }
                 const T& get() const
                 { return m_getter(); }
@@ -331,7 +396,6 @@ namespace fox
                 void operator -= (Closure closure)
                 {
                 }
-
 
             private:
                 static T default_get() { throw std::runtime_error("Read Only getter not bound"); }
@@ -384,6 +448,7 @@ namespace fox
                     std::is_constructible_v<SP, std::initializer_list<V>>>* = nullptr>
             basic_property(std::initializer_list<V> l) : SP(std::move(l)) {}
 
+
             //--
             //      GETTER
             //--
@@ -417,6 +482,30 @@ namespace fox
 
 
             //--
+            //      ANY SETTER
+            //--
+            template<typename U,
+                    std::enable_if_t<!is_property_v<U>, int> = 0>
+            void set(const U& v)
+            { SP::set(v); }
+
+            template<typename U,
+                    std::enable_if_t<!is_property_v<U>, int> = 0>
+            void set(U&& v)
+            { SP::set(std::move(v)); }
+
+            template<typename U,
+                    std::enable_if_t<!is_property_v<U>, int> = 0>
+            void operator()(const U &v)
+            { set(v); }
+
+            template<typename U,
+                    std::enable_if_t<!is_property_v<U>, int> = 0>
+            void operator()(U&& v)
+            { set(std::move(v)); }
+
+
+            //--
             //      ASSIGNMENT OPERATORS
             //--
             basic_property& operator=(const T& v)
@@ -431,17 +520,18 @@ namespace fox
                 return *this;
             }
 
-            template<typename U>
-                std::enable_if_t<!is_property_v<U>, basic_property&>
-            operator = (const U& v)
+            //-- ANY VALUE ASSIGNMENT OPERATORS --//
+            template<typename U,
+                    std::enable_if_t<!is_property_v<U>, int> = 0>
+            basic_property& operator = (const U& v)
             {
                 set(v);
                 return *this;
             }
 
-            template<typename U>
-                std::enable_if_t<!is_property_v<U>, basic_property&>
-            operator = (U&& v)
+            template<typename U,
+                    std::enable_if_t<!is_property_v<U>, int> = 0>
+            basic_property& operator = (U&& v)
             {
                 set(std::forward<U>(v));
                 return *this;
@@ -461,6 +551,7 @@ namespace fox
                 return *this;
             }
 
+            //-- ANY PROPERTY(SAME POLICY) ASSIGNMENT OPERATORS --//
             template<typename U>
             basic_property& operator = (const basic_property<U, StoragePolicy>& p)
             {
@@ -477,6 +568,7 @@ namespace fox
                 return *this;
             }
 
+            //-- ANY PROPERTY ASSIGNMENT OPERATORS --//
             template<typename U, typename V>
             basic_property& operator = (const basic_property<U, V>& p)
             {
@@ -513,35 +605,65 @@ namespace fox
             PROPERTY_OPERATOR(>>=)
             PROPERTY_OPERATOR(<<=)
 
+
+            //--
+            //      CONVERTOR OPERATORS
+            //--
             operator T& () { return get(); }
             operator const T& () const { return get(); }
 
+            //-- ANY CONVERTOR OPERATORS --//
+            template<typename U,
+                    std::enable_if_t<!is_property_v<U>, int> = 0>
+            operator U& () { return get(); }
+
+            template<typename U,
+                    std::enable_if_t<!is_property_v<U>, int> = 0>
+            operator const U& () const { return get(); }
+
+
+            //--
+            //      POINTER OPERATORS
+            //--
             T& operator -> () { return get(); }
             const T& operator -> () const { return get(); }
 
-            //-- ARRAY --//
+
+            //--
+            //      ARRAY OPERATORS
+            //--
             template<typename U>
             decltype(auto) operator [] (U&& i) { return get()[std::forward<U>(i)]; }
             template<typename U>
             decltype(auto) operator [] (U&& i) const { return get()[std::forward<U>(i)]; }
 
-            //-- EQUALITY --//
+
+            //--
+            //      EQUALITY OPERATORS
+            //--
             bool operator==(const T& v) const { return get() == v; }
             bool operator!=(const T& v) const { return get() != v; }
 
-            //-- ITERATOR --//
-            decltype(auto) begin()
+
+            //--
+            //      ITERATOR
+            //--
+            auto begin()
             { return get().begin(); }
 
-            decltype(auto) end()
+            auto end()
+            { return get().end(); }
+
+            auto begin() const
             { return get().begin(); }
 
-            decltype(auto) begin() const
-            { return get().begin(); }
+            auto end() const
+            { return get().end(); }
 
-            decltype(auto) end() const
-            { return get().begin(); }
 
+            //--
+            //      DELEGATE OPERATOR
+            //--
             template<typename Closure>
             basic_property& operator += (Closure closure)
             {
@@ -580,6 +702,7 @@ namespace fox
         PROPERTY_ARITHMETIC_OPERATOR(%)
         PROPERTY_ARITHMETIC_OPERATOR(>>)
         PROPERTY_ARITHMETIC_OPERATOR(<<)
+
 
         //--
         //      PROPERTY STREAM OPERATORS
@@ -644,7 +767,7 @@ namespace fox
         using read_property = basic_property<T, properties::policies::read_only<T>>;
 
 
-        #define GET [&](auto&&... args) -> decltype(auto)
+        #define GET [&](auto&&... args)
         #define SET [&](const auto& value)
 
         // Undef the macro to not have problems with other libraries

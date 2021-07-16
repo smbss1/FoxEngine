@@ -6,11 +6,7 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 #include <Core/Application.hpp>
-#include <Components/EntityName.hpp>
-#include <Components/Transform.hpp>
-#include <Components/CameraComponent.hpp>
-#include <Components/SpriteRenderer.hpp>
-#include <Components/NativeScript.hpp>
+#include <Components.hpp>
 #include "Scene/SceneSerializer.hpp"
 
 
@@ -182,6 +178,23 @@ namespace fox
             out << YAML::EndMap; // NativeScriptComponent
         }
 
+        auto pAnimationPlayer = entity.get<AnimationPlayer>();
+        if (pAnimationPlayer)
+        {
+            out << YAML::Key << "AnimationPlayer";
+//            out << YAML::BeginMap; // oAnimationPlayerComponent
+
+//            auto& oAnimationPlayerComponent = *pAnimationPlayer;
+//            out << YAML::Key << "Color" << YAML::Value << oAnimationPlayerComponent.Color.get();
+//
+//            if (oAnimationPlayerComponent.Sprite.get())
+//                out << YAML::Key << "Sprite" << YAML::Value << spriteRendererComponent.Sprite.get()->GetId();
+//            else
+//                out << YAML::Key << "Sprite" << YAML::Value << "";
+
+//            out << YAML::EndMap; // oAnimationPlayerComponent
+        }
+
         out << YAML::EndMap; // Entity
     }
 
@@ -288,6 +301,17 @@ namespace fox
                     ScriptCreator func = m_pScene->GetApp().GetScripts()[tag];
                     src.add(tag, func());
                 }
+            }
+
+            auto oAnimationPlayerComponent = entity["AnimationPlayer"];
+            if (oAnimationPlayerComponent)
+            {
+                auto& src = deserializedEntity.add<AnimationPlayer>();
+//                src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+//                auto strFilepath = spriteRendererComponent["Sprite"].as<std::string>();
+//                if (!strFilepath.empty()) {
+//                    src.Sprite = Texture2D::Create(strFilepath);
+//                }
             }
         }
 

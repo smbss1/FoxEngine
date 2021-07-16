@@ -19,6 +19,16 @@ struct Signal
 {
     std::function<void()> m_func;
     bool m_bCalled = false;
+
+    bool operator==(const Signal& other)
+    {
+        return this == &other && m_bCalled == other.m_bCalled;
+    }
+
+    bool operator!=(const Signal& other)
+    {
+        return !(*this == other);
+    }
 };
 
 class Timeline

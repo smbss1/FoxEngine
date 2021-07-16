@@ -127,10 +127,6 @@ namespace fox
             m_ContentBrowserPanel.OnProjectOpen();
         }
 
-        // Add Callback to the eventsystem
-//        event::EventSystem::Get().On<RuntimeStartEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStart));
-//        event::EventSystem::Get().On<RuntimeStopEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStop));
-
         // Create frame buffer
         fox::FramebufferSpecification fbSpec;
         fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
@@ -152,9 +148,11 @@ namespace fox
             serializer.Deserialize(m_oEditorConfig["LastOpenedScene"].get<std::string>());
         }
 
-        // Bind Editor Events
+        // Bind Events
         m_OnRuntimeStart += event::MakeFunc(*this, &EditorState::OnRuntimeStart);
         m_OnRuntimeStop += event::MakeFunc(*this, &EditorState::OnRuntimeStop);
+
+        m_SceneHierarchyPanel.SelectedEntity += event::MakeFunc(m_AnimationEditor, &AnimationEditor::OnSelectedEntityChanged);
 
         // InitFileWatcher();
     }

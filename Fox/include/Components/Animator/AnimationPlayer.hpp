@@ -12,12 +12,17 @@
 #include "Reflection.hpp"
 #include "Timeline.hpp"
 #include "Serialization.hpp"
+#include "Components/Component.hpp"
 
 namespace fox
 {
     class AnimationPlayer : public ComponentImpl<AnimationPlayer>
     {
         REFLECTABLEV(AnimationPlayer, Component)
+
+        using AnimationPtr = scope<Timeline>;
+        using AnimationList = std::vector<AnimationPtr>;
+        using AnimationIter = AnimationList::iterator;
 
     public:
         explicit AnimationPlayer() : m_vAnimations()
@@ -33,22 +38,32 @@ namespace fox
             Current = other.current;
         }
 
-        AnimationPlayer &operator=(AnimationPlayer &&rhs)
+        AnimationPlayer &operator = (AnimationPlayer &&rhs)
         {
             m_vAnimations = std::move(rhs.m_vAnimations);
             Current = rhs.current;
             return *this;
         }
 
-        Timeline &AddAnimation(const std::string &name)
+        Timeline &AddAnimation(const std::string_view &name)
         {
             std::unique_ptr<Timeline> anim = std::make_unique<Timeline>();
-            Timeline *ptr = anim.get();
             anim->Name = name;
+            Timeline *ptr = anim.get();
             m_vAnimations.push_back(std::move(anim));
             if (!current)
                 Current = ptr;
             return *ptr;
+        }
+
+        void RemoveAnimation(const std::string_view &name)
+        {
+            m_vAnimations.erase(FindAnimation(name));
+        }
+
+        Timeline* GetAnimation(const std::string_view &name)
+        {
+            return FindAnimation(name)->get();
         }
 
         Timeline &add_anim_from_file(const std::string &strFilepath)
@@ -78,11 +93,11 @@ namespace fox
         void play(const std::string &strName)
         {
             auto it = FindAnimation(strName);
-            if (it)
+            if (it != m_vAnimations.end())
             {
                 if (current)
                     current->reset();
-                Current = it;
+                Current = it->get();
             }
         }
 
@@ -98,15 +113,11 @@ namespace fox
         }
 
     private:
-        Timeline* FindAnimation(const std::string &strName)
+        AnimationIter FindAnimation(const std::string_view& strName)
         {
-            auto it = m_vAnimations.begin();
-            for (; it != m_vAnimations.end(); ++it)
-            {
-                if (it->get()->Name == strName)
-                    return it->get();
-            }
-            return nullptr;
+            return std::find_if(m_vAnimations.begin(), m_vAnimations.end(), [&](AnimationPtr& it) {
+                return it->Name.get() == strName;
+            });
         }
 
     public:
@@ -115,8 +126,17 @@ namespace fox
             SET { current = value; }
         };
 
+        fox::properties::read_property<std::vector<scope<Timeline>>> Animations {
+                GET -> const AnimationList& { return GetAnimations(); }
+        };
     private:
-        std::vector<scope<Timeline>> m_vAnimations;
+        const AnimationList& GetAnimations()
+        {
+            return m_vAnimations;
+        }
+
+    private:
+        AnimationList m_vAnimations;
         Timeline* current;
     };
 }

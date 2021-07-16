@@ -19,7 +19,8 @@
 #include <ImCurveEdit.h>
 #include <EventSystem/Delegate.hpp>
 #include <Logger/Logger.hpp>
-#include <Components/Animator/Timeline.hpp>
+#include <Components/Animator/AnimationPlayer.hpp>
+#include <Ecs/World.hpp>
 
 #ifdef IMGUI_DEFINE_MATH_OPERATORS
 ImVec2 operator*(const ImVec2& lhs, const float rhs);
@@ -422,9 +423,9 @@ namespace fox
         AnimationEditor(AnimationEditor&&) = delete;
         AnimationEditor(const AnimationEditor&) = delete;
 
-        void SetAnimation(Timeline* pAnim)
+        void SetAnimationPlayer(AnimationPlayer* pAnimPlayer)
         {
-            m_pAnimation = pAnim;
+            m_pAnimationPlayer = pAnimPlayer;
         }
 
 //        void add_line(SequenceItem item) { _sequencer->m_vItems.push_back(item); }
@@ -439,6 +440,7 @@ namespace fox
 //        }
 
         void OnImGui();
+        void OnSelectedEntityChanged(properties::rw_property<Entity>* p);
 
         bool play() const { return _play; }
         auto current_frame() const { return m_iCurrentFrame; }
@@ -451,7 +453,15 @@ namespace fox
 
         bool m_bExpanded = true;
 
-        Timeline* m_pAnimation;
+        Timeline* m_pCurrentAnimation = nullptr;
+        uint32_t m_iCurrentAnimationIdx = 0;
+
+        AnimationPlayer* m_pAnimationPlayer = nullptr;
+        std::vector<std::string_view> m_vAnimationNames;
+
+        // TODO: Comment
+        event::Delegate<void(Timeline&)> OnAnimationAdded;
+        event::Delegate<void(Timeline&)> OnAnimationDeleted;
     };
 }
 

@@ -9,7 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <utility>
-#include <vector>
+#include <list>
 #include <atomic>
 #include "common.hpp"
 
@@ -31,39 +31,14 @@ namespace fox
         //      RETURN: VOID
         //      ARGS: INFINITY
         //--
-        template <typename... Args>
-        class Delegate<void(Args...)> : public DelegateBase
+        template <typename R, typename... Args>
+        class Delegate<R (Args...)> : public DelegateBase
         {
-            struct base
-            {
-                virtual ~base() {}
-                virtual bool compare(base* other) = 0;
-                virtual void do_call(Args... args) = 0;
-            };
+            using CbFunc = std::function<R (Args...)>;
+            using CallbackSlot = ref<CbFunc>;
+            using CallbackList = std::vector<CallbackSlot>;
 
-            /**
-             * @brief This class is responsible of calling the function
-             * @tparam T the signature of the function
-             */
-            template <typename T>
-            struct call : base
-            {
-                T m_oFunc;
-                template <typename S>
-                call(S&& callback): m_oFunc(std::forward<S>(callback)) {}
-
-                bool compare(base* other)
-                {
-                    call<T>* tmp = dynamic_cast<call<T>*>(other);
-                    return tmp && m_oFunc == tmp->m_oFunc;
-                }
-
-                void do_call(Args... args)
-                {
-                    return m_oFunc(std::forward<Args>(args)...);
-                }
-            };
-            std::vector<ref<base>> m_vCallbacks;
+            CallbackList m_vCallbacks;
 
         public:
             Delegate() = default;
@@ -72,8 +47,9 @@ namespace fox
             //      SUBSCRIBE OPERATOR
             //--
             template <typename T>
-            Delegate& operator+= (T&& callback) {
-                m_vCallbacks.emplace_back(new call<T>(std::forward<T>(callback)));
+            Delegate& operator+= (T&& callback)
+            {
+                m_vCallbacks.emplace_back(new_ref<CbFunc>(callback));
                 return *this;
             }
 
@@ -81,13 +57,14 @@ namespace fox
             //      UNSUBSCRIBE OPERATOR
             //--
             template <typename T>
-            Delegate& operator-= (T&& callback) {
-                call<T> tmp(std::forward<T>(callback));
+            Delegate& operator-= (T&& callback)
+            {
+                CbFunc tmp(std::forward<T>(callback));
                 auto it = std::remove_if(m_vCallbacks.begin(),
                                          m_vCallbacks.end(),
-                                         [&](ref<base>& other)
+                                         [&](CallbackSlot& other)
                                          {
-                                             return tmp.compare(other.get());
+                                             return tmp == other.get();
                                          });
                 m_vCallbacks.erase(it, m_vCallbacks.end());
                 return *this;
@@ -96,9 +73,11 @@ namespace fox
             //--
             //      CALL OPERATOR
             //--
-            void operator()(Args... args) {
-                for (auto& callback: m_vCallbacks) {
-                    callback->do_call(args...);
+            void operator()(Args... args)
+            {
+                for (auto& callback : m_vCallbacks)
+                {
+                    (*callback)(args...);
                 }
             }
         }; //-- class Delegate
@@ -111,21 +90,34 @@ namespace fox
         template <typename RC, typename Class, typename... Args>
         class member_call
         {
-            Class* d_object;
-            RC (Class::*d_member)(Args...);
+            Class* d_object = nullptr;
+            RC (Class::*d_member)(Args...) = nullptr;
+
         public:
             member_call(Class* object, RC (Class::*member)(Args...))
                     : d_object(object)
-                    , d_member(member) {
+                    , d_member(member)
+            {
             }
-            RC operator()(Args... args) {
+
+            member_call(const member_call& other)
+                    : d_object(other.d_object)
+                    , d_member(other.d_member)
+            {
+            }
+
+            RC operator()(Args... args)
+            {
                 return (d_object->*d_member)(std::forward<Args>(args)...);
             }
-            bool operator== (member_call const& other) const {
-                return d_object == other.d_object
-                       && d_member == other.d_member;
+
+            bool operator== (member_call const& other) const
+            {
+                return d_object == other.d_object && d_member == other.d_member;
             }
-            bool operator!= (member_call const& other) const {
+
+            bool operator!= (member_call const& other) const
+            {
                 return !(*this == other);
             }
         }; //-- member_call class

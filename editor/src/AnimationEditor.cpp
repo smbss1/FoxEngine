@@ -26,8 +26,57 @@ namespace fox
             }
         }
 
+        if (m_pAnimationPlayer)
+        {
+            if (ImGui::Button("+"))
+            {
+                Timeline& oNewAnim = m_pAnimationPlayer->AddAnimation("Blank");
+                OnAnimationAdded(oNewAnim);
+
+                m_vAnimationNames.push_back(oNewAnim.Name);
+            }
+
+            if (ImGui::Button("-") && m_pCurrentAnimation)
+            {
+                OnAnimationDeleted(*m_pCurrentAnimation);
+                m_pAnimationPlayer->RemoveAnimation(m_pCurrentAnimation->Name.get());
+            }
+        }
+
+        // If we don't have select an entity with an AnimationPlayer, do nothing
+        if (m_pAnimationPlayer && !m_pAnimationPlayer->Animations.get().empty())
+        {
+            std::string_view strPreview = m_vAnimationNames[m_iCurrentAnimationIdx];
+            if (ImGui::BeginCombo("Animations", strPreview.data())) {
+                for (int i = 0; i < m_vAnimationNames.size(); ++i)
+                {
+                    bool isSelected = strPreview == m_vAnimationNames[i];
+                    if (ImGui::Selectable(m_vAnimationNames[i].data(), isSelected))
+                    {
+                        m_iCurrentAnimationIdx = i;
+                        m_pCurrentAnimation = m_pAnimationPlayer->GetAnimation(m_vAnimationNames[i]);
+                    }
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+        } else {
+            if (ImGui::BeginCombo("Animations", "[empty]")) {
+                ImGui::EndCombo();
+            }
+        }
+
         ImSequencer::Sequencer(m_oSequencer.get(), &m_iCurrentFrame, &m_bExpanded, &m_oSequencer->selected_entry, &m_oSequencer->first_frame, ImSequencer::SEQUENCER_EDIT_ALL | ImSequencer::SEQUENCER_ADD | ImSequencer::SEQUENCER_DEL | ImSequencer::SEQUENCER_COPYPASTE);
 
+        // TODO: Show list of available animation
+        // TODO: Possibility to create animation(s)
+        // TODO: Possibility to select animation for usage
+        // TODO: Possibility to add track(s)
+        // TODO: Possibility to add track(s) bind with a variable
+        // TODO: Possibility to add/del keyframe to a track
+        // TODO: Possibility to simulate animation in Editor
+        // TODO: Snap keys to the grid
 //        if (ImGui::BeginDragDropTarget())
 //        {
 ////            Bin::Entry to_add;
@@ -55,4 +104,13 @@ namespace fox
         ImGui::End();
 
     }
+
+    void AnimationEditor::OnSelectedEntityChanged(properties::rw_property<Entity>* p)
+    {
+        SetAnimationPlayer(nullptr);
+        auto pAnimPlayer = p->get().get<AnimationPlayer>();
+        if (pAnimPlayer)
+            SetAnimationPlayer(pAnimPlayer.get());
+    }
+
 }
