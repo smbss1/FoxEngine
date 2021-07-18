@@ -61,14 +61,7 @@ namespace ImSequencer
 
       static bool MovingScrollBar = false;
       static bool MovingCurrentFrame = false;
-      struct CustomDraw
-      {
-         int index;
-         ImRect customRect;
-         ImRect legendRect;
-         ImRect clippingRect;
-         ImRect legendClippingRect;
-      };
+
       ImVector<CustomDraw> customDraws;
       ImVector<CustomDraw> compactCustomDraws;
       // zoom in/out
@@ -375,7 +368,15 @@ namespace ImSequencer
 
                ImRect legendRect(rp + ImVec2(0.f, float(ItemHeight)), rp + ImVec2(float(legendWidth), float(localCustomHeight)));
                ImRect legendClippingRect(canvas_pos + ImVec2(0.f, float(ItemHeight)), canvas_pos + ImVec2(float(legendWidth), float(localCustomHeight + ItemHeight)));
-               customDraws.push_back({ i, customRect, legendRect, clippingRect, legendClippingRect });
+
+               CustomDraw custom = {
+                       i, customRect, legendRect, clippingRect, legendClippingRect,
+                       canvas_pos,
+                       framePixelWidth,
+                       legendWidth,
+                       firstFrameUsed
+               };
+               customDraws.push_back(custom);
             }
             else
             {
@@ -448,7 +449,7 @@ namespace ImSequencer
          draw_list->PopClipRect();
 
          for (auto& customDraw : customDraws)
-            sequence->CustomDraw(customDraw.index, draw_list, customDraw.customRect, customDraw.legendRect, customDraw.clippingRect, customDraw.legendClippingRect);
+            sequence->CustomDraw(customDraw, draw_list);
          for (auto& customDraw : compactCustomDraws)
             sequence->CustomDrawCompact(customDraw.index, draw_list, customDraw.customRect, customDraw.clippingRect);
 

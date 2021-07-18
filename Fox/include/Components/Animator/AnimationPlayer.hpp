@@ -127,7 +127,7 @@ namespace fox
         };
 
         fox::properties::read_property<std::vector<scope<Timeline>>> Animations {
-                GET -> const AnimationList& { return GetAnimations(); }
+                GET -> const AnimationList& { return m_vAnimations; }
         };
     private:
         const AnimationList& GetAnimations()

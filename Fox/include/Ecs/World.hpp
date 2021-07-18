@@ -12,12 +12,14 @@
 #include <memory>
 #include <typeindex>
 #include <Logger/Logger.hpp>
+
 #include "common.hpp"
 #include "Utils.hpp"
 #include "ASystem.hpp"
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
 #include "Pipeline.hpp"
+#include "Reflection.hpp"
 
 namespace fox
 {
@@ -506,6 +508,7 @@ namespace fox
 
     class Entity
     {
+        REFLECTABLEV(Entity)
     public:
         /**
          * @brief Construct a new Entity object
@@ -610,6 +613,15 @@ namespace fox
             return {};
         }
 
+        void SetAll(std::vector<ref<Component>> vComponents)
+        {
+            for (auto& comp : vComponents)
+            {
+                if (comp)
+                    set(comp);
+            }
+        }
+
 
         /**
          * @brief Set the value of a component
@@ -656,6 +668,11 @@ namespace fox
         EntityId get_id() const
         {
             return m_iId;
+        }
+
+        void set_id(EntityId id)
+        {
+            m_iId = id;
         }
 
         /**

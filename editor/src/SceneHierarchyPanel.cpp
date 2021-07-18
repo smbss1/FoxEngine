@@ -420,7 +420,7 @@ namespace fox
         if (open)
         {
             rttr::variant component_var = component_ptr.get();
-            inspect_var(component_var);
+            inspect_ui_var(component_var);
             ImGui::TreePop();
         }
 

@@ -40,6 +40,7 @@ public:
      */
     explicit Timeline()
     {
+        Time += fox::event::MakeFunc(*this, &Timeline::OnTimeChanged);
     }
 
     explicit Timeline(const std::string& strName) : Timeline()
@@ -115,6 +116,12 @@ public:
         return *result;
     }
 
+    void add(ITrack* track)
+    {
+        Tracks.get().push_back(fox::scope<ITrack>(track));
+        OnTrackAdded(&Tracks);
+    }
+
     /**
      * @brief Get a track at the index provide in parameter
      * @tparam T The type of the value to modified during the timeline execution
@@ -159,7 +166,7 @@ public:
     {
         IsFinish = false;
         m_fSignalTime = 0;
-        m_fTime = 0;
+        Time = 0;
 
         for (auto &sig : Signals.get()) {
             sig.second.m_bCalled = false;
@@ -168,11 +175,11 @@ public:
 
     void OnTrackAdded(fox::properties::property<TrackArray>* tracks)
     {
-        for (auto &track : tracks->get()) {
-            m_fEndTime = std::max(m_fEndTime, track->GetEndTime());
-        }
-        if (m_fEndTime <= 0)
-            m_fEndTime = 5.0f;
+//        for (auto &track : tracks->get()) {
+//            m_fEndTime = std::max(m_fEndTime, track->GetEndTime());
+//        }
+//        if (m_fEndTime <= 0)
+//            m_fEndTime = 5.0f;
     }
 
     /**
@@ -182,13 +189,7 @@ public:
     {
         if (m_fSignalTime <= m_fEndTime) {
             m_fSignalTime += Time::delta_time;
-            m_fTime += Time::delta_time;
-
-            for (auto &track : Tracks.get()) {
-                if (track->IsValid()) {
-                    track->Sample(m_fTime, m_bLoop);
-                }
-            }
+            Time = Time.get() + Time::delta_time;
 
             for (auto &sig : Signals.get()) {
                 if (!sig.second.m_bCalled && sig.first <= m_fSignalTime) {
@@ -204,7 +205,18 @@ public:
         }
     }
 
+
+
 private:
+
+    void OnTimeChanged(fox::properties::rw_property<float>* time)
+    {
+        for (auto &track : Tracks.get()) {
+            if (track->IsValid()) {
+                track->Sample(time->get(), m_bLoop);
+            }
+        }
+    }
 
 public:
     fox::properties::property<std::string> Name;
@@ -212,6 +224,10 @@ public:
     fox::properties::property<TrackArray> Tracks;
     fox::properties::property<std::unordered_map<float, Signal>> Signals;
     fox::properties::property<bool> IsFinish = false; // Is Finish the animation ?
+    fox::properties::rw_property<float> Time {
+        GET { return m_fTime; },
+        SET { m_fTime = value; }
+    };
 
 private:
     bool m_bLoop = false;

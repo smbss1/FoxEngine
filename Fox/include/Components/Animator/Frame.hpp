@@ -8,23 +8,25 @@
 #ifndef _FOX_FRAME_HPP_
 #define _FOX_FRAME_HPP_
 
-#include "EventSystem/EventNotifier.hpp"
+#include "Reflection.hpp"
 
 /***
  * @brief This struct store the key frame of the animation
  * @tparam T the type of the key value to store
  */
-template<typename T>
+template<typename T0>
 struct Frame
 {
+    REFLECTABLEV(Frame<T0>)
+
 public:
     Frame() {}
     ~Frame() = default;
 
-	T m_Value;
-	T m_In;
-	T m_Out;
-	float m_fTime;
+    T0 m_Value{};
+    T0 m_In{};
+    T0 m_Out{};
+	float m_fTime{};
 };
 
 #endif

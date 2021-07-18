@@ -11,11 +11,4 @@
 #include "Components/NativeScript.hpp"
 #include "Components/Animator/AnimationPlayer.hpp"
 
-
-REFLECT_EXTERN(Component);
-REFLECT_EXTERN(fox::TransformComponent);
-REFLECT_EXTERN(SpriteRenderer);
-REFLECT_EXTERN(CameraComponent);
-REFLECT_EXTERN(fox::AnimationPlayer);
-
 #endif

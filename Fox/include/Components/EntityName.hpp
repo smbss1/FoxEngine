@@ -14,7 +14,11 @@ namespace fox
 {
     struct EntityName : public ComponentImpl<EntityName>
     {
+        REFLECTABLEV(EntityName, Component);
+
         std::string name;
+
+    public:
         /**
          * @brief Default Constructor
          * @param tag the tag
@@ -35,7 +39,11 @@ namespace fox
 
     struct EntityTag : public ComponentImpl<EntityName>
     {
+        REFLECTABLEV(EntityTag, Component);
+
         std::string tag;
+
+    public:
         /**
          * @brief Default Constructor
          * @param tag the tag

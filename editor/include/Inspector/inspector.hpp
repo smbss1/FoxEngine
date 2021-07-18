@@ -15,7 +15,8 @@ struct inspector
 
     virtual ~inspector() = default;
 
-    virtual bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata) = 0;
+    virtual bool inspect_imgui(rttr::variant& var, bool read_only, const meta_getter& get_metadata) = 0;
+    virtual bool inspect_track(rttr::variant& var, bool read_only, const meta_getter& get_metadata) = 0;
 };
 
 struct property_layout
@@ -32,9 +33,9 @@ struct property_layout
 };
 
 REFLECT_INLINE(inspector)
-        {
-                rttr::registration::class_<inspector>("inspector");
-        }
+    {
+        rttr::registration::class_<inspector>("inspector");
+    }
 #define INSPECTOR_REFLECT(inspector_type, inspected_type)                                                    \
 	REFLECT_INLINE(inspector_type)                                                                           \
 	{                                                                                                        \
@@ -47,9 +48,16 @@ REFLECT_INLINE(inspector)
 	struct inspector_type : public inspector                                                                 \
 	{                                                                                                        \
 		REFLECTABLEV(inspector_type, inspector)                                                              \
-		bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);                   \
+		bool inspect_imgui(rttr::variant& var, bool read_only, const meta_getter& get_metadata) override;     \
+		bool inspect_track(rttr::variant& var, bool read_only, const meta_getter& get_metadata) override;   \
 	};                                                                                                       \
 	INSPECTOR_REFLECT(inspector_type, inspected_type)
 
+#define INSPECTOR_TRACK_FUNCTION(inspector_type, inspected_type)                                                                               \
+    bool inspector_type::inspect_track(rttr::variant& var, bool read_only, const meta_getter& get_metadata) {  \
+        Track<inspected_type>* new_track = new Track<inspected_type>();                                    \
+        var = new_track;                                                                                    \
+        return true;                                                                                        \
+    }
 
 #endif //FOXENGINE_INSPECTOR_HPP

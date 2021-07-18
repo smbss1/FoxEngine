@@ -7,9 +7,11 @@
 #include <imgui.h>
 #include <filesystem>
 #include <Logger/Logger.hpp>
-#include "Inspector/inspector_primitives.hpp"
+#include <Components/Animator/Track.hpp>
 
-bool inspector_vec2::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+#include "Inspector/inspector_math.hpp"
+
+bool inspector_vec2::inspect_imgui(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
     auto data = var.get_value<glm::vec2>();
     bool changed = false;
@@ -23,7 +25,7 @@ bool inspector_vec2::inspect(rttr::variant& var, bool read_only, const meta_gett
     return false;
 }
 
-bool inspector_vec3::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_vec3::inspect_imgui(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
     auto data = var.get_value<glm::vec3>();
     bool changed = false;
@@ -55,7 +57,7 @@ bool inspector_vec3::inspect(rttr::variant& var, bool read_only, const meta_gett
     return false;
 }
 
-bool inspector_vec4::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_vec4::inspect_imgui(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
     auto data = var.get_value<glm::vec4>();
     bool changed = false;
@@ -68,3 +70,7 @@ bool inspector_vec4::inspect(rttr::variant& var, bool read_only, const meta_gett
     }
     return false;
 }
+
+INSPECTOR_TRACK_FUNCTION(inspector_vec2, glm::vec2)
+INSPECTOR_TRACK_FUNCTION(inspector_vec3, glm::vec3)
+INSPECTOR_TRACK_FUNCTION(inspector_vec4, glm::vec4)

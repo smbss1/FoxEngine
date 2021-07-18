@@ -7,6 +7,17 @@
 
 #include "Scene.hpp"
 
+namespace io
+{
+
+/*!
+ * Serialize the given instance to a json encoded string.
+ */
+    std::string to_yaml(rttr::instance obj);
+
+}
+
+
 namespace fox
 {
     class SceneSerializer

@@ -10,7 +10,7 @@
 #include <FileSystem/SupportedFileFormat.hpp>
 #include "Inspector/inspector_assets.hpp"
 
-bool inspector_texture::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_texture::inspect_imgui(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
     auto data = var.get_value<fox::ref<fox::Texture2D>>();
     bool changed = false;
@@ -71,4 +71,11 @@ bool inspector_texture::inspect(rttr::variant& var, bool read_only, const meta_g
     }
 
     return changed;
+}
+
+//INSPECTOR_TRACK_FUNCTION(inspector_texture, fox::Texture2D)
+
+bool inspector_texture::inspect_track(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+{
+    return false;
 }

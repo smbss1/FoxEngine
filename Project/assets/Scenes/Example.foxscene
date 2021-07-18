@@ -1,40 +1,117 @@
-Scene: Untitled
-Entities:
-  - Entity: 0
-    NameComponent:
-      Name: Player
-    TransformComponent:
-      Position: [-2.29999995, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0, 0.300000012, 0.200000003, 1]
-      Sprite: /home/samuel/Epitech/FoxEngine/Project/assets/Sprites/DirectoryIcon.png
-    NativeScriptComponent:
-      Script: 8744723436264958133
-  - Entity: 1
-    NameComponent:
-      Name: Camera
-    TransformComponent:
-      Position: [-2, 0, 9.30000019]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CameraComponent:
-      Camera:
-        ProjectionType: 0
-        PerspectiveFOV: 0.785398185
-        PerspectiveNear: 0.00999999978
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
-      Primary: true
-      FixedAspectRatio: false
-  - Entity: 2
-    NameComponent:
-      Name: GameObject
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    AnimationPlayer
+{
+  "Entities": [{
+  "Components": [{
+  "Transform": {
+    "Scale": {
+      "z": 1.000000,
+      "y": 1.000000,
+      "x": 1.000000
+    },
+    "Rotation": {
+      "z": 0.000000,
+      "y": 0.078540,
+      "x": 0.000000
+    },
+    "Position": {
+  "z": 0.000000,
+  "y": 0.000000,
+  "x": 0.000000
+}
+  },
+  "Type": "Transform"
+}, {
+  "Type": "SpriteRenderer",
+  "SpriteRenderer": {
+  "Color": {
+    "x": 0.814672,
+    "y": 0.317691,
+    "z": 0.317691,
+    "w": 1.000000
+  },
+  "Filepath": "/home/samuel/Epitech/FoxEngine/Project/assets/Sprites/DirectoryIcon.png"
+}
+}, {
+  "TagComponent": {
+    "tag": "Undefined"
+  },
+  "Type": "TagComponent"
+}, {
+  "NameComponent": {
+    "name": "Player"
+  },
+  "Type": "NameComponent"
+}]
+}, {
+  "Components": [{
+  "Type": "Transform",
+  "Transform": {
+  "Position": {
+    "x": 0.000000,
+    "y": 0.000000,
+    "z": 0.000000
+  },
+  "Rotation": {
+    "x": 0.000000,
+    "y": 0.000000,
+    "z": 0.000000
+  },
+  "Scale": {
+  "x": 1.000000,
+  "y": 1.000000,
+  "z": 1.000000
+}
+}
+}, {
+  "Camera": {
+    "FixedAspectRatio": false,
+    "Primary": true
+  },
+  "Type": "Camera"
+}, {
+  "Type": "TagComponent",
+  "TagComponent": {
+  "tag": "Undefined"
+}
+}, {
+  "Type": "NameComponent",
+  "NameComponent": {
+  "name": "Camera"
+}
+}]
+}, {
+  "Components": [{
+  "Transform": {
+    "Scale": {
+      "z": 1.000000,
+      "y": 1.000000,
+      "x": 1.000000
+    },
+    "Rotation": {
+      "z": 0.000000,
+      "y": 0.000000,
+      "x": 0.000000
+    },
+    "Position": {
+  "z": 0.000000,
+  "y": 0.000000,
+  "x": 0.000000
+}
+  },
+  "Type": "Transform"
+}, {
+  "Type": "TagComponent",
+  "TagComponent": {
+  "tag": "Undefined"
+}
+}, {
+  "NameComponent": {
+    "name": "Animation"
+  },
+  "Type": "NameComponent"
+}, {
+  "AnimationPlayer": null,
+  "Type": "AnimationPlayer"
+}]
+}],
+  "Scene": "Untitled"
+}

@@ -15,12 +15,20 @@ class SpriteRenderer : public ComponentImpl<SpriteRenderer>
 {
     REFLECTABLEV(SpriteRenderer, Component)
 
+    std::string GetFilepath() const
+    {
+        return m_pSprite ? m_pSprite->GetId() : "";
+    }
+
+    void SetFilepath(std::string strPath)
+    {
+        m_pSprite = fox::Texture2D::Create(strPath);
+    }
+
 public:
     SpriteRenderer() = default;
     explicit SpriteRenderer(const fox::ref<fox::Texture2D>& sprite, const glm::vec4& color) : m_oColor(color), m_pSprite(sprite) {}
-    explicit SpriteRenderer(const glm::vec4& color) : m_oColor(color)
-    {
-    }
+    explicit SpriteRenderer(const glm::vec4& color) : m_oColor(color) { }
 
 
 public:
@@ -35,7 +43,6 @@ public:
     };
 
 private:
-
     fox::ref<fox::Texture2D> m_pSprite = nullptr;
     int Depth = 0;
     glm::vec4 m_oColor{ 1.0f, 1.0f, 1.0f, 1.0f };

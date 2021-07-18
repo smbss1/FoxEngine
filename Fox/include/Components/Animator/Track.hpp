@@ -11,10 +11,14 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
+#include <glm/glm.hpp>
+
+#include "common.hpp"
 #include "Frame.hpp"
 #include "Math/Vec3.hpp"
 #include "Math/Quat.hpp"
 #include "Easing.hpp"
+#include "Reflection.hpp"
 
 namespace TrackHelpers
 {
@@ -63,21 +67,16 @@ namespace TrackHelpers
 	/**
 	 * @brief Hermite helpers
 	 */
-	inline float AdjustHermiteResult(float f) {
-		return f;
-	}
-
-    /**
-	 * @brief Hermite helpers
-	 */
-	inline fox::Vec3 AdjustHermiteResult(const fox::Vec3& v) {
+    template<typename T>
+	inline T AdjustHermiteResult(T v) {
 		return v;
 	}
 
     /**
 	 * @brief Hermite helpers
 	 */
-	inline fox::quat AdjustHermiteResult(const fox::quat& q) {
+    template<>
+    inline fox::quat AdjustHermiteResult(fox::quat q) {
 		return q.normalized();
 	}
 
@@ -105,50 +104,61 @@ namespace TrackHelpers
 
 class ITrack
 {
+    REFLECTABLEV(ITrack);
 public:
 
-    virtual ~ITrack() {}
+    virtual ~ITrack() = default;
     /**
      * @brief Run the track
      * @param time current time of the animation
      * @param looping set it to true and the track will loop
      */
-	virtual void Sample(float time, bool looping) = 0;
+	virtual void Sample(float time, bool looping)
+    { }
 
     /**
      * @brief Return the number of keyframe
      * @return the number of keyframe
      */
-	virtual std::size_t size() = 0;
+	virtual std::size_t size()
+    { return 0; }
 
     /**
      * @brief Return the start time of the track
      * @return the start time of the track
      */
-	virtual float GetStartTime() = 0;
+	virtual float GetStartTime()
+    { return 0; }
 
     /**
      * @brief Return the end time of the track
      * @return the end time of the track
      */
-	virtual float GetEndTime() = 0;
+	virtual float GetEndTime()
+    { return 0; }
 
     /**
      * @brief Check if the track have keyframes otherwise false
      * @return true if the track have keyframes otherwise false
      */
-	virtual bool IsValid() = 0;
+	virtual bool IsValid()
+    { return false; }
+
+    virtual void SetObject(const rttr::instance& obj) { }
+    virtual void SetProperty(const rttr::property& prop) { }
 };
 
-template<typename T>
+template<typename T0>
 class Track : public ITrack
 {
-protected:
-	std::vector<Frame<T>> m_vFrames;
-	Easing m_eEasing;
-	T* m_pTarget;
+    REFLECTABLEV(Track<T0>, ITrack)
 
-    std::function<void(T)> settter;
+protected:
+	std::vector<Frame<T0>> m_vFrames;
+	Easing m_eEasing;
+
+    fox::ref<rttr::instance> m_pObject;
+    fox::ref<rttr::property> m_pProperty;
 
 protected:
     /**
@@ -157,11 +167,11 @@ protected:
      * @param looping set it to true and the track will loop
      * @return interpolated value
      */
-	T SampleConstant(float time, bool looping)
+    T0 SampleConstant(float time, bool looping)
 	{
 		int frame = FrameIndex(time, looping);
 		if (frame < 0 || frame >= (int)m_vFrames.size()) {
-			return T();
+			return T0();
 		}
 
 		return m_vFrames[frame].m_Value;
@@ -173,24 +183,24 @@ protected:
      * @param looping set it to true and the track will loop
      * @return interpolated value
      */
-	T SampleLinear(float time, bool looping)
+    T0 SampleLinear(float time, bool looping)
 	{
 		int thisFrame = FrameIndex(time, looping);
 
 		if (thisFrame < 0 || thisFrame >= (int)(m_vFrames.size() - 1)) {
-			return T();
+			return T0();
 		}
 		int nextFrame = thisFrame + 1;
 
 		float trackTime = AdjustTimeToFitTrack(time, looping);
 		float frameDelta = m_vFrames[nextFrame].m_fTime - m_vFrames[thisFrame].m_fTime;
 		if (frameDelta <= 0.0f) {
-			return T();
+			return T0();
 		}
 		float t = (trackTime - m_vFrames[thisFrame].m_fTime) / frameDelta;
 
-		T start = m_vFrames[thisFrame].m_Value;
-		T end = m_vFrames[nextFrame].m_Value;
+        T0 start = m_vFrames[thisFrame].m_Value;
+        T0 end = m_vFrames[nextFrame].m_Value;
 
 		return TrackHelpers::Interpolate(start, end, t);
 	}
@@ -201,38 +211,38 @@ protected:
      * @param looping set it to true and the track will loop
      * @return interpolated value
      */
-	T SampleCubic(float time, bool looping)
+    T0 SampleCubic(float time, bool looping)
 	{
 		int thisFrame = FrameIndex(time, looping);
 		if (thisFrame < 0 || thisFrame >= (int)(m_vFrames.size() - 1)) {
-			return T();
+			return T0();
 		}
 		int nextFrame = thisFrame + 1;
 
 		float trackTime = AdjustTimeToFitTrack(time, looping);
 		float frameDelta = m_vFrames[nextFrame].m_fTime - m_vFrames[thisFrame].m_fTime;
 		if (frameDelta <= 0.0f) {
-			return T();
+			return T0();
 		}
 		float t = (trackTime - m_vFrames[thisFrame].m_fTime) / frameDelta;
 
-		T point1 = m_vFrames[thisFrame].m_Value;
-		T slope1 = m_vFrames[thisFrame].m_Out;
+        T0 point1 = m_vFrames[thisFrame].m_Value;
+        T0 slope1 = m_vFrames[thisFrame].m_Out;
 		slope1 = slope1 * frameDelta;
 
-		T point2 = m_vFrames[nextFrame].m_Value;
-		T slope2 = m_vFrames[nextFrame].m_In;
+        T0 point2 = m_vFrames[nextFrame].m_Value;
+        T0 slope2 = m_vFrames[nextFrame].m_In;
 		slope2 = slope2 * frameDelta;
 
 		return Hermite(t, point1, slope1, point2, slope2);
 	}
 
-	T Hermite(float time, const T& point1, const T& slope1,	const T& point2, const T& slope2)
+    T0 Hermite(float time, const T0& point1, const T0& slope1,	const T0& point2, const T0& slope2)
 	{
 		float tt = time * time;
 		float ttt = tt * time;
 
-		T p2 = point2;
+        T0 p2 = point2;
 		TrackHelpers::Neighborhood(point1, p2);
 
 		float h1 = 2.0f * ttt - 3.0f * tt + 1.0f;
@@ -240,7 +250,7 @@ protected:
 		float h3 = ttt - 2.0f * tt + time;
 		float h4 = ttt - tt;
 
-		T result = point1 * h1 + p2 * h2 + slope1 * h3 + slope2 * h4;
+        T0 result = point1 * h1 + p2 * h2 + slope1 * h3 + slope2 * h4;
 		return TrackHelpers::AdjustHermiteResult(result);
 	}
 
@@ -315,7 +325,7 @@ public:
     /**
      * @brief COnstructor
      */
-	Track() : m_pTarget(nullptr), settter(nullptr), m_vFrames()
+	Track() : m_vFrames()
 	{
 		m_eEasing = Easing::Linear;
 	}
@@ -328,9 +338,9 @@ public:
      * @param value the value of the keyframe
      * @return the class itself
      */
-    Track<T>& then(float time, T value)
+    Track<T0>& then(float time, T0 value)
     {
-        return then(time, T(), T(), value);
+        return then(time, T0(), T0(), value);
     }
 
     /**
@@ -341,9 +351,9 @@ public:
      * @param value the value of the keyframe
      * @return the class itself
      */
-	Track<T>& then(float time, T in, T out, T value)
+	Track<T0>& then(float time, T0 in, T0 out, T0 value)
     {
-        Frame<T> result;
+        Frame<T0> result;
         result.m_fTime = time;
         result.m_In = in;
         result.m_Value = value;
@@ -384,24 +394,10 @@ public:
      * @param target the reference
      * @return the class itself
      */
-	Track<T>& apply(T& target)
+	Track<T0>& apply(const rttr::property& target)
 	{
-		m_pTarget = &target;
+		m_pProperty = fox::new_ref<rttr::property>(target);
         return *this;
-	}
-
-    /**
-      * @brief Set the setter of the value to be modified during the simulation
-     * @tparam TVar the type of the class
-     * @param obj the class for the setter
-     * @param set the setter
-     * @return the class itself
-     */
-	template<typename TVar>
-    Track<T>& apply(TVar* obj, void (TVar::*set)(T))
-	{
-		settter = [&obj, set](T val) -> void { std::cerr << val << std::endl; (obj->*set)(val); };
-		return *this;
 	}
 
     /**
@@ -419,8 +415,20 @@ public:
      */
 	float GetEndTime() override
 	{
+	    if (!IsValid())
+            return 0;
 		return m_vFrames[m_vFrames.size() - 1].m_fTime;
 	}
+
+    void SetObject(const rttr::instance& obj) override
+    {
+        m_pObject = fox::new_ref<rttr::instance>(obj);
+    }
+
+    void SetProperty(const rttr::property& prop) override
+    {
+	    m_pProperty = fox::new_ref<rttr::property>(prop);
+    }
 
     /**
      * @brief Run the track
@@ -429,68 +437,25 @@ public:
      */
 	void Sample(float time, bool looping) override
 	{
-		if (m_pTarget)
-		{
-			SampleTarget(time, looping);
-		} else {
-			SampleSetter(time, looping);
-		}
-	}
-
-    /**
-     * @brief Run the track using setter function
-     * @param time current time of the animation
-     * @param looping set it to true and the track will loop
-     */
-	void SampleSetter(float time, bool looping)
-	{
-		if (!settter)
-		{
-			std::cerr << "Setter not set in Track" << std::endl;
-			return;
-		}
-		switch (m_eEasing)
-		{
-			case Easing::Constant:
-				settter(SampleConstant(time, looping));
-				break;
-			case Easing::Linear:
-				settter(SampleLinear(time, looping));
-				break;
-			case Easing::Cubic:
-				settter(SampleCubic(time, looping));
-				break;
-			default:
-				break;
-		}
-	}
-
-    /**
-     * @brief Run the track using class member
-     * @param time current time of the animation
-     * @param looping set it to true and the track will loop
-     */
-	void SampleTarget(float time, bool looping)
-	{
-		if (!m_pTarget)
-		{
-			std::cerr << "Target not set in Track" << std::endl;
-			return;
-		}
-		switch (m_eEasing)
-		{
-			case Easing::Constant:
-				*m_pTarget = SampleConstant(time, looping);
-				break;
-			case Easing::Linear:
-				*m_pTarget = SampleLinear(time, looping);
-				break;
-			case Easing::Cubic:
-				*m_pTarget = SampleCubic(time, looping);
-				break;
-			default:
-				break;
-		}
+        if (!m_pProperty || !m_pObject)
+        {
+            std::cerr << "Target not set in Track" << std::endl;
+            return;
+        }
+        switch (m_eEasing)
+        {
+            case Easing::Constant:
+                m_pProperty->set_value(*m_pObject, SampleConstant(time, looping));
+                break;
+            case Easing::Linear:
+                m_pProperty->set_value(*m_pObject, SampleLinear(time, looping));
+                break;
+            case Easing::Cubic:
+                m_pProperty->set_value(*m_pObject, SampleCubic(time, looping));
+                break;
+            default:
+                break;
+        }
 	}
 
     /**
@@ -498,10 +463,14 @@ public:
      * @param index the position of the keyframe in the list
      * @return the keyframe
      */
-	Frame<T>& operator[](unsigned int index)
+	Frame<T0>& operator[](unsigned int index)
 	{
 		return m_vFrames[index];
 	}
 };
+
+//
+//REFLECT_EXTERN(ITrack);
+//REFLECT_EXTERN(Track);
 
 #endif
