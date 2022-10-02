@@ -99,33 +99,41 @@ void DockingToolbar(const char* name, ImGuiAxis* p_toolbar_axis, std::function<v
 
 namespace fox
 {
+    extern const std::filesystem::path g_AssetPath;
+
     EditorState::~EditorState()
     {
-        m_oWatcher.reset();
+        // m_oWatcher.reset();
         m_Framebuffer.reset();
         m_pActiveScene.reset();
     }
 
     void EditorState::OnEnter()
     {
+        m_IconPlay = Texture2D::Create("Resources/PlayButton.png");
+        m_IconSimulate = Texture2D::Create("Resources/SimulateButton.png");
+        m_IconStop = Texture2D::Create("Resources/StopButton.png");
+
         json::Value oConfigTemp;
         std::string out;
 
-        if (fox::file::ReadFile("./editor_config.json", out))
-            oConfigTemp = json::parse(out);
-        if (!oConfigTemp.is_null()) {
-            m_oEditorConfig = json::Value(oConfigTemp);
-            fox::info("editor_config.json load successfully");
-        }
-        else
-            fox::error("Wrong configuration format for 'editor_config.json'");
+        // DO NOT REMOVE ------
+            // if (fox::file::ReadFile("./editor_config.json", out))
+            //     oConfigTemp = json::parse(out);
+            // if (!oConfigTemp.is_null()) {
+            //     m_oEditorConfig = json::Value(oConfigTemp);
+            //     fox::info("editor_config.json load successfully");
+            // }
+            // else
+            //     fox::error("Wrong configuration format for 'editor_config.json'");
 
-        if (!m_oEditorConfig.is_null() && !m_oEditorConfig["LastOpenedProject"].is_null()) {
-            // Set the project directory
-            FPaths::SetProjectDir(m_oEditorConfig["LastOpenedProject"].get<std::string>());
-            // Notify the content panel that the project directory changed
-            m_ContentBrowserPanel.OnProjectOpen();
-        }
+            // if (!m_oEditorConfig.is_null() && !m_oEditorConfig["LastOpenedProject"].is_null()) {
+            //     // Set the project directory
+            //     FPaths::SetProjectDir(m_oEditorConfig["LastOpenedProject"].get<std::string>());
+            //     // Notify the content panel that the project directory changed
+            //     m_ContentBrowserPanel.OnProjectOpen();
+            // }
+        // DO NOT REMOVE ------
 
         // Add Callback to the eventsystem
         event::EventSystem::Get().On<RuntimeStartEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStart));
@@ -145,33 +153,25 @@ namespace fox
         m_pActiveScene = new_ref<Scene>(GetApp());
         m_SceneHierarchyPanel.SetContext(m_pActiveScene);
 
-        // If we have opened a scene last time so deserialize it to the active scene
-        if (!m_oEditorConfig.is_null() && !m_oEditorConfig["LastOpenedScene"].is_null())
-        {
-            SceneSerializer serializer(m_pActiveScene);
-            serializer.Deserialize(m_oEditorConfig["LastOpenedScene"].get<std::string>());
-        }
+        // DO NOT REMOVE ------
+            // If we have opened a scene last time so deserialize it to the active scene
+            // if (!m_oEditorConfig.is_null() && !m_oEditorConfig["LastOpenedScene"].is_null())
+            // {
+            //     SceneSerializer serializer(m_pActiveScene);
+            //     serializer.Deserialize(m_oEditorConfig["LastOpenedScene"].get<std::string>());
+            // }
 
-        InitFileWatcher();
-
-//            auto e1 = m_pActiveScene->NewEntity();
-//            e1.add<TransformComponent>();
-//            e1.add<SpriteRenderer>(glm::vec4{0.0f, 0.3f, 0.2f, 1.0f});
-//            auto e2 = m_pActiveScene->NewEntity();
-//            e2.add<TransformComponent>(glm::vec3{1, 1, 0});
-//            e2.add<SpriteRenderer>(glm::vec4{0.2f, 0.3f, 0.5f, 1.0f});
-//
-//            auto m_CameraEntity = m_pActiveScene->NewEntity("Camera");
-//            m_CameraEntity.add<CameraComponent>();
-//            m_CameraEntity.get<CameraComponent>()->Primary = true;
-//            m_CameraEntity.add<NativeScript>(Test());
+            // InitFileWatcher();
+        // DO NOT REMOVE ------
     }
 
     void EditorState::OnExit()
     {
-        m_oEditorConfig["LastOpenedProject"] = FPaths::ProjectDir();
-        if (!fox::file::WriteFile("./editor_config.json", m_oEditorConfig.dump()))
-            fox::error("Failed to write to 'editor_config.json'");
+        // DO NOT REMOVE ------
+            // m_oEditorConfig["LastOpenedProject"] = FPaths::ProjectDir();
+            // if (!fox::file::WriteFile("./editor_config.json", m_oEditorConfig.dump()))
+            //     fox::error("Failed to write to 'editor_config.json'");
+        // DO NOT REMOVE ------
     }
 
     void EditorState::OnUpdate()
@@ -187,10 +187,6 @@ namespace fox
             m_pActiveScene->OnViewportResize((uint32_t)m_oViewportSize.x, (uint32_t)m_oViewportSize.y);
         }
 
-        if (m_bViewportFocused)
-            m_CameraController.OnUpdate();
-        m_oEditorCamera.OnUpdate();
-
         fox::Renderer2D::ResetStats();
         m_Framebuffer->Bind();
         fox::RendererCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1});
@@ -199,33 +195,47 @@ namespace fox
         // Clear our entity ID attachment to -1
         m_Framebuffer->ClearAttachment(1, -1);
 
-        // Is running the simulation
-        if (m_bIsRunning)
+        switch (m_SceneState)
         {
-            m_pActiveScene->OnUpdateRuntime();
-        }
-        else
-        {
-            // Update scene
-            m_pActiveScene->OnUpdateEditor(m_oEditorCamera);
-
-            auto[mx, my] = ImGui::GetMousePos();
-            mx -= m_vViewportBounds[0].x;
-            my -= m_vViewportBounds[0].y;
-            glm::vec2 viewportSize = m_vViewportBounds[1] - m_vViewportBounds[0];
-
-            // Flip the mouse position Y to fit with OpenGL origin axis
-            // which is bottom-left
-            my = viewportSize.y - my;
-            int mouseX = (int)mx;
-            int mouseY = (int)my;
-
-            // Check the position of the mouse is in the viewport boundary
-            if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
+            case SceneState::Edit:
             {
-                int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-                m_oHoveredEntity = pixelData == -1 ? Entity() : Entity(&m_pActiveScene->GetWorld(), (EntityId)pixelData);
+                if (m_bViewportFocused)
+                    m_CameraController.OnUpdate();
+
+                m_oEditorCamera.OnUpdate();
+                m_pActiveScene->OnUpdateEditor(m_oEditorCamera);
+                break;
             }
+            case SceneState::Simulate:
+            {
+                m_oEditorCamera.OnUpdate();
+
+//                m_pActiveScene->OnUpdateSimulation(ts, m_EditorCamera);
+                break;
+            }
+            case SceneState::Play:
+            {
+                m_pActiveScene->OnUpdateRuntime();
+                break;
+            }
+        }
+
+        auto[mx, my] = ImGui::GetMousePos();
+        mx -= m_vViewportBounds[0].x;
+        my -= m_vViewportBounds[0].y;
+        glm::vec2 viewportSize = m_vViewportBounds[1] - m_vViewportBounds[0];
+
+        // Flip the mouse position Y to fit with OpenGL origin axis
+        // which is bottom-left
+        my = viewportSize.y - my;
+        int mouseX = (int)mx;
+        int mouseY = (int)my;
+
+        // Check the position of the mouse is in the viewport boundary
+        if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
+        {
+            int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+            m_oHoveredEntity = pixelData == -1 ? Entity() : Entity(&m_pActiveScene->GetWorld(), (EntityId)pixelData);
         }
 
         m_Framebuffer->Unbind();
@@ -288,11 +298,11 @@ namespace fox
         {
             if (ImGui::BeginMenu("File"))
             {
-                if (ImGui::MenuItem("New Project"))
-                    NewProject();
+                // if (ImGui::MenuItem("New Project"))
+                //     NewProject();
 
-                if (ImGui::MenuItem("Open Project", "Ctrl+O"))
-                    OpenProject();
+                // if (ImGui::MenuItem("Open Project", "Ctrl+O"))
+                //     OpenProject();
 
                 if (ImGui::MenuItem("New Scene", "Ctrl+N"))
                     NewScene();
@@ -359,6 +369,18 @@ namespace fox
                 uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
                 // Because I use the texture from OpenGL, I need to invert the axis from the UV.
                 ImGui::Image(reinterpret_cast<void *>(textureID), viewportPanelSize, ImVec2 {0, 1}, ImVec2 {1, 0});
+
+                if (ImGui::BeginDragDropTarget())
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                    {
+                        const char* path = (const char*)payload->Data;
+                        OpenScene(std::filesystem::path(g_AssetPath) / path);
+                        // OpenScene(std::filesystem::path(FPaths::AssetsDir()) / path);
+                    }
+                    ImGui::EndDragDropTarget();
+                }
+
 
                 // Gizmos
                 Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
@@ -466,6 +488,45 @@ namespace fox
             ImGui::PopStyleVar(2);
         });
 
+        UI_Toolbar();
+
+        ImGui::End();
+    }
+
+    void EditorState::UI_Toolbar()
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        auto& colors = ImGui::GetStyle().Colors;
+        const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+        const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+        ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+        {
+            bool toolbarEnabled = (bool)m_pActiveScene;
+
+            ImVec4 tintColor = ImVec4(1, 1, 1, 1);
+            if (!toolbarEnabled)
+                tintColor.w = 0.5f;
+
+            float size = ImGui::GetWindowHeight() - 4.0f;
+            {
+                ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
+                ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+                if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+                {
+                    if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
+                        OnScenePlay();
+                    else if (m_SceneState == SceneState::Play)
+                        OnSceneStop();
+                }
+            }
+        }
+        ImGui::PopStyleVar(2);
+        ImGui::PopStyleColor(3);
         ImGui::End();
     }
 
@@ -475,7 +536,10 @@ namespace fox
     void EditorState::OnEvent(fox::Event& event)
     {
         m_CameraController.OnEvent(event);
-        m_oEditorCamera.OnEvent(event);
+        if (m_SceneState == SceneState::Edit)
+        {
+            m_oEditorCamera.OnEvent(event);
+        }
 
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<KeyPressedEvent>(FOX_BIND_EVENT_FN(EditorState::OnKeyPressed));
@@ -593,46 +657,46 @@ namespace fox
     }
 
     ////////////////////////////////////////////
-    /// Project File
+    /// Project File    // DO NOT DELETE -----
     ////////////////////////////////////////////
-    void EditorState::NewProject()
-    {
-        auto filepath = FileDialogs::SaveFile({"Fox Project (*.foxproject)", "*.foxproject"});
-        if (!filepath.empty())
-        {
-            Path path(filepath);
-            const std::string& project_root = path.parent_path().string();
-            const std::string& sample_scene = project_root + "/assets/Scenes/Sample.foxscene";
+    // void EditorState::NewProject()
+    // {
+    //     auto filepath = FileDialogs::SaveFile({"Fox Project (*.foxproject)", "*.foxproject"});
+    //     if (!filepath.empty())
+    //     {
+    //         Path path(filepath);
+    //         const std::string& project_root = path.parent_path().string();
+    //         const std::string& sample_scene = project_root + "/assets/Scenes/Sample.foxscene";
 
-            std::filesystem::create_directories(project_root + "/assets/Scenes/");
-            file::WriteFile(filepath, "{\n}");
-            file::WriteFile(sample_scene, "");
+    //         std::filesystem::create_directories(project_root + "/assets/Scenes/");
+    //         file::WriteFile(filepath, "{\n}");
+    //         file::WriteFile(sample_scene, "");
 
-            m_pActiveScene = new_ref<Scene>(GetApp());
-            m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+    //         m_pActiveScene = new_ref<Scene>(GetApp());
+    //         m_SceneHierarchyPanel.SetContext(m_pActiveScene);
 
-            SceneSerializer serializer(m_pActiveScene);
-            serializer.Deserialize(sample_scene);
+    //         SceneSerializer serializer(m_pActiveScene);
+    //         serializer.Deserialize(sample_scene);
 
-            m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
+    //         m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
 
-            FPaths::SetProjectDir(path.parent_path().string());
-            m_ContentBrowserPanel.OnProjectOpen();
-        }
-    }
+    //         FPaths::SetProjectDir(path.parent_path().string());
+    //         m_ContentBrowserPanel.OnProjectOpen();
+    //     }
+    // }
 
-    void EditorState::OpenProject()
-    {
-        auto filepath = FileDialogs::OpenFile({"Fox Project (*.foxproject)", "*.foxproject"});
-        if (!filepath.empty()) {
-            m_pActiveScene = new_ref<Scene>(GetApp());
-            m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+    // void EditorState::OpenProject()
+    // {
+    //     auto filepath = FileDialogs::OpenFile({"Fox Project (*.foxproject)", "*.foxproject"});
+    //     if (!filepath.empty()) {
+    //         m_pActiveScene = new_ref<Scene>(GetApp());
+    //         m_SceneHierarchyPanel.SetContext(m_pActiveScene);
 
-            Path path(filepath);
-            FPaths::SetProjectDir(path.parent_path().string());
-            m_ContentBrowserPanel.OnProjectOpen();
-        }
-    }
+    //         Path path(filepath);
+    //         FPaths::SetProjectDir(path.parent_path().string());
+    //         m_ContentBrowserPanel.OnProjectOpen();
+    //     }
+    // }
 
     ////////////////////////////////////////////
     /// Scene File
@@ -642,28 +706,40 @@ namespace fox
         m_pActiveScene = new_ref<Scene>(GetApp());
         m_SceneHierarchyPanel.SetContext(m_pActiveScene);
         m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
+
+        m_EditorScenePath = std::filesystem::path();
+    }
+
+    void EditorState::OpenScene(const std::filesystem::path& path)
+    {
+        m_pActiveScene = new_ref<Scene>(GetApp());
+        m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
+        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+
+        SceneSerializer serializer(m_pActiveScene);
+        serializer.Deserialize(path.string());
+
+        // m_oEditorConfig["LastOpenedScene"] = path.string();
+        m_EditorScenePath = path;
     }
 
     void EditorState::OpenScene()
     {
         auto filepath = FileDialogs::OpenFile({"Fox Scene (*.foxscene)", "*.foxscene"});
         if (!filepath.empty()) {
-            m_pActiveScene = new_ref<Scene>(GetApp());
-            m_SceneHierarchyPanel.SetContext(m_pActiveScene);
-
-            SceneSerializer serializer(m_pActiveScene);
-            serializer.Deserialize(filepath);
-
-            m_oEditorConfig["LastOpenedScene"] = filepath;
-
-            m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
+            OpenScene(filepath);
         }
     }
 
     void EditorState::SaveScene()
     {
-        SceneSerializer serializer(m_pActiveScene);
-        serializer.Serialize(m_oEditorConfig["LastOpenedScene"].get<std::string>());
+        if (!m_EditorScenePath.empty())
+        {
+            SceneSerializer serializer(m_pActiveScene);
+            serializer.Serialize(m_EditorScenePath);
+        }
+		else
+			SaveSceneAs();
     }
 
     void EditorState::SaveSceneAs()
@@ -671,10 +747,12 @@ namespace fox
         auto filepath = FileDialogs::SaveFile({"Fox Scene (*.foxscene)", "*.foxscene"});
         if (!filepath.empty())
         {
-            m_oEditorConfig["LastOpenedScene"] = filepath;
+            // m_oEditorConfig["LastOpenedScene"] = filepath;
 
             SceneSerializer serializer(m_pActiveScene);
             serializer.Serialize(filepath);
+
+            m_EditorScenePath = filepath;
         }
     }
 
@@ -707,33 +785,50 @@ namespace fox
         m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
     }
 
-    void EditorState::InitFileWatcher()
+    void EditorState::OnScenePlay()
     {
-        // Create a FileWatcher instance that will check the current folder for changes every 5 seconds
-        m_oWatcher = new_scope<FileWatcher>(FPaths::AssetsDir(), std::chrono::milliseconds(5000));
-
-        // Start monitoring a folder for changes and (in case of changes)
-        // run a user provided lambda function
-        m_oWatcher->start([] (std::string path_to_watch, FileStatus status) {
-            // Process only regular files, all other file types are ignored
-            if(!std::filesystem::is_regular_file(std::filesystem::path(path_to_watch)) && status != FileStatus::erased) {
-                return;
-            }
-
-            switch(status)
-            {
-                case FileStatus::created:
-                    std::cout << "File created: " << path_to_watch << '\n';
-                    break;
-                case FileStatus::modified:
-                    std::cout << "File modified: " << path_to_watch << '\n';
-                    break;
-                case FileStatus::erased:
-                    std::cout << "File erased: " << path_to_watch << '\n';
-                    break;
-                default:
-                    std::cout << "Error! Unknown file status.\n";
-            }
-        });
+        m_SceneState = SceneState::Play;
     }
+
+    void EditorState::OnSceneSimulate()
+    {
+        m_SceneState = SceneState::Simulate;
+    }
+
+    void EditorState::OnSceneStop()
+    {
+        m_SceneState = SceneState::Edit;
+    }
+
+    // DO NOT DELETE -----
+        // void EditorState::InitFileWatcher()
+        // {
+        //     // Create a FileWatcher instance that will check the current folder for changes every 5 seconds
+        //     m_oWatcher = new_scope<FileWatcher>(FPaths::AssetsDir(), std::chrono::milliseconds(5000));
+
+        //     // Start monitoring a folder for changes and (in case of changes)
+        //     // run a user provided lambda function
+        //     m_oWatcher->start([] (std::string path_to_watch, FileStatus status) {
+        //         // Process only regular files, all other file types are ignored
+        //         if(!std::filesystem::is_regular_file(std::filesystem::path(path_to_watch)) && status != FileStatus::erased) {
+        //             return;
+        //         }
+
+        //         switch(status)
+        //         {
+        //             case FileStatus::created:
+        //                 std::cout << "File created: " << path_to_watch << '\n';
+        //                 break;
+        //             case FileStatus::modified:
+        //                 std::cout << "File modified: " << path_to_watch << '\n';
+        //                 break;
+        //             case FileStatus::erased:
+        //                 std::cout << "File erased: " << path_to_watch << '\n';
+        //                 break;
+        //             default:
+        //                 std::cout << "Error! Unknown file status.\n";
+        //         }
+        //     });
+        // }
+    // DO NOT REMOVE ------
 }

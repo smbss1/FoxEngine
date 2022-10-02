@@ -1,0 +1,6 @@
+[submodule "Fox/vendor/yaml-cpp"]
+	path = Fox/vendor/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp
+[submodule "Fox/vendor/FoxJson"]
+	path = Fox/vendor/FoxJson
+	url = https://github.com/smbss1/FoxJson/

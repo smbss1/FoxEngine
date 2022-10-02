@@ -1,5 +1,6 @@
 
 #include <FoxEngine.hpp>
+#include <Core/EntryPoint.hpp>
 
 #include <FirstTriangle.hpp>
 #include <Example2D.hpp>
@@ -19,11 +20,11 @@ void SandboxApp::init()
     fox::StateMachine& sceneManager = get<fox::StateMachine>().value();
 //    sceneManager.PushState(new FirstTriangleState);
 //    sceneManager.PushState(new Example2DState);
-//    sceneManager.PushState(new SpriteSheetState);
-    sceneManager.PushState(new AnimationPlayerState);
+   sceneManager.PushState(new SpriteSheetState);
+    // sceneManager.PushState(new AnimationPlayerState);
 }
 
-fox::Application* CreateApp(int argc, char** argv)
+fox::Application* fox::CreateApp(int argc, char** argv)
 {
     return new SandboxApp(argc, argv);
 }

@@ -46,10 +46,11 @@ namespace fox
         bool OnKeyPressed(KeyPressedEvent &e);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 
-        void NewProject();
-        void OpenProject();
+        // void NewProject();
+        // void OpenProject();
 
         void NewScene();
+        void OpenScene(const std::filesystem::path& path);
         void OpenScene();
         void SaveScene();
         void SaveSceneAs();
@@ -68,10 +69,17 @@ namespace fox
          */
         void OnRuntimeStop(const RuntimeStopEvent& e);
 
+        void OnScenePlay();
+        void OnSceneSimulate();
+        void OnSceneStop();
+
         /**
          * @brief Start init the file watcher for hot reload asset
          */
-        void InitFileWatcher();
+        // void InitFileWatcher();
+
+        // UI Panel
+        void UI_Toolbar();
 
     private:
         bool m_bIsRunning = false;
@@ -94,9 +102,19 @@ namespace fox
 
         Entity m_oHoveredEntity;
 
-        json::Value m_oEditorConfig;
+        std::string m_EditorScenePath;
 
-        scope<FileWatcher> m_oWatcher;
+        // json::Value m_oEditorConfig;
+        // scope<FileWatcher> m_oWatcher;
+
+        enum class SceneState
+        {
+            Edit = 0, Play = 1, Simulate = 2
+        };
+        SceneState m_SceneState = SceneState::Edit;
+
+        // Editor resources
+        ref<Texture2D> m_IconPlay, m_IconSimulate, m_IconStop;
     };
 }
 

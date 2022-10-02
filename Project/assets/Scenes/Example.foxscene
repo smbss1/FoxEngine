@@ -9,9 +9,7 @@ Entities:
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Color: [0, 0.300000012, 0.200000003, 1]
-      Sprite: /home/samuel/Epitech/FoxEngine/Project/assets/Sprites/DirectoryIcon.png
-    NativeScriptComponent:
-      Script: 8744723436264958133
+      Sprite: /home/samuel/Git Repos/FoxEngine/Project/assets/Sprites/DirectoryIcon.png
   - Entity: 1
     NameComponent:
       Name: Camera

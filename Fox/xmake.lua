@@ -1,0 +1,37 @@
+
+add_requires("rttr")
+add_requires("yaml-cpp")
+
+includes "vendor"
+-- includes "src/Platforms/OpenGL"
+add_requires("glfw", "opengl")
+
+target "fox_engine"
+    set_kind "static"
+    set_languages "cxx17"
+
+    -- add_defines("FOX_PLUGIN_DIRECTORY=$(FOX_PLUGIN_DIRECTORY)", { public = true })
+    -- add_defines "FOX_BUILD_LIB=1"
+
+    -- add_packages "rttr"
+    add_packages "yaml-cpp"
+    add_packages "glfw"
+    add_packages "opengl"
+
+    add_deps "imgui"
+    add_deps "fox_json"
+    add_deps "glm"
+    add_deps "glad"
+
+    add_syslinks "dl"
+
+    add_includedirs("src/Fox", { public = true })
+    add_includedirs("src/Platform", { public = true })
+    add_files "src/**.cpp"
+
+    add_includedirs("vendor/ImGuizmo/ImGuizmo", { public = true })
+    add_files "vendor/ImGuizmo/*.cpp"
+
+-- target_compile_definitions(fox_engine PUBLIC
+--     $<$<CONFIG:DEBUG>:FOX_DEBUG=1>
+-- )

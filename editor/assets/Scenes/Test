@@ -1,0 +1,30 @@
+Scene: Untitled
+Entities:
+  - Entity: 0
+    NameComponent:
+      Name: GameObject
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      Sprite: ""
+  - Entity: 1
+    NameComponent:
+      Name: GameObject
+    TransformComponent:
+      Position: [0, 0, 45]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.541052043
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 2
+        OrthographicNear: 1
+        OrthographicFar: 174
+      Primary: true
+      FixedAspectRatio: false
