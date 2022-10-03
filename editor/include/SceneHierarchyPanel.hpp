@@ -7,7 +7,8 @@
 
 #include <Core/Scene.hpp>
 #include <SharedLib.hpp>
-#include <Components/NativeScript.hpp>
+#include "Ecs/Entity.hpp"
+#include "Components/NativeScript.hpp"
 
 namespace fox
 {
@@ -41,8 +42,8 @@ namespace fox
         Entity m_SelectedEntity;
 
         scope<SharedLib> m_pScriptLib;
-        std::unordered_map<size_t, std::string> m_vScriptsNames;
-        std::unordered_map<size_t, ScriptCreator> m_vScripts;
+//        std::unordered_map<size_t, std::string> m_vScriptsNames;
+//        std::unordered_map<size_t, ScriptCreator> m_vScripts;
     };
 }
 

@@ -1,56 +1,34 @@
 {
-    ["yaml-cpp"] = {
-        version = "0.7.0",
-        linkdirs = "/usr/lib",
-        links = "yaml-cpp",
-        envs = {
-            LD_LIBRARY_PATH = {
-                "/home/samuel/Git Repos/FoxEngine/build/.packages/y/yaml-cpp/latest/4e0143c97b65425b855ad5fd03038b6a/lib",
-                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/lib"
-            },
-            PATH = {
-                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/bin"
-            }
-        },
-        __enabled = true,
-        __requirestr = "yaml-cpp"
-    },
     opengl = {
+        __requirestr = "opengl",
         __enabled = true,
-        links = "OpenGL",
+        linkdirs = "/usr/lib",
         envs = {
             LD_LIBRARY_PATH = {
                 "/home/samuel/.xmake/packages/o/opengl/latest/4e0143c97b65425b855ad5fd03038b6a/lib"
             }
         },
-        linkdirs = "/usr/lib",
-        __requirestr = "opengl"
-    },
-    rttr = {
-        libfiles = "/home/samuel/.xmake/packages/r/rttr/0.9.6/1febeb0e57544a14a228957bd1dad80b/lib/librttr_core.a",
-        static = true,
-        sysincludedirs = "/home/samuel/.xmake/packages/r/rttr/0.9.6/1febeb0e57544a14a228957bd1dad80b/include",
-        __requirestr = "rttr",
-        license = "MIT",
-        version = "0.9.6",
-        linkdirs = "/home/samuel/.xmake/packages/r/rttr/0.9.6/1febeb0e57544a14a228957bd1dad80b/lib",
-        links = "rttr_core",
-        envs = {
-            LD_LIBRARY_PATH = {
-                "/home/samuel/.xmake/packages/r/rttr/0.9.6/1febeb0e57544a14a228957bd1dad80b/lib",
-                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/lib"
-            },
-            PATH = {
-                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/bin"
-            }
-        },
-        __installdir = "/home/samuel/.xmake/packages/r/rttr/0.9.6/1febeb0e57544a14a228957bd1dad80b",
-        __enabled = true
+        links = "OpenGL"
     },
     glfw = {
-        libfiles = "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib/libglfw3.a",
-        __enabled = true,
+        static = true,
+        __requirestr = "glfw",
+        __installdir = "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0",
+        defines = {
+            "_GLFW_X11",
+            "GLFW_INCLUDE_NONE"
+        },
         envs = {
+            PATH = {
+                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/bin",
+                "/home/samuel/.xmake/packages/p/pkg-config/0.29.2/f9500a0d295b4a7aabf3f933f2972e71/bin",
+                "/home/samuel/.xmake/packages/p/pkg-config/0.29.2/f9500a0d295b4a7aabf3f933f2972e71/bin",
+                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/bin",
+                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/bin",
+                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/Scripts",
+                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/bin",
+                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/Scripts"
+            },
             LD_LIBRARY_PATH = {
                 "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib",
                 "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/lib",
@@ -83,30 +61,10 @@
             PYTHONPATH = {
                 "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/lib/python3.10/site-packages",
                 "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/lib/python3.10/site-packages"
-            },
-            PATH = {
-                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/bin",
-                "/home/samuel/.xmake/packages/p/pkg-config/0.29.2/f9500a0d295b4a7aabf3f933f2972e71/bin",
-                "/home/samuel/.xmake/packages/p/pkg-config/0.29.2/f9500a0d295b4a7aabf3f933f2972e71/bin",
-                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/bin",
-                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/bin",
-                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/Scripts",
-                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/bin",
-                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/Scripts"
             }
         },
-        __requirestr = "glfw",
-        syslinks = {
-            "dl",
-            "pthread"
-        },
-        static = true,
-        license = "zlib",
         version = "3.3.8",
-        linkdirs = {
-            "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib",
-            "/usr/lib"
-        },
+        libfiles = "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib/libglfw3.a",
         links = {
             "glfw3",
             "OpenGL",
@@ -151,15 +109,56 @@
             "Xau",
             "Xdmcp"
         },
-        defines = {
-            "_GLFW_X11",
-            "GLFW_INCLUDE_NONE"
-        },
-        __installdir = "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0",
         sysincludedirs = {
             "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/include",
             "/usr/include/python3.10",
             "/usr/include/X11/dri"
+        },
+        license = "zlib",
+        syslinks = {
+            "dl",
+            "pthread"
+        },
+        __enabled = true,
+        linkdirs = {
+            "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib",
+            "/usr/lib"
         }
+    },
+    ["yaml-cpp"] = {
+        version = "0.7.0",
+        __requirestr = "yaml-cpp",
+        __enabled = true,
+        linkdirs = "/usr/lib",
+        links = "yaml-cpp",
+        envs = {
+            LD_LIBRARY_PATH = {
+                "/home/samuel/Git Repos/FoxEngine/build/.packages/y/yaml-cpp/latest/4e0143c97b65425b855ad5fd03038b6a/lib",
+                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/lib"
+            },
+            PATH = {
+                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/bin"
+            }
+        }
+    },
+    box2d = {
+        static = true,
+        __requirestr = "box2d",
+        __installdir = "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c",
+        envs = {
+            LD_LIBRARY_PATH = {
+                "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib",
+                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/lib"
+            },
+            PATH = {
+                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/bin"
+            }
+        },
+        version = "2.4.1",
+        libfiles = "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib/libbox2d.a",
+        links = "box2d",
+        sysincludedirs = "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/include",
+        __enabled = true,
+        linkdirs = "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib"
     }
 }

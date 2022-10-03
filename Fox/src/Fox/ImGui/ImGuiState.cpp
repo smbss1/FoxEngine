@@ -2,15 +2,14 @@
 // Created by samuel on 01/07/2021.
 //
 
+#include "Core/Application.hpp"
+#include "ImGuiState.hpp"
+
 #include <imgui.h>
 #include <examples/imgui_impl_opengl3.h>
-#include <Core/Managers/StateMachine.hpp>
 #include <ImGuizmo.h>
 #include <examples/imgui_impl_glfw.h>
 #include <GLFW/glfw3.h>
-
-#include "Core/Application.hpp"
-#include "ImGuiState.hpp"
 
 namespace fox
 {
@@ -87,7 +86,6 @@ namespace fox
 
     void ImGuiState::End()
     {
-
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize = ImVec2((float)GetApp().GetWindow()->GetWidth(), (float)GetApp().GetWindow()->GetHeight());
 

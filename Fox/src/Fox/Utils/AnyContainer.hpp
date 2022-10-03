@@ -8,6 +8,8 @@
 #include "Any.hpp"
 #include "Option.hpp"
 
+#include <typeindex>
+
 namespace fox
 {
     class AnyContainer

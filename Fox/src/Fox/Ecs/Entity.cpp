@@ -5,22 +5,17 @@
 ** Entity.cpp
 */
 
-#include "Ecs/World.hpp"
+#include "Ecs/Entity.hpp"
+#include "Components/IDComponent.hpp"
+#include "Components/EntityName.hpp"
 
 namespace fox
 {
-    bool Entity::operator==(const Entity &e) const
+    Entity::Entity(entt::entity handle, Scene* scene)
+        : m_EntityHandle(handle), m_Scene(scene)
     {
-        return m_iId == e.get_id() && &m_oWld == &e.m_oWld;
     }
 
-    bool Entity::operator!=(const Entity &other) const
-    {
-        return !(*this == other);
-    }
-
-    void Entity::destroy()
-    {
-        m_oWld->delete_entity(m_iId);
-    }
+    UUID Entity::GetUUID() { return get<IDComponent>().ID; }
+    const std::string& Entity::GetName() { return get<EntityName>().name; }
 }

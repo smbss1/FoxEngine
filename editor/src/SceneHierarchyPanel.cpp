@@ -144,24 +144,28 @@ namespace fox
     void SceneHierarchyPanel::OnImGui()
     {
         ImGui::Begin("Scene Hierarchy");
-        m_pContext->GetWorld().each([&](auto entityid)
-         {
-            fox::Entity entity {&m_pContext->GetWorld(), entityid};
-             DrawEntityNode(entity);
-         });
 
-        if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
-            m_SelectedEntity = {};
-            event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
-        }
-
-        // Right-click on blank space
-        if (ImGui::BeginPopupContextWindow(0, 1, false))
+        if (m_pContext)
         {
-            if (ImGui::MenuItem("Create Empty Entity"))
-                m_pContext->NewEntity();
+            m_pContext->m_Registry.each([&](auto entityID)
+           {
+               Entity entity { entityID , m_pContext.get() };
+               DrawEntityNode(entity);
+           });
 
-            ImGui::EndPopup();
+            if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
+                m_SelectedEntity = {};
+                event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
+            }
+
+            // Right-click on blank space
+            if (ImGui::BeginPopupContextWindow(0, 1, false))
+            {
+                if (ImGui::MenuItem("Create Empty Entity"))
+                    m_pContext->NewEntity();
+
+                ImGui::EndPopup();
+            }
         }
         ImGui::End();
 
@@ -175,10 +179,10 @@ namespace fox
 
     void SceneHierarchyPanel::DrawEntityNode(Entity &entity)
     {
-        auto &name = *entity.get<EntityName>();
+        auto &name = entity.get<EntityName>();
         ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_OpenOnArrow : 0) | ImGuiTreeNodeFlags_Selected;
         flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-        bool expanded = ImGui::TreeNodeEx((void*)entity.get_id(), flags, "%s", name.name.c_str());
+        bool expanded = ImGui::TreeNodeEx((void*)(uint64_t)entity.GetUUID(), flags, "%s", name.name.c_str());
 
         if (ImGui::IsItemClicked())
         {
@@ -217,13 +221,13 @@ namespace fox
             const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SceneHierarchy");
             if (payload != nullptr) {
                 Entity *e = static_cast<Entity *>(payload->Data);
-                fox::info("Entity name: %", e->get<EntityName>()->name);
+                fox::info("Entity name: %", e->get<EntityName>().name);
             }
             ImGui::EndDragDropTarget();
         }
 
         if (bIsDeleted) {
-            entity.destroy();
+            m_pContext->DestroyEntity(m_SelectedEntity);
             if (m_SelectedEntity == entity) {
                 m_SelectedEntity = {};
                 event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
@@ -235,19 +239,17 @@ namespace fox
 	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
 	{
 		const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
-		auto has_component = entity.get<T>();
 
-        if (has_component)
+        if (entity.has<T>())
 		{
-			auto component = entity.get<T>();
+			auto& component = entity.get<T>();
 			ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
 			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 			ImGui::Separator();
 			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
-			ImGui::PopStyleVar(
-			);
+			ImGui::PopStyleVar();
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 			if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight }))
 			{
@@ -265,7 +267,7 @@ namespace fox
 
 			if (open)
 			{
-				uiFunction(*component);
+				uiFunction(component);
 				ImGui::TreePop();
 			}
 
@@ -276,15 +278,14 @@ namespace fox
 
     void SceneHierarchyPanel::DrawComponents(Entity& entity)
     {
-        auto has_name = entity.get<EntityName>();
-        if (has_name)
+        if (entity.has<EntityName>())
         {
             char buffer[256];
             memset(buffer, 0, sizeof(buffer));
-            strcpy(buffer, has_name->name.c_str());
+            strcpy(buffer, entity.get<EntityName>().name.c_str());
 
             if (ImGui::InputText("##Name", buffer, sizeof(buffer)))
-                has_name->name = buffer;
+                entity.get<EntityName>().name = buffer;
         }
 
         ImGui::SameLine();
@@ -296,7 +297,11 @@ namespace fox
         if (ImGui::BeginPopup("AddComponent"))
         {
             DisplayAddComponentEntry<CameraComponent>("Camera");
-			DisplayAddComponentEntry<SpriteRenderer>("Sprite Renderer");
+            DisplayAddComponentEntry<SpriteRenderer>("Sprite Renderer");
+            DisplayAddComponentEntry<Rigidbody2D>("Rigidbody 2D");
+            DisplayAddComponentEntry<BoxCollider2D>("BoxCollider 2D");
+            DisplayAddComponentEntry<CircleRenderer>("Circle Renderer");
+            DisplayAddComponentEntry<CircleCollider2D>("Circle Collider");
 
             // auto vComponentsTypes = rttr::type::get<Component>().get_derived_classes();
             // for (auto& component_type : vComponentsTypes)
@@ -419,7 +424,7 @@ namespace fox
         DrawComponent<SpriteRenderer>("Sprite Renderer", entity, [](auto& component)
 		{
 			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
-			
+
 			ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
 			if (ImGui::BeginDragDropTarget())
 			{
@@ -430,7 +435,7 @@ namespace fox
 					std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
 					ref<Texture2D> texture = Texture2D::Create(texturePath.string());
                     component.Sprite = texture;
-					
+
                     // if (texture->IsLoaded())
 					// 	component.Sprite = texture;
 					// else
@@ -442,32 +447,82 @@ namespace fox
 			ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
 		});
 
+        DrawComponent<CircleRenderer>("Circle Renderer", entity, [](auto& component)
+        {
+            ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+            ImGui::DragFloat("Thickness", &component.Thickness, 0.025f, 0.0f, 1.0f);
+            ImGui::DragFloat("Fade", &component.Fade, 0.00025f, 0.0f, 1.0f);
+        });
 
-       DrawComponent<AnimationPlayer>("AnimationPlayer", entity, [](AnimationPlayer& oAnimationPlayer)
-       {
-//            static int count = 0;
-//            int idx = 0;
-//            auto& stringToId = animator.GetAnimationsIds();
-//            auto& animations = animator.GetGraph();
-//            for (auto& id : stringToId)
-//            {
-//                auto& animation = animations.node(id);
-//                char buffer[256];
-//                memset(buffer, 0, sizeof(buffer));
-//                strcpy(buffer, animation.m_pAnimation->Name.get().c_str());
-//
-//                char label[256];
-//                std::snprintf(label, 256, "Name##%d", idx);
-//                if (ImGui::InputText(label, buffer, sizeof(buffer)))
-//                    animation.m_pAnimation->Name = buffer;
-//                idx++;
-//            }
-//
-//            if (ImGui::Button("Add"))
-//            {
-//                animator.add_anim("Anim" + std::to_string(count++));
-//            }
-       });
+        DrawComponent<Rigidbody2D>("Rigidbody 2D", entity, [](auto& component)
+        {
+            const char* bodyTypeString[] = { "Static", "Dynamic", "Kinematic" };
+            const char* currentBodyTypeString = bodyTypeString[(int)component.Type];
+            if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
+            {
+                for (int i = 0; i < 3; ++i)
+                {
+                    bool isSelected = currentBodyTypeString == bodyTypeString[i];
+                    if (ImGui::Selectable(bodyTypeString[i], isSelected))
+                    {
+                        currentBodyTypeString = bodyTypeString[i];
+                        component.Type = (Rigidbody2D::BodyType)i;
+                    }
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+            ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+        });
+
+        DrawComponent<BoxCollider2D>("BoxCollider 2D", entity, [](auto& component)
+        {
+            ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+            ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
+            ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat("RestitutionThreshold", &component.RestitutionThreshold, 0.01f, 0.0f, 1.0f);
+        });
+
+        DrawComponent<CircleCollider2D>("CircleCollider 2D", entity, [](auto& component)
+        {
+            ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+            ImGui::DragFloat("Radius", &component.Radius);
+            ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat("RestitutionThreshold", &component.RestitutionThreshold, 0.01f, 0.0f, 1.0f);
+        });
+
+
+//       DrawComponent<AnimationPlayer>("AnimationPlayer", entity, [](AnimationPlayer& oAnimationPlayer)
+//       {
+////            static int count = 0;
+////            int idx = 0;
+////            auto& stringToId = animator.GetAnimationsIds();
+////            auto& animations = animator.GetGraph();
+////            for (auto& id : stringToId)
+////            {
+////                auto& animation = animations.node(id);
+////                char buffer[256];
+////                memset(buffer, 0, sizeof(buffer));
+////                strcpy(buffer, animation.m_pAnimation->Name.get().c_str());
+////
+////                char label[256];
+////                std::snprintf(label, 256, "Name##%d", idx);
+////                if (ImGui::InputText(label, buffer, sizeof(buffer)))
+////                    animation.m_pAnimation->Name = buffer;
+////                idx++;
+////            }
+////
+////            if (ImGui::Button("Add"))
+////            {
+////                animator.add_anim("Anim" + std::to_string(count++));
+////            }
+//       });
 
 //        DrawScripts(entity, [](ScriptableBehaviour& script)
 //        {
@@ -570,8 +625,7 @@ namespace fox
 
     template<typename T>
 	void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName) {
-		auto component = m_SelectedEntity.get<T>();
-		if (!component)
+		if (!m_SelectedEntity.template has<T>())
 		{
 			if (ImGui::MenuItem(entryName.c_str()))
 			{

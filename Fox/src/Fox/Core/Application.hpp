@@ -2,17 +2,17 @@
 #ifndef FOX_APP_HPP_
 #define FOX_APP_HPP_
 
-#include <Renderer/OrthographicCamera.hpp>
-#include <Events/ApplicationEvent.hpp>
-#include <Components/NativeScript.hpp>
+#include "Core/Base.hpp"
 
-#include "FoxEcs.hpp"
-#include "Core/Managers/ResourceManager.hpp"
-#include "Core.hpp"
-#include "Window.hpp"
+#include "Core/Window.hpp"
+#include "Core/Managers/StateMachine.hpp"
+#include "Events/Event.hpp"
+#include "Events/ApplicationEvent.hpp"
+
+#include "Time.hpp"
+
 #include "ImGui/ImGuiState.hpp"
-
-// int main(int argc, char** argv);
+#include "Utils/AnyContainer.hpp"
 
 namespace fox
 {
@@ -26,7 +26,7 @@ namespace fox
     public:
         Application(int ac, char** av);
         virtual ~Application();
-    
+
         virtual void init();
         void run();
         void quit();
@@ -72,9 +72,9 @@ namespace fox
 
         bool IsWindowMinized() const { return m_bIsMinimized; }
 
-        void SetScriptsArray(const std::unordered_map<size_t, ScriptCreator>& scripts);
+//        void SetScriptsArray(const std::unordered_map<size_t, ScriptCreator>& scripts);
 
-        std::unordered_map<size_t, ScriptCreator>& GetScripts();
+//        std::unordered_map<size_t, ScriptCreator>& GetScripts();
 
     private:
         bool OnWindowClose(WindowCloseEvent& e);
@@ -91,7 +91,7 @@ namespace fox
         ref<Window> m_pWindow;
 
 
-        std::unordered_map<size_t, ScriptCreator> m_vScripts;
+//        std::unordered_map<size_t, ScriptCreator> m_vScripts;
 
         // friend int ::main(int argc, char** argv);
     };

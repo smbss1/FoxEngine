@@ -21,7 +21,7 @@
 
 namespace fox
 {
-    struct TransformComponent : public ComponentImpl<TransformComponent>
+    struct TransformComponent //: public ComponentImpl<TransformComponent>
     {
         // REFLECTABLEV(TransformComponent, Component)
 

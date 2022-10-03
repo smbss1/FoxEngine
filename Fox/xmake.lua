@@ -1,10 +1,10 @@
 
-add_requires("rttr")
-add_requires("yaml-cpp")
+-- add_requires("rttr")
+add_requires("yaml-cpp", "glfw", "opengl")
+add_requires("box2d")
+-- add_requires("entt")
 
 includes "vendor"
--- includes "src/Platforms/OpenGL"
-add_requires("glfw", "opengl")
 
 target "fox_engine"
     set_kind "static"
@@ -17,6 +17,8 @@ target "fox_engine"
     add_packages "yaml-cpp"
     add_packages "glfw"
     add_packages "opengl"
+    add_packages "box2d"
+--     add_packages "entt"
 
     add_deps "imgui"
     add_deps "fox_json"
@@ -29,6 +31,7 @@ target "fox_engine"
     add_includedirs("src/Platform", { public = true })
     add_files "src/**.cpp"
 
+    add_includedirs("vendor/entt/include", { public = true })
     add_includedirs("vendor/ImGuizmo/ImGuizmo", { public = true })
     add_files "vendor/ImGuizmo/*.cpp"
 

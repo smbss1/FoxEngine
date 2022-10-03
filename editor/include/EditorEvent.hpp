@@ -6,6 +6,7 @@
 #define FOXENGINE_EDITOREVENT_HPP
 
 #include "Events/EventSystem.hpp"
+#include "Ecs/Entity.hpp"
 
 struct RuntimeStartEvent
 {

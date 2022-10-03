@@ -5,16 +5,35 @@
 #include <Core/Assert.hpp>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
-#include <Core/Application.hpp>
-#include <Components/EntityName.hpp>
-#include <Components/Transform.hpp>
-#include <Components/CameraComponent.hpp>
-#include <Components/SpriteRenderer.hpp>
-#include <Components/NativeScript.hpp>
+#include "Core/Application.hpp"
+#include "Components/ScriptableBehaviour.hpp"
+#include "Components.hpp"
 #include "Core/SceneSerializer.hpp"
 
-
 namespace YAML {
+
+    template<>
+    struct convert<glm::vec2>
+    {
+        static Node encode(const glm::vec2& rhs)
+        {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::vec2& rhs)
+        {
+            if (!node.IsSequence() || node.size() != 2)
+                return false;
+
+            rhs.x = node[0].as<float>();
+            rhs.y = node[1].as<float>();
+            return true;
+        }
+    };
 
     template<>
     struct convert<glm::vec3>
@@ -72,6 +91,36 @@ namespace YAML {
 
 namespace fox
 {
+    static std::string RigidBody2DBodyTypeToString(Rigidbody2D::BodyType bodyType)
+    {
+        switch (bodyType)
+        {
+            case Rigidbody2D::BodyType::Static:    return "Static";
+            case Rigidbody2D::BodyType::Dynamic:   return "Dynamic";
+            case Rigidbody2D::BodyType::Kinematic: return "Kinematic";
+        }
+
+        FOX_ASSERT(false, "Unknown body type");
+        return {};
+    }
+
+    static Rigidbody2D::BodyType RigidBody2DBodyTypeFromString(const std::string& bodyTypeString)
+    {
+        if (bodyTypeString == "Static")    return Rigidbody2D::BodyType::Static;
+        if (bodyTypeString == "Dynamic")   return Rigidbody2D::BodyType::Dynamic;
+        if (bodyTypeString == "Kinematic") return Rigidbody2D::BodyType::Kinematic;
+
+        FOX_ASSERT(false, "Unknown body type");
+        return Rigidbody2D::BodyType::Static;
+    }
+
+    YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v)
+    {
+        out << YAML::Flow;
+        out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
+        return out;
+    }
+
     YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
     {
         out << YAML::Flow;
@@ -92,42 +141,42 @@ namespace fox
 
     static void SerializeEntity(YAML::Emitter& out, Entity entity)
     {
+        FOX_ASSERT(entity.has<IDComponent>())
         out << YAML::BeginMap; // Entity
-        out << YAML::Key << "Entity" << YAML::Value << entity.get_id(); // TODO: Entity ID goes here
+        out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID(); // TODO: Entity ID goes here
 
-        auto oNameComponent = entity.get<EntityName>();
-        if (oNameComponent)
+        if (entity.has<EntityName>())
         {
             out << YAML::Key << "NameComponent";
             out << YAML::BeginMap; // NameComponent
 
-            auto& name = oNameComponent->name;
+            auto& name = entity.get<EntityName>().name;
             out << YAML::Key << "Name" << YAML::Value << name;
 
             out << YAML::EndMap; // NameComponent
         }
 
-        auto oTransform = entity.get<TransformComponent>();
-        if (oTransform)
+        if (entity.has<TransformComponent>())
         {
+            auto& oTransform = entity.get<TransformComponent>();
+
             out << YAML::Key << "TransformComponent";
             out << YAML::BeginMap; // TransformComponent
 
-            auto& tc = *oTransform;
-            out << YAML::Key << "Position" << YAML::Value << tc.position;
-            out << YAML::Key << "Rotation" << YAML::Value << tc.rotation;
-            out << YAML::Key << "Scale" << YAML::Value << tc.scale;
+            out << YAML::Key << "Position" << YAML::Value << oTransform.position;
+            out << YAML::Key << "Rotation" << YAML::Value << oTransform.rotation;
+            out << YAML::Key << "Scale" << YAML::Value << oTransform.scale;
 
             out << YAML::EndMap; // TransformComponent
         }
 
-        auto oCamera = entity.get<CameraComponent>();
-        if (oCamera)
+        if (entity.has<CameraComponent>())
         {
+            auto& cameraComp = entity.get<CameraComponent>();
+            auto& camera = cameraComp.camera;
+
             out << YAML::Key << "CameraComponent";
             out << YAML::BeginMap; // CameraComponent
-
-            auto& camera = oCamera->camera;
 
             out << YAML::Key << "Camera" << YAML::Value;
             out << YAML::BeginMap; // Camera
@@ -140,46 +189,108 @@ namespace fox
             out << YAML::Key << "OrthographicFar" << YAML::Value << camera.GetOrthographicFarClip();
             out << YAML::EndMap; // Camera
 
-            out << YAML::Key << "Primary" << YAML::Value << oCamera->Primary;
-            out << YAML::Key << "FixedAspectRatio" << YAML::Value << oCamera->FixedAspectRatio;
+            out << YAML::Key << "Primary" << YAML::Value << cameraComp.Primary;
+            out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComp.FixedAspectRatio;
 
             out << YAML::EndMap; // CameraComponent
         }
 
-        auto oSpriteRenderer = entity.get<SpriteRenderer>();
-        if (oSpriteRenderer)
+        if (entity.has<SpriteRenderer>())
         {
+            auto& oSpriteRenderer = entity.get<SpriteRenderer>();
+
             out << YAML::Key << "SpriteRendererComponent";
             out << YAML::BeginMap; // SpriteRendererComponent
 
-            auto& spriteRendererComponent = *oSpriteRenderer;
-            out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
+            out << YAML::Key << "Color" << YAML::Value << oSpriteRenderer.Color;
 
-            if (spriteRendererComponent.Sprite.get())
-                out << YAML::Key << "Sprite" << YAML::Value << spriteRendererComponent.Sprite.get()->GetId();
+            if (oSpriteRenderer.Sprite.get())
+                out << YAML::Key << "Sprite" << YAML::Value << oSpriteRenderer.Sprite.get()->GetId();
             else
                 out << YAML::Key << "Sprite" << YAML::Value << "";
 
             out << YAML::EndMap; // SpriteRendererComponent
         }
 
-        auto oNativeScript = entity.get<NativeScript>();
-        if (oNativeScript)
+        if (entity.has<CircleRenderer>())
         {
-            out << YAML::Key << "NativeScriptComponent";
-            out << YAML::BeginMap; // NativeScriptComponent
-            for (auto& script : oNativeScript->m_vScripts)
-            {
-                out << YAML::Key << "Script" << YAML::Value << script.first;
+            auto& component = entity.get<CircleRenderer>();
 
-                // TODO: Save variables from the script
-                // out << YAML::BeginMap; // Script
+            out << YAML::Key << "CircleRenderer";
+            out << YAML::BeginMap; // CircleRenderer
 
-                // out << YAML::Key << "ID" <<
+            out << YAML::Key << "Color" << YAML::Value << component.Color;
+            out << YAML::Key << "Thickness" << YAML::Value << component.Thickness;
+            out << YAML::Key << "Fade" << YAML::Value << component.Fade;
 
-                // out << YAML::EndMap; // Script
-            }
-            out << YAML::EndMap; // NativeScriptComponent
+            out << YAML::EndMap; // CircleRenderer
+        }
+
+//        if (entity.has<NativeScript>())
+//        {
+//            auto& oNativeScript = entity.get<NativeScript>();
+//
+//            out << YAML::Key << "NativeScriptComponent";
+//            out << YAML::BeginMap; // NativeScriptComponent
+//            for (auto& script : oNativeScript.m_vScripts)
+//            {
+//                out << YAML::Key << "Script" << YAML::Value << script.first;
+//
+//                // TODO: Save variables from the script
+//                // out << YAML::BeginMap; // Script
+//
+//                // out << YAML::Key << "ID" <<
+//
+//                // out << YAML::EndMap; // Script
+//            }
+//            out << YAML::EndMap; // NativeScriptComponent
+//        }
+
+        if (entity.has<Rigidbody2D>())
+        {
+            auto& rb2d = entity.get<Rigidbody2D>();
+
+            out << YAML::Key << "Rigidbody2D";
+            out << YAML::BeginMap; // Rigidbody2D
+
+            out << YAML::Key << "BodyType" << YAML::Value << RigidBody2DBodyTypeToString(rb2d.Type);
+            out << YAML::Key << "FixedRotation" << YAML::Value << rb2d.FixedRotation;
+
+            out << YAML::EndMap; // Rigidbody2D
+        }
+
+        if (entity.has<BoxCollider2D>())
+        {
+            auto& box = entity.get<BoxCollider2D>();
+
+            out << YAML::Key << "BoxCollider2D";
+            out << YAML::BeginMap; // BoxCollider2D
+
+            out << YAML::Key << "Offset" << YAML::Value << box.Offset;
+            out << YAML::Key << "Size" << YAML::Value << box.Size;
+            out << YAML::Key << "Density" << YAML::Value << box.Density;
+            out << YAML::Key << "Friction" << YAML::Value << box.Friction;
+            out << YAML::Key << "Restitution" << YAML::Value << box.Restitution;
+            out << YAML::Key << "RestitutionThreshold" << YAML::Value << box.RestitutionThreshold;
+
+            out << YAML::EndMap; // BoxCollider2D
+        }
+
+        if (entity.has<CircleCollider2D>())
+        {
+            auto& component = entity.get<CircleCollider2D>();
+
+            out << YAML::Key << "CircleCollider2D";
+            out << YAML::BeginMap; // CircleCollider2D
+
+            out << YAML::Key << "Offset" << YAML::Value << component.Offset;
+            out << YAML::Key << "Radius" << YAML::Value << component.Radius;
+            out << YAML::Key << "Density" << YAML::Value << component.Density;
+            out << YAML::Key << "Friction" << YAML::Value << component.Friction;
+            out << YAML::Key << "Restitution" << YAML::Value << component.Restitution;
+            out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.RestitutionThreshold;
+
+            out << YAML::EndMap; // CircleCollider2D
         }
 
         out << YAML::EndMap; // Entity
@@ -191,9 +302,9 @@ namespace fox
         out << YAML::BeginMap;
         out << YAML::Key << "Scene" << YAML::Value << "Untitled";
         out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-        m_pScene->GetWorld().each([&](auto entityID)
+        m_pScene->m_Registry.each([&](auto entityID)
          {
-             Entity entity = { &m_pScene->GetWorld(), entityID };
+             Entity entity = { entityID, m_pScene.get() };
              if (!entity)
                  return;
 
@@ -225,7 +336,7 @@ namespace fox
             return true;
         for (auto entity : entities)
         {
-            EntityId uuid = entity["Entity"].as<EntityId>(); // TODO
+            uint64_t uuid = entity["Entity"].as<uint64_t>(); // TODO
 
             std::string name;
             auto nameComponent = entity["NameComponent"];
@@ -234,13 +345,13 @@ namespace fox
 
             fox::info("Deserialized entity with ID = %, name = %", uuid, name);
 
-            Entity deserializedEntity = m_pScene->NewEntity(name);
+            Entity deserializedEntity = m_pScene->NewEntityWithUUID(uuid, name);
 
             auto transformComponent = entity["TransformComponent"];
             if (transformComponent)
             {
                 // Entities always have transforms
-                auto& tc = *deserializedEntity.get<TransformComponent>();
+                auto& tc = deserializedEntity.get<TransformComponent>();
                 tc.position = transformComponent["Position"].as<glm::vec3>();
                 tc.rotation = transformComponent["Rotation"].as<glm::vec3>();
                 tc.scale = transformComponent["Scale"].as<glm::vec3>();
@@ -277,17 +388,58 @@ namespace fox
                 }
             }
 
-            auto oNativeScriptComponent = entity["NativeScriptComponent"];
-            if (oNativeScriptComponent)
+            auto circleRenderer = entity["CircleRenderer"];
+            if (circleRenderer)
             {
-                auto& src = deserializedEntity.add<NativeScript>();
+                auto& src = deserializedEntity.add<CircleRenderer>();
+                src.Color = circleRenderer["Color"].as<glm::vec4>();
+                src.Thickness = circleRenderer["Thickness"].as<float>();
+                src.Fade = circleRenderer["Fade"].as<float>();
+            }
 
-                for (auto script : oNativeScriptComponent)
-                {
-                    auto tag = script.second.as<std::size_t>();
-                    ScriptCreator func = m_pScene->GetApp().GetScripts()[tag];
-                    src.add(tag, func());
-                }
+//            auto oNativeScriptComponent = entity["NativeScriptComponent"];
+//            if (oNativeScriptComponent)
+//            {
+//                auto& src = deserializedEntity.add<NativeScript>();
+//
+//                for (auto script : oNativeScriptComponent)
+//                {
+//                    auto tag = script.second.as<std::size_t>();
+//                    ScriptCreator func = m_pScene->GetApp().GetScripts()[tag];
+//                    src.add(tag, func());
+//                }
+//            }
+
+            auto rigidbody2DComponent = entity["Rigidbody2D"];
+            if (rigidbody2DComponent)
+            {
+                auto& rb2d = deserializedEntity.add<Rigidbody2D>();
+                rb2d.Type = RigidBody2DBodyTypeFromString(rigidbody2DComponent["BodyType"].as<std::string>());
+                rb2d.FixedRotation = rigidbody2DComponent["FixedRotation"].as<bool>();
+            }
+
+            auto boxCollider2DComponent = entity["BoxCollider2D"];
+            if (boxCollider2DComponent)
+            {
+                auto& bc2d = deserializedEntity.add<BoxCollider2D>();
+                bc2d.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
+                bc2d.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
+                bc2d.Density = boxCollider2DComponent["Density"].as<float>();
+                bc2d.Friction = boxCollider2DComponent["Friction"].as<float>();
+                bc2d.Restitution = boxCollider2DComponent["Restitution"].as<float>();
+                bc2d.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
+            }
+
+            auto circleCollider2DComponent = entity["CircleCollider2D"];
+            if (circleCollider2DComponent)
+            {
+                auto& cc2d = deserializedEntity.add<CircleCollider2D>();
+                cc2d.Offset = circleCollider2DComponent["Offset"].as<glm::vec2>();
+                cc2d.Radius = circleCollider2DComponent["Radius"].as<float>();
+                cc2d.Density = circleCollider2DComponent["Density"].as<float>();
+                cc2d.Friction = circleCollider2DComponent["Friction"].as<float>();
+                cc2d.Restitution = circleCollider2DComponent["Restitution"].as<float>();
+                cc2d.RestitutionThreshold = circleCollider2DComponent["RestitutionThreshold"].as<float>();
             }
         }
 

@@ -16,6 +16,7 @@
 #include "SceneHierarchyPanel.hpp"
 #include "Renderer/EditorCamera.hpp"
 #include "ContentBrowserPanel.hpp"
+#include "Events/KeyEvent.hpp"
 
 class RuntimeStartEvent;
 class RuntimeStopEvent;
@@ -32,13 +33,9 @@ namespace fox
         ~EditorState() override;
 
         void OnEnter() override;
-
         void OnExit() override;
-
         void OnEvent(fox::Event &event) override;
-
         void OnUpdate() override;
-
         void OnImGui() override;
 
     private:
@@ -73,6 +70,8 @@ namespace fox
         void OnSceneSimulate();
         void OnSceneStop();
 
+        void OnDuplicateEntity();
+
         /**
          * @brief Start init the file watcher for hot reload asset
          */
@@ -91,6 +90,7 @@ namespace fox
         bool m_bViewportFocused = false;
         bool m_bViewportHovered = false;
         ref<Scene> m_pActiveScene;
+        ref<Scene> m_pEditorScene;
         ContentBrowserPanel m_ContentBrowserPanel;
         SceneHierarchyPanel m_SceneHierarchyPanel;
 

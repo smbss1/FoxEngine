@@ -44,4 +44,14 @@ namespace fox
     {
         m_spRenderer->SetViewport(x, y, width, height);
     }
+
+    void RendererCommand::DrawLines(const ref<VertexArray>& vertexArray, uint32_t vertexCount)
+    {
+        m_spRenderer->DrawLines(vertexArray, vertexCount);
+    }
+
+    void RendererCommand::SetLineWidth(float width)
+    {
+        m_spRenderer->SetLineWidth(width);
+    }
 }

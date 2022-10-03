@@ -13,7 +13,7 @@
 #include <FPaths.hpp>
 #include <Utils/FileSystem.hpp>
 #include <imgui_internal.h>
-#include <EditorEvent.hpp>
+#include "EditorEvent.hpp"
 
 #include "EditorState.hpp"
 
@@ -235,7 +235,7 @@ namespace fox
         if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
         {
             int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-            m_oHoveredEntity = pixelData == -1 ? Entity() : Entity(&m_pActiveScene->GetWorld(), (EntityId)pixelData);
+            m_oHoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_pActiveScene.get());
         }
 
         m_Framebuffer->Unbind();
@@ -403,7 +403,7 @@ namespace fox
                     glm::mat4 cameraView = m_oEditorCamera.GetViewMatrix();
 
                     // Entity transform
-                    auto& tc = *selectedEntity.get<TransformComponent>();
+                    auto& tc = selectedEntity.get<TransformComponent>();
                     glm::mat4 transform = tc.GetTransform();
 
                     // Snapping
@@ -584,6 +584,15 @@ namespace fox
             }
             break;
 
+            // Scene Commands
+            case Key::D:
+            {
+                if (control)
+                    OnDuplicateEntity();
+
+                break;
+            }
+
             // Gizmos
             case Key::Q:
                 m_iGizmoType = -1;
@@ -712,15 +721,27 @@ namespace fox
 
     void EditorState::OpenScene(const std::filesystem::path& path)
     {
-        m_pActiveScene = new_ref<Scene>(GetApp());
-        m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
-        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+        if (m_SceneState != SceneState::Edit)
+            OnSceneStop();
 
-        SceneSerializer serializer(m_pActiveScene);
-        serializer.Deserialize(path.string());
+        if (path.extension().string() != ".foxscene")
+        {
+            fox::warn("Could not load % - not a scene file", path.filename().string());
+            return;
+        }
 
-        // m_oEditorConfig["LastOpenedScene"] = path.string();
-        m_EditorScenePath = path;
+        ref<Scene> newScene = new_ref<Scene>(m_pActiveScene->GetApp());
+        SceneSerializer serializer(newScene);
+        if (serializer.Deserialize(path.string()))
+        {
+            m_pEditorScene = newScene;
+            m_pEditorScene->OnViewportResize((uint32_t)m_oViewportSize.x, (uint32_t)m_oViewportSize.y);
+            m_SceneHierarchyPanel.SetContext(m_pEditorScene);
+
+            m_pActiveScene = m_pEditorScene;
+            m_EditorScenePath = path;
+            // m_oEditorConfig["LastOpenedScene"] = path.string();
+        }
     }
 
     void EditorState::OpenScene()
@@ -788,16 +809,41 @@ namespace fox
     void EditorState::OnScenePlay()
     {
         m_SceneState = SceneState::Play;
+
+        m_pActiveScene = Scene::Copy(m_pEditorScene);
+        m_pActiveScene->OnRuntimeStart();
+
+        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
     }
 
     void EditorState::OnSceneSimulate()
     {
         m_SceneState = SceneState::Simulate;
+        m_pActiveScene->OnRuntimeStop();
     }
 
     void EditorState::OnSceneStop()
     {
+        FOX_ASSERT(m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate);
+
+        if (m_SceneState == SceneState::Play)
+            m_pActiveScene->OnRuntimeStop();
+//        else if (m_SceneState == SceneState::Simulate)
+//            m_pActiveScene->OnSimulationStop();
+
         m_SceneState = SceneState::Edit;
+        m_pActiveScene = m_pEditorScene;
+        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+    }
+
+    void EditorState::OnDuplicateEntity()
+    {
+        if (m_SceneState != SceneState::Edit)
+            return;
+
+        Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+        if (selectedEntity)
+            m_pEditorScene->DuplicateEntity(selectedEntity);
     }
 
     // DO NOT DELETE -----

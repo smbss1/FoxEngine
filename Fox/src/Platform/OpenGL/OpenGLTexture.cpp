@@ -101,8 +101,7 @@ namespace fox
 
     void OpenGLTexture::Bind(uint32_t slot) const
     {
-        GLCall(glActiveTexture(GL_TEXTURE0 + slot));
-        GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
+        GLCall(glBindTextureUnit(slot, m_RendererID));
     }
 
     void OpenGLTexture::Unbind() const

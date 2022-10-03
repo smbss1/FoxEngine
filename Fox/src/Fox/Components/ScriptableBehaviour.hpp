@@ -8,14 +8,13 @@
 #ifndef ECS_SCRIPTABLEBEHAVIOUR_HPP
 #define ECS_SCRIPTABLEBEHAVIOUR_HPP
 
-#include <Core/Scene.hpp>
-#include "Utils/Option.hpp"
-#include "Ecs/World.hpp"
+#include "Ecs/Entity.hpp"
 
 namespace fox
 {
     class Collider;
     class Application;
+    class Scene;
 }
 
 class ScriptableBehaviour
@@ -70,20 +69,7 @@ public:
     template <typename T, typename... Args>
     T &add_component(Args &&...args)
     {
-        assert(m_pWorld);
-        return m_pWorld->template add_component<T>(m_eEntity, std::forward<Args>(args)...);
-    }
-
-    /**
-     * @brief Add component to the entity index
-     * @tparam T the type of the Component
-     * @return T& reference to the Component
-     */
-    template <typename T>
-    T &add_component()
-    {
-        assert(m_pWorld);
-        return m_pWorld->template add_component<T>(m_eEntity);
+        return m_Entity.add<T>(std::forward<Args>(args)...);
     }
 
     /**
@@ -93,29 +79,28 @@ public:
      * @return fox::Option<T&> an optionnal value
      */
     template <typename T>
-    fox::ref<T> get_component()
+    T& get_component()
     {
-        assert(m_pWorld);
-        return m_pWorld->template get_component<T>(m_eEntity);
+        return m_Entity.get<T>();
     }
 
     /**
      * @brief Set the id of the entity
      * @param id the id of the entity
      */
-    void set_entity(EntityId id)
-    {
-        m_eEntity = id;
-    }
+//    void set_entity(EntityId id)
+//    {
+//        m_eEntity = id;
+//    }
 
     /**
      * @brief Set the world
      * @param world the ECS World
      */
-    void set_world(fox::World& world)
-    {
-        m_pWorld = &world;
-    }
+//    void set_world(fox::World& world)
+//    {
+//        m_pWorld = &world;
+//    }
 
     /**
      * @brief Set the application reference
@@ -151,56 +136,56 @@ public:
      * @brief Get the world
      * @return the world
      */
-    fox::World& get_world()
-    {
-        return *m_pWorld;
-    }
+//    fox::World& get_world()
+//    {
+//        return *m_pWorld;
+//    }
 
     /**
      * @brief Get the id of the entity
      * @return the id of the entity
      */
-    [[nodiscard]] EntityId get_id() const
-    {
-        return m_eEntity;
-    }
+//    [[nodiscard]] EntityId get_id() const
+//    {
+//        return m_eEntity;
+//    }
 
     /**
      * @brief Destroy the entity
      */
-    void destroy()
-    {
-        assert(m_pWorld);
-        m_pWorld->delete_entity(m_eEntity);
-    }
+//    void destroy()
+//    {
+//        assert(m_pWorld);
+//        m_pWorld->delete_entity(m_eEntity);
+//    }
 
     /**
      * @brief Create a new entity
      * @return the new created entity
      */
-    fox::Entity new_entity()
-    {
-        assert(m_pWorld);
-        return m_pWorld->new_entity();
-    }
-
-    fox::Entity new_entity(const std::string &name, bool enable = true)
-    {
-        assert(m_pWorld);
-        return m_pWorld->new_entity(name, enable);
-    }
-
-    fox::Entity new_entity(const std::string &name, const std::string &tag, bool enable = true)
-    {
-        assert(m_pWorld);
-        return m_pWorld->new_entity(name, tag, enable);
-    }
+//    fox::Entity new_entity()
+//    {
+//        assert(m_pWorld);
+//        return m_pWorld->new_entity();
+//    }
+//
+//    fox::Entity new_entity(const std::string &name, bool enable = true)
+//    {
+//        assert(m_pWorld);
+//        return m_pWorld->new_entity(name, enable);
+//    }
+//
+//    fox::Entity new_entity(const std::string &name, const std::string &tag, bool enable = true)
+//    {
+//        assert(m_pWorld);
+//        return m_pWorld->new_entity(name, tag, enable);
+//    }
 
 private:
-    EntityId m_eEntity{};
-    fox::World* m_pWorld{};
     fox::Application* m_pApp{};
-    fox::Scene* m_pScene{};
+    fox::Scene* m_pScene = nullptr;
+    fox::Entity m_Entity;
+    friend class Scene;
 };
 
 #endif //ECS_SCRIPTABLEBEHAVIOUR_HPP

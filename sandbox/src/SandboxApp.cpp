@@ -5,7 +5,7 @@
 #include <FirstTriangle.hpp>
 #include <Example2D.hpp>
 #include <SpriteSheet.hpp>
-#include <AnimationPlayerState.hpp>
+//#include <AnimationPlayerState.hpp>
 
 #include "SandboxApp.hpp"
 

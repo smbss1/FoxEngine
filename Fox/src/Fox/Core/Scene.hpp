@@ -8,13 +8,18 @@
 #ifndef FOX_SCENE_HPP_
 #define FOX_SCENE_HPP_
 
-#include "Ecs/World.hpp"
+#include "Core/UUID.hpp"
 #include "Renderer/EditorCamera.hpp"
+
+#include "entt.hpp"
 
 namespace fox
 {
     class Application;
+    class Entity;
 }
+
+class b2World;
 
 namespace fox
 {
@@ -24,37 +29,33 @@ namespace fox
         Scene(Application& app);
         ~Scene() = default;
 
+        static ref<Scene> Copy(ref<Scene> other);
+
         Entity NewEntity(const std::string& name = std::string());
+        Entity NewEntityWithUUID(UUID uuid, const std::string &name);
+        void DuplicateEntity(Entity entity);
+
+        template<typename... Components>
+        auto GetAllEntitiesWith()
+        {
+            return m_Registry.view<Components...>();
+        }
+
         void DestroyEntity(Entity entity);
-
-        template<typename T, typename... Args>
-        T &AddComponent(Entity e, Args&&... args)
-        {
-            return m_oWorld.template add_component<T>(e, args...);
-        }
-
-        template<typename T>
-        T &AddComponent(Entity e)
-        {
-            T& comp = m_oWorld.template add_component<T>(e);
-            OnComponentAdded(e, comp);
-            return comp;
-        }
-
-        template<typename T>
-        fox::Option<T&> GetComponent(Entity e)
-        {
-            return m_oWorld.template get_component<T>(e);
-        }
 
         void OnStartRuntime();
         void OnUpdateRuntime();
         void OnUpdateEditor(EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
 
+        void OnRuntimeStart();
+        void OnRuntimeStop();
+
+        void RenderScene();
+        void RenderScene(EditorCamera& camera);
+
         Entity GetPrimaryCameraEntity();
 
-        World& GetWorld();
         Application& GetApp();
     private:
         template<typename T>
@@ -62,11 +63,16 @@ namespace fox
 
     private:
         Application& m_oApp;
-        World m_oWorld {};
+        entt::registry m_Registry;
+        b2World* m_PhysicsWorld;
         uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
     protected:
         const float timeStep = 1.0f / 60.0f;
+
+        friend class Entity;
+        friend class SceneSerializer;
+        friend class SceneHierarchyPanel;
     };
 }
 #endif /* !SCENE_HPP_ */

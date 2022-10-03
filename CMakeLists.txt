@@ -16,6 +16,7 @@ target_include_directories(fox_editor PRIVATE
     editor/include
     Fox/src/Fox
     Fox/src/Platform
+    Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
     Fox/vendor/glad
     Fox/vendor/glm
@@ -92,6 +93,7 @@ target_link_libraries(fox_editor PRIVATE
     Xau
     Xdmcp
     OpenGL
+    box2d
     glad
     glm
     fox_json
@@ -104,6 +106,7 @@ target_link_directories(fox_editor PRIVATE
     build/linux/x86_64/release
     /usr/lib
     /home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib
+    /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib
 )
 target_link_options(fox_editor PRIVATE
     -m64
@@ -127,6 +130,7 @@ add_dependencies(fox_engine imgui fox_json glm glad)
 target_include_directories(fox_engine PRIVATE
     Fox/src/Fox
     Fox/src/Platform
+    Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
     Fox/vendor/glad
     Fox/vendor/glm
@@ -137,12 +141,14 @@ target_include_directories(fox_engine PRIVATE
 target_include_directories(fox_engine INTERFACE
     Fox/src/Fox
     Fox/src/Platform
+    Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
 )
 target_include_directories(fox_engine PRIVATE
     /home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/include
     /usr/include/python3.10
     /usr/include/X11/dri
+    /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/include
 )
 target_compile_definitions(fox_engine PRIVATE
     FOX_PLUGIN_DIRECTORY="/home/samuel/Git Repos/FoxEngine/"
@@ -214,6 +220,7 @@ target_link_libraries(fox_engine PRIVATE
     Xau
     Xdmcp
     OpenGL
+    box2d
     glad
     glm
     fox_json
@@ -225,6 +232,7 @@ target_link_libraries(fox_engine PRIVATE
 target_link_directories(fox_engine PRIVATE
     /usr/lib
     /home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib
+    /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib
     build/linux/x86_64/release
 )
 target_sources(fox_engine PRIVATE
@@ -272,6 +280,7 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Core/Input/Keyboard.cpp
     Fox/src/Fox/Core/Input/Mouse.cpp
     Fox/src/Fox/Core/Input/Input.cpp
+    Fox/src/Fox/Core/UUID.cpp
     Fox/src/Fox/Core/Window.cpp
     Fox/src/Fox/Core/Managers/PluginManager.cpp
     Fox/src/Fox/Core/Managers/StateMachine.cpp
@@ -292,9 +301,6 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Renderer/Renderer.cpp
     Fox/src/Fox/Renderer/GraphicsContext.cpp
     Fox/src/Fox/Ecs/Entity.cpp
-    Fox/src/Fox/Ecs/Pipeline.cpp
-    Fox/src/Fox/Ecs/System.cpp
-    Fox/src/Fox/Ecs/World.cpp
     Fox/src/Fox/FileWatcher.cpp
     Fox/vendor/ImGuizmo/ImCurveEdit.cpp
     Fox/vendor/ImGuizmo/ImGradient.cpp
@@ -528,6 +534,7 @@ target_include_directories(sandbox PRIVATE
     sandbox/include
     Fox/src/Fox
     Fox/src/Platform
+    Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
     Fox/vendor/glad
     Fox/vendor/glm
@@ -604,6 +611,7 @@ target_link_libraries(sandbox PRIVATE
     Xau
     Xdmcp
     OpenGL
+    box2d
     glad
     glm
     fox_json
@@ -616,6 +624,7 @@ target_link_directories(sandbox PRIVATE
     build/linux/x86_64/release
     /usr/lib
     /home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib
+    /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib
 )
 target_link_options(sandbox PRIVATE
     -m64

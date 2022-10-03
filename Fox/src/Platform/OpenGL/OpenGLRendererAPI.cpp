@@ -29,13 +29,24 @@ namespace fox
 
     void OpenGLRendererAPI::DrawIndexed(const ref<VertexArray> &pVertexArray, uint32_t uIndexCount)
     {
-        uint32_t uCount = uIndexCount ? uIndexCount : pVertexArray->GetIndexBuffer()->GetCount();
-        GLCall(glDrawElements(GL_TRIANGLES, uCount, GL_UNSIGNED_INT, nullptr));
-        glBindTexture(GL_TEXTURE_2D, 0);
+        pVertexArray->Bind();
+        uint32_t count = uIndexCount ? uIndexCount : pVertexArray->GetIndexBuffer()->GetCount();
+        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
     }
 
     void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
     {
         GLCall(glViewport(x, y, width, height));
+    }
+
+    void OpenGLRendererAPI::DrawLines(const ref<VertexArray>& vertexArray, uint32_t vertexCount)
+    {
+        vertexArray->Bind();
+        glDrawArrays(GL_LINES, 0, vertexCount);
+    }
+
+    void OpenGLRendererAPI::SetLineWidth(float width)
+    {
+        glLineWidth(width);
     }
 }

@@ -26,6 +26,9 @@ namespace fox
 
         static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 
+        static void DrawLines(const ref<VertexArray>& vertexArray, uint32_t vertexCount);
+        static void SetLineWidth(float width);
+
     private:
         static ref<RendererAPI> m_spRenderer;
     };

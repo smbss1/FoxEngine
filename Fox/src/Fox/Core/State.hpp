@@ -6,7 +6,6 @@
 #define FOXENGINE_STATE_HPP
 
 #include <string>
-// #include "Application.hpp"
 #include "Events/Event.hpp"
 
 namespace fox

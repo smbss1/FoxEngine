@@ -10,7 +10,7 @@
 
 #include <unordered_map>
 
-#include <Core/Application.hpp>
+#include "Core/Application.hpp"
 
 #include "api.hpp"
 #include "Plugin/IPlugin.hpp"

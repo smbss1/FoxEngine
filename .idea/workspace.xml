@@ -3,9 +3,9 @@
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
-  <component name="CMakePresetLoader"><![CDATA[{
-  "useNewFormat": true
-}]]></component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
   <component name="CMakeReloadState">
     <option name="reloaded" value="true" />
   </component>
@@ -28,663 +28,87 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9425326e-0688-4775-a9e0-e421f6f970fc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitmodules" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/vendor/FoxJson" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeUtils/foxCmakeUtils.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/Animator/AnimationPlayer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/Animator/Easing.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/Animator/Frame.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/Animator/Serialization.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/Animator/Timeline.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/Animator/Track.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/Animator/Track.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/CameraComponent.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/Component.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/EntityName.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/NativeScript.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/ScriptableBehaviour.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/SpriteRenderer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Components/Transform.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Application.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Assert.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/AudioGroup.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Base.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Core.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/EventNotifier.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Input/Input.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Input/InputManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Input/InputRegistry.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Input/KeyCodes.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Input/Keyboard.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Input/Mouse.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Input/MouseCodes.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Logger/Logger.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Managers/AudioManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Managers/PluginManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Managers/ResourceManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Managers/StateMachine.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/PluginLoader.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Property.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Scene.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/SceneSerializer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/State.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Core/Window.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/DebugBreak.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Ecs/ASystem.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Ecs/ComponentArray.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Ecs/ComponentManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Ecs/EntityManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Ecs/Pipeline.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Ecs/World.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Events/ApplicationEvent.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Events/Event.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Events/EventSystem.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Events/KeyEvent.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Events/MouseEvent.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Events/TypedMap.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/FPaths.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/FileWatcher.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Font.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/FoxEcs.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/FoxEngine.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/ImGuiExtension.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/LockFreeQueue.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Math/Math.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Observer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Plugin/IGraphic.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Plugin/IPlugin.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Reflection.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/Buffer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/Camera.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/EditorCamera.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/Framebuffer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/GraphicsContext.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/OrthographicCamera.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/OrthographicCameraController.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/Renderer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/Renderer2D.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/RendererAPI.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/RendererCommand.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/Shader.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/SubTexture2D.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/Texture.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/VertexArray.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Renderer/VertexBufferLayout.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/SceneCamera.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/SharedLib.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/SupportedFileFormat.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Time.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/Any.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/AnyContainer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/DynamicArray.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/FileSystem.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/Graph.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/NameUtils.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/Option.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/Path.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/PlatformUtils.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/Quat.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/Vec2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/Vec3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/Utils/bitsets.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/api.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/common.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/common.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/_features.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/_fixes.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/_noise.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/_swizzle.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/_swizzle_func.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/_vectorize.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/compute_common.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/compute_vector_relational.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_common.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_common_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_exponential.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_exponential_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_geometric.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_geometric_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_integer.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_integer_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_matrix.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_matrix_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_packing.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_packing_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_trigonometric.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_trigonometric_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_vector_relational.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/func_vector_relational_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/glm.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/qualifier.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/setup.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_float.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_half.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_half.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat2x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat2x2.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat2x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat2x3.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat2x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat2x4.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat3x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat3x2.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat3x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat3x3.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat3x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat3x4.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat4x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat4x2.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat4x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat4x3.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat4x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat4x4.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_mat4x4_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_quat.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_quat.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_quat_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_vec1.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_vec1.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_vec2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_vec2.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_vec3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_vec3.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_vec4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_vec4.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/detail/type_vec4_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/exponential.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_clip_space.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_clip_space.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_common.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_common.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double2x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double2x2_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double2x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double2x3_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double2x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double2x4_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double3x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double3x2_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double3x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double3x3_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double3x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double3x4_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double4x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double4x2_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double4x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double4x3_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double4x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_double4x4_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float2x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float2x2_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float2x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float2x3_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float2x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float2x4_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float3x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float3x2_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float3x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float3x3_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float3x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float3x4_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float4x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float4x2_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float4x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float4x3_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float4x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_float4x4_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int2x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int2x2_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int2x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int2x3_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int2x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int2x4_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int3x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int3x2_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int3x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int3x3_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int3x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int3x4_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int4x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int4x2_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int4x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int4x3_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int4x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_int4x4_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_projection.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_projection.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_relational.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_relational.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_transform.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_transform.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint2x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint2x2_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint2x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint2x3_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint2x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint2x4_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint3x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint3x2_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint3x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint3x3_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint3x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint3x4_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint4x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint4x2_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint4x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint4x3_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint4x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/matrix_uint4x4_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_common.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_common.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_common_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_double.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_double_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_exponential.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_exponential.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_float.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_float_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_geometric.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_geometric.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_relational.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_relational.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_transform.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_transform.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_trigonometric.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/quaternion_trigonometric.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_common.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_common.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_constants.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_constants.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_int_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_integer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_integer.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_packing.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_packing.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_relational.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_relational.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_uint_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_ulp.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/scalar_ulp.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_bool1.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_bool1_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_bool2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_bool2_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_bool3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_bool3_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_bool4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_bool4_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_common.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_common.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_double1.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_double1_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_double2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_double2_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_double3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_double3_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_double4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_double4_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_float1.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_float1_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_float2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_float2_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_float3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_float3_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_float4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_float4_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_int1.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_int1_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_int2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_int2_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_int3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_int3_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_int4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_int4_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_integer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_integer.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_packing.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_packing.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_relational.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_relational.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_uint1.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_uint1_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_uint2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_uint2_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_uint3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_uint3_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_uint4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_uint4_sized.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_ulp.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/ext/vector_ulp.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/fwd.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/geometric.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/glm.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/bitfield.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/bitfield.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/color_space.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/color_space.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/constants.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/constants.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/epsilon.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/epsilon.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/integer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/integer.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/matrix_access.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/matrix_access.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/matrix_integer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/matrix_inverse.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/matrix_inverse.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/matrix_transform.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/matrix_transform.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/noise.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/noise.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/packing.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/packing.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/quaternion.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/quaternion.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/quaternion_simd.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/random.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/random.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/reciprocal.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/reciprocal.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/round.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/round.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/type_aligned.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/type_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/type_precision.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/type_ptr.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/type_ptr.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/ulp.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/ulp.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtc/vec1.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/associated_min_max.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/associated_min_max.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/bit.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/bit.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/closest_point.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/closest_point.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/color_encoding.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/color_encoding.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/color_space.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/color_space.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/color_space_YCoCg.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/color_space_YCoCg.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/common.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/common.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/compatibility.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/compatibility.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/component_wise.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/component_wise.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/dual_quaternion.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/dual_quaternion.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/easing.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/easing.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/euler_angles.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/euler_angles.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/extend.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/extend.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/extended_min_max.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/extended_min_max.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/exterior_product.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/exterior_product.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/fast_exponential.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/fast_exponential.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/fast_square_root.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/fast_square_root.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/fast_trigonometry.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/fast_trigonometry.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/float_notmalize.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/functions.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/functions.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/gradient_paint.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/gradient_paint.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/handed_coordinate_space.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/handed_coordinate_space.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/hash.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/hash.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/integer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/integer.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/intersect.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/intersect.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/io.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/io.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/log_base.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/log_base.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_cross_product.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_cross_product.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_decompose.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_decompose.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_factorisation.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_factorisation.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_interpolation.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_interpolation.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_major_storage.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_major_storage.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_operation.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_operation.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_query.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_query.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_transform_2d.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/matrix_transform_2d.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/mixed_product.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/mixed_product.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/norm.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/norm.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/normal.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/normal.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/normalize_dot.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/normalize_dot.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/number_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/number_precision.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/optimum_pow.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/optimum_pow.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/orthonormalize.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/orthonormalize.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/perpendicular.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/perpendicular.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/polar_coordinates.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/polar_coordinates.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/projection.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/projection.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/quaternion.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/quaternion.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/range.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/raw_data.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/raw_data.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/rotate_normalized_axis.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/rotate_normalized_axis.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/rotate_vector.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/rotate_vector.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/scalar_multiplication.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/scalar_relational.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/scalar_relational.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/spline.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/spline.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/std_based_type.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/std_based_type.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/string_cast.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/string_cast.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/texture.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/texture.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/transform.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/transform.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/transform2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/transform2.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/type_aligned.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/type_aligned.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/type_trait.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/type_trait.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/vec_swizzle.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/vector_angle.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/vector_angle.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/vector_query.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/vector_query.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/wrap.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/gtx/wrap.inl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/integer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/mat2x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/mat2x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/mat2x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/mat3x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/mat3x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/mat3x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/mat4x2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/mat4x3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/mat4x4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/matrix.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/packing.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/simd/common.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/simd/exponential.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/simd/geometric.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/simd/integer.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/simd/matrix.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/simd/neon.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/simd/packing.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/simd/platform.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/simd/trigonometric.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/simd/vector_relational.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/trigonometric.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/vec2.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/vec3.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/vec4.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/glm/vector_relational.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/include/portable-file-dialogs.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/Application.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/AudioGroup.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/Input/Input.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/Input/Keyboard.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/Input/Mouse.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/Logger.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/Managers/AudioManager.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/Managers/PluginManager.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/Managers/StateMachine.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/PluginLoader.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/Scene.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/SceneSerializer.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/State.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Core/Window.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Ecs/Entity.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Ecs/Pipeline.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Ecs/System.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Ecs/World.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/EntryPoint.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Event/EventSystem.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/FPaths.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/FileWatcher.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Font.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/ImGuiExtension.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Math/Math.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Math/Quat.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Math/Vec3.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/ReflectedComponents.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/Buffer.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/EditorCamera.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/Framebuffer.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/GraphicsContext.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/OrthographicCamera.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/OrthographicCameraController.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/Renderer.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/Renderer2D.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/RendererAPI.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/RendererCommand.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/Shader.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/SubTexture2D.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/Texture.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Renderer/VertexArray.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/SceneCamera.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/ScriptRegistry.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/ScriptableBehaviour.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Time.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Utils/Any.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Utils/FileSystem.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Utils/Path.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Utils/PlatformUtils.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Utils/SharedLib.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Utils/bitsets.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/ImGuizmo/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/ImGui/imconfig.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/ImGui/imgui.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/ImGui/imgui_internal.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/ImGui/imstb_rectpack.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/ImGui/imstb_textedit.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/ImGui/imstb_truetype.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/imgui.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/imgui/imgui.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/imgui_tables.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/imgui/imgui_tables.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project/assets/Scenes/Example.foxscene" beforeDir="false" afterPath="$PROJECT_DIR$/Project/assets/Scenes/Example.foxscene" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake/CheckLibraryExists.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake/FindPackageHandleStandardArgs.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake/FindPackageMessage.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake/Findfox_engine.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake/Findfoxjson.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake/Findrttr.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake/Findyamlcpp.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/CMakeLists.txt" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/IDComponent.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Rigidbody2D.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/UUID.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/UUID.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/UniformBuffer.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/UniformBuffer.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLUniformBuffer.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLUniformBuffer.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/vendor/entt/include/entt.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/config" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/detect" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/detect" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/history" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/history" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/package" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/package" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/toolchain" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/toolchain" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/AnimationPlayer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/AnimationPlayer.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Easing.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Easing.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Frame.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Frame.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Serialization.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Serialization.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Timeline.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Timeline.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Track.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Track.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Track.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Track.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/CameraComponent.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/CameraComponent.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/EntityName.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/EntityName.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/NativeScript.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/NativeScript.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/ScriptableBehaviour.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/ScriptableBehaviour.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/SpriteRenderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/SpriteRenderer.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Transform.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Transform.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Scene.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Scene.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Scene.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/SceneSerializer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/SceneSerializer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/State.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/State.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/ASystem.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/ComponentArray.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/ComponentManager.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Entity.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Entity.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/EntityManager.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Pipeline.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Pipeline.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/System.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/World.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/World.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/FoxEcs.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/FoxEcs.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/FoxEngine.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/FoxEngine.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiState.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer2D.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer2D.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer2D.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer2D.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererAPI.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererAPI.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererCommand.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererCommand.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererCommand.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererCommand.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ScriptRegistry.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ScriptRegistry.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/AnyContainer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Utils/AnyContainer.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLRendererAPI.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLRendererAPI.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLRendererAPI.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLRendererAPI.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLTexture.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLTexture.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/vendor/FoxJson" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/FoxJson" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/vendor/xmake.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/xmake.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/xmake.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/xmake.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/fonts/OpenSans-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/fonts/OpenSans-Regular.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/shaders/Basic.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/shaders/FlatColor.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/shaders/Texture.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Example.foxscene" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scenes/Example.foxscene" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Example2.foxscene" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scenes/Example2.foxscene" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Test" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/editor/assets/shaders/Texture.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/editor/fox_editor" beforeDir="false" afterPath="$PROJECT_DIR$/editor/fox_editor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/include/EditorApp.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/editor/include/EditorEvent.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/include/EditorEvent.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/include/EditorState.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/include/EditorState.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/include/Inspector/inspector.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/include/Inspector/inspector.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/include/Inspector/inspector_assets.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/include/Inspector/inspector_assets.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/include/Inspector/inspector_primitives.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/include/Inspector/inspector_primitives.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/include/Inspector/inspectors.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/include/Inspector/inspectors.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/include/SceneHierarchyPanel.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/include/SceneHierarchyPanel.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/ContentBrowserPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/ContentBrowserPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/EditorApp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/EditorApp.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/editor/metas/active_scene.foxscene.meta" beforeDir="false" afterPath="$PROJECT_DIR$/editor/metas/active_scene.foxscene.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/src/EditorState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/EditorState.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/src/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/SceneHierarchyPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/inspector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/inspector.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/inspector_assets.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/inspector_assets.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/inspector_primitives.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/inspector_primitives.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/inspectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/inspectors.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/cmake/Findglfw.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/GlfwWindow.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/ImGui/imgui_impl_glfw.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/ImGui/imgui_impl_opengl3.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/ImGuiState.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/IndexBuffer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/KHR/khrplatform.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/OpenGLContext.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/OpenGLFrameBuffer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/OpenGLRendererAPI.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/OpenGLShader.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/OpenGLTexture.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/OpenGLVertexArray.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/PluginEntry.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/SpriteManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/TextureManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/VertexBuffer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/glad/glad.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/include/stb_image.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/GlfwWindow.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/ImGui/imgui_impl_glfw.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/ImGui/imgui_impl_opengl3.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/ImGuiState.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/IndexBuffer.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/OpenGLContext.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/OpenGLFrameBuffer.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/OpenGLRendererAPI.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/OpenGLShader.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/OpenGLTexture.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/OpenGLVertexArray.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/PluginEntry.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/SpriteManager.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/TextureManager.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/VertexBuffer.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/glad/glad.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/OpenGLRendererPlugin/src/stb_image.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/include/AnimationPlayerState.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/include/AnimationPlayerState.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/src/Animator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/src/Animator.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/CppScriptPlugin/include/PluginEntry.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/plugins/CppScriptPlugin/include/PluginEntry.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sandbox/sandbox" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/sandbox" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sandbox/src/SandboxApp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/src/SandboxApp.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -693,6 +117,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ClangdSettings">
+    <option name="clangTidyViaClangd" value="false" />
     <option name="formatViaClangd" value="false" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
@@ -701,6 +126,9 @@
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="OCResolveContextSettings">
+    <option name="configuration" value="0-Debug-fox_engine" />
   </component>
   <component name="ProjectApplicationVersion">
     <option name="ide" value="CLion" />
@@ -712,24 +140,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="XMake.Run Editor">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <configuration name="fox_editor" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="fox_lexer" TARGET_NAME="fox_editor" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="fox_lexer" RUN_TARGET_NAME="fox_editor">
@@ -798,7 +227,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1664723797544</updated>
-      <workItem from="1664723800107" duration="4155000" />
+      <workItem from="1664723800107" duration="6163000" />
+      <workItem from="1664730449848" duration="31517000" />
     </task>
     <servers />
   </component>

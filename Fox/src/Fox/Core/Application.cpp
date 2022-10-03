@@ -190,13 +190,13 @@ namespace fox
         return false;
     }
 
-    std::unordered_map<size_t, ScriptCreator> &Application::GetScripts()
-    {
-        return m_vScripts;
-    }
-
-    void Application::SetScriptsArray(const std::unordered_map<size_t, ScriptCreator> &scripts)
-    {
-        m_vScripts = scripts;
-    }
+//    std::unordered_map<size_t, ScriptCreator> &Application::GetScripts()
+//    {
+//        return m_vScripts;
+//    }
+//
+//    void Application::SetScriptsArray(const std::unordered_map<size_t, ScriptCreator> &scripts)
+//    {
+//        m_vScripts = scripts;
+//    }
 }

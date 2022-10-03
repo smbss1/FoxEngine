@@ -20,6 +20,9 @@ namespace fox
         virtual void DrawIndexed(const ref<VertexArray>& pVertexArray, uint32_t uIndexCount = 0) = 0;
         virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 
+        virtual void DrawLines(const ref<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
+        virtual void SetLineWidth(float width) = 0;
+
         // static GraphicPlugin* GetGraphicPlugin();
         // static void SetGraphicPlugin(GraphicPlugin* pGraphic);
 

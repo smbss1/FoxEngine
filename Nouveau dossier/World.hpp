@@ -20,6 +20,7 @@
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
 #include "Pipeline.hpp"
+#include "Components/IDComponent.hpp"
 
 namespace fox
 {
@@ -329,6 +330,25 @@ namespace fox
             return m_pCompManager->GetAllComponents(entityId, m_pEntityManager->GetSignature(entityId));
         }
 
+        template<typename T>
+        void emplace_or_replace(EntityId e, const T& component)
+        {
+            if (get_component<T>(e) != nullptr)
+            {
+                auto opt = get_component<T>(e);
+                if (opt)
+                    *opt = component;
+                auto &signature = m_pEntityManager->GetSignature(e);
+                signature.set(m_pCompManager->GetComponentType<T>(), true);
+                m_pSysManager->EntitySignatureChanged(e, signature);
+            }
+            else
+            {
+                add_component<T>(e);
+//                set_component<T>(e, component);
+            }
+        }
+
         /**
          * @brief Set the value of a component
          * @tparam T the type of the component
@@ -336,7 +356,7 @@ namespace fox
          * @param value the new component value
          */
         template<typename T>
-        void set_component(EntityId e, T &&value)
+        void set_component(EntityId e, T&& value)
         {
             auto opt = get_component<T>(e);
             if (opt)
@@ -603,6 +623,17 @@ namespace fox
             if (m_oWld)
                 return m_oWld->get_component<T>(m_iId);
             return {};
+        }
+
+        uint64_t get_uuid()
+        {
+            return get<IDComponent>()->ID;
+        }
+
+        template<typename T>
+        bool has()
+        {
+            return get<T>() != nullptr;
         }
 
         std::vector<ref<Component>> GetAll()
