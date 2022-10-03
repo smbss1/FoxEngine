@@ -136,8 +136,8 @@ namespace fox
         // DO NOT REMOVE ------
 
         // Add Callback to the eventsystem
-        event::EventSystem::Get().On<RuntimeStartEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStart));
-        event::EventSystem::Get().On<RuntimeStopEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStop));
+//        event::EventSystem::Get().On<RuntimeStartEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStart));
+//        event::EventSystem::Get().On<RuntimeStopEvent>(FOX_BIND_EVENT_FN(EditorState::OnRuntimeStop));
 
         // Create frame buffer
         fox::FramebufferSpecification fbSpec;
@@ -209,8 +209,7 @@ namespace fox
             case SceneState::Simulate:
             {
                 m_oEditorCamera.OnUpdate();
-
-//                m_pActiveScene->OnUpdateSimulation(ts, m_EditorCamera);
+                m_pActiveScene->OnUpdateSimulation(m_oEditorCamera);
                 break;
             }
             case SceneState::Play:
@@ -238,6 +237,7 @@ namespace fox
             m_oHoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_pActiveScene.get());
         }
 
+        OnOverlayRender();
         m_Framebuffer->Unbind();
     }
 
@@ -346,6 +346,10 @@ namespace fox
         }
         ImGui::End();
 
+        ImGui::Begin("Settings");
+        ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
+        ImGui::End();
+
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
         ImGui::Begin("Viewport");
         {
@@ -393,12 +397,6 @@ namespace fox
                     ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
                     // Camera
-                    // Runtime camera from entity
-//                    auto cameraEntity = m_pActiveScene->GetPrimaryCameraEntity();
-//                    const auto& camera = cameraEntity.get<CameraComponent>()->camera;
-//                    const glm::mat4& cameraProjection = camera.GetProjection();
-//                    glm::mat4 cameraView = glm::inverse(cameraEntity.get<TransformComponent>()->GetTransform());
-
                     const glm::mat4& cameraProjection = m_oEditorCamera.GetProjection();
                     glm::mat4 cameraView = m_oEditorCamera.GetViewMatrix();
 
@@ -524,10 +522,85 @@ namespace fox
                         OnSceneStop();
                 }
             }
+            ImGui::SameLine();
+            {
+                ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? m_IconSimulate : m_IconStop;
+                //ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+                if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+                {
+                    if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
+                        OnSceneSimulate();
+                    else if (m_SceneState == SceneState::Simulate)
+                        OnSceneStop();
+                }
+            }
         }
         ImGui::PopStyleVar(2);
         ImGui::PopStyleColor(3);
         ImGui::End();
+    }
+
+    void EditorState::OnOverlayRender()
+    {
+        if (m_SceneState == SceneState::Play)
+        {
+            Entity camera = m_pActiveScene->GetPrimaryCameraEntity();
+            if (!camera)
+                return;
+
+            Renderer2D::BeginScene(camera.get<CameraComponent>().camera, camera.get<TransformComponent>().GetTransform());
+        }
+        else
+        {
+            Renderer2D::BeginScene(m_oEditorCamera);
+        }
+
+        if (m_ShowPhysicsColliders)
+        {
+            // Box Colliders
+            {
+                auto view = m_pActiveScene->GetAllEntitiesWith<TransformComponent, BoxCollider2D>();
+                for (auto entity : view)
+                {
+                    auto [tc, bc2d] = view.get<TransformComponent, BoxCollider2D>(entity);
+
+                    glm::vec3 translation = tc.position + glm::vec3(bc2d.Offset, 0.001f);
+                    glm::vec3 scale = tc.scale * glm::vec3(bc2d.Size * 2.0f, 1.0f);
+
+                    glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+                                          * glm::rotate(glm::mat4(1.0f), tc.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+                                          * glm::scale(glm::mat4(1.0f), scale);
+
+                    Renderer2D::DrawRect(transform, glm::vec4(0, 1, 0, 1));
+                }
+            }
+
+            // Circle Colliders
+            {
+                auto view = m_pActiveScene->GetAllEntitiesWith<TransformComponent, CircleCollider2D>();
+                for (auto entity : view)
+                {
+                    auto [tc, cc2d] = view.get<TransformComponent, CircleCollider2D>(entity);
+
+                    glm::vec3 translation = tc.position + glm::vec3(cc2d.Offset, 0.001f);
+                    glm::vec3 scale = tc.scale * glm::vec3(cc2d.Radius * 2.0f);
+
+                    glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+                                          * glm::scale(glm::mat4(1.0f), scale);
+
+                    Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.01f);
+                }
+            }
+        }
+
+        // Draw selected entity outline
+        if (Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity())
+        {
+            const TransformComponent& transform = selectedEntity.get<TransformComponent>();
+            Renderer2D::DrawRect(transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+        }
+
+        Renderer2D::EndScene();
     }
 
     ////////////////////////////////////////////
@@ -777,35 +850,6 @@ namespace fox
         }
     }
 
-    void EditorState::OnRuntimeStart(const RuntimeStartEvent& e)
-    {
-        m_bIsRunning = true;
-
-        // Create the meta directory
-        std::filesystem::create_directories("metas");
-        // Save the scene in a temp file
-        SceneSerializer serializer(m_pActiveScene);
-        serializer.Serialize("metas/active_scene.foxscene.meta");
-
-        m_pActiveScene->OnStartRuntime();
-    }
-
-    void EditorState::OnRuntimeStop(const RuntimeStopEvent& e)
-    {
-        m_bIsRunning = false;
-
-        // Create a new scene and the context of the scene panel
-        m_pActiveScene = new_ref<Scene>(GetApp());
-        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
-
-        // Reload the scene from the temp file
-        SceneSerializer serializer(m_pActiveScene);
-        serializer.Deserialize("metas/active_scene.foxscene.meta");
-
-        // Send the viewport event to set the viewport of the games cameras properly
-        m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
-    }
-
     void EditorState::OnScenePlay()
     {
         m_SceneState = SceneState::Play;
@@ -818,8 +862,15 @@ namespace fox
 
     void EditorState::OnSceneSimulate()
     {
+        if (m_SceneState == SceneState::Play)
+            OnSceneStop();
+
         m_SceneState = SceneState::Simulate;
-        m_pActiveScene->OnRuntimeStop();
+
+        m_pActiveScene = Scene::Copy(m_pEditorScene);
+        m_pActiveScene->OnSimulationStart();
+
+        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
     }
 
     void EditorState::OnSceneStop()
@@ -828,8 +879,8 @@ namespace fox
 
         if (m_SceneState == SceneState::Play)
             m_pActiveScene->OnRuntimeStop();
-//        else if (m_SceneState == SceneState::Simulate)
-//            m_pActiveScene->OnSimulationStop();
+        else if (m_SceneState == SceneState::Simulate)
+            m_pActiveScene->OnSimulationStop();
 
         m_SceneState = SceneState::Edit;
         m_pActiveScene = m_pEditorScene;

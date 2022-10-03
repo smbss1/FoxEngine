@@ -28,88 +28,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9425326e-0688-4775-a9e0-e421f6f970fc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/IDComponent.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Rigidbody2D.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/UUID.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/UUID.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/UniformBuffer.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/UniformBuffer.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLUniformBuffer.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLUniformBuffer.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/vendor/entt/include/entt.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/config" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/config" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/detect" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/detect" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/history" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/history" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/package" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/package" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/toolchain" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/toolchain" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/AnimationPlayer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/AnimationPlayer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Easing.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Easing.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Frame.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Frame.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Serialization.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Serialization.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Timeline.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Timeline.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Track.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Track.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Track.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Animator/Track.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/CameraComponent.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/CameraComponent.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/EntityName.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/EntityName.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/NativeScript.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/NativeScript.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/ScriptableBehaviour.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/ScriptableBehaviour.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/SpriteRenderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/SpriteRenderer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Transform.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Transform.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Scene.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Scene.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Scene.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/SceneSerializer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/SceneSerializer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/State.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/State.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/ASystem.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/ComponentArray.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/ComponentManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Entity.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Entity.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/EntityManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Pipeline.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Pipeline.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/System.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/World.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/World.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/FoxEcs.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/FoxEcs.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/FoxEngine.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/FoxEngine.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiState.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer2D.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer2D.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer2D.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer2D.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererAPI.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererAPI.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererCommand.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererCommand.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererCommand.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererCommand.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ScriptRegistry.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ScriptRegistry.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/AnyContainer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Utils/AnyContainer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLRendererAPI.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLRendererAPI.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLRendererAPI.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLRendererAPI.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLTexture.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLTexture.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/vendor/FoxJson" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/FoxJson" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/xmake.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/xmake.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/xmake.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/xmake.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/OpenSans-Bold.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/OpenSans-Regular.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/Basic.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/FlatColor.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/shaders/Texture.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Example.foxscene" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scenes/Example.foxscene" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Example2.foxscene" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scenes/Example2.foxscene" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Test" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/shaders/Texture.glsl" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/fox_editor" beforeDir="false" afterPath="$PROJECT_DIR$/editor/fox_editor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/include/EditorEvent.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/include/EditorEvent.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/include/EditorState.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/include/EditorState.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/include/SceneHierarchyPanel.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/include/SceneHierarchyPanel.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/metas/active_scene.foxscene.meta" beforeDir="false" afterPath="$PROJECT_DIR$/editor/metas/active_scene.foxscene.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/src/EditorState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/EditorState.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/SceneHierarchyPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/CppScriptPlugin/include/PluginEntry.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/plugins/CppScriptPlugin/include/PluginEntry.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/sandbox" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/sandbox" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/src/SandboxApp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/src/SandboxApp.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -228,7 +156,7 @@
       <option name="presentableId" value="Default" />
       <updated>1664723797544</updated>
       <workItem from="1664723800107" duration="6163000" />
-      <workItem from="1664730449848" duration="31517000" />
+      <workItem from="1664730449848" duration="34070000" />
     </task>
     <servers />
   </component>

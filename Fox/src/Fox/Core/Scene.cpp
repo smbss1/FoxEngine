@@ -40,30 +40,8 @@ namespace fox
 
     Scene::Scene(Application& app) : m_oApp(app)
     {
-//        m_oWorld.RegisterComponent<TransformComponent>();
-//        m_oWorld.RegisterComponent<SpriteRenderer>();
-//        m_oWorld.RegisterComponent<NativeScript>();
-//        m_oWorld.RegisterComponent<CameraComponent>();
-//        m_oWorld.RegisterComponent<EntityTag>();
-//        m_oWorld.RegisterComponent<EntityName>();
-//        m_oWorld.RegisterComponent<AnimationPlayer>();
-//        m_oWorld.RegisterComponent<Rigidbody2D>();
-//        m_oWorld.RegisterComponent<BoxCollider2D>();
-//
-//        m_oWorld.add_phase(game::OnStart);
-//        m_oWorld.add_phase(ecs::OnAddScript);
-//        m_oWorld.add_phase(ecs::PostFixUpdate);
-//        m_oWorld.add_phase(ecs::PreFixUpdate);
-
 
         // Draw Systems
-//        m_oWorld.system<TransformComponent, SpriteRenderer>().kind(ecs::OnStore)
-//                .each([](Entity& e, TransformComponent& transform, SpriteRenderer& sprite)
-//                      {
-//                          Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int) e.get_id());
-//                      });
-//
-//
 //        // Native Script Systems
 //        m_oWorld.system<NativeScript>().kind(ecs::OnUpdate)
 //                .each([&](Entity& e, NativeScript& script)
@@ -136,47 +114,6 @@ namespace fox
 //            transform.update_position();
 //        });
 //
-//        get_world().system<ray::Model, fox::Transform>().kind(fox::game::CameraDraw)
-//            .each([](Entity e, ray::Model& model, fox::Transform& transform)
-//        {
-//            model.Draw(transform.position, transform.rotation.normalized().getAxis(), 0, transform.scale);
-//        });
-//
-//        get_world().system<ray::Camera3D>().kind(fox::game::CameraBegin)
-//            .each([](Entity e, ray::Camera3D& camera)
-//        {
-//            // camera.Update();
-//            camera.BeginMode();
-//            e.get_world()->run_phase(fox::game::CameraDraw);
-//            camera.EndMode();
-//        });
-//
-//        get_world().system<ray::Cube, fox::Transform>().kind(fox::game::CameraDraw)
-//            .each([](Entity e, ray::Cube& cube, fox::Transform& transform)
-//        {
-//            cube.Draw(transform.position, transform.scale);
-//        });
-//
-//        get_world().system<ray::Texture, fox::Transform>().kind(fox::ecs::OnStore)
-//            .each([](Entity e, ray::Texture& texture, fox::Transform& transform)
-//                  {
-//                      ray::Rectangle sourceRec = { 0.0f, 0.0f, (float)texture.width, (float)texture.height };
-//                      ray::Rectangle destRec = { transform.position.x, transform.position.y, texture.width * transform.scale.x, texture.height * transform.scale.y };
-//                      texture.Draw(sourceRec, destRec, Vec2(), transform.rotation.GetAngle());
-//                  });
-//
-//        get_world().system<ray::Rectangle, fox::Transform>().kind(fox::ecs::PreStore)
-//            .each([](Entity e, ray::Rectangle& rec, fox::Transform& transform)
-//        {
-//            rec.SetPosition(transform.position.x, transform.position.y);
-//        });
-//
-//        get_world().system<ray::Rectangle>().kind(fox::ecs::OnStore)
-//                .each([](Entity e, ray::Rectangle& rec)
-//                      {
-//                        rec.Draw();
-//                      });
-//
 //        get_world().system<fox::Button, fox::Transform>().kind(ecs::OnStore)
 //            .each([](Entity e, fox::Button& btn, fox::Transform& transform)
 //        {
@@ -207,65 +144,6 @@ namespace fox
 //                      ray::Rectangle destRec = { transform.position.x, transform.position.y, img.sprite().width * transform.scale.x, img.sprite().height * transform.scale.y };
 //                      img.sprite().Draw(sourceRec, destRec, Vec2(), transform.rotation.GetAngle());
 //                  });
-//
-//        get_world().system<ray::Text, fox::Transform>().kind(fox::ecs::OnStore)
-//            .each([](Entity e, ray::Text& text, fox::Transform& transform)
-//        {
-//            text.Draw(transform.position.x, transform.position.y);
-//        });
-//
-//        get_world()
-//                .system<RigidBody, fox::Transform>()
-//                .kind(fox::ecs::PreFixUpdate)
-//                .each([&](
-//                        Entity e, RigidBody &body,
-//                        fox::Transform &transform)
-//                      {
-//                          body.get_rb()->setTransform(transform);
-//                      });
-//        get_world()
-//                .system<RigidBody, fox::Transform>()
-//                .kind(fox::ecs::PostFixUpdate)
-//                .each([&](
-//                        Entity e, RigidBody &body,
-//                        fox::Transform &transform)
-//                      {
-//                          const reactphysics3d::Transform &qTrans =
-//                                  body.get_rb()->getTransform();
-//                          transform.position =
-//                                  Vec3(qTrans.getPosition().x, qTrans.getPosition().y,
-//                                       qTrans.getPosition().z);
-//                      });
-//
-//        get_world().system<RigidBody, BoxCollider, fox::Transform>()
-//                .kind(ecs::OnAdd)
-//                .each([](Entity e, RigidBody& body, BoxCollider& shape, fox::Transform& transform)
-//                      {
-//                          reactphysics3d::Vector3 v = shape.getReactShape()->getHalfExtents();
-//                          fox::Transform trans = fox::Transform();
-//                          trans.scale = Vec3(v.x * (transform.scale.x * .5f), v.y * (transform.scale.y * .5f), v.z * (transform.scale.z * .5f));
-//                          shape.getReactShape()->setHalfExtents(shape.getHalfExtents() * trans.scale);
-//                          auto f = body.get_rb()->addCollider(shape.getReactShape(), trans);
-//                          f->getMaterial().setBounciness(0);
-//                          shape.set_collider(f);
-//                          // f->getMaterial().setFrictionCoefficient(0);
-//                          // f->getMaterial().setMassDensity(0);
-//                          // f->getMaterial().setRollingResistance(0);
-//                          f->setUserData(&shape);
-//                      });
-//        get_world().system<RigidBody, BoxCollider>()
-//                .kind(ecs::OnRemove)
-//                .each([](Entity e, RigidBody& body, BoxCollider& shape)
-//                      {
-//                          body.get_rb()->removeCollider(shape.get_collider());
-//                      });
-//
-//        get_world().system<ray::InputBox, fox::Transform>().kind(ecs::OnStore)
-//            .each([](Entity e, ray::InputBox& box, fox::Transform& transform)
-//                  {
-//                      box.Draw();
-//                  });
-//    }
 
     Entity Scene::NewEntity(const std::string &name)
     {
@@ -292,14 +170,107 @@ namespace fox
         RenderScene(camera);
     }
 
-    void Scene::OnStartRuntime()
+    void Scene::OnUpdateSimulation(EditorCamera& camera)
     {
-//        m_oWorld.run_phase(game::OnStart);
+        // Physics
+        {
+            const int32_t velocityIterations = 6;
+            const int32_t positionIterations = 2;
+            m_PhysicsWorld->Step(Time::delta_time, velocityIterations, positionIterations);
+
+            // Retrieve transform from Box2D
+            auto view = m_Registry.view<Rigidbody2D>();
+            for (auto e : view)
+            {
+                Entity entity = { e, this };
+                auto& transform = entity.get<TransformComponent>();
+                auto& rb2d = entity.get<Rigidbody2D>();
+
+                b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                const auto& position = body->GetPosition();
+                transform.position.x = position.x;
+                transform.position.y = position.y;
+                transform.rotation.z = body->GetAngle();
+            }
+        }
+
+        // Render
+        RenderScene(camera);
+    }
+
+    void Scene::OnUpdateRuntime()
+    {
+        // Physics
+        {
+            const int32_t velocityIterations = 6;
+            const int32_t positionIterations = 2;
+            m_PhysicsWorld->Step(Time::delta_time, velocityIterations, positionIterations);
+
+            // Retrieve transform from Box2D
+            auto view = m_Registry.view<Rigidbody2D>();
+            for (auto e : view)
+            {
+                Entity entity = { e, this };
+                auto& transform = entity.get<TransformComponent>();
+                auto& rb2d = entity.get<Rigidbody2D>();
+
+                b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                const auto& position = body->GetPosition();
+                transform.position.x = position.x;
+                transform.position.y = position.y;
+                transform.rotation.z = body->GetAngle();
+            }
+        }
+
+        // Render 2D
+        Camera* mainCamera = nullptr;
+        glm::mat4 cameraTransform;
+        {
+            auto view = m_Registry.view<TransformComponent, CameraComponent>();
+            for (auto entity : view)
+            {
+                auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
+
+                if (camera.Primary)
+                {
+                    mainCamera = &camera.camera;
+                    cameraTransform = transform.GetTransform();
+                    break;
+                }
+            }
+        }
+
+        if (mainCamera)
+        {
+            Renderer2D::BeginScene(*mainCamera, cameraTransform);
+            RenderScene();
+            Renderer2D::EndScene();
+        }
     }
 
     void Scene::OnRuntimeStart()
     {
-        m_PhysicsWorld = new b2World({0.0f, -9.81f});
+        OnPhysics2DStart();
+    }
+
+    void Scene::OnRuntimeStop()
+    {
+        OnPhysics2DStop();
+    }
+
+    void Scene::OnSimulationStart()
+    {
+        OnPhysics2DStart();
+    }
+
+    void Scene::OnSimulationStop()
+    {
+        OnPhysics2DStop();
+    }
+
+    void Scene::OnPhysics2DStart()
+    {
+        m_PhysicsWorld = new b2World({ 0.0f, -9.81f });
 
         auto view = m_Registry.view<Rigidbody2D>();
         for (auto e : view)
@@ -352,69 +323,16 @@ namespace fox
         }
     }
 
-    void Scene::OnRuntimeStop()
+    void Scene::OnPhysics2DStop()
     {
         delete m_PhysicsWorld;
         m_PhysicsWorld = nullptr;
-    }
-
-    void Scene::OnUpdateRuntime()
-    {
-        // Physics
-        {
-            const int32_t velocityIterations = 6;
-            const int32_t positionIterations = 2;
-            m_PhysicsWorld->Step(Time::delta_time, velocityIterations, positionIterations);
-
-            // Retrieve transform from Box2D
-            auto view = m_Registry.view<Rigidbody2D>();
-            for (auto e : view)
-            {
-                Entity entity = { e, this };
-                auto& transform = entity.get<TransformComponent>();
-                auto& rb2d = entity.get<Rigidbody2D>();
-
-                b2Body* body = (b2Body*)rb2d.RuntimeBody;
-                const auto& position = body->GetPosition();
-                transform.position.x = position.x;
-                transform.position.y = position.y;
-                transform.rotation.z = body->GetAngle();
-            }
-        }
-
-        // Render 2D
-        Camera* mainCamera = nullptr;
-        glm::mat4 cameraTransform;
-        {
-            auto view = m_Registry.view<TransformComponent, CameraComponent>();
-            for (auto entity : view)
-            {
-                auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
-
-                if (camera.Primary)
-                {
-                    mainCamera = &camera.camera;
-                    cameraTransform = transform.GetTransform();
-                    break;
-                }
-            }
-        }
-
-        if (mainCamera)
-        {
-             Renderer2D::BeginScene(*mainCamera, cameraTransform);
-                RenderScene();
-             Renderer2D::EndScene();
-        }
     }
 
     void Scene::RenderScene(EditorCamera& camera)
     {
         Renderer2D::BeginScene(camera);
         RenderScene();
-
-        Renderer2D::DrawLine(glm::vec3(0.0f), glm::vec3(5.0f), glm::vec4(1, 0, 1, 1));
-        Renderer2D::DrawRect(glm::vec3(0.0f), glm::vec3(1.0f), glm::vec4(1, 1, 1, 1));
         Renderer2D::EndScene();
     }
 

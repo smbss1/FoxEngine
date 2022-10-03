@@ -1,14 +1,5 @@
 {
     cmdlines = {
-        "xmake -w",
-        "xmake -w",
-        "xmake -w",
-        "xmake -w",
-        "xmake -w",
-        "xmake -w",
-        "xmake -w",
-        "xmake -w",
-        "xmake -w",
         "xmake project -k cmake -y",
         "xmake -w",
         "xmake -w",
@@ -64,6 +55,15 @@
         "xmake run fox_editor",
         "xmake run fox_editor",
         "xmake -w",
-        "xmake run fox_editor"
+        "xmake run fox_editor",
+        "xmake -w",
+        "xmake run fox_editor",
+        "xmake -w",
+        "xmake run fox_editor",
+        "xmake run fox_editor",
+        "xmake -w",
+        "xmake run fox_editor",
+        "xmake run fox_editor",
+        "xmake -w"
     }
 }

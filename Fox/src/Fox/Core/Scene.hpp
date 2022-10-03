@@ -43,21 +43,28 @@ namespace fox
 
         void DestroyEntity(Entity entity);
 
-        void OnStartRuntime();
         void OnUpdateRuntime();
+        void OnUpdateSimulation(EditorCamera& camera);
         void OnUpdateEditor(EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
 
         void OnRuntimeStart();
         void OnRuntimeStop();
 
-        void RenderScene();
-        void RenderScene(EditorCamera& camera);
+        void OnSimulationStart();
+        void OnSimulationStop();
 
         Entity GetPrimaryCameraEntity();
 
         Application& GetApp();
     private:
+
+        void OnPhysics2DStart();
+        void OnPhysics2DStop();
+
+        void RenderScene();
+        void RenderScene(EditorCamera& camera);
+
         template<typename T>
         void OnComponentAdded(Entity &e, T &component);
 

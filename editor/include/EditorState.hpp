@@ -54,18 +54,6 @@ namespace fox
 
         void NewScript();
 
-        /**
-         * @brief On runtime start, this function will be called from EventSystem
-         * @param e the event
-         */
-        void OnRuntimeStart(const RuntimeStartEvent& e);
-
-        /**
-         * @brief On runtime stop, this function will be called from EventSystem
-         * @param e the event
-         */
-        void OnRuntimeStop(const RuntimeStopEvent& e);
-
         void OnScenePlay();
         void OnSceneSimulate();
         void OnSceneStop();
@@ -79,6 +67,7 @@ namespace fox
 
         // UI Panel
         void UI_Toolbar();
+        void OnOverlayRender();
 
     private:
         bool m_bIsRunning = false;
@@ -106,7 +95,7 @@ namespace fox
 
         // json::Value m_oEditorConfig;
         // scope<FileWatcher> m_oWatcher;
-
+        bool m_ShowPhysicsColliders = false;
         enum class SceneState
         {
             Edit = 0, Play = 1, Simulate = 2
