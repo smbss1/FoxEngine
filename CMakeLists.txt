@@ -94,6 +94,10 @@ target_link_libraries(fox_editor PRIVATE
     Xdmcp
     OpenGL
     box2d
+    mono-2.0
+    monosgen-2.0
+    m
+    pthread
     glad
     glm
     fox_json
@@ -107,6 +111,7 @@ target_link_directories(fox_editor PRIVATE
     /usr/lib
     /home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib
     /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib
+    /usr/lib/pkgconfig/../../lib
 )
 target_link_options(fox_editor PRIVATE
     -m64
@@ -149,6 +154,7 @@ target_include_directories(fox_engine PRIVATE
     /usr/include/python3.10
     /usr/include/X11/dri
     /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/include
+    /usr/lib/pkgconfig/../../include/mono-2.0
 )
 target_compile_definitions(fox_engine PRIVATE
     FOX_PLUGIN_DIRECTORY="/home/samuel/Git Repos/FoxEngine/"
@@ -221,6 +227,10 @@ target_link_libraries(fox_engine PRIVATE
     Xdmcp
     OpenGL
     box2d
+    mono-2.0
+    monosgen-2.0
+    m
+    pthread
     glad
     glm
     fox_json
@@ -233,6 +243,7 @@ target_link_directories(fox_engine PRIVATE
     /usr/lib
     /home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib
     /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib
+    /usr/lib/pkgconfig/../../lib
     build/linux/x86_64/release
 )
 target_sources(fox_engine PRIVATE
@@ -243,6 +254,7 @@ target_sources(fox_engine PRIVATE
     Fox/src/Platform/OpenGL/SpriteManager.cpp
     Fox/src/Platform/OpenGL/stb_image.cpp
     Fox/src/Platform/OpenGL/OpenGLShader.cpp
+    Fox/src/Platform/OpenGL/OpenGLUniformBuffer.cpp
     Fox/src/Platform/OpenGL/PluginEntry.cpp
     Fox/src/Platform/OpenGL/OpenGLFrameBuffer.cpp
     Fox/src/Platform/OpenGL/OpenGLVertexArray.cpp
@@ -260,6 +272,8 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Math/Quat.cpp
     Fox/src/Fox/Math/Math.cpp
     Fox/src/Fox/Math/Vec3.cpp
+    Fox/src/Fox/Scripting/ScriptGlue.cpp
+    Fox/src/Fox/Scripting/ScriptEngine.cpp
     Fox/src/Fox/FPaths.cpp
     Fox/src/Fox/Utils/bitsets.cpp
     Fox/src/Fox/Utils/Path.cpp
@@ -292,6 +306,7 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Renderer/EditorCamera.cpp
     Fox/src/Fox/Renderer/Shader.cpp
     Fox/src/Fox/Renderer/VertexArray.cpp
+    Fox/src/Fox/Renderer/UniformBuffer.cpp
     Fox/src/Fox/Renderer/RendererCommand.cpp
     Fox/src/Fox/Renderer/Buffer.cpp
     Fox/src/Fox/Renderer/Framebuffer.cpp
@@ -612,6 +627,10 @@ target_link_libraries(sandbox PRIVATE
     Xdmcp
     OpenGL
     box2d
+    mono-2.0
+    monosgen-2.0
+    m
+    pthread
     glad
     glm
     fox_json
@@ -625,6 +644,7 @@ target_link_directories(sandbox PRIVATE
     /usr/lib
     /home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib
     /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib
+    /usr/lib/pkgconfig/../../lib
 )
 target_link_options(sandbox PRIVATE
     -m64

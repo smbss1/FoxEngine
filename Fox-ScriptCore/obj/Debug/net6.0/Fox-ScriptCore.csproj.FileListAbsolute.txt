@@ -1,0 +1,12 @@
+/home/samuel/Git Repos/FoxEngine/editor/Resources/Scripts/net6.0/Fox-ScriptCore.deps.json
+/home/samuel/Git Repos/FoxEngine/editor/Resources/Scripts/net6.0/Fox-ScriptCore.dll
+/home/samuel/Git Repos/FoxEngine/editor/Resources/Scripts/net6.0/ref/Fox-ScriptCore.dll
+/home/samuel/Git Repos/FoxEngine/editor/Resources/Scripts/net6.0/Fox-ScriptCore.pdb
+/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Debug/net6.0/Fox-ScriptCore.csproj.AssemblyReference.cache
+/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Debug/net6.0/Fox-ScriptCore.GeneratedMSBuildEditorConfig.editorconfig
+/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Debug/net6.0/Fox-ScriptCore.AssemblyInfoInputs.cache
+/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Debug/net6.0/Fox-ScriptCore.AssemblyInfo.cs
+/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Debug/net6.0/Fox-ScriptCore.csproj.CoreCompileInputs.cache
+/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Debug/net6.0/Fox-ScriptCore.dll
+/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Debug/net6.0/ref/Fox-ScriptCore.dll
+/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Debug/net6.0/Fox-ScriptCore.pdb

@@ -69,6 +69,11 @@ namespace fox
 //                      });
     }
 
+    Scene::~Scene()
+    {
+        delete m_PhysicsWorld;
+    }
+
 //    void Scene::init_systems()
 //    {
 //        get_world().system<NativeScript, BoxCollider>()

@@ -150,8 +150,9 @@ namespace fox
         m_oEditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
         // Create a new Scene
-        m_pActiveScene = new_ref<Scene>(GetApp());
-        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+        m_pEditorScene = new_ref<Scene>(GetApp());
+        m_pActiveScene = m_pEditorScene;
+//        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
 
         // DO NOT REMOVE ------
             // If we have opened a scene last time so deserialize it to the active scene

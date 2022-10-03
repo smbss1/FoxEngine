@@ -27,7 +27,7 @@ namespace fox
     {
     public:
         Scene(Application& app);
-        ~Scene() = default;
+        ~Scene();
 
         static ref<Scene> Copy(ref<Scene> other);
 

@@ -15,6 +15,7 @@
 #include "Core/Application.hpp"
 #include "Core/Logger/Logger.hpp"
 #include "json.hpp"
+#include "Scripting/ScriptEngine.hpp"
 
 namespace fox
 {
@@ -31,6 +32,7 @@ namespace fox
         Input::SetWindow(m_pWindow.get());
 
         Renderer::Init();
+        ScriptEngine::Init();
 
         // Add the ImGui state of GUI
         m_pImGuiState = new ImGuiState;
