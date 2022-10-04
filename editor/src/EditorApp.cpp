@@ -44,13 +44,13 @@ namespace fox
 
     //         float speed = 5.0f;
 
-    //         if (Input::IsKeyPressed(Key::A))
+    //         if (Input::IsKeyPressed(KeyCode::A))
     //             translation.x -= speed * Time::delta_time;
-    //         if (Input::IsKeyPressed(Key::D))
+    //         if (Input::IsKeyPressed(KeyCode::D))
     //             translation.x += speed * Time::delta_time;
-    //         if (Input::IsKeyPressed(Key::W))
+    //         if (Input::IsKeyPressed(KeyCode::W))
     //             translation.y += speed * Time::delta_time;
-    //         if (Input::IsKeyPressed(Key::S))
+    //         if (Input::IsKeyPressed(KeyCode::S))
     //             translation.y -= speed * Time::delta_time;
     //     }
 

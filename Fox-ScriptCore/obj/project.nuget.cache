@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "qcLbMXmVPCdgaqeeUUu4CaG3iQx9dlDZCoARYh8DOaxpaBjTbrRM3nFk5P89PQjtBcvvNzaysrLedNHT9HgLFQ==",
+  "dgSpecHash": "xTcYGC+AVq0ffcVz3mEzbGG9IdKUtSq21jYxY5UVTNOPHMi5x9cjiWnEuzq4euXcUQzH2gC5fQyA//g6ma3RsA==",
   "success": true,
   "projectFilePath": "/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/Fox-ScriptCore.csproj",
   "expectedPackageFiles": [
-    "/home/samuel/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.8/microsoft.aspnetcore.app.ref.6.0.8.nupkg.sha512"
+    "/home/samuel/.nuget/packages/microsoft.netframework.referenceassemblies/1.0.2/microsoft.netframework.referenceassemblies.1.0.2.nupkg.sha512",
+    "/home/samuel/.nuget/packages/microsoft.netframework.referenceassemblies.net45/1.0.2/microsoft.netframework.referenceassemblies.net45.1.0.2.nupkg.sha512"
   ],
   "logs": []
 }

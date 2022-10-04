@@ -32,17 +32,17 @@
 //    {
 //	public:
 //
-//        bool GetKey(Key key)
+//        bool GetKey(KeyCode key)
 //        {
 //            return m_oKeyboard.IsDown(key);
 //        }
 //
-//		bool GetKeyDown(Key key)
+//		bool GetKeyDown(KeyCode key)
 //        {
 //            return m_oKeyboard.IsPressed(key);
 //        }
 //
-//		bool GetKeyUp(Key key)
+//		bool GetKeyUp(KeyCode key)
 //        {
 //            return m_oKeyboard.IsReleased(key);
 //        }

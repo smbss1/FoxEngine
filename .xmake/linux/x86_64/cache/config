@@ -1,20 +1,16 @@
 {
+    recheck = false,
     mtimes = {
         ["Fox/vendor/FoxJson/xmake.lua"] = 1664619654,
         ["Fox/vendor/imgui/xmake.lua"] = 1664685899,
-        ["Fox/vendor/xmake.lua"] = 1664749020,
-        ["sandbox/xmake.lua"] = 1664683285,
-        ["Fox/xmake.lua"] = 1664778824,
-        ["xmake.lua"] = 1664698538,
-        ["Fox/vendor/FoxJson/submodules/GenericLexer/xmake.lua"] = 1664608246,
-        ["editor/xmake.lua"] = 1664698577,
         ["plugins/xmake.lua"] = 1664676028,
-        ["Fox/vendor/FoxJson/submodules/xmake.lua"] = 1664608223
+        ["Fox/vendor/FoxJson/submodules/GenericLexer/xmake.lua"] = 1664608246,
+        ["Fox/vendor/xmake.lua"] = 1664749020,
+        ["xmake.lua"] = 1664698538,
+        ["editor/xmake.lua"] = 1664698577,
+        ["Fox/vendor/FoxJson/submodules/xmake.lua"] = 1664608223,
+        ["Fox/xmake.lua"] = 1664904434,
+        ["sandbox/xmake.lua"] = 1664683285
     },
-    recheck = false,
-    options = {
-        mode = "release",
-        arch = "x86_64",
-        plat = "linux"
-    }
+    options = { }
 }

@@ -54,7 +54,7 @@ namespace fox
          * @brief Set the callback for key event without pooling
          * @param callback the callback
          */
-        virtual bool IsKeyPressed(const Key key) = 0;
+        virtual bool IsKeyPressed(const KeyCode key) = 0;
         virtual bool IsMouseButtonPressed(const Mouse button) = 0;
         virtual glm::vec2 GetMousePosition() = 0;
 

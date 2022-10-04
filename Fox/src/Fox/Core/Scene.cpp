@@ -22,6 +22,7 @@
 #include "box2d/b2_polygon_shape.h"
 #include "box2d/b2_circle_shape.h"
 #include "Assert.hpp"
+#include "Scripting/ScriptEngine.hpp"
 
 namespace fox
 {
@@ -76,12 +77,6 @@ namespace fox
 
 //    void Scene::init_systems()
 //    {
-//        get_world().system<NativeScript, BoxCollider>()
-//                .kind(ecs::OnAdd)
-//                .each([](Entity e, NativeScript& script, BoxCollider& shape)
-//                      {
-//                          shape.m_pScript = &script;
-//                      });
 //        get_world().system<BoxCollider>()
 //                .kind(ecs::OnAdd)
 //                .each([](Entity e, BoxCollider& shape)
@@ -162,12 +157,15 @@ namespace fox
         entity.add<TransformComponent>();
         auto& tag = entity.add<EntityName>();
         tag.name = name.empty() ? "Entity" : name;
+
+        m_EntityMap[uuid] = entity;
         return entity;
     }
 
     void Scene::DestroyEntity(Entity entity)
     {
         m_Registry.destroy(entity);
+        m_EntityMap.erase(entity.GetUUID());
     }
 
     void Scene::OnUpdateEditor(EditorCamera &camera)
@@ -205,6 +203,31 @@ namespace fox
 
     void Scene::OnUpdateRuntime()
     {
+        // Update scripts
+        {
+            // C# Entity OnUpdate
+            auto view = m_Registry.view<ScriptComponent>();
+            for (auto e : view)
+            {
+                Entity entity = { e, this };
+                ScriptEngine::OnUpdateEntity(entity);
+            }
+
+//            m_Registry.view<NativeScript>().each([=](auto entity, auto& nsc)
+//              {
+//                  // TODO: Move to Scene::OnScenePlay
+//                  if (!nsc.Instance)
+//                  {
+//                      nsc.Instance = nsc.InstantiateScript();
+//                      nsc.Instance->m_Entity = Entity{ entity, this };
+//                      nsc.Instance->OnCreate();
+//                  }
+//
+//                  nsc.Instance->OnUpdate(ts);
+//              });
+        }
+
+
         // Physics
         {
             const int32_t velocityIterations = 6;
@@ -256,11 +279,25 @@ namespace fox
     void Scene::OnRuntimeStart()
     {
         OnPhysics2DStart();
+
+        // Scripting
+        {
+            ScriptEngine::OnRuntimeStart(this);
+            // Instantiate all script entities
+
+            auto view = m_Registry.view<ScriptComponent>();
+            for (auto e : view)
+            {
+                Entity entity = { e, this };
+                ScriptEngine::OnCreateEntity(entity);
+            }
+        }
     }
 
     void Scene::OnRuntimeStop()
     {
         OnPhysics2DStop();
+        ScriptEngine::OnRuntimeStop();
     }
 
     void Scene::OnSimulationStart()
@@ -398,6 +435,15 @@ namespace fox
         return m_oApp;
     }
 
+    Entity Scene::GetEntityByUUID(UUID uuid)
+    {
+        // TODO(Yan): Maybe should be assert
+        if (m_EntityMap.find(uuid) != m_EntityMap.end())
+            return { m_EntityMap.at(uuid), this };
+
+        return {};
+    }
+
     template<typename T>
     void Scene::OnComponentAdded(Entity &e, T &component) { }
 
@@ -448,6 +494,11 @@ namespace fox
 
     template<>
     void Scene::OnComponentAdded<CircleRenderer>(Entity &e, CircleRenderer& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<ScriptComponent>(Entity &e, ScriptComponent& component)
     {
     }
 

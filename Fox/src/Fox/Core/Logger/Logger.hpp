@@ -103,6 +103,14 @@ namespace fox
         return detail::Printer<Args...>{format, std::forward_as_tuple(args...)};
     }
 
+    template <typename... Args,
+        std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
+    std::string format(std::string_view format, const Args&... args)
+    {
+        std::stringstream str;
+        str << detail::Printer<Args...>{format, std::forward_as_tuple(args...)};
+        return str.str();
+    }
 
     enum typelog {
         DEBUG,

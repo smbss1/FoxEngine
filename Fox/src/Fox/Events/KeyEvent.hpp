@@ -13,20 +13,20 @@ namespace fox
     class KeyEvent : public Event
     {
     public:
-        [[nodiscard]] Key GetKeyCode() const { return m_KeyCode; }
+        [[nodiscard]] KeyCode GetKeyCode() const { return m_KeyCode; }
 
         EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
     protected:
-        explicit KeyEvent(const Key keycode)
+        explicit KeyEvent(const KeyCode keycode)
                 : m_KeyCode(keycode) {}
 
-        Key m_KeyCode;
+        KeyCode m_KeyCode;
     };
 
     class KeyPressedEvent : public KeyEvent
     {
     public:
-        KeyPressedEvent(const Key keycode, const uint16_t repeatCount)
+        KeyPressedEvent(const KeyCode keycode, const uint16_t repeatCount)
                 : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
 
         [[nodiscard]] uint16_t GetRepeatCount() const { return m_RepeatCount; }
@@ -46,7 +46,7 @@ namespace fox
     class KeyReleasedEvent : public KeyEvent
     {
     public:
-        explicit KeyReleasedEvent(const Key keycode)
+        explicit KeyReleasedEvent(const KeyCode keycode)
                 : KeyEvent(keycode) {}
 
         [[nodiscard]] std::string ToString() const override
@@ -62,7 +62,7 @@ namespace fox
     class KeyTypedEvent : public KeyEvent
     {
     public:
-        explicit KeyTypedEvent(const Key keycode)
+        explicit KeyTypedEvent(const KeyCode keycode)
                 : KeyEvent(keycode) {}
 
         [[nodiscard]] std::string ToString() const override

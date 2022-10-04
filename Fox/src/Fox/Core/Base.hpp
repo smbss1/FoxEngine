@@ -225,27 +225,27 @@
 //};
 //
 //#include <map>
-//template <class Key,
+//template <class KeyCode,
 //        class T,
-//        class Compare = std::less<Key>,
-//        class Allocator = std::allocator<std::pair<const Key, T>>>
+//        class Compare = std::less<KeyCode>,
+//        class Allocator = std::allocator<std::pair<const KeyCode, T>>>
 //class IndexedProperty
 //{
-//    std::map<Key, T, Compare,
+//    std::map<KeyCode, T, Compare,
 //            Allocator> data;
-//    typedef typename std::map<Key, T, Compare,
+//    typedef typename std::map<KeyCode, T, Compare,
 //            Allocator>::iterator
 //            map_iterator;
 //public:
 //
 //    // function call syntax
-//    T operator()(Key const & key) {
+//    T operator()(KeyCode const & key) {
 //        std::pair<map_iterator, bool> result;
 //        result
 //                = data.insert(std::make_pair(key, T()));
 //        return (*result.first).second;
 //    }
-//    T operator()(Key const & key,
+//    T operator()(KeyCode const & key,
 //                 T const & t) {
 //        std::pair<map_iterator, bool> result;
 //        result
@@ -254,13 +254,13 @@
 //    }
 //
 //    // get/set syntax
-//    T get_Item(Key const & key) {
+//    T get_Item(KeyCode const & key) {
 //        std::pair<map_iterator, bool> result;
 //        result
 //                = data.insert(std::make_pair(key, T()));
 //        return (*result.first).second;
 //    }
-//    T set_Item(Key const & key,
+//    T set_Item(KeyCode const & key,
 //               T const & t) {
 //        std::pair<map_iterator, bool> result;
 //        result
@@ -269,7 +269,7 @@
 //    }
 //
 //    // operator [] syntax
-//    T& operator[](Key const & key) {
+//    T& operator[](KeyCode const & key) {
 //        return (*((data.insert(make_pair(
 //                key, T()))).first)).second;
 //    }

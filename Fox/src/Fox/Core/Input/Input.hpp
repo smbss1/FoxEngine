@@ -14,7 +14,7 @@ namespace fox
     {
         static Window* s_Window;
     public:
-        static bool IsKeyPressed(Key key);
+        static bool IsKeyPressed(KeyCode key);
 
         static bool IsMouseButtonPressed(Mouse button);
         static glm::vec2 GetMousePosition();

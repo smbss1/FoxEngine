@@ -45,13 +45,13 @@
 // //    if (m_AnimationPlayer->Current.get())
 // //        fox::info("Current Animation: %", m_AnimationPlayer->Current.get()->Name);
 
-//     if (fox::Input::IsKeyPressed(fox::Key::G))
+//     if (fox::Input::IsKeyPressed(fox::KeyCode::G))
 //         m_AnimationPlayer->play("Idle");
 
-//     if (fox::Input::IsKeyPressed(fox::Key::H))
+//     if (fox::Input::IsKeyPressed(fox::KeyCode::H))
 //         m_AnimationPlayer->play("Run");
 
-//     if (fox::Input::IsKeyPressed(fox::Key::J))
+//     if (fox::Input::IsKeyPressed(fox::KeyCode::J))
 //         m_AnimationPlayer->stop();
 
 //     fox::Renderer2D::ResetStats();

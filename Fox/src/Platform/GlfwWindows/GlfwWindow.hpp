@@ -11,7 +11,7 @@
 #include <Core/Application.hpp>
 #include "GLFW/glfw3.h"
 
-static std::unordered_map<int, fox::Key> GLFW_TO_KEYBOARD_KEYS = {
+static std::unordered_map<int, fox::KeyCode> GLFW_TO_KEYBOARD_KEYS = {
         { GLFW_KEY_A, fox::Key::A},
         { GLFW_KEY_B, fox::Key::B},
         { GLFW_KEY_C, fox::Key::C},
@@ -154,7 +154,7 @@ public:
     [[nodiscard]] void* GetNativeWindow() const override;
     void SetNativeWindow(void* data) override;
 
-    bool IsKeyPressed(const fox::Key key) override;
+    bool IsKeyPressed(const fox::KeyCode key) override;
     bool IsMouseButtonPressed(const fox::Mouse button) override;
     glm::vec2 GetMousePosition() override;
 

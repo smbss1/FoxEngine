@@ -38,4 +38,7 @@
 
 #include "Renderer/OrthographicCamera.hpp"
 
+
+#include "Scripting/ScriptEngine.hpp"
+
 #endif

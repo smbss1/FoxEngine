@@ -8,7 +8,7 @@ namespace fox
 {
     Window* Input::s_Window = nullptr;
 
-    bool Input::IsKeyPressed(Key key)
+    bool Input::IsKeyPressed(KeyCode key)
     {
         return s_Window->IsKeyPressed(key);
     }

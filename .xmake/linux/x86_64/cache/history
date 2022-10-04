@@ -1,18 +1,30 @@
 {
     cmdlines = {
-        "xmake project -k cmake -y",
-        "xmake -w",
         "xmake run fox_editor",
-        "xmake f -y -p linux -a x86_64 -m release",
         "xmake -w",
-        "xmake lua /usr/share/xmake/actions/build/statistics.lua",
-        "xmake lua /usr/share/xmake/actions/build/cleaner.lua",
         "xmake -w",
-        "xmake run fox_editor",
         "xmake run fox_editor",
         "xmake -w",
         "xmake run fox_editor",
+        "xmake c",
+        "xmake c",
         "xmake -w",
-        "xmake run fox_editor"
+        "xmake run fox_editor",
+        "xmake -w",
+        "xmake run fox_editor",
+        "xmake -w",
+        "xmake run fox_editor",
+        "xmake -w",
+        "xmake run fox_editor",
+        "xmake -w",
+        "xmake run fox_editor",
+        "xmake run fox_editor",
+        [[xmake l -c "import(\"core.project.config\"); import(\"core.project.project\"); config.load(); for name, _ in pairs((project.targets())) do print(name) end"]],
+        [[xmake run fox_editor MONO_LOG_LEVEL=\"debug\"]],
+        "xmake run fox_editor",
+        [[xmake run fox_editor MONO_LOG_LEVEL=\"debug\"]],
+        [[xmake run fox_editor MONO_LOG_LEVEL=\"debug\"]],
+        [[xmake l -c "import(\"core.project.config\"); import(\"core.project.project\"); config.load(); for name, _ in pairs((project.targets())) do print(name) end"]],
+        "xmake -w"
     }
 }

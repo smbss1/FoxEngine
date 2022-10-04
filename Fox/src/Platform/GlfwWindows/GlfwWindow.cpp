@@ -196,7 +196,7 @@ void GlfwWindow::SetNativeWindow(void *data)
     m_pWindow = static_cast<GLFWwindow*>(data);
 }
 
-bool GlfwWindow::IsKeyPressed(const fox::Key key)
+bool GlfwWindow::IsKeyPressed(const fox::KeyCode key)
 {
     auto state = glfwGetKey(m_pWindow, static_cast<int32_t>(key));
     return state == GLFW_PRESS || state == GLFW_REPEAT;

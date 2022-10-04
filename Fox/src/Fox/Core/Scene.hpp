@@ -57,6 +57,8 @@ namespace fox
         Entity GetPrimaryCameraEntity();
 
         Application& GetApp();
+        Entity GetEntityByUUID(UUID uuid);
+
     private:
 
         void OnPhysics2DStart();
@@ -71,12 +73,12 @@ namespace fox
     private:
         Application& m_oApp;
         entt::registry m_Registry;
-        b2World* m_PhysicsWorld;
+        b2World* m_PhysicsWorld = nullptr;
         uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+        std::unordered_map<UUID, entt::entity> m_EntityMap;
 
     protected:
         const float timeStep = 1.0f / 60.0f;
-
         friend class Entity;
         friend class SceneSerializer;
         friend class SceneHierarchyPanel;

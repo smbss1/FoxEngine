@@ -12,6 +12,7 @@
 //#include "Components/Animator/AnimationPlayer.hpp"
 #include "Components/Rigidbody2D.hpp"
 #include "Components/IDComponent.hpp"
+#include "Components/ScriptComponent.hpp"
 
 
 // REFLECT_EXTERN(Component);
@@ -34,6 +35,7 @@ namespace fox
             CircleRenderer,
             CameraComponent,
             NativeScript,
+            ScriptComponent,
             Rigidbody2D,
             BoxCollider2D,
             CircleCollider2D

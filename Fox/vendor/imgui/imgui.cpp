@@ -1910,7 +1910,7 @@ void ImGui::ColorConvertHSVtoRGB(float h, float s, float v, float& out_r, float&
 
 //-----------------------------------------------------------------------------
 // [SECTION] ImGuiStorage
-// Helper: Key->value storage
+// Helper: KeyCode->value storage
 //-----------------------------------------------------------------------------
 
 // std::lower_bound but without the bullshit
@@ -7819,7 +7819,7 @@ static void ImGui::ErrorCheckEndFrameSanityChecks()
 {
     ImGuiContext& g = *GImGui;
 
-    // Verify that io.KeyXXX fields haven't been tampered with. Key mods should not be modified between NewFrame() and EndFrame()
+    // Verify that io.KeyXXX fields haven't been tampered with. KeyCode mods should not be modified between NewFrame() and EndFrame()
     // One possible reason leading to this assert is that your backends update inputs _AFTER_ NewFrame().
     // It is known that when some modal native windows called mid-frame takes focus away, some backends such as GLFW will
     // send key release events mid-frame. This would normally trigger this assertion and lead to sheared inputs.
@@ -16953,7 +16953,7 @@ void ImGui::DebugNodeStorage(ImGuiStorage* storage, const char* label)
     for (int n = 0; n < storage->Data.Size; n++)
     {
         const ImGuiStorage::ImGuiStoragePair& p = storage->Data[n];
-        BulletText("Key 0x%08X Value { i: %d }", p.key, p.val_i); // Important: we currently don't store a type, real value may not be integer.
+        BulletText("KeyCode 0x%08X Value { i: %d }", p.key, p.val_i); // Important: we currently don't store a type, real value may not be integer.
     }
     TreePop();
 }

@@ -12,6 +12,15 @@ target "fox_engine"
 
     -- add_defines("FOX_PLUGIN_DIRECTORY=$(FOX_PLUGIN_DIRECTORY)", { public = true })
     -- add_defines "FOX_BUILD_LIB=1"
+    -- add_defines "_REENTRANT"
+
+    -- add_cxflags("-I/usr/lib/pkgconfig/../../include/mono-2.0 -D_REENTRANT -L/usr/lib/pkgconfig/../../lib -lmono-2.0 -lm -lpthread", {force=true})
+    -- add_includedirs("/usr/lib/pkgconfig/../../include/mono-2.0", { public = true })
+
+    -- add_linkdirs("/usr/lib/pkgconfig/../../lib")
+    -- add_links("mono-2.0")
+    -- add_links("mono-native")
+    -- add_links("m")
 
     -- add_packages "rttr"
     add_packages "yaml-cpp"
@@ -26,6 +35,7 @@ target "fox_engine"
     add_deps "glad"
 
     add_syslinks "dl"
+    add_syslinks "pthread"
 
     add_includedirs("src/Fox", { public = true })
     add_includedirs("src/Platform", { public = true })
