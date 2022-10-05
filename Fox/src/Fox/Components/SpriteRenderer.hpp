@@ -6,8 +6,6 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <Renderer/SubTexture2D.hpp>
-#include <Reflection.hpp>
-#include <Components/Component.hpp>
 #include <Core/Property.hpp>
 
 namespace fox

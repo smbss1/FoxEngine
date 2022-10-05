@@ -9,16 +9,14 @@
 // #ifndef FOX_ENTRY_POINT_HPP_
 // #define FOX_ENTRY_POINT_HPP_
 
-// #include "Core/Application.hpp"
-
-extern fox::Application* fox::CreateApp(int argc, char** argv);
+extern fox::Application* fox::CreateApp(ApplicationCommandLineArgs args);
 
 int main(int argc, char** argv)
 {
     fox::Application *pApp = nullptr;
     try {
-        pApp = fox::CreateApp(argc, argv);
-        pApp->run();
+        pApp = fox::CreateApp({argc, argv});
+        pApp->Run();
     } catch (std::exception& e) {
         fox::error("%", e.what());
     }

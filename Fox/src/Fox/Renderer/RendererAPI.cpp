@@ -7,18 +7,6 @@
 
 namespace fox
 {
-    // GraphicPlugin* RendererAPI::s_Graphic = nullptr;
-
-    // GraphicPlugin* RendererAPI::GetGraphicPlugin()
-    // {
-    //     return s_Graphic;
-    // }
-
-    // void RendererAPI::SetGraphicPlugin(GraphicPlugin *pGraphic)
-    // {
-    //     s_Graphic = pGraphic;
-    // }
-
     scope<RendererAPI> RendererAPI::Create()
 	{
         return new_scope<OpenGLRendererAPI>();

@@ -5,15 +5,10 @@
 #ifndef FOXENGINE_CAMERACOMPONENT_HPP
 #define FOXENGINE_CAMERACOMPONENT_HPP
 
-#include <SceneCamera.hpp>
-// #include <rttr/type>
-#include "Component.hpp"
-#include "Reflection.hpp"
+#include "Scene/SceneCamera.hpp"
 
-struct CameraComponent //: public ComponentImpl<CameraComponent>
+struct CameraComponent
 {
-    // REFLECTABLEV(CameraComponent, Component)
-
 public:
     fox::SceneCamera camera;
     bool Primary = true; // TODO: think about moving to Scene

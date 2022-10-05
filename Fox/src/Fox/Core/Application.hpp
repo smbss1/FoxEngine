@@ -5,14 +5,14 @@
 #include "Core/Base.hpp"
 
 #include "Core/Window.hpp"
-#include "Core/Managers/StateMachine.hpp"
+#include "Core/LayerStack.hpp"
 #include "Events/Event.hpp"
 #include "Events/ApplicationEvent.hpp"
 
-#include "Time.hpp"
+#include "Core/Timestep.hpp"
 
-#include "ImGui/ImGuiState.hpp"
-#include "Utils/AnyContainer.hpp"
+#include "ImGui/ImGuiLayer.hpp"
+#include "Assert.hpp"
 
 namespace fox
 {
@@ -21,60 +21,47 @@ namespace fox
         class Value;
     }
 
+    struct ApplicationCommandLineArgs
+    {
+        int Count = 0;
+        char** Args = nullptr;
+
+        const char* operator[](int index) const
+        {
+            FOX_ASSERT(index < Count);
+            return Args[index];
+        }
+    };
+
+    struct ApplicationSpecification
+    {
+        std::string Name = "Hazel Application";
+        std::string WorkingDirectory;
+        ApplicationCommandLineArgs CommandLineArgs;
+    };
+
     class Application
     {
     public:
-        Application(int ac, char** av);
+        Application(const ApplicationSpecification& specification);
         virtual ~Application();
 
-        virtual void init();
-        void run();
-        void quit();
+        void Run();
+        void Close();
         void OnEvent(Event& e);
+
+        void PushLayer(Layer* layer);
+        void PushOverlay(Layer* layer);
 
         void LoadConfig();
 
-        template <typename T, typename... Args>
-        T& set(Args&&... args)
-        {
-            return m_vAny.set<T>(args...);
-        }
-
-        template <typename T>
-        fox::Option<T&> get()
-        {
-            return m_vAny.get<T>();
-        }
-
-        template <typename T, typename... Args>
-        fox::Option<T&> get_or_create(Args&&... args)
-        {
-            auto option = m_vAny.get<T>();
-            if (!option)
-                m_vAny.set<T>(args...);
-            return m_vAny.get<T>();
-        }
-
-        template <typename T>
-        fox::Option<const T&> get() const
-        {
-            return m_vAny.get<T>();
-        }
-
-        template <typename T>
-        void remove()
-        {
-            m_vAny.remove<T>();
-        }
-
         Window* GetWindow() const;
         json::Value& GetConfigs() const;
+        static Application& Get() { return *s_Instance; }
 
         bool IsWindowMinized() const { return m_bIsMinimized; }
-
-//        void SetScriptsArray(const std::unordered_map<size_t, ScriptCreator>& scripts);
-
-//        std::unordered_map<size_t, ScriptCreator>& GetScripts();
+        ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+        const ApplicationSpecification& GetSpecs() { return m_Specification; }
 
     private:
         bool OnWindowClose(WindowCloseEvent& e);
@@ -83,20 +70,21 @@ namespace fox
         bool m_bIsRunning;
         bool m_bIsMinimized = false;
 
-        ImGuiState* m_pImGuiState = nullptr;
-
-    protected:
-        fox::AnyContainer m_vAny;
-        scope<json::Value> m_oConfigFile;
+        ApplicationSpecification m_Specification;
         ref<Window> m_pWindow;
+        float m_LastFrameTime = 0.0f;
+        ImGuiLayer* m_ImGuiLayer = nullptr;
+        LayerStack m_LayerStack;
+        scope<json::Value> m_oConfigFile;
+
+    private:
+        static Application* s_Instance;
 
 
 //        std::unordered_map<size_t, ScriptCreator> m_vScripts;
-
-        // friend int ::main(int argc, char** argv);
     };
 
-    Application* CreateApp(int argc, char** argv);
+    Application* CreateApp(ApplicationCommandLineArgs args);
 }
 
 #endif

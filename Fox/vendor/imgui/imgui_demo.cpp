@@ -6230,7 +6230,7 @@ static void ShowExampleMenuFile()
         IM_ASSERT(0);
     }
     if (ImGui::MenuItem("Checked", NULL, true)) {}
-    if (ImGui::MenuItem("Quit", "Alt+F4")) {}
+    if (ImGui::MenuItem("Close", "Alt+F4")) {}
 }
 
 //-----------------------------------------------------------------------------

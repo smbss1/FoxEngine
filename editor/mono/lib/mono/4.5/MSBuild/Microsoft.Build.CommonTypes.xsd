@@ -231,17 +231,17 @@ elementFormDefault="qualified">
                             <xs:element name="DependentUpon"/>
                             <xs:element name="Generator">
                                 <xs:annotation>
-                                    <xs:documentation>Name of any file generator that is run on this item</xs:documentation>
+                                    <xs:documentation>Name of any file generator that is Run on this item</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                             <xs:element name="LastGenOutput">
                                 <xs:annotation>
-                                    <xs:documentation>File that was created by any file generator that was run on this item</xs:documentation>
+                                    <xs:documentation>File that was created by any file generator that was Run on this item</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                             <xs:element name="CustomToolNamespace">
                                 <xs:annotation>
-                                    <xs:documentation>Namespace into which any file generator that is run on this item should create code</xs:documentation>
+                                    <xs:documentation>Namespace into which any file generator that is Run on this item should create code</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                             <xs:element name="Link">
@@ -279,7 +279,7 @@ elementFormDefault="qualified">
                             <xs:element name="DependentUpon"/>
                             <xs:element name="Generator">
                                 <xs:annotation>
-                                    <xs:documentation>Name of any file generator that is run on this item</xs:documentation>
+                                    <xs:documentation>Name of any file generator that is Run on this item</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                             <xs:element name="LastGenOutput"/>
@@ -332,7 +332,7 @@ elementFormDefault="qualified">
                             <xs:element name="DependentUpon"/>
                             <xs:element name="Generator">
                                 <xs:annotation>
-                                    <xs:documentation>Name of any file generator that is run on this item</xs:documentation>
+                                    <xs:documentation>Name of any file generator that is Run on this item</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                             <xs:element name="LastGenOutput"/>
@@ -627,12 +627,12 @@ elementFormDefault="qualified">
     <xs:element name="PlatformTarget" type="msb:StringPropertyType" substitutionGroup="msb:Property"/>
     <xs:element name="PostBuildEvent" type="msb:StringPropertyType" substitutionGroup="msb:Property">
         <xs:annotation>
-            <xs:documentation>Command line to be run at the end of build</xs:documentation>
+            <xs:documentation>Command line to be Run at the end of build</xs:documentation>
         </xs:annotation>
     </xs:element>
     <xs:element name="PreBuildEvent" type="msb:StringPropertyType" substitutionGroup="msb:Property">
         <xs:annotation>
-            <xs:documentation>Command line to be run at the start of build</xs:documentation>
+            <xs:documentation>Command line to be Run at the start of build</xs:documentation>
         </xs:annotation>
     </xs:element>
     <xs:element name="ProductName" type="msb:StringPropertyType" substitutionGroup="msb:Property"/>

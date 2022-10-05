@@ -2,11 +2,11 @@
 // Created by samuel on 28/06/2021.
 //
 
-#include <Time.hpp>
+#include "Save for later/Time.hpp"
 #include <imgui.h>
 #include "SpriteSheet.hpp"
 
-void SpriteSheetState::OnEnter()
+void SpriteSheetLayer::OnAttach()
 {
     m_pSpriteSheet = fox::Texture2D::Create("sandbox/assets/RPGpack_sheet_2X.png");
     m_TextureStairs = fox::SubTexture2D::CreateFromCoords(m_pSpriteSheet, {7,6}, {128, 128});
@@ -14,15 +14,15 @@ void SpriteSheetState::OnEnter()
     m_TextureTree = fox::SubTexture2D::CreateFromCoords(m_pSpriteSheet, {2,1}, {128, 128}, {1, 2});
 }
 
-void SpriteSheetState::OnExit()
+void SpriteSheetLayer::OnDetach()
 {}
 
-void SpriteSheetState::OnEvent(fox::Event& event)
+void SpriteSheetLayer::OnEvent(fox::Event& event)
 {
     m_Camera.OnEvent(event);
 }
 
-void SpriteSheetState::OnUpdate()
+void SpriteSheetLayer::OnUpdate(fox::Timestep ts)
 {
     m_Camera.OnUpdate();
 
@@ -38,7 +38,7 @@ void SpriteSheetState::OnUpdate()
     fox::Renderer2D::EndScene();
 }
 
-void SpriteSheetState::OnImGui()
+void SpriteSheetLayer::OnImGuiRender()
 {
     ImGui::Begin("Settings");
 

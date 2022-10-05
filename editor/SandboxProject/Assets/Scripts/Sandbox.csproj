@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net45</TargetFramework>
+    <RootNamespace>Sandbox</RootNamespace>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>./Binaries</OutputPath>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <Reference Include="Fox-ScriptCore">
+        <HintPath>../../../Resources/Scripts/Fox-ScriptCore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+<!--   <ItemGroup> -->
+<!--     <PackageReference Include="Fox-ScriptCore" /> -->
+<!--   </ItemGroup> -->
+
+<!--   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' "> -->
+<!--     <OutputPath>./Binaries/Sandbox.dll</OutputPath> -->
+<!--     <PlatformTarget>x86</PlatformTarget> -->
+<!--   </PropertyGroup> -->
+
+<!--   <PropertyGroup Condition=" '$(Configuration)' == 'Release' "> -->
+<!--     <OutputPath>./Binaries/Sandbox.dll</OutputPath> -->
+<!--   </PropertyGroup> -->
+
+<!--   <ItemGroup> -->
+<!--     <Folder Include="Scene" /> -->
+<!--   </ItemGroup> -->
+
+</Project>

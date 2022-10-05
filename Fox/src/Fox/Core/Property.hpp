@@ -17,7 +17,7 @@
 #include <ios>
 #include <cstddef>
 
-#include "Core/EventNotifier.hpp"
+#include "Events/EventNotifier.hpp"
 
 
 

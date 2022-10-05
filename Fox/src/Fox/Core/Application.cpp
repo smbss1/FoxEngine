@@ -1,33 +1,34 @@
 
-
-#include <Core/Managers/PluginManager.hpp>
-#include <chrono>
-#include <Time.hpp>
 #include <Utils/FileSystem.hpp>
-#include <Core/Managers/StateMachine.hpp>
-#include <Core/Managers/ResourceManager.hpp>
+#include "Save for later/StateMachine.hpp"
 #include <Renderer/RendererAPI.hpp>
 #include <Renderer/RendererCommand.hpp>
 #include <Core/Input/Input.hpp>
 #include <Renderer/Renderer.hpp>
 #include <Renderer/Renderer2D.hpp>
-#include "Core/Input/InputManager.hpp"
 #include "Core/Application.hpp"
 #include "Core/Logger/Logger.hpp"
 #include "json.hpp"
 #include "Scripting/ScriptEngine.hpp"
+#include "Utils/PlatformUtils.hpp"
 
 namespace fox
 {
-    Application::Application(int ac, char** av)
-    {
-        m_bIsRunning = true;
-        set<StateMachine>(*this);
-        set<ResourceManager>();
-//        set<InputManager>();
-        set<TimeInfo>();
+    Application* Application::s_Instance = nullptr;
 
-        m_pWindow = Window::Create(WindowProps());
+    Application::Application(const ApplicationSpecification& specification)
+            : m_Specification(specification)
+    {
+        FOX_ASSERT(!s_Instance, "Application already exists!");
+        s_Instance = this;
+
+        m_bIsRunning = true;
+
+        // Set working directory here
+        if (!m_Specification.WorkingDirectory.empty())
+            std::filesystem::current_path(m_Specification.WorkingDirectory);
+
+        m_pWindow = Window::Create(WindowProps(m_Specification.Name));
         m_pWindow->SetEventCallback(FOX_BIND_EVENT_FN(Application::OnEvent));
         Input::SetWindow(m_pWindow.get());
 
@@ -35,23 +36,30 @@ namespace fox
         ScriptEngine::Init();
 
         // Add the ImGui state of GUI
-        m_pImGuiState = new ImGuiState;
-        get<StateMachine>()->PushOverlay(m_pImGuiState);
+        m_ImGuiLayer = new ImGuiLayer;
+        PushOverlay(m_ImGuiLayer);
     }
 
     Application::~Application()
     {
-        remove<ResourceManager>();
-        remove<StateMachine>();
+        ScriptEngine::Shutdown();
         Renderer2D::Shutdown();
         RendererCommand::Shutdown();
     }
 
-    void Application::init()
+    void Application::PushLayer(Layer* layer)
     {
+        m_LayerStack.PushLayer(layer);
+        layer->OnAttach();
     }
 
-    void Application::quit()
+    void Application::PushOverlay(Layer* layer)
+    {
+        m_LayerStack.PushOverlay(layer);
+        layer->OnAttach();
+    }
+
+    void Application::Close()
     {
         m_bIsRunning = false;
     }
@@ -61,9 +69,8 @@ namespace fox
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<WindowCloseEvent>(FOX_BIND_EVENT_FN(Application::OnWindowClose));
         dispatcher.Dispatch<WindowResizeEvent>(FOX_BIND_EVENT_FN(Application::OnWindowResize));
-        auto& oStateMachine = get<StateMachine>().value();
 
-        for (auto it = oStateMachine.rbegin(); it != oStateMachine.rend(); ++it)
+        for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
         {
             if (e.Handled)
                 break;
@@ -88,23 +95,19 @@ namespace fox
             fox::error("Wrong configuration format for 'config.json'");
     }
 
-    void Application::run()
+    void Application::Run()
     {
         fox::info("Starting Application...");
-        float fFixedDeltaTime = 0;
-        float fFixedTimeStep = 1.0f / 45.0f;
-        float fDeltaTime;
-        auto lastUpdate = std::chrono::high_resolution_clock::now();
 
         // LoadConfig();
 
         // PluginManager& plugin_manager = get_or_create<fox::PluginManager>().value();
         // plugin_manager.FindAndLoadPlugins(std::string(FOX_PLUGIN_DIRECTORY) + (*m_oConfigFile)["plugins directory"].get<std::string>());
         // if(plugin_manager.GetGraphics().GetCount() <= 0)
-        //     throw std::runtime_error("Cannot run the application because no Graphics Plugins found");
+        //     throw std::runtime_error("Cannot Run the application because no Graphics Plugins found");
 
         // if(plugin_manager.GetWindowPlugin() == nullptr)
-        //     throw std::runtime_error("Cannot run the application because no Window Plugin found");
+        //     throw std::runtime_error("Cannot Run the application because no Window Plugin found");
 
         // GraphicPlugin& graphic_ctx = plugin_manager.GetGraphics().GetPlugin(0);
         // RendererAPI::SetGraphicPlugin(&graphic_ctx);
@@ -117,46 +120,25 @@ namespace fox
 
         // plugin_manager.InitializePlugins(*this);
 
-        // RendererCommand::SetRendererAPI(RenderCreateRenderer());
-        // RendererCommand::SetRendererAPI(graphic_ctx.CreateRenderer());
-        // Renderer::Init();
-
-        // init();
         fox::info("Application is running");
         while (m_bIsRunning)
         {
-            auto now = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double> elapsed = now - lastUpdate;
-            lastUpdate = now;
-
-            fDeltaTime = elapsed.count();
-            Time::delta_time = fDeltaTime;
-            if (Time::delta_time > 0.25)
-                Time::delta_time = 0.25;
-            Time::time += fDeltaTime;
-            get<TimeInfo>()->delta_time = Time::delta_time;
-            get<TimeInfo>()->time = Time::time;
-
-            fFixedDeltaTime += fDeltaTime;
-            while (fFixedDeltaTime >= fFixedTimeStep)
-            {
-                // get<SceneManager>()->fix_update();
-                Time::fixed_delta_time = fFixedDeltaTime;
-                get<TimeInfo>()->time = Time::fixed_delta_time;
-                fFixedDeltaTime -= fFixedTimeStep;
-            }
-            Time::factor_physics = fFixedDeltaTime / fFixedTimeStep;
-            get<TimeInfo>()->factor_physics = Time::factor_physics;
+            float time = Time::GetTime();
+            Timestep timestep = time - m_LastFrameTime;
+            m_LastFrameTime = time;
 
             if (!m_bIsMinimized)
             {
-                get<StateMachine>()->Update();
+                for (Layer* layer : m_LayerStack)
+                    layer->OnUpdate(timestep);
 
-                m_pImGuiState->Begin();
+                m_ImGuiLayer->Begin();
                 {
-                    get<fox::StateMachine>()->UpdateImGui();
+
+                    for (Layer* layer : m_LayerStack)
+                        layer->OnImGuiRender();
                 }
-                m_pImGuiState->End();
+                m_ImGuiLayer->End();
             }
             m_pWindow->OnUpdate();
         }

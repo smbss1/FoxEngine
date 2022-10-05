@@ -4,8 +4,10 @@
 #define FOXEGINE_OPENGL_UTILS
 
 #include "Renderer/RendererAPI.hpp"
-#include <glad/glad.h>
 #include "DebugBreak.hpp"
+
+#include <glad/glad.h>
+#include <string>
 
 #define ASSERT(x) if (!(x)) debug_break();
 #define GLCall(x) GLClearError();\

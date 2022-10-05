@@ -324,7 +324,7 @@
 			<Output TaskParameter="SatelliteFiles" ItemName="ReferenceSatellitePaths"/>
 			<Output TaskParameter="CopyLocalFiles" ItemName="ReferenceCopyLocalPaths"/>
 			<Output TaskParameter="DependsOnSystemRuntime" PropertyName="DependsOnSystemRuntime"/>
-			
+
 			<!-- FIXME: backwards compatibility -->
 			<Output TaskParameter="ResolvedDependencyFiles" ItemName="_ResolvedDependencyFiles"/>
 		</ResolveAssemblyReference>
@@ -908,7 +908,7 @@
 
 	<Target Name="Clean" DependsOnTargets="$(CleanDependsOn)"/>
 
-	<!-- Override in project to run before/after clean tasks -->
+	<!-- Override in project to Run before/after clean tasks -->
 	<Target Name="BeforeClean" />
 	<Target Name="AfterClean" />
 

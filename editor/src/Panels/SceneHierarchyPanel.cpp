@@ -7,7 +7,7 @@
 #include "Components.hpp"
 #include "imgui_internal.h"
 #include "Utils/Path.hpp"
-#include "FPaths.hpp"
+#include "Save for later/FPaths.hpp"
 #include "Events/EventSystem.hpp"
 #include "../EditorEvent.hpp"
 #include <filesystem>
@@ -15,14 +15,14 @@
 
 #include "Components.hpp"
 #include "SceneHierarchyPanel.hpp"
-#include "ImGuiExtension.hpp"
+#include "ImGui/ImGuiExtension.hpp"
 #include "Scripting/ScriptEngine.hpp"
 
 namespace fox
 {
     extern const std::filesystem::path g_AssetPath;
 
-    SceneHierarchyPanel::SceneHierarchyPanel() : m_pScriptLib(new_scope<SharedLib>())
+    SceneHierarchyPanel::SceneHierarchyPanel()
     {
     }
 
@@ -34,7 +34,6 @@ namespace fox
     SceneHierarchyPanel::~SceneHierarchyPanel()
     {
         m_pContext.reset();
-        m_pScriptLib.reset();
     }
 
     void SceneHierarchyPanel::SetContext(const ref<Scene>& context)
@@ -43,29 +42,6 @@ namespace fox
         m_SelectedEntity = {};
 
         event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
-
-        // if (!m_pScriptLib->GetHandle()) {
-
-        //     std::unordered_map<size_t, std::string> (*GetScriptsNames)();
-        //     std::unordered_map<size_t, ScriptCreator> (*GetScripts)();
-        //     fox::info("Open the native script library");
-
-        //     try {
-        //         std::string strLibPath = FPaths::ProjectDir() + "/libfox_native_script" DL_EXT;
-        //         m_pScriptLib->open(strLibPath);
-        //         m_pScriptLib->sym("GetScriptsNames", GetScriptsNames);
-        //         m_pScriptLib->sym("GetScripts", GetScripts);
-        //         m_vScriptsNames = GetScriptsNames();
-        //         m_vScripts = GetScripts();
-        //         context->GetApp().SetScriptsArray(m_vScripts);
-        //         for (auto name : m_vScriptsNames) {
-        //             fox::info("Script: '%'", name.second);
-        //         }
-        //     }
-        //     catch (std::exception &e) {
-        //         fox::error("%", e.what());
-        //     }
-        // }
     }
 
     void SceneHierarchyPanel::OnImGui()
@@ -203,7 +179,7 @@ namespace fox
 		}
 	}
 
-    void SceneHierarchyPanel::DrawComponents(Entity& entity)
+    void SceneHierarchyPanel::DrawComponents(Entity entity)
     {
         if (entity.has<EntityName>())
         {
@@ -301,7 +277,7 @@ namespace fox
            }
        });
 
-        DrawComponent<ScriptComponent>("Script", entity, [](auto& component)
+        DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_pContext](auto& component) mutable
         {
             bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
 
@@ -314,67 +290,62 @@ namespace fox
             if (ImGui::InputText("Class", buffer, sizeof(buffer)))
                 component.ClassName = buffer;
 
-//            // Fields
-//            bool sceneRunning = scene->IsRunning();
-//            if (sceneRunning)
-//            {
-//                Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
-//                if (scriptInstance)
-//                {
-//                    const auto& fields = scriptInstance->GetScriptClass()->GetFields();
-//                    for (const auto& [name, field] : fields)
-//                    {
-//                        if (field.Type == ScriptFieldType::Float)
-//                        {
-//                            float data = scriptInstance->GetFieldValue<float>(name);
-//                            if (ImGui::DragFloat(name.c_str(), &data))
-//                            {
-//                                scriptInstance->SetFieldValue(name, data);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            else
-//            {
-//                if (scriptClassExists)
-//                {
-//                    Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(component.ClassName);
-//                    const auto& fields = entityClass->GetFields();
-//
-//                    auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
-//                    for (const auto& [name, field] : fields)
-//                    {
-//                        // Field has been set in editor
-//                        if (entityFields.find(name) != entityFields.end())
-//                        {
-//                            ScriptFieldInstance& scriptField = entityFields.at(name);
-//
-//                            // Display control to set it maybe
-//                            if (field.Type == ScriptFieldType::Float)
-//                            {
-//                                float data = scriptField.GetValue<float>();
-//                                if (ImGui::DragFloat(name.c_str(), &data))
-//                                    scriptField.SetValue(data);
-//                            }
-//                        }
-//                        else
-//                        {
-//                            // Display control to set it maybe
-//                            if (field.Type == ScriptFieldType::Float)
-//                            {
-//                                float data = 0.0f;
-//                                if (ImGui::DragFloat(name.c_str(), &data))
-//                                {
-//                                    ScriptFieldInstance& fieldInstance = entityFields[name];
-//                                    fieldInstance.Field = field;
-//                                    fieldInstance.SetValue(data);
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
+            // Fields
+            bool sceneRunning = scene->IsRunning();
+            if (sceneRunning)
+            {
+                ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
+                if (scriptInstance)
+                {
+                    const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+                    for (const auto& [name, field] : fields)
+                    {
+                        if (field.Type == ScriptFieldType::Float)
+                        {
+                            float data = scriptInstance->GetFieldValue<float>(name);
+                            if (ImGui::DragFloat(name.c_str(), &data))
+                            {
+                                scriptInstance->SetFieldValue(name, data);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (scriptClassExists)
+                {
+                    ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(component.ClassName);
+                    const auto& fields = entityClass->GetFields();
+
+                    auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+                    for (const auto& [name, field] : fields)
+                    {
+                        // Field has not been set in editor
+                        bool isSet = entityFields.find(name) != entityFields.end();
+                        if (!isSet)
+                        {
+                            ScriptFieldInstance& fieldInstance = entityFields[name];
+                            fieldInstance.Field = field;
+
+                            // This works for geting default value like 'Speed = 45.4f' but maybe expensive memory alloc cuz of instance creation
+//                            ScriptInstance instance = ScriptInstance(entityClass, entity);
+//                            fieldInstance.template SetValue<float>(instance.GetFieldValue<float>(name));
+//                            fox::info("data = %", fieldInstance.GetValue<float>());
+                        }
+
+                        ScriptFieldInstance& scriptField = entityFields.at(name);
+
+                        // Display control to set it maybe
+                        if (field.Type == ScriptFieldType::Float)
+                        {
+                            float data = scriptField.GetValue<float>();
+                            if (ImGui::DragFloat(name.c_str(), &data))
+                                scriptField.SetValue(data);
+                        }
+                    }
+                }
+            }
 
             if (!scriptClassExists)
                 ImGui::PopStyleColor();

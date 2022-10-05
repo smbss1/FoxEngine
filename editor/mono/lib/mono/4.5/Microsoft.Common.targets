@@ -905,7 +905,7 @@
 
 	<Target Name="Clean" DependsOnTargets="$(CleanDependsOn)"/>
 
-	<!-- Override in project to run before/after clean tasks -->
+	<!-- Override in project to Run before/after clean tasks -->
 	<Target Name="BeforeClean" />
 	<Target Name="AfterClean" />
 

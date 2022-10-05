@@ -10,12 +10,10 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-// #include <rttr/type>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "Reflection.hpp"
 #include "Utils/Vec3.hpp"
 #include "Utils/Quat.hpp"
 

@@ -86,7 +86,7 @@
         </xs:attribute>
         <xs:attribute name="DependsOnTargets" type="xs:string" use="optional">
             <xs:annotation>
-                <xs:documentation>Optional semi-colon separated list of targets that should be run before this target</xs:documentation>
+                <xs:documentation>Optional semi-colon separated list of targets that should be Run before this target</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="Inputs" type="xs:string" use="optional">
@@ -101,7 +101,7 @@
         </xs:attribute>
         <xs:attribute name="Condition" type="xs:string" use="optional">
             <xs:annotation>
-                <xs:documentation>Optional expression evaluated to determine whether the Target and the targets it depends on should be run</xs:documentation>
+                <xs:documentation>Optional expression evaluated to determine whether the Target and the targets it depends on should be Run</xs:documentation>
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>

@@ -5,8 +5,7 @@
 #ifndef FOXENGINE_SCENEHIERARCHYPANEL_HPP
 #define FOXENGINE_SCENEHIERARCHYPANEL_HPP
 
-#include "Core/Scene.hpp"
-#include "SharedLib.hpp"
+#include "Scene/Scene.hpp"
 #include "Ecs/Entity.hpp"
 #include "Components/NativeScript.hpp"
 
@@ -28,7 +27,7 @@ namespace fox
 
     private:
         void DrawEntityNode(Entity& e);
-        void DrawComponents(Entity& entity);
+        void DrawComponents(Entity entity);
 
         // void DrawComponent(const ref<Component> &component_ptr, Entity entity);
 
@@ -40,10 +39,6 @@ namespace fox
     private:
         ref<Scene> m_pContext = nullptr;
         Entity m_SelectedEntity;
-
-        scope<SharedLib> m_pScriptLib;
-//        std::unordered_map<size_t, std::string> m_vScriptsNames;
-//        std::unordered_map<size_t, ScriptCreator> m_vScripts;
     };
 }
 

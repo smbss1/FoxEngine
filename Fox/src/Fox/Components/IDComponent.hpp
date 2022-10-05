@@ -9,7 +9,7 @@
 
 namespace fox
 {
-    struct IDComponent // : public ComponentImpl<IDComponent>
+    struct IDComponent
     {
         UUID ID;
 

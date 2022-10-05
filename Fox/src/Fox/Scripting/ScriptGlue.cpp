@@ -10,7 +10,7 @@
 #include "Core/Input/Input.hpp"
 #include "Core/Logger/Logger.hpp"
 
-#include "Core/Scene.hpp"
+#include "Scene/Scene.hpp"
 #include "Ecs/Entity.hpp"
 #include "Components.hpp"
 

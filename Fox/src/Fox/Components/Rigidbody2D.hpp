@@ -7,7 +7,7 @@
 
 #include "glm/glm.hpp"
 
-struct Rigidbody2D // : public ComponentImpl<Rigidbody2D>
+struct Rigidbody2D
 {
     enum class BodyType { Static = 0, Dynamic, Kinematic };
     BodyType Type = BodyType::Static;
@@ -20,7 +20,7 @@ struct Rigidbody2D // : public ComponentImpl<Rigidbody2D>
     Rigidbody2D(const Rigidbody2D&) = default;
 };
 
-struct BoxCollider2D // : public ComponentImpl<BoxCollider2D>
+struct BoxCollider2D
 {
     glm::vec2 Offset = { 0.0f, 0.0f };
     glm::vec2 Size = { 0.5f, 0.5f };
@@ -38,7 +38,7 @@ struct BoxCollider2D // : public ComponentImpl<BoxCollider2D>
     BoxCollider2D(const BoxCollider2D&) = default;
 };
 
-struct CircleCollider2D // : public ComponentImpl<CircleCollider2D>
+struct CircleCollider2D
 {
     glm::vec2 Offset = { 0.0f, 0.0f };
     float Radius = 0.5f;

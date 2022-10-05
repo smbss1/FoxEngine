@@ -5,9 +5,10 @@
 #ifndef FOXENGINE_TEXTURE_HPP
 #define FOXENGINE_TEXTURE_HPP
 
+#include "common.hpp"
+
 #include <cstdint>
 #include <string>
-#include "common.hpp"
 
 namespace fox
 {

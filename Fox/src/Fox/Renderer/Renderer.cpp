@@ -2,7 +2,6 @@
 // Created by samuel on 26/06/2021.
 //
 
-#include <Plugin/IPlugin.hpp>
 #include <Renderer/RendererCommand.hpp>
 #include <Renderer/Renderer2D.hpp>
 #include "Renderer/Renderer.hpp"

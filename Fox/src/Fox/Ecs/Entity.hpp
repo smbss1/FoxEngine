@@ -9,7 +9,7 @@
 #define FOX_WORLD_HPP_
 
 #include "Core/UUID.hpp"
-#include "Core/Scene.hpp"
+#include "Scene/Scene.hpp"
 #include "Core/Assert.hpp"
 
 #include "entt.hpp"

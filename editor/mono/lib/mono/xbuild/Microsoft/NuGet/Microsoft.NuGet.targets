@@ -6,7 +6,7 @@ WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and
           created a backup copy.  Incorrect changes to this file will make it
           impossible to load or build your projects from the command-line or the IDE.
 
-Copyright (c) .NET Foundation. All rights reserved. 
+Copyright (c) .NET Foundation. All rights reserved.
 ***********************************************************************************************
 -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -70,7 +70,7 @@ Copyright (c) .NET Foundation. All rights reserved.
   <PropertyGroup>
     <ResolveNuGetPackages Condition="'$(ResolveNuGetPackages)' == '' and '$(MSBuildProjectExtension)' != '.xproj'">true</ResolveNuGetPackages>
 
-    <!-- 
+    <!--
     if BaseNuGetRuntimeIdentifier is defined then simply use it as RuntimeIdentifier, otherwise
     we'll set RuntimeIdentifiers to default value later on.
     -->
@@ -247,7 +247,7 @@ Copyright (c) .NET Foundation. All rights reserved.
         [OUT]
         @(Analyzer) - Paths to build-time diagnostic analyzers
         @(Reference) - Paths to build-time NuGet dependencies
-        @(ReferenceCopyLocalPaths) - Paths to run-time dependencies to copy
+        @(ReferenceCopyLocalPaths) - Paths to Run-time dependencies to copy
     ============================================================
   -->
 
@@ -308,7 +308,7 @@ Copyright (c) .NET Foundation. All rights reserved.
       <Output TaskParameter="Include" ItemName="%(_NuGetContentItems.NuGetItemType)" />
     </CreateItem>
   </Target>
-  
+
   <Target Name="RuntimeImplementationProjectOutputGroup"
           Returns="@(RuntimeImplementationProjectOutputGroupOutput)"
           Condition="'$(ResolveNuGetPackages)' == 'true' and exists('$(ProjectLockFile)')"

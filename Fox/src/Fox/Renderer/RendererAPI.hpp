@@ -6,7 +6,7 @@
 #define FOXENGINE_RENDERERAPI_HPP
 
 #include "glm/glm.hpp"
-#include "Plugin/IPlugin.hpp"
+#include "common.hpp"
 
 namespace fox
 {
@@ -22,9 +22,6 @@ namespace fox
 
         virtual void DrawLines(const ref<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
         virtual void SetLineWidth(float width) = 0;
-
-        // static GraphicPlugin* GetGraphicPlugin();
-        // static void SetGraphicPlugin(GraphicPlugin* pGraphic);
 
         static scope<RendererAPI> Create();
 

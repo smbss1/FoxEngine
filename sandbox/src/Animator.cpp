@@ -14,7 +14,7 @@
 //     auto e = m_pActiveScene->NewEntity("");
 //     auto& oAnimPlayer = e.add<fox::AnimationPlayer>();
 //     auto& idle = oAnimPlayer.AddAnimation("Idle");
-//     auto& run = oAnimPlayer.AddAnimation("Run");
+//     auto& Run = oAnimPlayer.AddAnimation("Run");
 
 //     m_AnimationPlayer = &oAnimPlayer;
 
@@ -40,7 +40,7 @@
 //     m_Camera.OnUpdate();
 //     m_pActiveScene->OnUpdateRuntime();
 
-//     m_AnimationPlayer->run();
+//     m_AnimationPlayer->Run();
 
 // //    if (m_AnimationPlayer->Current.get())
 // //        fox::info("Current Animation: %", m_AnimationPlayer->Current.get()->Name);

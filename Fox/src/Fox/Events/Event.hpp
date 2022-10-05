@@ -6,6 +6,7 @@
 #define FOXENGINE_EVENT_HPP
 
 #include <common.hpp>
+#include <string>
 #include <functional>
 
 #include "Core/Base.hpp"

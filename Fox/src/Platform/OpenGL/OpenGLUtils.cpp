@@ -1,6 +1,8 @@
 
 #include "OpenGL/OpenGLUtils.hpp"
 
+#include <iostream>
+
 void GLClearError()
 {
     while (glGetError() != GL_NO_ERROR);

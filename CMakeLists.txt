@@ -13,11 +13,12 @@ set_target_properties(fox_editor PROPERTIES OUTPUT_NAME "fox_editor")
 set_target_properties(fox_editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/editor")
 add_dependencies(fox_editor fox_engine)
 target_include_directories(fox_editor PRIVATE
-    editor/include
-    Fox/src/Fox
-    Fox/src/Platform
+    editor/src
     Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
+    Fox/vendor/mono/include
+    Fox/src/Fox
+    Fox/src/Platform
     Fox/vendor/glad
     Fox/vendor/glm
     Fox/vendor/FoxJson/include
@@ -117,10 +118,10 @@ target_link_options(fox_editor PRIVATE
     -m64
 )
 target_sources(fox_editor PRIVATE
-        editor/src/Panels/ContentBrowserPanel.cpp
-        editor/src/Panels/SceneHierarchyPanel.cpp
+    editor/src/Panels/ContentBrowserPanel.cpp
+    editor/src/Panels/SceneHierarchyPanel.cpp
     editor/src/EditorApp.cpp
-    editor/src/EditorState.cpp
+    editor/src/EditorLayer.cpp
 )
 
 # target
@@ -129,10 +130,11 @@ set_target_properties(fox_engine PROPERTIES OUTPUT_NAME "fox_engine")
 set_target_properties(fox_engine PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/linux/x86_64/release")
 add_dependencies(fox_engine imgui fox_json glm glad)
 target_include_directories(fox_engine PRIVATE
-    Fox/src/Fox
-    Fox/src/Platform
     Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
+    Fox/vendor/mono/include
+    Fox/src/Fox
+    Fox/src/Platform
     Fox/vendor/glad
     Fox/vendor/glm
     Fox/vendor/FoxJson/include
@@ -140,10 +142,11 @@ target_include_directories(fox_engine PRIVATE
     Fox/vendor/imgui
 )
 target_include_directories(fox_engine INTERFACE
-    Fox/src/Fox
-    Fox/src/Platform
     Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
+    Fox/vendor/mono/include
+    Fox/src/Fox
+    Fox/src/Platform
 )
 target_include_directories(fox_engine PRIVATE
     /home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/include
@@ -243,7 +246,13 @@ target_link_directories(fox_engine PRIVATE
     build/linux/x86_64/release
 )
 target_sources(fox_engine PRIVATE
+    Fox/vendor/ImGuizmo/ImCurveEdit.cpp
+    Fox/vendor/ImGuizmo/ImGradient.cpp
+    Fox/vendor/ImGuizmo/ImSequencer.cpp
+    Fox/vendor/ImGuizmo/ImGuizmo.cpp
+    Fox/vendor/ImGuizmo/GraphEditor.cpp
     Fox/src/Platform/GlfwWindows/GlfwWindow.cpp
+    Fox/src/Platform/GlfwWindows/GlfwWindowsPlatformUtils.cpp
     Fox/src/Platform/OpenGL/VertexBuffer.cpp
     Fox/src/Platform/OpenGL/IndexBuffer.cpp
     Fox/src/Platform/OpenGL/OpenGLRendererAPI.cpp
@@ -259,43 +268,44 @@ target_sources(fox_engine PRIVATE
     Fox/src/Platform/OpenGL/OpenGLContext.cpp
     Fox/src/Platform/OpenGL/OpenGLTexture.cpp
     Fox/src/Fox/ImGui/ImGuiBuild.cpp
-    Fox/src/Fox/ImGui/ImGuiState.cpp
+    Fox/src/Fox/ImGui/ImGuiLayer.cpp
     Fox/src/Fox/Components/Animator/Track.cpp
     Fox/src/Fox/ReflectedComponents.cpp
-    Fox/src/Fox/ImGuiExtension.cpp
-    Fox/src/Fox/ScriptRegistry.cpp
-    Fox/src/Fox/Events/EventSystem.cpp
+        Fox/src/Fox/ImGui/ImGuiExtension.cpp
+    "Fox/src/Fox/Scripting/Old Thing/ScriptRegistry.cpp"
+        Fox/src/Fox/Events/EventSystem.cpp
     Fox/src/Fox/Math/Quat.cpp
     Fox/src/Fox/Math/Math.cpp
     Fox/src/Fox/Math/Vec3.cpp
     Fox/src/Fox/Scripting/ScriptGlue.cpp
     Fox/src/Fox/Scripting/ScriptEngine.cpp
-    Fox/src/Fox/FPaths.cpp
-    Fox/src/Fox/Utils/bitsets.cpp
+    "Fox/src/Fox/Save for later/FPaths.cpp"
+        Fox/src/Fox/Utils/bitsets.cpp
     Fox/src/Fox/Utils/Path.cpp
     Fox/src/Fox/Utils/PlatformUtils.cpp
-    Fox/src/Fox/Utils/SharedLib.cpp
-    Fox/src/Fox/Utils/Any.cpp
+    "Fox/src/Fox/Save for later/Plugin System (Not used)/SharedLib.cpp"
+        Fox/src/Fox/Utils/Any.cpp
     Fox/src/Fox/Utils/FileSystem.cpp
-    Fox/src/Fox/ScriptableBehaviour.cpp
-    Fox/src/Fox/SceneCamera.cpp
+        Fox/src/Fox/Scene/ScriptableBehaviour.cpp
+        Fox/src/Fox/Scene/SceneCamera.cpp
     Fox/src/Fox/Font.cpp
-    Fox/src/Fox/Time.cpp
-    Fox/src/Fox/Core/PluginLoader.cpp
-    Fox/src/Fox/Core/AudioGroup.cpp
-    Fox/src/Fox/Core/Scene.cpp
+    "Fox/src/Fox/Save for later/Time.cpp"
+        Fox/src/Fox/Core/LayerStack.cpp
+    Fox/src/Fox/Core/Layer.cpp
+    "Fox/src/Fox/Save for later/Plugin System (Not used)/PluginLoader.cpp"
+        "Fox/src/Fox/Save for later/AudioGroup.cpp"
+        Fox/src/Fox/Scene/Scene.cpp
     Fox/src/Fox/Core/Logger.cpp
     Fox/src/Fox/Core/State.cpp
-    Fox/src/Fox/Core/SceneSerializer.cpp
-    Fox/src/Fox/Core/Input/Keyboard.cpp
+        Fox/src/Fox/Scene/SceneSerializer.cpp
     Fox/src/Fox/Core/Input/Mouse.cpp
     Fox/src/Fox/Core/Input/Input.cpp
     Fox/src/Fox/Core/UUID.cpp
     Fox/src/Fox/Core/Window.cpp
-    Fox/src/Fox/Core/Managers/PluginManager.cpp
-    Fox/src/Fox/Core/Managers/StateMachine.cpp
-    Fox/src/Fox/Core/Managers/AudioManager.cpp
-    Fox/src/Fox/Core/Application.cpp
+    "Fox/src/Fox/Save for later/Plugin System (Not used)/PluginManager.cpp"
+        "Fox/src/Fox/Save for later/StateMachine.cpp"
+        "Fox/src/Fox/Save for later/AudioManager.cpp"
+        Fox/src/Fox/Core/Application.cpp
     Fox/src/Fox/Renderer/SubTexture2D.cpp
     Fox/src/Fox/Renderer/Texture.cpp
     Fox/src/Fox/Renderer/Renderer2D.cpp
@@ -312,13 +322,8 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Renderer/Renderer.cpp
     Fox/src/Fox/Renderer/GraphicsContext.cpp
     Fox/src/Fox/Ecs/Entity.cpp
-    Fox/src/Fox/FileWatcher.cpp
-    Fox/vendor/ImGuizmo/ImCurveEdit.cpp
-    Fox/vendor/ImGuizmo/ImGradient.cpp
-    Fox/vendor/ImGuizmo/ImSequencer.cpp
-    Fox/vendor/ImGuizmo/ImGuizmo.cpp
-    Fox/vendor/ImGuizmo/GraphEditor.cpp
-)
+    "Fox/src/Fox/Save for later/FileWatcher.cpp"
+        )
 
 # target
 add_library(fox_json STATIC "")
@@ -543,10 +548,11 @@ set_target_properties(sandbox PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURC
 add_dependencies(sandbox fox_engine)
 target_include_directories(sandbox PRIVATE
     sandbox/include
-    Fox/src/Fox
-    Fox/src/Platform
     Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
+    Fox/vendor/mono/include
+    Fox/src/Fox
+    Fox/src/Platform
     Fox/vendor/glad
     Fox/vendor/glm
     Fox/vendor/FoxJson/include

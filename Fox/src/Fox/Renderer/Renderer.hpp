@@ -5,11 +5,12 @@
 #ifndef FOXENGINE_RENDERER_HPP
 #define FOXENGINE_RENDERER_HPP
 
-#include "Plugin/IPlugin.hpp"
 #include "OrthographicCamera.hpp"
+#include "Shader.hpp"
 
 namespace fox
 {
+    class VertexArray;
     class Renderer
     {
     public:

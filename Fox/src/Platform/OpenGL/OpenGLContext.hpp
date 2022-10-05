@@ -5,7 +5,6 @@
 #ifndef FOXENGINE_OPENGLCONTEXT_HPP
 #define FOXENGINE_OPENGLCONTEXT_HPP
 
-#include <SharedLib.hpp>
 #include "Renderer/GraphicsContext.hpp"
 
 struct GLFWwindow;

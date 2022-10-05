@@ -18,6 +18,11 @@ namespace fox {
         static std::string SaveFile(const std::vector<std::string>& filter);
     };
 
+    class Time
+    {
+    public:
+        static float GetTime();
+    };
 }
 
 

@@ -2,26 +2,24 @@
 #include <FoxEngine.hpp>
 #include <Core/EntryPoint.hpp>
 
-#include <Core/Input/InputManager.hpp>
 #include <Core/State.hpp>
-#include <Core/Managers/StateMachine.hpp>
+#include "Save for later/StateMachine.hpp"
 #include <Renderer/EditorCamera.hpp>
-#include "EditorState.hpp"
-#include <Time.hpp>
+#include "EditorLayer.hpp"
+#include "Save for later/Time.hpp"
 #include <Core/Input/Input.hpp>
+// #include "ScriptableBehaviour.hpp"
 
 class EditorApp : public fox::Application
 {
     public:
-    EditorApp(int argc, char** argv);
-        ~EditorApp() override;
-        void init() override;
+        EditorApp(const fox::ApplicationSpecification& specification);
+        ~EditorApp() override = default;
 
     protected:
     private:
 };
 
-// #include "ScriptableBehaviour.hpp"
 
 namespace fox
 {
@@ -59,21 +57,16 @@ namespace fox
     // };
 }
 
-EditorApp::EditorApp(int argc, char** argv) : fox::Application(argc, argv)
+EditorApp::EditorApp(const fox::ApplicationSpecification& specification) : fox::Application(specification)
 {
-    fox::StateMachine& sceneManager = get<fox::StateMachine>().value();
-    sceneManager.PushState(new fox::EditorState());
+    PushLayer(new fox::EditorLayer());
 }
 
-EditorApp::~EditorApp() { }
-
-void EditorApp::init()
+fox::Application* fox::CreateApp(ApplicationCommandLineArgs args)
 {
-    // fox::StateMachine& sceneManager = get<fox::StateMachine>().value();
-    // sceneManager.PushState(new fox::EditorState());
-}
+    ApplicationSpecification spec;
+    spec.Name = "Fox Editor";
+    spec.CommandLineArgs = args;
 
-fox::Application* fox::CreateApp(int argc, char** argv)
-{
-    return new EditorApp(argc, argv);
+    return new EditorApp(spec);
 }
