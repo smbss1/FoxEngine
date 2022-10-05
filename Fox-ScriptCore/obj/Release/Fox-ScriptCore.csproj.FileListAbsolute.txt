@@ -6,3 +6,4 @@
 /home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Release/Fox-ScriptCore.csproj.CoreCompileInputs.cache
 /home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Release/Fox-ScriptCore.dll
 /home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Release/Fox-ScriptCore.pdb
+/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Release/Fox-ScriptCore.csproj.AssemblyReference.cache

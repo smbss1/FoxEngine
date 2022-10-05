@@ -117,13 +117,9 @@ target_link_options(fox_editor PRIVATE
     -m64
 )
 target_sources(fox_editor PRIVATE
-    editor/src/ContentBrowserPanel.cpp
-    editor/src/inspector_primitives.cpp
-    editor/src/SceneHierarchyPanel.cpp
-    editor/src/inspector_assets.cpp
-    editor/src/inspectors.cpp
+        editor/src/Panels/ContentBrowserPanel.cpp
+        editor/src/Panels/SceneHierarchyPanel.cpp
     editor/src/EditorApp.cpp
-    editor/src/inspector.cpp
     editor/src/EditorState.cpp
 )
 

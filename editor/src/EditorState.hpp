@@ -8,14 +8,14 @@
 #ifndef FOX_EDITOR_STATE_HPP_
 #define FOX_EDITOR_STATE_HPP_
 
-#include <Utils/Vec2.hpp>
-#include <json.hpp>
-#include <FileWatcher.hpp>
+#include "Utils/Vec2.hpp"
+#include "json.hpp"
+#include "FileWatcher.hpp"
 
 #include "FoxEngine.hpp"
-#include "SceneHierarchyPanel.hpp"
+#include "Panels/SceneHierarchyPanel.hpp"
 #include "Renderer/EditorCamera.hpp"
-#include "ContentBrowserPanel.hpp"
+#include "Panels/ContentBrowserPanel.hpp"
 #include "Events/KeyEvent.hpp"
 
 class RuntimeStartEvent;

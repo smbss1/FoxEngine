@@ -5,5 +5,5 @@ target("fox_editor")
 
     add_deps("fox_engine")
 
-    add_includedirs("include")
-    add_files("src/*.cpp")
+    add_includedirs("src")
+    add_files("src/**.cpp")

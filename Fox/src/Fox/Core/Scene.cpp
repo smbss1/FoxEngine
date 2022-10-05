@@ -41,33 +41,6 @@ namespace fox
 
     Scene::Scene(Application& app) : m_oApp(app)
     {
-
-        // Draw Systems
-//        // Native Script Systems
-//        m_oWorld.system<NativeScript>().kind(ecs::OnUpdate)
-//                .each([&](Entity& e, NativeScript& script)
-//                      {
-//                          script.on_update();
-//                      });
-//
-//        m_oWorld.system<NativeScript>().kind(ecs::OnAdd)
-//                .each([&](Entity& e, NativeScript& script)
-//                      {
-//                          script.m_pWorld = e.get_world();
-//                          script.on_create_all(e.get_id(), app);
-//                      });
-//
-//        m_oWorld.system<NativeScript>().kind(ecs::OnAddScript)
-//                .each([&](Entity& e, NativeScript& script)
-//                      {
-//                          script.on_create(e.get_id(), app);
-//                      });
-//
-//        m_oWorld.system<NativeScript>().kind(game::OnStart)
-//                .each([&](Entity& e, NativeScript& script)
-//                      {
-//                          script.OnStart();
-//                      });
     }
 
     Scene::~Scene()
@@ -77,13 +50,7 @@ namespace fox
 
 //    void Scene::init_systems()
 //    {
-//        get_world().system<BoxCollider>()
-//                .kind(ecs::OnAdd)
-//                .each([](Entity e, BoxCollider& shape)
-//                      {
-//                          shape.entity = e.get_id();
-//                      });
-//
+
 //        get_world().system<fox::Button, Animator>().each([](Entity e, fox::Button& btn, Animator& anim)
 //        {
 //            if (btn.state() == btn.prev_state())
@@ -107,13 +74,7 @@ namespace fox
 //                    break;
 //            }
 //        });
-//
-//        get_world().system<fox::Transform>().kind(fox::ecs::PreUpdate)
-//            .each([](Entity e, fox::Transform& transform)
-//        {
-//            transform.update_position();
-//        });
-//
+
 //        get_world().system<fox::Button, fox::Transform>().kind(ecs::OnStore)
 //            .each([](Entity e, fox::Button& btn, fox::Transform& transform)
 //        {
@@ -136,14 +97,7 @@ namespace fox
 //            }
 //            btn.sprite().Draw(sourceRec, destRec, Vec2(), transform.rotation.GetAngle());
 //        });
-//
-//        get_world().system<fox::Image, fox::Transform>().kind(ecs::OnStore)
-//            .each([](Entity e, fox::Image& img, fox::Transform& transform)
-//                  {
-//                      ray::Rectangle sourceRec = { 0.0f, 0.0f, (float)img.sprite().width, (float)img.sprite().height };
-//                      ray::Rectangle destRec = { transform.position.x, transform.position.y, img.sprite().width * transform.scale.x, img.sprite().height * transform.scale.y };
-//                      img.sprite().Draw(sourceRec, destRec, Vec2(), transform.rotation.GetAngle());
-//                  });
+
 
     Entity Scene::NewEntity(const std::string &name)
     {
@@ -164,8 +118,8 @@ namespace fox
 
     void Scene::DestroyEntity(Entity entity)
     {
-        m_Registry.destroy(entity);
         m_EntityMap.erase(entity.GetUUID());
+        m_Registry.destroy(entity);
     }
 
     void Scene::OnUpdateEditor(EditorCamera &camera)
@@ -441,6 +395,18 @@ namespace fox
         if (m_EntityMap.find(uuid) != m_EntityMap.end())
             return { m_EntityMap.at(uuid), this };
 
+        return {};
+    }
+
+    Entity Scene::FindEntityByName(std::string_view name)
+    {
+        auto view = m_Registry.view<EntityName>();
+        for (auto entity : view)
+        {
+            const EntityName& tc = view.get<EntityName>(entity);
+            if (tc.name == name)
+                return Entity{ entity, this };
+        }
         return {};
     }
 

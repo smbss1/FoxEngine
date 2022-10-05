@@ -16,4 +16,8 @@
       <OutputPath>../editor/Resources/Scripts/</OutputPath>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Scene" />
+    </ItemGroup>
+
 </Project>

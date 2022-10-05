@@ -2,10 +2,10 @@
 // Created by samuel on 02/07/2021.
 //
 
-#include <imgui.h>
-#include <FPaths.hpp>
-#include <Core/Logger/Logger.hpp>
-#include <SupportedFileFormat.hpp>
+#include "imgui.h"
+#include "FPaths.hpp"
+#include "Core/Logger/Logger.hpp"
+#include "SupportedFileFormat.hpp"
 #include "ContentBrowserPanel.hpp"
 
 namespace fox

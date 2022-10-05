@@ -58,6 +58,7 @@ namespace fox
 
         Application& GetApp();
         Entity GetEntityByUUID(UUID uuid);
+        Entity FindEntityByName(std::string_view name);
 
     private:
 

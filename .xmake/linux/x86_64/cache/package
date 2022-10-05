@@ -1,16 +1,10 @@
 {
     glfw = {
-        version = "3.3.8",
-        sysincludedirs = {
-            "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/include",
-            "/usr/include/python3.10",
-            "/usr/include/X11/dri"
+        syslinks = {
+            "dl",
+            "pthread"
         },
-        linkdirs = {
-            "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib",
-            "/usr/lib"
-        },
-        __requirestr = "glfw",
+        license = "zlib",
         envs = {
             LD_LIBRARY_PATH = {
                 "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib",
@@ -41,6 +35,10 @@
                 "/home/samuel/.xmake/packages/l/libxcursor/1.2.0/74629e954cd54dd4b68e35f81fca2dc1/lib",
                 "/home/samuel/.xmake/packages/l/libxi/1.8/98f0dd4777c3417abf73c89d52845a65/lib"
             },
+            PYTHONPATH = {
+                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/lib/python3.10/site-packages",
+                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/lib/python3.10/site-packages"
+            },
             PATH = {
                 "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/bin",
                 "/home/samuel/.xmake/packages/p/pkg-config/0.29.2/f9500a0d295b4a7aabf3f933f2972e71/bin",
@@ -50,12 +48,13 @@
                 "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/Scripts",
                 "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/bin",
                 "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/Scripts"
-            },
-            PYTHONPATH = {
-                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/lib/python3.10/site-packages",
-                "/home/samuel/.xmake/packages/p/python/3.10.6/e357df3d007a461995be04740991afd2/lib/python3.10/site-packages"
             }
         },
+        defines = {
+            "_GLFW_X11",
+            "GLFW_INCLUDE_NONE"
+        },
+        version = "3.3.8",
         links = {
             "glfw3",
             "OpenGL",
@@ -100,83 +99,84 @@
             "Xau",
             "Xdmcp"
         },
-        syslinks = {
-            "dl",
-            "pthread"
-        },
-        license = "zlib",
-        defines = {
-            "_GLFW_X11",
-            "GLFW_INCLUDE_NONE"
-        },
-        libfiles = "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib/libglfw3.a",
-        static = true,
         __enabled = true,
+        libfiles = "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib/libglfw3.a",
+        linkdirs = {
+            "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib",
+            "/usr/lib"
+        },
+        __requirestr = "glfw",
+        sysincludedirs = {
+            "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/include",
+            "/usr/include/python3.10",
+            "/usr/include/X11/dri"
+        },
+        static = true,
         __installdir = "/home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0"
     },
     box2d = {
-        version = "2.4.1",
-        sysincludedirs = "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/include",
         linkdirs = "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib",
-        __requirestr = "box2d",
         envs = {
-            PATH = {
-                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/bin"
-            },
             LD_LIBRARY_PATH = {
                 "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib",
                 "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/lib"
+            },
+            PATH = {
+                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/bin"
             }
         },
-        links = "box2d",
-        libfiles = "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib/libbox2d.a",
         static = true,
+        libfiles = "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib/libbox2d.a",
+        links = "box2d",
         __enabled = true,
+        version = "2.4.1",
+        sysincludedirs = "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/include",
+        __requirestr = "box2d",
         __installdir = "/home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c"
     },
     opengl = {
-        links = "OpenGL",
         linkdirs = "/usr/lib",
-        __requirestr = "opengl",
         __enabled = true,
         envs = {
             LD_LIBRARY_PATH = {
                 "/home/samuel/.xmake/packages/o/opengl/latest/4e0143c97b65425b855ad5fd03038b6a/lib"
             }
-        }
+        },
+        links = "OpenGL",
+        __requirestr = "opengl"
     },
     ["yaml-cpp"] = {
-        links = "yaml-cpp",
         linkdirs = "/usr/lib",
-        version = "0.7.0",
-        __requirestr = "yaml-cpp",
         __enabled = true,
+        version = "0.7.0",
         envs = {
-            PATH = {
-                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/bin"
-            },
             LD_LIBRARY_PATH = {
                 "/home/samuel/Git Repos/FoxEngine/build/.packages/y/yaml-cpp/latest/4e0143c97b65425b855ad5fd03038b6a/lib",
                 "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/lib"
+            },
+            PATH = {
+                "/home/samuel/.xmake/packages/c/cmake/3.24.1/baaee90934bf4f53b3740f2c3f06a3a0/bin"
             }
-        }
+        },
+        links = "yaml-cpp",
+        __requirestr = "yaml-cpp"
     },
     mono = {
+        linkdirs = "/usr/lib/pkgconfig/../../lib",
+        __enabled = true,
+        __requirestr = "mono",
         links = {
             "mono-2.0",
             "monosgen-2.0",
             "m",
             "pthread"
         },
-        sysincludedirs = "/usr/lib/pkgconfig/../../include/mono-2.0",
-        linkdirs = "/usr/lib/pkgconfig/../../lib",
-        version = "6.12.0",
-        __requirestr = "mono",
-        __enabled = true,
         envs = {
             LD_LIBRARY_PATH = {
                 "/home/samuel/.xmake/packages/m/mono/6.8.0+123/5e3a0872a4534bfd8741c242f620ff1a/lib"
             }
-        }
+        },
+        sysincludedirs = "/usr/lib/pkgconfig/../../include/mono-2.0",
+        version = "6.12.0"
     }
 }

@@ -2,95 +2,21 @@
 // Created by samuel on 25/06/2021.
 //
 
-#include <imgui.h>
-#include <Core/Application.hpp>
-#include <Components.hpp>
-#include <imgui_internal.h>
-#include <Utils/Path.hpp>
-#include <FPaths.hpp>
-#include <Events/EventSystem.hpp>
-#include <EditorEvent.hpp>
-#include <Inspector/inspectors.hpp>
+#include "imgui.h"
+#include "Core/Application.hpp"
+#include "Components.hpp"
+#include "imgui_internal.h"
+#include "Utils/Path.hpp"
+#include "FPaths.hpp"
+#include "Events/EventSystem.hpp"
+#include "../EditorEvent.hpp"
 #include <filesystem>
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/gtc/type_ptr.hpp"
 
 #include "Components.hpp"
 #include "SceneHierarchyPanel.hpp"
 #include "ImGuiExtension.hpp"
 #include "Scripting/ScriptEngine.hpp"
-
-//const float toolbarSize = 10;
-//float menuBarHeight = 100;
-//
-//void DockSpaceUI()
-//{
-//    ImGuiViewport* viewport = ImGui::GetMainViewport();
-//    ImVec2 pos = {viewport->Pos.x, viewport->Pos.y + toolbarSize};
-//    ImVec2 size = {viewport->Size.x, viewport->Size.y - toolbarSize};
-//    ImGui::SetNextWindowPos(pos);
-//    ImGui::SetNextWindowSize(size);
-//    ImGui::SetNextWindowViewport(viewport->ID);
-//    ImGuiWindowFlags window_flags = 0
-//                                    | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
-//                                    | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
-//                                    | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-//                                    | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-//
-//    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-//    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-//    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-//    ImGui::Begin("Master DockSpace", NULL, window_flags);
-//    ImGuiID dockMain = ImGui::GetID("MyDockspace");
-//
-//    // Save off menu bar height for later.
-//    menuBarHeight = ImGui::GetCurrentWindow()->MenuBarHeight();
-//
-//    ImGui::DockSpace(dockMain);
-//    ImGui::End();
-//    ImGui::PopStyleVar(3);
-//}
-//
-//void ToolbarUI()
-//{
-//    ImGuiViewport* viewport = ImGui::GetMainViewport();
-//    ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + menuBarHeight));
-//    ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, toolbarSize));
-//    ImGui::SetNextWindowViewport(viewport->ID);
-//
-//    ImGuiWindowFlags window_flags = 0
-//                                    | ImGuiWindowFlags_NoDocking
-//                                    | ImGuiWindowFlags_NoTitleBar
-//                                    | ImGuiWindowFlags_NoResize
-//                                    | ImGuiWindowFlags_NoMove
-//                                    | ImGuiWindowFlags_NoScrollbar
-//                                    | ImGuiWindowFlags_NoSavedSettings
-//    ;
-//    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
-//    ImGui::Begin("TOOLBAR", NULL, window_flags);
-//    ImGui::PopStyleVar();
-//
-//    ImGui::Button("Toolbar goes here", ImVec2(0, 37));
-//
-//    ImGui::End();
-//}
-//
-//void UndockWidget(ImVec2 icon_size, ImGuiAxis axis)
-//{
-//    ImGuiWindow* window = ImGui::GetCurrentWindow();
-//
-//    ImVec2 size = icon_size;
-//    size[axis] = ImFloor(size[axis] * 0.30f);
-//    ImVec2 p = ImGui::GetCursorScreenPos();
-//    ImGui::InvisibleButton("##Undock", size);
-//
-//    const bool is_hovered = ImGui::IsItemHovered();
-//    const bool is_active = ImGui::IsItemActive();
-//    if (is_active)
-//        ImGui::StartMouseMovingWindowOrNode(window, window->DockNode, true);
-//
-//    const ImU32 col = ImGui::GetColorU32(is_active ? ImGuiCol_ButtonActive : is_hovered ? ImGuiCol_ButtonHovered : ImGuiCol_TextDisabled, 0.4f);
-//    window->DrawList->AddRectFilled(p, {p.x + size.x, p.y + size.y}, col);
-//}
 
 namespace fox
 {
@@ -305,57 +231,9 @@ namespace fox
             DisplayAddComponentEntry<CircleRenderer>("Circle Renderer");
             DisplayAddComponentEntry<CircleCollider2D>("Circle Collider");
 
-            // auto vComponentsTypes = rttr::type::get<Component>().get_derived_classes();
-            // for (auto& component_type : vComponentsTypes)
-            // {
-            //     // If any constructors registered
-            //     auto cstructor = component_type.get_constructor();
-            //     if (!cstructor)
-            //         return;
-
-            //     auto meta_id = component_type.get_metadata("pretty_name");
-            //     if(!meta_id)
-            //         continue;
-
-            //     std::string name = meta_id.to_string();
-            //     if (ImGui::MenuItem(meta_id.to_string().c_str()))
-            //     {
-            //         auto c = cstructor.invoke();
-            //         auto c_ptr = c.get_value<ref<Component>>();
-
-            //         if(c_ptr)
-            //             m_SelectedEntity.set(c_ptr);
-
-            //         ImGui::CloseCurrentPopup();
-            //     }
-            // }
-
-//            for (auto script : m_vScriptsNames)
-//            {
-//                const std::string& name = script.second;
-//                const std::size_t& tag = script.first;
-//                if (ImGui::MenuItem(name.c_str()))
-//                {
-//                    auto has_native_script = m_pContext->GetWorld().get_component<NativeScript>(m_SelectedEntity);
-//                    if (!has_native_script)
-//                        m_pContext->AddComponent<NativeScript>(m_SelectedEntity);
-//                    has_native_script = m_pContext->GetWorld().get_component<NativeScript>(m_SelectedEntity);
-//                    has_native_script->add(tag, std::move(m_vScripts[tag]()));
-//                    ImGui::CloseCurrentPopup();
-//                }
-//            }
             ImGui::EndPopup();
         }
         ImGui::PopItemWidth();
-
-        // Components of the entity
-        // auto components = entity.GetAll();
-
-        // // Draw the Component Group
-        // for (auto component_ptr : components)
-        // {
-        //     DrawComponent(component_ptr, entity);
-        // }
 
         DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
 		{
@@ -604,105 +482,7 @@ namespace fox
 ////                animator.add_anim("Anim" + std::to_string(count++));
 ////            }
 //       });
-
-//        DrawScripts(entity, [](ScriptableBehaviour& script)
-//        {
-//        });
     }
-
-    // void SceneHierarchyPanel::DrawComponent(const ref<Component> &component_ptr, Entity entity)
-    // {
-    //     auto component_type = rttr::type::get(*component_ptr);
-
-    //     auto meta_id = component_type.get_metadata("pretty_name");
-    //     if (!meta_id) // If it don't have the met property 'pretty name', dont draw this component
-    //         return;
-
-    //     std::string name = meta_id.to_string();
-
-    //     const ImGuiTreeNodeFlags treeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
-    //                                          ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap;
-    //     ImVec2 contentRegionAvail = ImGui::GetContentRegionAvail();
-
-    //     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4});
-    //     float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-    //     ImGui::Separator();
-
-    //     ImGui::PushID(component_ptr->Id());
-    //     bool open = ImGui::TreeNodeEx(name.c_str(), treeFlags, name.c_str());
-    //     ImGui::PopStyleVar();
-
-    //     ImGui::SameLine(contentRegionAvail.x - lineHeight * 0.5f);
-    //     if (ImGui::Button("...", ImVec2{ lineHeight, lineHeight }))
-    //         ImGui::OpenPopup("ComponentSettings");
-
-    //     bool bIsDeleted = false; // Is the component removed ?
-    //     if (ImGui::BeginPopup("ComponentSettings"))
-    //     {
-    //         if (ImGui::MenuItem("Remove Component"))
-    //             bIsDeleted = true;
-    //         ImGui::EndPopup();
-    //     }
-
-    //     if (open)
-    //     {
-    //         // rttr::variant component_var = component_ptr.get();
-    //         // inspect_var(component_var);
-    //         ImGui::TreePop();
-    //     }
-
-    //     if (bIsDeleted)
-    //     {
-    //         entity.remove(component_ptr);
-    //     }
-    //     ImGui::PopID();
-    // }
-
-    // void SceneHierarchyPanel::DrawScripts(Entity entity, std::function<void(ScriptableBehaviour&)> callback)
-    // {
-    //     const ImGuiTreeNodeFlags treeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
-    //                                          ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap;
-    //     auto has_component = entity.get<NativeScript>();
-
-    //     if (has_component)
-    //     {
-    //         for (auto& script : has_component->m_vScripts)
-    //         {
-    //             ImVec2 contentRegionAvail = ImGui::GetContentRegionAvail();
-
-    //             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4});
-    //             float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-    //             ImGui::Separator();
-    //             bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeFlags, m_vScriptsNames[script.first].c_str());
-    //             ImGui::PopStyleVar();
-
-    //             ImGui::SameLine(contentRegionAvail.x - lineHeight * 0.5f);
-    //             if (ImGui::Button("...", ImVec2{ lineHeight, lineHeight }))
-    //             {
-    //                 ImGui::OpenPopup("ComponentSettings");
-    //             }
-
-    //             bool bIsDeleted = false; // Is the component removed ?
-    //             if (ImGui::BeginPopup("ComponentSettings"))
-    //             {
-    //                 if (ImGui::MenuItem("Remove Component"))
-    //                     bIsDeleted = true;
-    //                 ImGui::EndPopup();
-    //             }
-
-    //             if (open)
-    //             {
-    //                 callback(*script.second);
-    //                 ImGui::TreePop();
-    //             }
-
-    //             if (bIsDeleted)
-    //             {
-    //                 has_component->remove(script.first);
-    //             }
-    //         }
-    //     }
-    // }
 
     template<typename T>
 	void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName) {

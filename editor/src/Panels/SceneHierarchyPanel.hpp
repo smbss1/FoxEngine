@@ -5,8 +5,8 @@
 #ifndef FOXENGINE_SCENEHIERARCHYPANEL_HPP
 #define FOXENGINE_SCENEHIERARCHYPANEL_HPP
 
-#include <Core/Scene.hpp>
-#include <SharedLib.hpp>
+#include "Core/Scene.hpp"
+#include "SharedLib.hpp"
 #include "Ecs/Entity.hpp"
 #include "Components/NativeScript.hpp"
 

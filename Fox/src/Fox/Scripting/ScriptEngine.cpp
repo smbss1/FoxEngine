@@ -162,7 +162,7 @@ namespace fox
 //        LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
         LoadAssemblyClasses();
 
-//        ScriptGlue::RegisterComponents();
+        ScriptGlue::RegisterComponents();
         ScriptGlue::RegisterFunctions();
 
         // Retrieve and instantiate class
