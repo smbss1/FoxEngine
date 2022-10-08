@@ -7,6 +7,7 @@
 #include "Core/Logger/Logger.hpp"
 #include "Save for later/SupportedFileFormat.hpp"
 #include "ContentBrowserPanel.hpp"
+#include "EditorLayer.hpp"
 
 namespace fox
 {

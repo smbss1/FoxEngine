@@ -109,14 +109,18 @@ namespace fox
 
     void EditorLayer::OnAttach()
     {
+        // Load Textures for Editor
         m_IconPlay = Texture2D::Create("Resources/PlayButton.png");
         m_IconSimulate = Texture2D::Create("Resources/SimulateButton.png");
         m_IconStop = Texture2D::Create("Resources/StopButton.png");
 
-        json::Value oConfigTemp;
-        std::string out;
+        // Bind Signals
+        m_OnImGuiRenderEvent.Bind<ContentBrowserPanel, &ContentBrowserPanel::OnImGui>(m_ContentBrowserPanel);
+        m_OnImGuiRenderEvent.Bind<SceneHierarchyPanel, &SceneHierarchyPanel::OnImGui>(m_SceneHierarchyPanel);
 
         // DO NOT REMOVE ------
+            // json::Value oConfigTemp;
+            // std::string out;
             // if (fox::file::ReadFile("./editor_config.json", out))
             //     oConfigTemp = json::parse(out);
             // if (!oConfigTemp.is_null()) {
@@ -151,7 +155,6 @@ namespace fox
         // Create a new Scene
         m_pEditorScene = new_ref<Scene>();
         m_pActiveScene = m_pEditorScene;
-//        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
 
         // DO NOT REMOVE ------
             // If we have opened a scene last time so deserialize it to the active scene
@@ -164,6 +167,7 @@ namespace fox
             // InitFileWatcher();
         // DO NOT REMOVE ------
 
+        // Open a scene if provided in cmd arguments
         auto commandLineArgs = Application::Get().GetSpecs().CommandLineArgs;
         if (commandLineArgs.Count > 1)
         {
@@ -340,8 +344,7 @@ namespace fox
             ImGui::EndMenuBar();
         }
 
-        m_ContentBrowserPanel.OnImGui();
-        m_SceneHierarchyPanel.OnImGui();
+        m_OnImGuiRenderEvent.Invoke();
 
         ImGui::Begin("Stats");
         {
@@ -514,7 +517,7 @@ namespace fox
         const auto& buttonActive = colors[ImGuiCol_ButtonActive];
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
-        ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+        ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse);
         {
             bool toolbarEnabled = (bool)m_pActiveScene;
 

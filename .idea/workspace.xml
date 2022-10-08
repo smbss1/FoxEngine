@@ -28,44 +28,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9425326e-0688-4775-a9e0-e421f6f970fc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/EditorLogger.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/EditorLogger.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiFieldDrawer.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiFieldDrawer.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Any.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Base.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Constructor.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Conversion.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/DataMember.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Function.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Reflect.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/TypeDescriptor.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/TypeDescriptor.inl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/TypeFactory.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Reflection.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Reflection.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Events/Delegate.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Events/Signal.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/editor/mono_crash.0.0.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/editor/mono_crash.0.1.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/editor/mono_crash.0.2.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/editor/src/Panels/Panel.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/config" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/config" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/detect" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/detect" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/history" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/history" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/package" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/package" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/toolchain" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/toolchain" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/SpriteRenderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/SpriteRenderer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiExtension.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiExtension.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiExtension.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiExtension.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/Scene.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scene/SceneSerializer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/SceneSerializer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Events/EventSystem.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Events/EventSystem.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/vendor/FoxJson" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/FoxJson" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/vendor/yaml-cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/yaml-cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Example.foxscene" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scenes/Example.foxscene" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Physics Box.foxscene" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scenes/Physics Box.foxscene" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/fox_editor" beforeDir="false" afterPath="$PROJECT_DIR$/editor/fox_editor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.0.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/sandbox" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/sandbox" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/editor/src/EditorLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/EditorLayer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/editor/src/EditorLayer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/EditorLayer.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/editor/src/Panels/ContentBrowserPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/ContentBrowserPanel.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +63,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="OCResolveContextSettings">
-    <option name="configuration" value="0-Debug-fox_engine" />
+    <option name="configuration" value="0-Debug-fox_editor" />
   </component>
   <component name="ProjectApplicationVersion">
     <option name="ide" value="CLion" />
@@ -132,6 +111,11 @@
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.fox_editor">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="fox_editor" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="fox_lexer" TARGET_NAME="fox_editor" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="fox_lexer" RUN_TARGET_NAME="fox_editor">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -277,7 +261,7 @@
       <workItem from="1665090436703" duration="1054000" />
       <workItem from="1665092805445" duration="8539000" />
       <workItem from="1665119262065" duration="20269000" />
-      <workItem from="1665200691051" duration="11000" />
+      <workItem from="1665200691051" duration="2962000" />
     </task>
     <servers />
   </component>

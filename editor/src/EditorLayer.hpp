@@ -18,6 +18,7 @@
 #include "Events/KeyEvent.hpp"
 
 #include "Core/Layer.hpp"
+#include "Events/Signal.hpp"
 
 class RuntimeStartEvent;
 class RuntimeStopEvent;
@@ -29,7 +30,8 @@ namespace fox
     public:
         EditorLayer()
                 : m_CameraController(1280.f / 720.f), Layer("Editor")
-        {}
+        {
+        }
 
         ~EditorLayer() override;
 
@@ -81,6 +83,7 @@ namespace fox
         bool m_bViewportHovered = false;
         ref<Scene> m_pActiveScene;
         ref<Scene> m_pEditorScene;
+
         ContentBrowserPanel m_ContentBrowserPanel;
         SceneHierarchyPanel m_SceneHierarchyPanel;
 
@@ -105,6 +108,13 @@ namespace fox
 
         // Editor resources
         ref<Texture2D> m_IconPlay, m_IconSimulate, m_IconStop;
+
+        // Events Defs
+        SIGNAL(OnImGuiRenderEvent);
+
+    public:
+        // Events
+        OnImGuiRenderEvent m_OnImGuiRenderEvent;
     };
 }
 

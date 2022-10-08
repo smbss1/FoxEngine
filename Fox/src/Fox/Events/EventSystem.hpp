@@ -99,7 +99,7 @@ namespace fox
                 m_vEvents.Get<Event<E>>()->Add(fn);
                 return true;
             }
-//
+
 //            bool listen_any(std::function<void(const any_event&)> fn) {
 //                std::lock_guard<std::mutex> lock(this->access_mtx);
 //
