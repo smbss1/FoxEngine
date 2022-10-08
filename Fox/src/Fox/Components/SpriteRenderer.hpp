@@ -7,25 +7,18 @@
 #include <glm/glm.hpp>
 #include <Renderer/SubTexture2D.hpp>
 #include <Core/Property.hpp>
+#include "Core/Logger/Logger.hpp"
 
 namespace fox
 {
     struct SpriteRenderer
     {
-    public:
         SpriteRenderer() = default;
         SpriteRenderer(const SpriteRenderer&) = default;
-        explicit SpriteRenderer(const fox::ref<fox::Texture2D>& sprite, const glm::vec4& color) : Color(color), Sprite(sprite) {}
-        explicit SpriteRenderer(const glm::vec4& color) : Color(color)
-        {
-        }
 
-    public:
         fox::ref<fox::Texture2D> Sprite;
         glm::vec4 Color { 1.0f, 1.0f, 1.0f, 1.0f };
         float TilingFactor = 1.0f;
-
-    private:
         int Depth = 0;
     };
 

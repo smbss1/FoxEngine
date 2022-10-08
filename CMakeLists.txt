@@ -260,7 +260,6 @@ target_sources(fox_engine PRIVATE
     Fox/src/Platform/OpenGL/stb_image.cpp
     Fox/src/Platform/OpenGL/OpenGLShader.cpp
     Fox/src/Platform/OpenGL/OpenGLUniformBuffer.cpp
-    Fox/src/Platform/OpenGL/PluginEntry.cpp
     Fox/src/Platform/OpenGL/OpenGLFrameBuffer.cpp
     Fox/src/Platform/OpenGL/OpenGLVertexArray.cpp
     Fox/src/Platform/OpenGL/TextureManager.cpp
@@ -268,44 +267,46 @@ target_sources(fox_engine PRIVATE
     Fox/src/Platform/OpenGL/OpenGLContext.cpp
     Fox/src/Platform/OpenGL/OpenGLTexture.cpp
     Fox/src/Fox/ImGui/ImGuiBuild.cpp
+    Fox/src/Fox/ImGui/ImGuiExtension.cpp
     Fox/src/Fox/ImGui/ImGuiLayer.cpp
+    Fox/src/Fox/ImGui/ImGuiFieldDrawer.cpp
     Fox/src/Fox/Components/Animator/Track.cpp
-    Fox/src/Fox/ReflectedComponents.cpp
-        Fox/src/Fox/ImGui/ImGuiExtension.cpp
-    "Fox/src/Fox/Scripting/Old Thing/ScriptRegistry.cpp"
-        Fox/src/Fox/Events/EventSystem.cpp
+    Fox/src/Fox/Events/EventSystem.cpp
     Fox/src/Fox/Math/Quat.cpp
     Fox/src/Fox/Math/Math.cpp
     Fox/src/Fox/Math/Vec3.cpp
+    "Fox/src/Fox/Scripting/Old Thing/ScriptRegistry.cpp"
     Fox/src/Fox/Scripting/ScriptGlue.cpp
     Fox/src/Fox/Scripting/ScriptEngine.cpp
+    Fox/src/Fox/Scene/Scene.cpp
+    Fox/src/Fox/Scene/SceneSerializer.cpp
+    Fox/src/Fox/Scene/ScriptableBehaviour.cpp
+    Fox/src/Fox/Scene/SceneCamera.cpp
+    "Fox/src/Fox/Save for later/StateMachine.cpp"
+    "Fox/src/Fox/Save for later/AudioGroup.cpp"
+    "Fox/src/Fox/Save for later/AudioManager.cpp"
     "Fox/src/Fox/Save for later/FPaths.cpp"
-        Fox/src/Fox/Utils/bitsets.cpp
+    "Fox/src/Fox/Save for later/Time.cpp"
+    "Fox/src/Fox/Save for later/Plugin System (Not used)/PluginManager.cpp"
+    "Fox/src/Fox/Save for later/Plugin System (Not used)/PluginLoader.cpp"
+    "Fox/src/Fox/Save for later/Plugin System (Not used)/SharedLib.cpp"
+    "Fox/src/Fox/Save for later/FileWatcher.cpp"
+    Fox/src/Fox/Utils/bitsets.cpp
     Fox/src/Fox/Utils/Path.cpp
     Fox/src/Fox/Utils/PlatformUtils.cpp
-    "Fox/src/Fox/Save for later/Plugin System (Not used)/SharedLib.cpp"
-        Fox/src/Fox/Utils/Any.cpp
+    Fox/src/Fox/Utils/Any.cpp
     Fox/src/Fox/Utils/FileSystem.cpp
-        Fox/src/Fox/Scene/ScriptableBehaviour.cpp
-        Fox/src/Fox/Scene/SceneCamera.cpp
-    Fox/src/Fox/Font.cpp
-    "Fox/src/Fox/Save for later/Time.cpp"
-        Fox/src/Fox/Core/LayerStack.cpp
+    Fox/src/Fox/Reflection/Reflection.cpp
+    Fox/src/Fox/Core/LayerStack.cpp
     Fox/src/Fox/Core/Layer.cpp
-    "Fox/src/Fox/Save for later/Plugin System (Not used)/PluginLoader.cpp"
-        "Fox/src/Fox/Save for later/AudioGroup.cpp"
-        Fox/src/Fox/Scene/Scene.cpp
     Fox/src/Fox/Core/Logger.cpp
     Fox/src/Fox/Core/State.cpp
-        Fox/src/Fox/Scene/SceneSerializer.cpp
     Fox/src/Fox/Core/Input/Mouse.cpp
     Fox/src/Fox/Core/Input/Input.cpp
     Fox/src/Fox/Core/UUID.cpp
+    Fox/src/Fox/Core/EditorLogger.cpp
     Fox/src/Fox/Core/Window.cpp
-    "Fox/src/Fox/Save for later/Plugin System (Not used)/PluginManager.cpp"
-        "Fox/src/Fox/Save for later/StateMachine.cpp"
-        "Fox/src/Fox/Save for later/AudioManager.cpp"
-        Fox/src/Fox/Core/Application.cpp
+    Fox/src/Fox/Core/Application.cpp
     Fox/src/Fox/Renderer/SubTexture2D.cpp
     Fox/src/Fox/Renderer/Texture.cpp
     Fox/src/Fox/Renderer/Renderer2D.cpp
@@ -322,8 +323,7 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Renderer/Renderer.cpp
     Fox/src/Fox/Renderer/GraphicsContext.cpp
     Fox/src/Fox/Ecs/Entity.cpp
-    "Fox/src/Fox/Save for later/FileWatcher.cpp"
-        )
+)
 
 # target
 add_library(fox_json STATIC "")

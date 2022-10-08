@@ -2,21 +2,14 @@ Scene: Untitled
 Entities:
   - Entity: 3222483763
     NameComponent:
-      Name: Player
+      Name: Folder
     TransformComponent:
-      Position: [-2.29999995, 0, 0]
+      Position: [-2.07999873, 0.125724256, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Color: [0, 0.300000012, 0.200000003, 1]
       Sprite: /home/samuel/Git Repos/FoxEngine/Project/assets/Sprites/DirectoryIcon.png
-    CircleCollider2D:
-      Offset: [-2.29999995, 0]
-      Radius: 0
-      Density: 0
-      Friction: 0
-      Restitution: 0
-      RestitutionThreshold: 1
   - Entity: 4600877384260911104
     NameComponent:
       Name: Camera

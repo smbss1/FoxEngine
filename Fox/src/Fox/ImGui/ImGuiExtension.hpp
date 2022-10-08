@@ -16,7 +16,7 @@ namespace fox
     {
         bool DragVec3(glm::vec3 &values, float resetValue = 0.0f, float columnWidth = 100.0f);
 
-        void DrawVec3Control(const std::string &label, glm::vec3 &values, float resetValue = 0.0f,
+        bool DrawVec3Control(const std::string &label, glm::vec3 &values, float resetValue = 0.0f,
                              float columnWidth = 100.0f);
 
         void ImageWithAspect(ref<Texture2D> texture, ImVec2 texture_size, ImVec2 size,

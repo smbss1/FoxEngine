@@ -106,8 +106,9 @@ namespace fox
             return value_changed;
         }
 
-        void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth)
+        bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth)
         {
+            bool result = false;
             ImGuiIO& io = ImGui::GetIO();
             auto boldFont = io.Fonts->Fonts[0];
 
@@ -130,12 +131,16 @@ namespace fox
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
             ImGui::PushFont(boldFont);
             if (ImGui::Button("X", buttonSize))
+            {
                 values.x = resetValue;
+                result = true;
+            }
             ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+            if(ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f"))
+                result = true;
             ImGui::PopItemWidth();
             ImGui::SameLine();
 
@@ -145,12 +150,17 @@ namespace fox
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
             ImGui::PushFont(boldFont);
             if (ImGui::Button("Y", buttonSize))
+            {
                 values.y = resetValue;
+                result = true;
+            }
+
             ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+            if (ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f"))
+                result = true;
             ImGui::PopItemWidth();
             ImGui::SameLine();
 
@@ -160,18 +170,23 @@ namespace fox
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.1f, 0.25f, 0.8f, 1.0f});
             ImGui::PushFont(boldFont);
             if (ImGui::Button("Z", buttonSize))
+            {
                 values.z = resetValue;
+                result = true;
+            }
             ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+            if (ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f"))
+                result = true;
+
             ImGui::PopItemWidth();
-
             ImGui::PopStyleVar();
-
             ImGui::Columns(1);
             ImGui::PopID();
+
+            return result;
         }
 
         void ImageWithAspect(ref<Texture2D> texture, ImVec2 texture_size, ImVec2 size, const ImVec2& _uv0,

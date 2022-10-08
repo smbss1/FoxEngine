@@ -11,6 +11,7 @@
 #include "json.hpp"
 #include "Scripting/ScriptEngine.hpp"
 #include "Utils/PlatformUtils.hpp"
+#include "Reflection/Reflection.hpp"
 
 namespace fox
 {
@@ -34,6 +35,7 @@ namespace fox
 
         Renderer::Init();
         ScriptEngine::Init();
+        Reflection::Init();
 
         // Add the ImGui state of GUI
         m_ImGuiLayer = new ImGuiLayer;

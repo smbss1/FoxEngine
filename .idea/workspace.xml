@@ -28,35 +28,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9425326e-0688-4775-a9e0-e421f6f970fc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Layer.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Layer.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/LayerStack.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/LayerStack.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Timestep.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fox/src/Platform/GlfwWindows/GlfwWindowsPlatformUtils.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/.idea/.idea.Sandbox.dir/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/.idea/.idea.Sandbox.dir/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/.idea/.idea.Sandbox.dir/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/.idea/.idea.Sandbox.dir/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/Binaries/Fox-ScriptCore.pdb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.pdb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttributes.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.AssemblyInfo.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.AssemblyInfoInputs.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.assets.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.csproj.AssemblyReference.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.csproj.CopyComplete" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.csproj.FileListAbsolute.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.pdb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Sandbox.csproj.nuget.dgspec.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Sandbox.csproj.nuget.g.props" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Sandbox.csproj.nuget.g.targets" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/project.assets.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/project.nuget.cache" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/project.packagespec.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/rider.project.restore.info" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/EditorLogger.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/EditorLogger.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiFieldDrawer.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiFieldDrawer.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Any.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Base.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Constructor.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Conversion.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/DataMember.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Function.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/Reflect.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/TypeDescriptor.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/TypeDescriptor.inl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/TypeFactory.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Reflection.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Reflection.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/config" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/config" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/detect" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/detect" afterDir="false" />
@@ -64,143 +51,21 @@
       <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/package" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/package" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/toolchain" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/toolchain" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/CameraComponent.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/CameraComponent.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Component.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/EntityName.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/EntityName.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/IDComponent.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/IDComponent.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/NativeScript.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/NativeScript.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Rigidbody2D.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Rigidbody2D.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/SpriteRenderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/SpriteRenderer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Transform.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Transform.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/AudioGroup.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/AudioGroup.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/AudioGroup.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/AudioGroup.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/EntryPoint.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/EntryPoint.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/EventNotifier.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Events/EventNotifier.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Input/InputManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Input/InputRegistry.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Input/Keyboard.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Input/Keyboard.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Input/Mouse.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Managers/AudioManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/AudioManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Managers/AudioManager.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/AudioManager.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Managers/PluginManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/Plugin System (Not used)/PluginManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Managers/PluginManager.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/Plugin System (Not used)/PluginManager.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Managers/ResourceManager.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/ResourceManager.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Managers/StateMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/StateMachine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Managers/StateMachine.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/StateMachine.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/PluginLoader.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/Plugin System (Not used)/PluginLoader.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/PluginLoader.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/Plugin System (Not used)/PluginLoader.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Property.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Property.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/Scene.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Scene.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/Scene.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/SceneSerializer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/SceneSerializer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/SceneSerializer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/SceneSerializer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Entity.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Entity.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Events/Event.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Events/Event.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/FPaths.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/FPaths.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/FPaths.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/FPaths.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/FileWatcher.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/FileWatcher.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/FileWatcher.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/FileWatcher.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Font.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Font.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/FoxEcs.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/FoxEngine.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/FoxEngine.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiLayer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiState.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiLayer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGuiExtension.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiExtension.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGuiExtension.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiExtension.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/LockFreeQueue.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/LockFreeQueue.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Observer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Events/Observer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Plugin/IGraphic.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/Plugin System (Not used)/Plugin/IGraphic.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Plugin/IPlugin.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/Plugin System (Not used)/Plugin/IPlugin.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ReflectedComponents.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Reflection.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/OrthographicCameraController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/OrthographicCameraController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Renderer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererAPI.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererAPI.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererAPI.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/RendererAPI.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Texture.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Renderer/Texture.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/SceneCamera.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/SceneCamera.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/SceneCamera.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/SceneCamera.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ScriptRegistry.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scripting/Old Thing/ScriptRegistry.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ScriptableBehaviour.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/ScriptableBehaviour.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptEngine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptEngine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptEngine.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptEngine.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptGlue.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptGlue.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/SharedLib.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/Plugin System (Not used)/SharedLib.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/SupportedFileFormat.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/SupportedFileFormat.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Time.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/Time.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Time.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/Time.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/PlatformUtils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Utils/PlatformUtils.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/PlatformUtils.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Utils/PlatformUtils.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/SharedLib.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/Plugin System (Not used)/SharedLib.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/api.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Save for later/Plugin System (Not used)/api.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/common.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/common.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/portable-file-dialogs.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Utils/portable-file-dialogs.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLContext.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLContext.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLUtils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLUtils.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLUtils.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/OpenGLUtils.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/PluginEntry.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/PluginEntry.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/stb_image.h" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/OpenGL/stb_image.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiExtension.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiExtension.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiExtension.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiExtension.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/Scene.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scene/SceneSerializer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/SceneSerializer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/vendor/FoxJson" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/FoxJson" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/examples/imgui_impl_opengl3.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/imgui/examples/imgui_impl_opengl3.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/imgui.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/imgui/imgui.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/imgui_demo.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/imgui/imgui_demo.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/imgui_widgets.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/imgui/imgui_widgets.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/imstb_rectpack.h" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/imgui/imstb_rectpack.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/imstb_textedit.h" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/imgui/imstb_textedit.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/vendor/imgui/imstb_truetype.h" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/imgui/imstb_truetype.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/vendor/yaml-cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/yaml-cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/xmake.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/xmake.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project/assets/Scripts/Player_Controller.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Project/assets/Scripts/Player_Controller.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project/assets/Scripts/Test.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Project/assets/Scripts/Test.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/Resources/Scripts/Fox-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/editor/Resources/Scripts/Fox-ScriptCore.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Example.foxscene" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scenes/Example.foxscene" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Physics Box.foxscene" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scenes/Physics Box.foxscene" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/Scripts/Player_Controller.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scripts/Player_Controller.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/Scripts/Test.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scripts/Test.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/fox_editor" beforeDir="false" afterPath="$PROJECT_DIR$/editor/fox_editor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono/lib/mono/4.5/MSBuild/Microsoft.Build.CommonTypes.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/editor/mono/lib/mono/4.5/MSBuild/Microsoft.Build.CommonTypes.xsd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono/lib/mono/4.5/MSBuild/Microsoft.Build.Core.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/editor/mono/lib/mono/4.5/MSBuild/Microsoft.Build.Core.xsd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono/lib/mono/4.5/Microsoft.Common.targets" beforeDir="false" afterPath="$PROJECT_DIR$/editor/mono/lib/mono/4.5/Microsoft.Common.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/12.0/bin/MSBuild/Microsoft.Build.CommonTypes.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/12.0/bin/MSBuild/Microsoft.Build.CommonTypes.xsd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/12.0/bin/MSBuild/Microsoft.Build.Core.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/12.0/bin/MSBuild/Microsoft.Build.Core.xsd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/12.0/bin/Microsoft.Common.targets" beforeDir="false" afterPath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/12.0/bin/Microsoft.Common.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/14.0/bin/MSBuild/Microsoft.Build.CommonTypes.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/14.0/bin/MSBuild/Microsoft.Build.CommonTypes.xsd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/14.0/bin/MSBuild/Microsoft.Build.Core.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/14.0/bin/MSBuild/Microsoft.Build.Core.xsd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/14.0/bin/Microsoft.Common.targets" beforeDir="false" afterPath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/14.0/bin/Microsoft.Common.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/Microsoft/NuGet/Microsoft.NuGet.targets" beforeDir="false" afterPath="$PROJECT_DIR$/editor/mono/lib/mono/xbuild/Microsoft/NuGet/Microsoft.NuGet.targets" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.0.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.1.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.2.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.3.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.4.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.5.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.6.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/EditorApp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/EditorApp.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/EditorState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/EditorLayer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/EditorState.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/EditorLayer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/ContentBrowserPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/ContentBrowserPanel.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/SceneHierarchyPanel.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/SceneHierarchyPanel.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/AnimatorPlugin/include/PluginEntry.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/plugins/AnimatorPlugin/include/PluginEntry.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/AnimatorPlugin/src/PluginEntry.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/plugins/AnimatorPlugin/src/PluginEntry.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/CppScriptPlugin/include/PluginEntry.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/plugins/CppScriptPlugin/include/PluginEntry.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/CppScriptPlugin/include/ScriptableBehaviour.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/plugins/CppScriptPlugin/include/ScriptableBehaviour.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/CppScriptPlugin/src/PluginEntry.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/plugins/CppScriptPlugin/src/PluginEntry.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/include/SandboxApp.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/include/SandboxApp.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/include/SpriteSheet.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/include/SpriteSheet.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sandbox/sandbox" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/sandbox" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/src/Animator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/src/Animator.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/src/Example2D.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/src/Example2D.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/src/SandboxApp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/src/SandboxApp.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sandbox/src/SpriteSheet.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/src/SpriteSheet.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -227,45 +92,46 @@
     <option name="minorVersion" value="2.3" />
   </component>
   <component name="ProjectId" id="2FaIWGOqcfni5thjN918vY4DetA" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "last_opened_file_path": "/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.advertisement.text.has.clang-format&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts" />
       <recent name="$PROJECT_DIR$/Fox-ScriptCore" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core" />
       <recent name="$PROJECT_DIR$/Fox/src/Fox/Save for later/Plugin System (Not used)" />
       <recent name="$PROJECT_DIR$/Fox/src/Fox/Save for later" />
       <recent name="$PROJECT_DIR$/Fox/src/Fox/Utils" />
       <recent name="$PROJECT_DIR$/Fox/src/Fox/Plugin System (Not used)" />
-      <recent name="$PROJECT_DIR$/Fox/src/Fox/Scene" />
     </key>
   </component>
-  <component name="RunManager" selected="Shell Script.Build &amp; Run Editor">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="CMake Application.fox_editor">
     <configuration name="fox_editor" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="fox_lexer" TARGET_NAME="fox_editor" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="fox_lexer" RUN_TARGET_NAME="fox_editor">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -406,11 +272,19 @@
       <workItem from="1664730449848" duration="37174000" />
       <workItem from="1664791919876" duration="5916000" />
       <workItem from="1664866099623" duration="33468000" />
-      <workItem from="1664939095424" duration="31805000" />
+      <workItem from="1664939095424" duration="31981000" />
+      <workItem from="1665033383747" duration="39000" />
+      <workItem from="1665090436703" duration="1054000" />
+      <workItem from="1665092805445" duration="8539000" />
+      <workItem from="1665119262065" duration="20269000" />
+      <workItem from="1665200691051" duration="11000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
 </project>

@@ -10,6 +10,7 @@
 #include "Components.hpp"
 #include "SceneSerializer.hpp"
 #include "Scripting/ScriptEngine.hpp"
+#include "Core/EditorLogger.hpp"
 
 namespace YAML {
 
@@ -407,6 +408,7 @@ namespace fox
         FOX_CORE_ASSERT(false, "");
     }
 
+
     bool SceneSerializer::Deserialize(const std::string &filepath)
     {
         YAML::Node data = YAML::LoadFile(filepath);
@@ -485,7 +487,8 @@ namespace fox
                         ScriptFieldInstance& fieldInstance = entityFields[name];
 
                         // TODO(Yan): turn this assert into Hazelnut log warning
-                        FOX_ASSERT(fields.find(name) != fields.end());
+                        if (fields.find(name) != fields.end())
+                            AddLog("vjsnosivspovkŝo");
 
                         if (fields.find(name) == fields.end())
                             continue;
