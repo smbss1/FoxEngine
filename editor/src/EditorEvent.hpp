@@ -8,21 +8,24 @@
 #include "Events/EventSystem.hpp"
 #include "Ecs/Entity.hpp"
 
-struct RuntimeStartEvent
+namespace fox
 {
-};
-
-struct RuntimeStopEvent
-{
-};
-
-// Scene Hierarchy Events
-struct OnSelectedEntityChangeEvent
-{
-    OnSelectedEntityChangeEvent(fox::Entity& entity) : m_oEntity(entity)
+    // Scene Hierarchy Events
+    struct OnSelectedEntityChangeEvent
     {
-    }
-    fox::Entity& m_oEntity;
-};
+        OnSelectedEntityChangeEvent(fox::Entity& entity) : m_oEntity(entity)
+        {
+        }
+        fox::Entity& m_oEntity;
+    };
+
+    struct OnContextChangeEvent
+    {
+        OnContextChangeEvent(ref<fox::Scene> scene) : Context(scene)
+        {
+        }
+        ref<fox::Scene> Context;
+    };
+}
 
 #endif //FOXENGINE_EDITOREVENT_HPP

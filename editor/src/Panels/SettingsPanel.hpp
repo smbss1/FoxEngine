@@ -5,12 +5,29 @@
 #ifndef FOX_LEXER_SETTINGSPANEL_HPP
 #define FOX_LEXER_SETTINGSPANEL_HPP
 
+#include "Panel.hpp"
+#include "common.hpp"
+
+namespace fox
+{
+    class Scene;
+    struct OnContextChangeEvent;
+
+    class SettingsPanel : public Panel
+    {
+    public:
+        SettingsPanel();
+        void OnImGui() override;
+
+    private:
+        void OnContextChangeChange(const OnContextChangeEvent& event);
 
 
-class SettingsPanel {
+        bool m_ShowPhysicsColliders = false;
+        ref<Scene> m_pContext;
 
-};
-
+    };
+}
 
 
 #endif //FOX_LEXER_SETTINGSPANEL_HPP

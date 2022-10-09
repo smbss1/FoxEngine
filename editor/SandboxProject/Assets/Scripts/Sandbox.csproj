@@ -15,6 +15,11 @@
     </Reference>
   </ItemGroup>
 
+
+<!--  <ItemGroup> -->
+<!--    <ProjectReference Include="..\..\..\..\Fox-ScriptCore\Fox-ScriptCore.csproj" /> -->
+<!--  </ItemGroup> -->
+
 <!--   <ItemGroup> -->
 <!--     <PackageReference Include="Fox-ScriptCore" /> -->
 <!--   </ItemGroup> -->

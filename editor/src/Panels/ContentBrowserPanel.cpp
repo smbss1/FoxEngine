@@ -8,14 +8,15 @@
 #include "Save for later/SupportedFileFormat.hpp"
 #include "ContentBrowserPanel.hpp"
 #include "EditorLayer.hpp"
+#include "ImGui/IconsFontAwesome5.hpp"
 
 namespace fox
 {
     // Once we have projects, change this
 	extern const std::filesystem::path g_AssetPath = "assets";
 
-    static float padding = 16.0f; // Padding between folders and files
-    static float thumbnailSize = 90.f; // Size of the thumbnail (icon)
+    static float padding = 17.0f; // Padding between folders and files
+    static float thumbnailSize = 80.f; // Size of the thumbnail (icon)
 
     ContentBrowserPanel::ContentBrowserPanel()
         : m_oCurrentDirectory(g_AssetPath)
@@ -26,12 +27,12 @@ namespace fox
 
     void ContentBrowserPanel::OnImGui()
     {
-        ImGui::Begin("Content Browser");
+        ImGui::Begin(ICON_FA_FOLDER" Content Browser");
 
         if (!m_oCurrentDirectory.empty())
         {
-            if (m_oCurrentDirectory != std::filesystem::path(FPaths::AssetsDir())) {
-                if (ImGui::Button("<")) {
+            if (m_oCurrentDirectory != std::filesystem::path(g_AssetPath)) {
+                if (ImGui::Button(ICON_FA_ARROW_LEFT)) {
                     m_oCurrentDirectory = m_oCurrentDirectory.parent_path();
                 }
             }
@@ -100,8 +101,8 @@ namespace fox
             }
             ImGui::Columns(1);
 
-            ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
-            ImGui::SliderFloat("Padding", &padding, 0, 32);
+//            ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
+//            ImGui::SliderFloat("Padding", &padding, 0, 32);
         }
 
         ImGui::End();

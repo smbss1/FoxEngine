@@ -88,10 +88,10 @@ namespace fox::Reflect
 		return mName;
 	}
 
-	//inline std::size_t TypeDescriptor::GetSize() const
-	//{
-	//	return mSize;
-	//}
+	inline std::size_t TypeDescriptor::GetSize() const
+	{
+		return mSize;
+	}
 
 	inline std::vector<Constructor*> TypeDescriptor::GetConstructors() const
 	{
@@ -186,7 +186,6 @@ namespace fox::Reflect
 
 		return nullptr;
 	}
-
 }  // namespace Reflect
 
 #endif  // TYPE_DESCRIPTOR_INL

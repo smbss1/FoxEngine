@@ -70,6 +70,12 @@ GlfwWindow::GlfwWindow(const fox::WindowProps& props)
     glfwSetKeyCallback(m_pWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
     {
         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+        auto& stateKey = data.GLFW_KEYS_STATES[key];
+        stateKey.wasPressed = stateKey.isPressed;
+
+//        stateKey.isPressed = false;
+//        stateKey.isRelease = false;
+//        stateKey.isHold = false;
 
         switch (action)
         {
@@ -77,18 +83,23 @@ GlfwWindow::GlfwWindow(const fox::WindowProps& props)
             {
                 fox::KeyPressedEvent event(GLFW_TO_KEYBOARD_KEYS[key], 0);
                 data.EventCallback(event);
+                stateKey.isPressed = true;
                 break;
             }
             case GLFW_RELEASE:
             {
                 fox::KeyReleasedEvent event(GLFW_TO_KEYBOARD_KEYS[key]);
                 data.EventCallback(event);
+                stateKey.isRelease = true;
+                stateKey.isPressed = false;
                 break;
             }
             case GLFW_REPEAT:
             {
                 fox::KeyPressedEvent event(GLFW_TO_KEYBOARD_KEYS[key], 1);
                 data.EventCallback(event);
+                stateKey.isHold = true;
+                stateKey.isPressed = false;
                 break;
             }
         }
@@ -198,8 +209,15 @@ void GlfwWindow::SetNativeWindow(void *data)
 
 bool GlfwWindow::IsKeyPressed(const fox::KeyCode key)
 {
-    auto state = glfwGetKey(m_pWindow, static_cast<int32_t>(key));
-    return state == GLFW_PRESS || state == GLFW_REPEAT;
+//    auto state = glfwGetKey(m_pWindow, static_cast<int32_t>(key));
+    auto& stateKey = m_oData.GLFW_KEYS_STATES[key];
+    if (stateKey.isPressed && !stateKey.wasPressed)
+    {
+        stateKey.isPressed = false;
+        stateKey.wasPressed = true;
+        return true;
+    }
+    return stateKey.isPressed && !stateKey.wasPressed;
 }
 
 bool GlfwWindow::IsMouseButtonPressed(const fox::Mouse button)

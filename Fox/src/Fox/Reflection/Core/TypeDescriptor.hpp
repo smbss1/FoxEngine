@@ -69,7 +69,7 @@ namespace fox::Reflect
 
 		std::string const &GetName() const;
 
-		//std::size_t GetSize() const;
+		std::size_t GetSize() const;
 
 		std::vector<Constructor*> GetConstructors() const;
 

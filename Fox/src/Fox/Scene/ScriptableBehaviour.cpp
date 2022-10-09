@@ -5,12 +5,15 @@
 #include "Core/Application.hpp"
 #include "Components/ScriptableBehaviour.hpp"
 
-void ScriptableBehaviour::set_app(fox::Application& app)
+namespace fox
 {
-    m_pApp = &app;
-}
+    void ScriptableBehaviour::set_app(fox::Application& app)
+    {
+        m_pApp = &app;
+    }
 
-fox::Application& ScriptableBehaviour::get_app()
-{
-    return *m_pApp;
+    fox::Application& ScriptableBehaviour::get_app()
+    {
+        return *m_pApp;
+    }
 }

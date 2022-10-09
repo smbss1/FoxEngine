@@ -2,7 +2,15 @@
 // Created by samuel on 09/10/22.
 //
 
-#ifndef FOX_LEXER_PANEL_HPP
-#define FOX_LEXER_PANEL_HPP
+#ifndef FOXENGINE_PANEL_HPP
+#define FOXENGINE_PANEL_HPP
 
-#endif //FOX_LEXER_PANEL_HPP
+namespace fox
+{
+    class Panel
+    {
+    public:
+        virtual void OnImGui() = 0;
+    };
+}
+#endif //FOXENGINE_PANEL_HPP

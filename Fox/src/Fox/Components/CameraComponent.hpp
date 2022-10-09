@@ -7,15 +7,17 @@
 
 #include "Scene/SceneCamera.hpp"
 
-struct CameraComponent
+namespace fox
 {
-public:
-    fox::SceneCamera camera;
-    bool Primary = true; // TODO: think about moving to Scene
-    bool FixedAspectRatio = false;
+    struct CameraComponent
+    {
+        fox::SceneCamera camera;
+        bool Primary = true; // TODO: think about moving to Scene
+        bool FixedAspectRatio = false;
 
-    CameraComponent() = default;
-    CameraComponent(const CameraComponent&) = default;
-};
+        CameraComponent() = default;
+        CameraComponent(const CameraComponent &) = default;
+    };
+}
 
 #endif //FOXENGINE_CAMERACOMPONENT_HPP

@@ -35,6 +35,27 @@ namespace fox
         return ScriptEngine::GetManagedInstance(entityID);
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // Logging ////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    void Log_LogMessage(typelog level, MonoString* formattedMessage)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        switch (level)
+        {
+            case typelog::TRACE:		fox::trace(mono_string_to_utf8(formattedMessage));   break;
+            case typelog::DEBUG:		fox::debug(mono_string_to_utf8(formattedMessage));   break;
+            case typelog::INFO:		    fox::info(mono_string_to_utf8(formattedMessage));    break;
+            case typelog::WARN:		    fox::warn(mono_string_to_utf8(formattedMessage));    break;
+            case typelog::ERROR:		fox::error(mono_string_to_utf8(formattedMessage));   break;
+            case typelog::CRITICAL:	fox::critical(mono_string_to_utf8(formattedMessage));break;
+            default:					fox::info(mono_string_to_utf8(formattedMessage));   break;
+        }
+    }
+
+
     static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
@@ -61,6 +82,40 @@ namespace fox
 
         return entity.GetUUID();
     }
+
+    static uint64_t Entity_Instantiate(uint64_t entityToInstantiate)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        FOX_ASSERT(scene);
+        Entity entity = scene->GetEntityByUUID(entityToInstantiate);
+        FOX_ASSERT(entity);
+
+        return scene->CloneEntity(entity).GetUUID();
+    }
+
+    MonoString* NameComponent_GetName(uint64_t entityID)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        FOX_ASSERT(scene);
+        Entity entity = scene->GetEntityByUUID(entityID);
+        FOX_ASSERT(entity);
+
+        const auto& name = entity.get<EntityName>();
+        return mono_string_new(mono_domain_get(), name.name.c_str());
+    }
+
+    void NameComponent_SetName(uint64_t entityID, MonoString* tag)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        FOX_ASSERT(scene);
+        Entity entity = scene->GetEntityByUUID(entityID);
+        FOX_ASSERT(entity);
+
+        const auto& name = entity.get<EntityName>();
+
+        entity.get<EntityName>().name = mono_string_to_utf8(tag);
+    }
+
 
     static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation)
     {
@@ -111,6 +166,11 @@ namespace fox
         return Input::IsKeyPressed(keycode);
     }
 
+    static bool Input_IsMouseButtonDown(Mouse button)
+    {
+        return Input::IsMouseButtonPressed(button);
+    }
+
     #include <cxxabi.h>  // needed for abi::__cxa_demangle
 
     std::shared_ptr<char> cppDemangle(const char *abiName)
@@ -143,7 +203,8 @@ namespace fox
                 fox::error("Could not find component type %", managedTypename);
                 return;
             }
-            s_EntityHasComponentFuncs[managedType] = [](Entity entity) { return entity.has<Component>(); };
+
+            s_EntityHasComponentFuncs[managedType] = [](Entity entity) { if (entity) return entity.has<Component>(); return false; };
         }(), ...);
     }
 
@@ -155,15 +216,21 @@ namespace fox
 
     void ScriptGlue::RegisterComponents()
     {
+        RegisterComponent<EntityName>();
         RegisterComponent(AllComponents{});
     }
 
     void ScriptGlue::RegisterFunctions()
     {
         FOX_ADD_INTERNAL_CALL(GetScriptInstance);
+        FOX_ADD_INTERNAL_CALL(Log_LogMessage);
 
         FOX_ADD_INTERNAL_CALL(Entity_HasComponent);
         FOX_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+        FOX_ADD_INTERNAL_CALL(Entity_Instantiate);
+
+        FOX_ADD_INTERNAL_CALL(NameComponent_GetName);
+        FOX_ADD_INTERNAL_CALL(NameComponent_SetName);
 
         FOX_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
         FOX_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);

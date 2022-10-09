@@ -13,156 +13,164 @@
 namespace fox
 {
     class Collider;
+
     class Application;
+
     class Scene;
-}
 
-class ScriptableBehaviour
-{
-public:
-    virtual ~ScriptableBehaviour() = default;
-
-public:
-    /**
-     * @brief Called when the script is added in the entity
-     */
-    virtual void on_create() {}
-
-    /**
-     * @brief Called when the scene start
-     */
-    virtual void OnStart() {}
-
-    /**
-     * @brief Called every frame
-     */
-    virtual void on_update() {}
-
-    /**
-     * @brief Called when the script is removed to the entity or when the entity is destroyed
-     */
-    virtual void on_destroy() {}
-
-    /**
-     * @brief Called when a collision enter
-     */
-    virtual void on_collision_enter(fox::Collider&) {}
-
-    /**
-     * @brief Called when a collision stay
-     */
-    virtual void on_collision_stay(fox::Collider&) {}
-
-    /**
-     * @brief Called when a collision exit
-     */
-    virtual void on_collision_exit(fox::Collider&) {}
-
-    /**
-     * @brief Add a component to the entity
-     *
-     * @tparam T the type of the component
-     * @tparam Args the list of arguments to pass to the constuctor of the component
-     * @param args the arguments to pass to the constuctor of the component
-     * @return T& a reference the component
-     */
-    template <typename T, typename... Args>
-    T &add_component(Args &&...args)
+    class ScriptableBehaviour
     {
-        return m_Entity.add<T>(std::forward<Args>(args)...);
-    }
+    public:
+        virtual ~ScriptableBehaviour() = default;
 
-    /**
-     * @brief Get the component object
-     *
-     * @tparam T the type of the component
-     * @return fox::Option<T&> an optionnal value
-     */
-    template <typename T>
-    T& get_component()
-    {
-        return m_Entity.get<T>();
-    }
+    public:
+        /**
+         * @brief Called when the script is added in the entity
+         */
+        virtual void on_create()
+        {}
 
-    /**
-     * @brief Set the id of the entity
-     * @param id the id of the entity
-     */
+        /**
+         * @brief Called when the scene start
+         */
+        virtual void OnStart()
+        {}
+
+        /**
+         * @brief Called every frame
+         */
+        virtual void on_update()
+        {}
+
+        /**
+         * @brief Called when the script is removed to the entity or when the entity is destroyed
+         */
+        virtual void on_destroy()
+        {}
+
+        /**
+         * @brief Called when a collision enter
+         */
+        virtual void on_collision_enter(fox::Collider &)
+        {}
+
+        /**
+         * @brief Called when a collision stay
+         */
+        virtual void on_collision_stay(fox::Collider &)
+        {}
+
+        /**
+         * @brief Called when a collision exit
+         */
+        virtual void on_collision_exit(fox::Collider &)
+        {}
+
+        /**
+         * @brief Add a component to the entity
+         *
+         * @tparam T the type of the component
+         * @tparam Args the list of arguments to pass to the constuctor of the component
+         * @param args the arguments to pass to the constuctor of the component
+         * @return T& a reference the component
+         */
+        template<typename T, typename... Args>
+        T &add_component(Args &&...args)
+        {
+            return m_Entity.add<T>(std::forward<Args>(args)...);
+        }
+
+        /**
+         * @brief Get the component object
+         *
+         * @tparam T the type of the component
+         * @return fox::Option<T&> an optionnal value
+         */
+        template<typename T>
+        T &get_component()
+        {
+            return m_Entity.get<T>();
+        }
+
+        /**
+         * @brief Set the id of the entity
+         * @param id the id of the entity
+         */
 //    void set_entity(EntityId id)
 //    {
 //        m_eEntity = id;
 //    }
 
-    /**
-     * @brief Set the world
-     * @param world the ECS World
-     */
+        /**
+         * @brief Set the world
+         * @param world the ECS World
+         */
 //    void set_world(fox::World& world)
 //    {
 //        m_pWorld = &world;
 //    }
 
-    /**
-     * @brief Set the application reference
-     * @param app the application reference
-     */
-    void set_app(fox::Application& app);
+        /**
+         * @brief Set the application reference
+         * @param app the application reference
+         */
+        void set_app(fox::Application &app);
 
-    /**
-     * @brief Set the scene reference
-     * @param app the scene reference
-     */
+        /**
+         * @brief Set the scene reference
+         * @param app the scene reference
+         */
 //    void set_scene(fox::Scene& scene)
 //    {
 //        m_pScene = &scene;
 //    }
 
-    /**
-     * @brief Get the application
-     * @return the application
-     */
-    fox::Application& get_app();
+        /**
+         * @brief Get the application
+         * @return the application
+         */
+        fox::Application &get_app();
 
-    /**
-     * @brief Get the scene
-     * @return the scene
-     */
+        /**
+         * @brief Get the scene
+         * @return the scene
+         */
 //    fox::Scene& get_scene()
 //    {
 //        return *m_pScene;
 //    }
 
-    /**
-     * @brief Get the world
-     * @return the world
-     */
+        /**
+         * @brief Get the world
+         * @return the world
+         */
 //    fox::World& get_world()
 //    {
 //        return *m_pWorld;
 //    }
 
-    /**
-     * @brief Get the id of the entity
-     * @return the id of the entity
-     */
+        /**
+         * @brief Get the id of the entity
+         * @return the id of the entity
+         */
 //    [[nodiscard]] EntityId get_id() const
 //    {
 //        return m_eEntity;
 //    }
 
-    /**
-     * @brief Destroy the entity
-     */
+        /**
+         * @brief Destroy the entity
+         */
 //    void destroy()
 //    {
 //        assert(m_pWorld);
 //        m_pWorld->delete_entity(m_eEntity);
 //    }
 
-    /**
-     * @brief Create a new entity
-     * @return the new created entity
-     */
+        /**
+         * @brief Create a new entity
+         * @return the new created entity
+         */
 //    fox::Entity new_entity()
 //    {
 //        assert(m_pWorld);
@@ -181,11 +189,13 @@ public:
 //        return m_pWorld->new_entity(name, tag, enable);
 //    }
 
-private:
-    fox::Application* m_pApp{};
-    fox::Scene* m_pScene = nullptr;
-    fox::Entity m_Entity;
-    friend class Scene;
-};
+    private:
+        fox::Application *m_pApp {};
+        fox::Scene *m_pScene = nullptr;
+        fox::Entity m_Entity;
+
+        friend class Scene;
+    };
+}
 
 #endif //ECS_SCRIPTABLEBEHAVIOUR_HPP

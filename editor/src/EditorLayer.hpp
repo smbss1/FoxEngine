@@ -19,6 +19,7 @@
 
 #include "Core/Layer.hpp"
 #include "Events/Signal.hpp"
+#include "Panels/Panel.hpp"
 
 class RuntimeStartEvent;
 class RuntimeStopEvent;
@@ -73,8 +74,6 @@ namespace fox
         void OnOverlayRender();
 
     private:
-        bool m_bIsRunning = false;
-
         fox::OrthographicCameraController m_CameraController;
 
         Vec2 m_oViewportSize = {0, 0};
@@ -84,22 +83,19 @@ namespace fox
         ref<Scene> m_pActiveScene;
         ref<Scene> m_pEditorScene;
 
-        ContentBrowserPanel m_ContentBrowserPanel;
         SceneHierarchyPanel m_SceneHierarchyPanel;
+        std::vector<ref<Panel>> m_Panels;
 
         EditorCamera m_oEditorCamera;
 
         int m_iGizmoType = -1;
 
         glm::vec2 m_vViewportBounds[2];
-
         Entity m_oHoveredEntity;
-
         std::string m_EditorScenePath;
 
         // json::Value m_oEditorConfig;
         // scope<FileWatcher> m_oWatcher;
-        bool m_ShowPhysicsColliders = false;
         enum class SceneState
         {
             Edit = 0, Play = 1, Simulate = 2

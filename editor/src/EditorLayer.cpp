@@ -8,7 +8,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <Math/Math.hpp>
 #include <Renderer/Framebuffer.hpp>
-#include <Components/EntityName.hpp>
 #include <Utils/Path.hpp>
 #include "Save for later/FPaths.hpp"
 #include <Utils/FileSystem.hpp>
@@ -16,86 +15,10 @@
 #include "EditorEvent.hpp"
 
 #include "EditorLayer.hpp"
-
-
-void DockingToolbar(const char* name, ImGuiAxis* p_toolbar_axis, std::function<void(const ImVec2, ImGuiAxis)> func)
-{
-    // [Option] Automatically update axis based on parent split (inside of doing it via right-click on the toolbar)
-    // Pros:
-    // - Less user intervention.
-    // - Avoid for need for saving the toolbar direction, since it's automatic.
-    // Cons:
-    // - This is currently leading to some glitches.
-    // - Some docking setup won't return the axis the user would expect.
-    const bool TOOLBAR_AUTO_DIRECTION_WHEN_DOCKED = true;
-
-    // ImGuiAxis_X = horizontal toolbar
-    // ImGuiAxis_Y = vertical toolbar
-    ImGuiAxis toolbar_axis = *p_toolbar_axis;
-
-    // 1. We request auto-sizing on one axis
-    // Note however this will only affect the toolbar when NOT docked.
-    ImVec2 requested_size = (toolbar_axis == ImGuiAxis_X) ? ImVec2(-1.0f, 0.0f) : ImVec2(0.0f, -1.0f);
-    ImGui::SetNextWindowSize(requested_size);
-
-    // 2. Specific docking options for toolbars.
-    // Currently they add some constraint we ideally wouldn't want, but this is simplifying our first implementation
-    ImGuiWindowClass window_class;
-    window_class.DockingAllowUnclassed = true;
-    window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoCloseButton;
-    window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_HiddenTabBar; // ImGuiDockNodeFlags_NoTabBar // FIXME: Will need a working Undock widget for _NoTabBar to work
-    window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoDockingSplitMe;
-    window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoDockingOverMe;
-    window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoDockingOverOther;
-    if (toolbar_axis == ImGuiAxis_X)
-        window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoResizeY;
-    else
-        window_class.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoResizeX;
-    ImGui::SetNextWindowClass(&window_class);
-
-    // 3. Begin into the window
-    const float font_size = ImGui::GetFontSize();
-    const ImVec2 icon_size(ImFloor(font_size * 1.7f), ImFloor(font_size * 1.7f));
-    ImGui::Begin(name, NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
-
-    // 4. Overwrite node size
-    ImGuiDockNode* node = ImGui::GetWindowDockNode();
-    if (node != NULL)
-    {
-        // Overwrite size of the node
-        ImGuiStyle& style = ImGui::GetStyle();
-        const ImGuiAxis toolbar_axis_perp = (ImGuiAxis)(toolbar_axis ^ 1);
-        const float TOOLBAR_SIZE_WHEN_DOCKED = style.WindowPadding[toolbar_axis_perp] * 2.0f + icon_size[toolbar_axis_perp];
-        node->WantLockSizeOnce = true;
-        node->Size[toolbar_axis_perp] = node->SizeRef[toolbar_axis_perp] = TOOLBAR_SIZE_WHEN_DOCKED;
-
-        if (TOOLBAR_AUTO_DIRECTION_WHEN_DOCKED)
-            if (node->ParentNode && node->ParentNode->SplitAxis != ImGuiAxis_None)
-                toolbar_axis = (ImGuiAxis)(node->ParentNode->SplitAxis ^ 1);
-    }
-
-    func(icon_size, toolbar_axis);
-
-    // 6. Context-menu to change axis
-    if (node == NULL || !TOOLBAR_AUTO_DIRECTION_WHEN_DOCKED)
-    {
-        if (ImGui::BeginPopupContextWindow())
-        {
-            ImGui::TextUnformatted(name);
-            ImGui::Separator();
-            if (ImGui::MenuItem("Horizontal", "", (toolbar_axis == ImGuiAxis_X)))
-                toolbar_axis = ImGuiAxis_X;
-            if (ImGui::MenuItem("Vertical", "", (toolbar_axis == ImGuiAxis_Y)))
-                toolbar_axis = ImGuiAxis_Y;
-            ImGui::EndPopup();
-        }
-    }
-
-    ImGui::End();
-
-    // Output user stored data
-    *p_toolbar_axis = toolbar_axis;
-}
+#include "Panels/PropertyPanel.hpp"
+#include "Panels/StatsPanel.hpp"
+#include "Panels/SettingsPanel.hpp"
+#include "Panels/ConsolePanel.hpp"
 
 namespace fox
 {
@@ -114,9 +37,19 @@ namespace fox
         m_IconSimulate = Texture2D::Create("Resources/SimulateButton.png");
         m_IconStop = Texture2D::Create("Resources/StopButton.png");
 
+        // Create Panels
+        m_Panels.emplace_back(new_ref<PropertyPanel>());
+        m_Panels.emplace_back(new_ref<ContentBrowserPanel>());
+        m_Panels.emplace_back(new_ref<StatsPanel>());
+        m_Panels.emplace_back(new_ref<SettingsPanel>());
+        m_Panels.emplace_back(new_ref<ConsolePanel>());
+
         // Bind Signals
-        m_OnImGuiRenderEvent.Bind<ContentBrowserPanel, &ContentBrowserPanel::OnImGui>(m_ContentBrowserPanel);
         m_OnImGuiRenderEvent.Bind<SceneHierarchyPanel, &SceneHierarchyPanel::OnImGui>(m_SceneHierarchyPanel);
+        for (ref<Panel> panel : m_Panels)
+        {
+            m_OnImGuiRenderEvent.Bind<Panel, &Panel::OnImGui>(*panel);
+        }
 
         // DO NOT REMOVE ------
             // json::Value oConfigTemp;
@@ -155,6 +88,7 @@ namespace fox
         // Create a new Scene
         m_pEditorScene = new_ref<Scene>();
         m_pActiveScene = m_pEditorScene;
+        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
 
         // DO NOT REMOVE ------
             // If we have opened a scene last time so deserialize it to the active scene
@@ -346,22 +280,6 @@ namespace fox
 
         m_OnImGuiRenderEvent.Invoke();
 
-        ImGui::Begin("Stats");
-        {
-            auto stats = fox::Renderer2D::GetStats();
-            ImGui::Text("Renderer2D Stats:");
-            ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
-            ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-            ImGui::Text("Quads: %d", stats.QuadCount);
-            ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-            ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-        }
-        ImGui::End();
-
-        ImGui::Begin("Settings");
-        ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
-        ImGui::End();
-
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
         ImGui::Begin("Viewport");
         {
@@ -449,58 +367,6 @@ namespace fox
         ImGui::End();
         ImGui::PopStyleVar();
 
-        static ImGuiAxis toolbar1_axis = ImGuiAxis_X; // Your storage for the current direction.
-        DockingToolbar("Toolbar1", &toolbar1_axis, [this](const ImVec2 icon_size, ImGuiAxis toolbar_axis) {
-            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(5.0f, 5.0f));
-
-            if (toolbar_axis == ImGuiAxis_X)
-                ImGui::SameLine();
-
-            // If not running disable the Play button and enable Stop button
-            if (m_bIsRunning)
-            {
-                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-            }
-
-            if (ImGui::Button("Play")) {
-                event::EventSystem::Get().Emit(RuntimeStartEvent());
-
-                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-            }
-            if (m_bIsRunning)
-            {
-                ImGui::PopItemFlag();
-                ImGui::PopStyleVar();
-            }
-
-            // If not running disable the Stop button and enable Play button
-            if (!m_bIsRunning)
-            {
-                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-            }
-
-            if (toolbar_axis == ImGuiAxis_X)
-                ImGui::SameLine();
-            if (ImGui::Button("Stop")) {
-                event::EventSystem::Get().Emit(RuntimeStopEvent());
-
-                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-            }
-
-            if (!m_bIsRunning)
-            {
-                ImGui::PopItemFlag();
-                ImGui::PopStyleVar();
-            }
-
-            ImGui::PopStyleVar(2);
-        });
-
         UI_Toolbar();
 
         ImGui::End();
@@ -568,44 +434,6 @@ namespace fox
         else
         {
             Renderer2D::BeginScene(m_oEditorCamera);
-        }
-
-        if (m_ShowPhysicsColliders)
-        {
-            // Box Colliders
-            {
-                auto view = m_pActiveScene->GetAllEntitiesWith<TransformComponent, BoxCollider2D>();
-                for (auto entity : view)
-                {
-                    auto [tc, bc2d] = view.get<TransformComponent, BoxCollider2D>(entity);
-
-                    glm::vec3 translation = tc.position + glm::vec3(bc2d.Offset, 0.001f);
-                    glm::vec3 scale = tc.scale * glm::vec3(bc2d.Size * 2.0f, 1.0f);
-
-                    glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
-                                          * glm::rotate(glm::mat4(1.0f), tc.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
-                                          * glm::scale(glm::mat4(1.0f), scale);
-
-                    Renderer2D::DrawRect(transform, glm::vec4(0, 1, 0, 1));
-                }
-            }
-
-            // Circle Colliders
-            {
-                auto view = m_pActiveScene->GetAllEntitiesWith<TransformComponent, CircleCollider2D>();
-                for (auto entity : view)
-                {
-                    auto [tc, cc2d] = view.get<TransformComponent, CircleCollider2D>(entity);
-
-                    glm::vec3 translation = tc.position + glm::vec3(cc2d.Offset, 0.001f);
-                    glm::vec3 scale = tc.scale * glm::vec3(cc2d.Radius * 2.0f);
-
-                    glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
-                                          * glm::scale(glm::mat4(1.0f), scale);
-
-                    Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.01f);
-                }
-            }
         }
 
         // Draw selected entity outline
@@ -793,8 +621,9 @@ namespace fox
     void EditorLayer::NewScene()
     {
         m_pActiveScene = new_ref<Scene>();
-        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
         m_EditorScenePath = std::filesystem::path();
+
+        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
     }
 
     void EditorLayer::OpenScene(const std::filesystem::path& path)
@@ -813,11 +642,11 @@ namespace fox
         if (serializer.Deserialize(path.string()))
         {
             m_pEditorScene = newScene;
-            m_SceneHierarchyPanel.SetContext(m_pEditorScene);
-
             m_pActiveScene = m_pEditorScene;
             m_EditorScenePath = path;
             // m_oEditorConfig["LastOpenedScene"] = path.string();
+
+            event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
         }
     }
 
@@ -835,9 +664,9 @@ namespace fox
         {
             SceneSerializer serializer(m_pActiveScene);
             serializer.Serialize(m_EditorScenePath);
+            return;
         }
-		else
-			SaveSceneAs();
+        SaveSceneAs();
     }
 
     void EditorLayer::SaveSceneAs()
@@ -861,7 +690,7 @@ namespace fox
         m_pActiveScene = Scene::Copy(m_pEditorScene);
         m_pActiveScene->OnRuntimeStart();
 
-        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
     }
 
     void EditorLayer::OnSceneSimulate()
@@ -874,7 +703,7 @@ namespace fox
         m_pActiveScene = Scene::Copy(m_pEditorScene);
         m_pActiveScene->OnSimulationStart();
 
-        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
     }
 
     void EditorLayer::OnSceneStop()
@@ -888,7 +717,7 @@ namespace fox
 
         m_SceneState = SceneState::Edit;
         m_pActiveScene = m_pEditorScene;
-        m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
     }
 
     void EditorLayer::OnDuplicateEntity()

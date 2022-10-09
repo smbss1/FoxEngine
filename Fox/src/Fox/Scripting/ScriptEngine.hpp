@@ -21,6 +21,7 @@ extern "C" {
     typedef struct _MonoClassField MonoClassField;
 }
 
+class BoxCollider2D;
 namespace fox
 {
     enum class ScriptFieldType
@@ -31,6 +32,11 @@ namespace fox
         UByte, UShort, UInt, ULong,
         Vector2, Vector3, Vector4,
         Entity
+    };
+
+    struct Collision2DData
+    {
+        uint64_t OtherEntityID = 0;
     };
 
     struct ScriptField
@@ -58,11 +64,21 @@ namespace fox
             return *(T*)m_Buffer;
         }
 
+        void* GetValue()
+        {
+            return m_Buffer;
+        }
+
         template<typename T>
         void SetValue(T value)
         {
             static_assert(sizeof(T) <= 16, "Type too large!");
             memcpy(m_Buffer, &value, sizeof(T));
+        }
+
+        void SetValue(void* value, size_t size)
+        {
+            memcpy(m_Buffer, value, size);
         }
 
     private:
@@ -103,7 +119,8 @@ namespace fox
 
         void InvokeOnCreate();
         void InvokeOnUpdate(float ts);
-
+        void InvokeOnCollisionEnter2D(Collision2DData collisionInfo);
+        void InvokeOnCollisionExit2D(Collision2DData collisionInfo);
         ref<ScriptClass> GetScriptClass() { return m_ScriptClass; }
 
         template<typename T>
@@ -138,6 +155,9 @@ namespace fox
         MonoMethod* m_OnCreateMethod = nullptr;
         MonoMethod* m_OnUpdateMethod = nullptr;
 
+        MonoMethod* m_OnCollisionEnter2DMethod = nullptr;
+        MonoMethod* m_OnCollisionExit2DMethod = nullptr;
+
         inline static char s_FieldValueBuffer[16];
 
         friend class ScriptEngine;
@@ -168,8 +188,10 @@ namespace fox
         static ScriptFieldMap& GetScriptFieldMap(Entity entity);
 
         static MonoImage* GetCoreAssemblyImage();
-
         static MonoObject* GetManagedInstance(UUID uuid);
+
+        static void InitComponentEvents(entt::registry& registry);
+
     private:
         static void InitMono();
         static void ShutdownMono();

@@ -2,6 +2,9 @@
 // Created by samuel on 03/10/22.
 //
 
+#include "Components/ScriptComponent.hpp"
+#include "Components/Rigidbody2D.hpp"
+
 #include "ScriptEngine.hpp"
 #include "ScriptGlue.hpp"
 
@@ -10,7 +13,7 @@
 #include "mono/metadata/object.h"
 #include "mono/metadata/tabledefs.h"
 
-#include "Components/ScriptComponent.hpp"
+
 
 #include <fstream>
 
@@ -200,6 +203,16 @@ namespace fox
 #endif
     }
 
+    void ScriptEngine::InitComponentEvents(entt::registry& registry)
+    {
+//        auto view = registry.view<BoxCollider2D>();
+//
+//        for (auto e : view)
+//        {
+//            Entity entity = { e,  };
+//        }
+    }
+
     void ScriptEngine::Shutdown()
     {
         ShutdownMono();
@@ -280,7 +293,28 @@ namespace fox
             {
                 const ScriptFieldMap& fieldMap = s_Data->EntityScriptFields.at(entityID);
                 for (const auto& [name, fieldInstance] : fieldMap)
-                    instance->SetFieldValueInternal(name, fieldInstance.m_Buffer);
+                {
+//                    if (fieldInstance.Field.Type == ScriptFieldType::Entity)
+//                    {
+//                        if (fieldInstance.m_Buffer == 0)
+//                            continue;
+//
+//                        Entity* ent = (Entity*)fieldInstance.m_Buffer;
+//                        if (ent == nullptr || !*ent)
+//                            continue;
+//
+//                        fox::trace("Name-: %", ent->GetName());
+//
+//                        auto inst = ScriptEngine::GetEntityScriptInstance(ent->GetUUID());
+//                        if (!instance || inst->m_Instance == nullptr)
+//                        {
+//                            inst = new_ref<ScriptInstance>(new_ref<ScriptClass>(s_Data->EntityClass), *ent);
+//                        }
+//                        instance->SetFieldValueInternal(name, inst->m_Instance);
+//                    }
+//                    else
+                        instance->SetFieldValueInternal(name, fieldInstance.m_Buffer);
+                }
             }
 
             instance->InvokeOnCreate();
@@ -437,6 +471,9 @@ namespace fox
         m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
         m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
 
+        m_OnCollisionEnter2DMethod = s_Data->EntityClass.GetMethod("HandleOnCollisionEnter2D", 1);
+        m_OnCollisionExit2DMethod = s_Data->EntityClass.GetMethod("HandleOnCollisionExit2D", 1);
+
         // Call Entity constructor
         {
             UUID entityID = entity.GetUUID();
@@ -458,6 +495,18 @@ namespace fox
             void* param = &ts;
             m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
         }
+    }
+
+    void ScriptInstance::InvokeOnCollisionEnter2D(Collision2DData collisionInfo)
+    {
+        void* params = &collisionInfo;
+        m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionEnter2DMethod, &params);
+    }
+
+    void ScriptInstance::InvokeOnCollisionExit2D(Collision2DData collisionInfo)
+    {
+        void* params = &collisionInfo;
+        m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionExit2DMethod, &params);
     }
 
     bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer)

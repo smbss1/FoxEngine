@@ -10,11 +10,37 @@
 #include <ImGuizmo.h>
 #include <examples/imgui_impl_glfw.h>
 #include <GLFW/glfw3.h>
+#include "IconsFontAwesome5.hpp"
+#include "IconsFontAwesome5Brands.hpp"
 
 namespace fox
 {
     ImGuiLayer::ImGuiLayer() : Layer("ImGui State")
     {
+    }
+
+    static void AddIconFont(float fontSize)
+    {
+//        ImGuiIO& io = ImGui::GetIO();
+//
+//        static const ImWchar icons_ranges[] = { ICON_MIN_MD, ICON_MAX_16_MD, 0 };
+//        ImFontConfig iconsConfig;
+//        // merge in icons from Font Awesome
+//        iconsConfig.MergeMode = true;
+//        iconsConfig.PixelSnapH = true;
+//        iconsConfig.GlyphOffset.y = 1.0f;
+//        iconsConfig.OversampleH = iconsConfig.OversampleV = 1;
+//        iconsConfig.GlyphMinAdvanceX = 4.0f;
+//        iconsConfig.SizePixels = 12.0f;
+
+
+// merge in icons from Font Awesome
+//        static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
+//        ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
+//        io.Fonts->AddFontFromFileTTF( FONT_ICON_FILE_NAME_FAS, 16.0f, &icons_config, icons_ranges );
+// use FONT_ICON_FILE_NAME_FAR if you want regular instead of solid
+
+//        io.Fonts->AddFontFromMemoryCompressedTTF(MaterialDesign_compressed_data, MaterialDesign_compressed_size, fontSize, &iconsConfig, icons_ranges);
     }
 
     void ImGuiLayer::OnAttach()
@@ -30,8 +56,18 @@ namespace fox
         //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
         //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-        io.Fonts->AddFontFromFileTTF(FOX_PLUGIN_DIRECTORY"assets/fonts/OpenSans-Bold.ttf", 18.0f);
-        io.FontDefault = io.Fonts->AddFontFromFileTTF(FOX_PLUGIN_DIRECTORY"assets/fonts/OpenSans-Regular.ttf", 18.0f);
+        std::string fontFolder = fox::format("%%", FOX_PLUGIN_DIRECTORY, "editor/assets/fonts/");
+
+        io.Fonts->AddFontFromFileTTF(fox::format("%%", fontFolder, "OpenSans-Bold.ttf").c_str(), 18.0f);
+        io.FontDefault = io.Fonts->AddFontFromFileTTF(fox::format("%%", fontFolder, "OpenSans-Regular.ttf").c_str(), 18.0f);
+
+        static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
+        ImFontConfig icons_config;
+        icons_config.MergeMode = true;
+        icons_config.PixelSnapH = true;
+        io.Fonts->AddFontFromFileTTF(fox::format("%%", fontFolder, FONT_ICON_FILE_NAME_FAS).c_str(), 16.0f, &icons_config, icons_ranges );
+        io.Fonts->AddFontFromFileTTF(fox::format("%%", fontFolder, FONT_ICON_FILE_NAME_FAR).c_str(), 16.0f, &icons_config, icons_ranges );
+        io.Fonts->AddFontFromFileTTF(fox::format("%%", fontFolder, FONT_ICON_FILE_NAME_FAB).c_str(), 16.0f, &icons_config, icons_ranges );
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();

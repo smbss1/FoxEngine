@@ -8,33 +8,26 @@
 #include "Scene/Scene.hpp"
 #include "Ecs/Entity.hpp"
 #include "Components/NativeScript.hpp"
+#include "Panel.hpp"
 
 namespace fox
 {
-    class SceneHierarchyPanel
+    class OnContextChangeEvent;
+
+    class SceneHierarchyPanel : public Panel
     {
     public:
         explicit SceneHierarchyPanel();
-        explicit SceneHierarchyPanel(const ref<Scene>& context);
         ~SceneHierarchyPanel();
 
-        void SetContext(const ref<Scene>& context);
-
-        void OnImGui();
+        void OnImGui() override;
 
         const Entity& GetSelectedEntity() const { return m_SelectedEntity; }
         void SetSelectedEntity(const Entity& e) { m_SelectedEntity = e; }
 
     private:
         void DrawEntityNode(Entity& e);
-        void DrawComponents(Entity entity);
-
-        // void DrawComponent(const ref<Component> &component_ptr, Entity entity);
-
-        // void DrawScripts(Entity entity, std::function<void(ScriptableBehaviour&)> callback);
-
-        template<typename T>
-		void DisplayAddComponentEntry(const std::string& entryName);
+        void OnContextChangeChange(const OnContextChangeEvent& event);
 
     private:
         ref<Scene> m_pContext = nullptr;

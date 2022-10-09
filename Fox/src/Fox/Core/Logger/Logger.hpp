@@ -5,6 +5,8 @@
 #ifndef TCPSERVER_LOGGER_HPP
 #define TCPSERVER_LOGGER_HPP
 
+#include "Events/EventSystem.hpp"
+
 #include <mutex>
 #include <string>
 #include <sstream>
@@ -112,11 +114,24 @@ namespace fox
         return str.str();
     }
 
-    enum typelog {
+    enum typelog
+    {
+        TRACE,
         DEBUG,
         INFO,
         WARN,
-        ERROR
+        ERROR,
+        CRITICAL,
+        COUNT
+    };
+
+    struct OnConsoleLogEvent
+    {
+        OnConsoleLogEvent(std::string message, typelog log) : Message(message), Log(log)
+        {
+        }
+        std::string Message;
+        typelog Log;
     };
 
     /**
@@ -157,16 +172,17 @@ namespace fox
          * @param[in] type		The enum type
          * @return				String name of the enum
          */
-        std::string get_type_str(typelog type)
+        static char* get_type_str(typelog type)
         {
-            std::string label;
             switch(type) {
-                case DEBUG: label = "DEBUG"; break;
-                case INFO:  label = "INFO "; break;
-                case WARN:  label = "WARN "; break;
-                case ERROR: label = "ERROR"; break;
+                case DEBUG: return "DEBUG";
+                case INFO:  return "INFO ";
+                case WARN:  return "WARN ";
+                case ERROR: return "ERROR";
+                case TRACE: return "TRACE";
+                case CRITICAL: return "CRITICAL";
             }
-            return label;
+            return "Unknown name";
         }
 
         /**
@@ -181,9 +197,14 @@ namespace fox
         {
             // Lock the output
             std::lock_guard<std::mutex> locker(mutex);
+            std::stringstream stream;
+
             // Put and flush the message
+            stream << print(msg, args...);
             *output_stream << "[" << get_type_str(type) << "] ";
-            *output_stream << print(msg, args...) << std::endl;
+            *output_stream << stream.str() << std::endl;
+
+            event::EventSystem::Get().template Emit(OnConsoleLogEvent(stream.str(), type));
         }
 
         void set_output_stream(std::ostream& stream)
@@ -244,6 +265,20 @@ namespace fox
     void debug(const std::string& msg, const Args&... args)
     {
         log(DEBUG, msg, args...);
+    }
+
+    template <typename... Args,
+        std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
+    void trace(const std::string& msg, const Args&... args)
+    {
+        log(TRACE, msg, args...);
+    }
+
+    template <typename... Args,
+        std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
+    void critical(const std::string& msg, const Args&... args)
+    {
+        log(CRITICAL, msg, args...);
     }
 }
 

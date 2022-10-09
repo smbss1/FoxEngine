@@ -161,12 +161,25 @@ public:
 private:
 
     GLFWwindow* m_pWindow = nullptr;
+
+    struct KeyState
+    {
+        bool isPressed;
+        bool wasPressed;
+
+        bool isRelease;
+        bool wasReleased;
+
+        bool isHold;
+    };
+
     struct WindowData
     {
         std::string Title;
         uint32_t width, height;
         bool bIsVSync;
         EventCallbackFn EventCallback;
+        std::unordered_map<fox::KeyCode, KeyState> GLFW_KEYS_STATES;
     };
 
     WindowData m_oData;

@@ -38,7 +38,7 @@ namespace fox
          */
         Entity(const Entity& other) = default;
 
-        operator bool () const { return m_EntityHandle != entt::null; }
+        operator bool () const { return m_EntityHandle != entt::null && m_Scene != nullptr; }
         operator entt::entity () const { return m_EntityHandle; }
         operator uint32_t() const { return (uint32_t)m_EntityHandle; }
 
@@ -109,11 +109,6 @@ namespace fox
             return m_Scene->m_Registry.get<T>(m_EntityHandle);
         }
 
-//        uint64_t get_uuid()
-//        {
-//            return get<IDComponent>()->ID;
-//        }
-
         template<typename T>
         bool has()
         {
@@ -131,6 +126,12 @@ namespace fox
             FOX_ASSERT(has<T>(), "Entity does not have component!");
             m_Scene->m_Registry.remove<T>(m_EntityHandle);
         }
+
+        Entity clone()
+        {
+            return m_Scene->CloneEntity(*this);
+        }
+
 
     private:
         entt::entity m_EntityHandle { entt::null };

@@ -21,6 +21,7 @@
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
 #include "box2d/b2_circle_shape.h"
+#include "box2d/b2_contact.h"
 #include "Core/Assert.hpp"
 #include "Scripting/ScriptEngine.hpp"
 
@@ -38,6 +39,199 @@ namespace fox
         FOX_ASSERT(false, "Unknown body type");
         return b2_staticBody;
     }
+
+    class PhysicsContactListener2D : public b2ContactListener
+    {
+    public:
+        Scene* m_Scene;
+
+        void BeginContact(b2Contact* contact) final override
+        {
+//            BoxCollider2D* bodyUserData_1 = reinterpret_cast<BoxCollider2D*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
+//            BoxCollider2D* bodyUserData_2 = reinterpret_cast<BoxCollider2D*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
+//
+//            // check if fixture A was a ball
+//            if (bodyUserData_1 && bodyUserData_2)
+//            {
+//                bodyUserData_1->OnTriggerEnter(*bodyUserData_2);
+//                bodyUserData_2->OnTriggerEnter(*bodyUserData_1);
+////                uint64_t id_1 = (uint64_t)*bodyUserData_1;
+////                uint64_t id_2 = (uint64_t)*bodyUserData_2;
+////
+////                fox::info("Id 1: %", id_1);
+////                fox::info("Id 2: %", id_2);
+////
+////                Entity entity_1 = m_Scene->GetEntityByUUID(id_1);
+////                Entity entity_2 = m_Scene->GetEntityByUUID(id_2);
+////
+////                fox::info("Entity Id 1: %", entity_1.GetUUID());
+////                fox::info("Entity Id 2: %", entity_2.GetUUID());
+////
+////                entity_1.get<BoxCollider2D>().OnTriggerEnter(entity_2.get<BoxCollider2D>());
+////                entity_2.get<BoxCollider2D>().OnTriggerEnter(entity_1.get<BoxCollider2D>());
+//            }
+
+            b2Fixture* a = contact->GetFixtureA();
+            b2Fixture* b = contact->GetFixtureB();
+
+            bool aSensor = a->IsSensor();
+            bool bSensor = b->IsSensor();
+
+            Entity e1 = { (entt::entity)(uint32_t)a->GetUserData().pointer, m_Scene };
+            Entity e2 = { (entt::entity)(uint32_t)b->GetUserData().pointer, m_Scene };
+
+//            if (e1.has<BuoyancyEffector2DComponent>() && aSensor
+//                && !e2.HasComponent<BuoyancyEffector2DComponent>() && b->GetBody()->GetType() == b2_dynamicBody)
+//            {
+//                m_BuoyancyFixtures.insert(eastl::make_pair(a, b));
+//            }
+//            else if (e2.HasComponent<BuoyancyEffector2DComponent>() && bSensor
+//                     && !e1.HasComponent<BuoyancyEffector2DComponent>() && a->GetBody()->GetType() == b2_dynamicBody)
+//            {
+//                m_BuoyancyFixtures.insert(eastl::make_pair(b, a));
+//            }
+
+            b2WorldManifold worldManifold;
+            contact->GetWorldManifold(&worldManifold);
+//            b2Vec2 point = worldManifold.points[0];
+//            b2Vec2 velocityA = a->GetBody()->GetLinearVelocityFromWorldPoint(point);
+//            b2Vec2 velocityB = b->GetBody()->GetLinearVelocityFromWorldPoint(point);
+
+            Collision2DData collisionData;
+            collisionData.OtherEntityID = e2.GetUUID();
+//            collisionData.RelativeVelocity = { velocityB.x - velocityA.x, velocityB.y - velocityA.y };
+
+            if (e1.has<ScriptComponent>())
+            {
+                const auto& sc = e1.get<ScriptComponent>();
+                if (!bSensor)
+                {
+                    ScriptEngine::GetEntityScriptInstance(e1.GetUUID())->InvokeOnCollisionEnter2D(collisionData);
+//                    for (const auto& className : sc.Classes)
+//                        ScriptEngine::GetInstance(e1, className)->InvokeOnCollisionEnter2D(collisionData);
+                }
+//                else
+//                {
+////                    ScriptEngine::GetEntityScriptInstance(e1.GetUUID())->InvokeOnCollisionEnter2D(collisionData);
+//
+////                    for (const auto& className : sc.ClassName)
+////                        ScriptEngine::GetInstance(e1, sc.ClassName)->InvokeOnSensorEnter2D(collisionData);
+//                }
+            }
+
+//            point = worldManifold.points[1];
+//            velocityA = a->GetBody()->GetLinearVelocityFromWorldPoint(point);
+//            velocityB = b->GetBody()->GetLinearVelocityFromWorldPoint(point);
+
+            collisionData.OtherEntityID = e1.GetUUID();
+//            collisionData.RelativeVelocity = { velocityA.x - velocityB.x, velocityA.y - velocityB.y };
+            if (e2.has<ScriptComponent>())
+            {
+                const auto& sc = e2.get<ScriptComponent>();
+                if (aSensor)
+                {
+                    ScriptEngine::GetEntityScriptInstance(e2.GetUUID())->InvokeOnCollisionEnter2D(collisionData);
+//                    for (const auto& className : sc.Classes)
+//                        ScriptEngine::GetInstance(e1, className)->InvokeOnCollisionEnter2D(collisionData);
+                }
+//                else
+//                {
+////                    ScriptEngine::GetEntityScriptInstance(e2.GetUUID())->InvokeOnCollisionEnter2D(collisionData);
+//
+////                    for (const auto& className : sc.ClassName)
+////                        ScriptEngine::GetInstance(e1, sc.ClassName)->InvokeOnSensorEnter2D(collisionData);
+//                }
+            }
+        }
+
+        void EndContact(b2Contact* contact) final override
+        {
+            void* bodyUserData_1 = (void *) contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+            void* bodyUserData_2 = (void *) contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+
+//            // check if fixture A was a ball
+//            if (bodyUserData_1)
+//            {
+//                static_cast<Rigidbody2D*>(bodyUserData_1)->endContact();
+//            }
+//
+//            // check if fixture B was a ball
+//            if (bodyUserData_2)
+//            {
+//                static_cast<Rigidbody2D*>(bodyUserData_2)->endContact();
+//            }
+
+            b2Fixture* a = contact->GetFixtureA();
+            b2Fixture* b = contact->GetFixtureB();
+            bool aSensor = a->IsSensor();
+            bool bSensor = b->IsSensor();
+            Entity e1 = { (entt::entity)(uint32_t)a->GetUserData().pointer, m_Scene };
+            Entity e2 = { (entt::entity)(uint32_t)b->GetUserData().pointer, m_Scene };
+
+//            if (e1.HasComponent<BuoyancyEffector2DComponent>() && aSensor
+//                && !e2.HasComponent<BuoyancyEffector2DComponent>() && b->GetBody()->GetType() == b2_dynamicBody)
+//            {
+//                m_BuoyancyFixtures.erase(eastl::make_pair(a, b));
+//            }
+//            else if (e2.HasComponent<BuoyancyEffector2DComponent>() && bSensor
+//                     && !e1.HasComponent<BuoyancyEffector2DComponent>() && a->GetBody()->GetType() == b2_dynamicBody)
+//            {
+//                m_BuoyancyFixtures.erase(eastl::make_pair(b, a));
+//            }
+
+            b2WorldManifold worldManifold;
+            contact->GetWorldManifold(&worldManifold);
+            b2Vec2 point = worldManifold.points[0];
+            b2Vec2 velocityA = a->GetBody()->GetLinearVelocityFromWorldPoint(point);
+            b2Vec2 velocityB = b->GetBody()->GetLinearVelocityFromWorldPoint(point);
+
+            Collision2DData collisionData;
+            collisionData.OtherEntityID = e2.GetUUID();
+//            collisionData.RelativeVelocity = { velocityB.x - velocityA.x, velocityB.y - velocityA.y };
+
+            if (e1.has<ScriptComponent>())
+            {
+                const auto& sc = e1.get<ScriptComponent>();
+                if (bSensor)
+                {
+                    ScriptEngine::GetEntityScriptInstance(e1.GetUUID())->InvokeOnCollisionExit2D(collisionData);
+//                    for (const auto& className : sc.Classes)
+//                        ScriptEngine::GetInstance(e1, className)->InvokeOnCollisionEnter2D(collisionData);
+                }
+//                else
+//                {
+////                    ScriptEngine::GetEntityScriptInstance(e1.GetUUID())->InvokeOnCollisionExit2D(collisionData);
+//
+////                    for (const auto& className : sc.ClassName)
+////                        ScriptEngine::GetInstance(e1, sc.ClassName)->InvokeOnSensorExit2D(collisionData);
+//                }
+            }
+
+            point = worldManifold.points[1];
+            velocityA = a->GetBody()->GetLinearVelocityFromWorldPoint(point);
+            velocityB = b->GetBody()->GetLinearVelocityFromWorldPoint(point);
+
+            collisionData.OtherEntityID = e1.GetUUID();
+//            collisionData.RelativeVelocity = { velocityA.x - velocityB.x, velocityA.y - velocityB.y };
+            if (e2.has<ScriptComponent>())
+            {
+                const auto& sc = e2.get<ScriptComponent>();
+                if (aSensor)
+                {
+                    ScriptEngine::GetEntityScriptInstance(e2.GetUUID())->InvokeOnCollisionExit2D(collisionData);
+//                    for (const auto& className : sc.Classes)
+//                        ScriptEngine::GetInstance(e1, className)->InvokeOnCollisionEnter2D(collisionData);
+                }
+//                else
+//                {
+////                    ScriptEngine::GetEntityScriptInstance(e1.GetUUID())->InvokeOnCollisionExit2D(collisionData);
+//
+////                    for (const auto& className : sc.ClassName)
+////                        ScriptEngine::GetInstance(e1, sc.ClassName)->InvokeOnSensorExit2D(collisionData);
+//                }
+            }
+        }
+    };
 
     Scene::Scene() : m_oApp(Application::Get())
     {
@@ -268,9 +462,14 @@ namespace fox
         OnPhysics2DStop();
     }
 
+    static PhysicsContactListener2D m_ContactListener;
+
     void Scene::OnPhysics2DStart()
     {
+        m_ContactListener.m_Scene = this;
+
         m_PhysicsWorld = new b2World({ 0.0f, -9.81f });
+        m_PhysicsWorld->SetContactListener(&m_ContactListener);
 
         auto view = m_Registry.view<Rigidbody2D>();
         for (auto e : view)
@@ -287,10 +486,12 @@ namespace fox
             b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
             body->SetFixedRotation(rb2d.FixedRotation);
             rb2d.RuntimeBody = body;
+            UUID id = entity.GetUUID();
 
             if (entity.has<BoxCollider2D>())
             {
                 auto& bc2d = entity.get<BoxCollider2D>();
+                body->GetUserData().pointer = reinterpret_cast<uintptr_t>(&bc2d);
 
                 b2PolygonShape boxShape;
                 boxShape.SetAsBox(bc2d.Size.x * transform.scale.x, bc2d.Size.y * transform.scale.y);
@@ -301,6 +502,7 @@ namespace fox
                 fixtureDef.friction = bc2d.Friction;
                 fixtureDef.restitution = bc2d.Restitution;
                 fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
+                fixtureDef.userData.pointer = (uint32_t)entity;
                 body->CreateFixture(&fixtureDef);
             }
 
@@ -318,6 +520,7 @@ namespace fox
                 fixtureDef.friction = cc2d.Friction;
                 fixtureDef.restitution = cc2d.Restitution;
                 fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
+                fixtureDef.userData.pointer = (uint32_t)entity;
                 body->CreateFixture(&fixtureDef);
             }
         }
@@ -440,10 +643,10 @@ namespace fox
     {
     }
 
-    template<>
-    void Scene::OnComponentAdded<EntityTag>(Entity &e, EntityTag& component)
-    {
-    }
+//    template<>
+//    void Scene::OnComponentAdded<EntityTag>(Entity &e, EntityTag& component)
+//    {
+//    }
 
 //    template<>
 //    void Scene::OnComponentAdded<AnimationPlayer>(Entity &e, AnimationPlayer& component)
@@ -551,6 +754,14 @@ namespace fox
     {
         Entity newEntity = NewEntity(entity.GetName());
         CopyComponentIfExists(AllComponents{}, newEntity, entity);
+    }
+
+    Entity Scene::CloneEntity(Entity& entity)
+    {
+        std::string name = entity.GetName();
+        Entity newEntity = NewEntity(name);
+        CopyComponentIfExists(AllComponents{}, newEntity, entity);
+        return newEntity;
     }
 
 }// namespace fox

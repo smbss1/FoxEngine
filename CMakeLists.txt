@@ -118,8 +118,12 @@ target_link_options(fox_editor PRIVATE
     -m64
 )
 target_sources(fox_editor PRIVATE
+    editor/src/Panels/StatsPanel.cpp
     editor/src/Panels/ContentBrowserPanel.cpp
     editor/src/Panels/SceneHierarchyPanel.cpp
+    editor/src/Panels/ConsolePanel.cpp
+    editor/src/Panels/SettingsPanel.cpp
+    editor/src/Panels/PropertyPanel.cpp
     editor/src/EditorApp.cpp
     editor/src/EditorLayer.cpp
 )

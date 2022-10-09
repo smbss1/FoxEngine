@@ -2,14 +2,42 @@
 // Created by samuel on 09/10/22.
 //
 
-#ifndef FOX_LEXER_PROPERTYPANEL_HPP
-#define FOX_LEXER_PROPERTYPANEL_HPP
+#ifndef FOXENGINE_PROPERTYPANEL_HPP
+#define FOXENGINE_PROPERTYPANEL_HPP
 
+#include "Scene/Scene.hpp"
+#include "Ecs/Entity.hpp"
+#include "Components/NativeScript.hpp"
+#include "Panel.hpp"
 
-class PropertyPanel
+namespace fox
 {
+    class OnSelectedEntityChangeEvent;
+    class OnContextChangeEvent;
 
-};
+    class PropertyPanel : public Panel
+    {
+    public:
+        explicit PropertyPanel();
+        explicit PropertyPanel(const ref<Scene>& context);
+        ~PropertyPanel();
 
+        void SetContext(const ref<Scene>& context);
+        void OnImGui() override;
+
+    private:
+
+        void OnContextChangeChange(const OnContextChangeEvent& event);
+        void OnSelectedEntityChange(const OnSelectedEntityChangeEvent& event);
+        void DrawComponents(Entity entity);
+
+        template<typename T>
+        void DisplayAddComponentEntry(const std::string& entryName);
+
+    private:
+        ref<Scene> m_pContext = nullptr;
+        Entity m_SelectedEntity;
+    };
+}
 
 #endif //FOX_LEXER_PROPERTYPANEL_HPP

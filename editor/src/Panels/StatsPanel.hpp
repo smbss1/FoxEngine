@@ -5,12 +5,15 @@
 #ifndef FOX_LEXER_STATSPANEL_HPP
 #define FOX_LEXER_STATSPANEL_HPP
 
+#include "Panel.hpp"
 
-
-class StatsPanel {
-
-};
-
+namespace fox
+{
+    class StatsPanel : public Panel
+    {
+        void OnImGui() override;
+    };
+}
 
 
 #endif //FOX_LEXER_STATSPANEL_HPP

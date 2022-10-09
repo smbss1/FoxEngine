@@ -7,15 +7,16 @@
 
 #include <filesystem>
 #include "Renderer/Texture.hpp"
+#include "Panel.hpp"
 
 namespace fox
 {
-    class ContentBrowserPanel
+    class ContentBrowserPanel : public Panel
     {
     public:
         ContentBrowserPanel();
 
-        void OnImGui();
+        void OnImGui() override;
         void OnProjectOpen();
 
     private:

@@ -35,6 +35,7 @@ namespace fox
         Entity NewEntity(const std::string& name = std::string());
         Entity NewEntityWithUUID(UUID uuid, const std::string &name);
         void DuplicateEntity(Entity entity);
+        Entity CloneEntity(Entity& entity);
 
         template<typename... Components>
         auto GetAllEntitiesWith()
