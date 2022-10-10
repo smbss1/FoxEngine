@@ -85,7 +85,7 @@ namespace fox
         fox::info("Starting load config.json....");
         json::Value oConfigTemp;
         std::string out;
-        if (fox::file::ReadFile(std::string(FOX_PLUGIN_DIRECTORY) + "config.json", out))
+        if (fox::FileSystem::ReadFile(std::string(FOX_PLUGIN_DIRECTORY) + "config.json", out))
             oConfigTemp = json::parse(out);
         else
             fox::error("Cannot read config.json");

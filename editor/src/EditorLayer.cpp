@@ -535,7 +535,7 @@ namespace fox
         const std::string& cpp_filepath = path + "/" + strName + ".cpp";
 
         // Create the HPP Class
-        file::WriteFile(hpp_filepath, "\n#include <Components/NativeScript.hpp>\n"
+        FileSystem::WriteFile(hpp_filepath, "\n#include <Components/NativeScript.hpp>\n"
                                       "\nclass "+ strName +" : public ScriptableBehaviour\n{\n"
                                          "public:\n"
                                          "protected:\n"
@@ -546,7 +546,7 @@ namespace fox
                                          "REGISTER_SCRIPT("+ strName +");");
 
         // Create the CPP Class
-        file::WriteFile(cpp_filepath, "\n#include <FoxEngine.hpp>\n"
+        FileSystem::WriteFile(cpp_filepath, "\n#include <FoxEngine.hpp>\n"
                                       "#include \"" + strName + ".hpp\""
                                     "\n\n"
                                     "\nvoid " + strName + "::OnStart()\n{\n}\n"

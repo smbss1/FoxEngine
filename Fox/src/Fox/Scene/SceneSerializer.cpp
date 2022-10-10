@@ -10,7 +10,6 @@
 #include "Components.hpp"
 #include "SceneSerializer.hpp"
 #include "Scripting/ScriptEngine.hpp"
-#include "Core/EditorLogger.hpp"
 
 namespace YAML {
 
@@ -487,14 +486,13 @@ namespace fox
                         ScriptFieldInstance& fieldInstance = entityFields[name];
 
                         // TODO(Yan): turn this assert into Hazelnut log warning
-                        if (fields.find(name) != fields.end())
-                            AddLog("vjsnosivspovkŝo");
-
                         if (fields.find(name) == fields.end())
+                        {
+                            fox::warn("Cannot find % of type (%) in the C# class %", name, typeString, sc.ClassName);
                             continue;
+                        }
 
                         fieldInstance.Field = fields.at(name);
-
                         switch (type)
                         {
                             READ_SCRIPT_FIELD(Float,   float     );

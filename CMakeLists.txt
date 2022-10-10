@@ -279,6 +279,7 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Math/Quat.cpp
     Fox/src/Fox/Math/Math.cpp
     Fox/src/Fox/Math/Vec3.cpp
+    Fox/src/Fox/Scripting/GCManager.cpp
     "Fox/src/Fox/Scripting/Old Thing/ScriptRegistry.cpp"
     Fox/src/Fox/Scripting/ScriptGlue.cpp
     Fox/src/Fox/Scripting/ScriptEngine.cpp
@@ -295,10 +296,8 @@ target_sources(fox_engine PRIVATE
     "Fox/src/Fox/Save for later/Plugin System (Not used)/PluginLoader.cpp"
     "Fox/src/Fox/Save for later/Plugin System (Not used)/SharedLib.cpp"
     "Fox/src/Fox/Save for later/FileWatcher.cpp"
-    Fox/src/Fox/Utils/bitsets.cpp
     Fox/src/Fox/Utils/Path.cpp
     Fox/src/Fox/Utils/PlatformUtils.cpp
-    Fox/src/Fox/Utils/Any.cpp
     Fox/src/Fox/Utils/FileSystem.cpp
     Fox/src/Fox/Reflection/Reflection.cpp
     Fox/src/Fox/Core/LayerStack.cpp
@@ -308,7 +307,6 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Core/Input/Mouse.cpp
     Fox/src/Fox/Core/Input/Input.cpp
     Fox/src/Fox/Core/UUID.cpp
-    Fox/src/Fox/Core/EditorLogger.cpp
     Fox/src/Fox/Core/Window.cpp
     Fox/src/Fox/Core/Application.cpp
     Fox/src/Fox/Renderer/SubTexture2D.cpp

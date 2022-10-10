@@ -211,17 +211,30 @@ namespace fox
     template<typename... Component>
     static void RegisterComponent(ComponentGroup<Component...>)
     {
+//        FOX_PROFILE_SCOPE();
+
         RegisterComponent<Component...>();
     }
 
     void ScriptGlue::RegisterComponents()
     {
+//        FOX_PROFILE_SCOPE();
+
         RegisterComponent<EntityName>();
         RegisterComponent(AllComponents{});
     }
 
+    void ScriptGlue::ClearTypes()
+    {
+//        FOX_PROFILE_SCOPE();
+
+        s_EntityHasComponentFuncs.clear();
+    }
+
     void ScriptGlue::RegisterFunctions()
     {
+//        FOX_PROFILE_SCOPE();
+
         FOX_ADD_INTERNAL_CALL(GetScriptInstance);
         FOX_ADD_INTERNAL_CALL(Log_LogMessage);
 

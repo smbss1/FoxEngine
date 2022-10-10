@@ -9,6 +9,7 @@
 #include "Components/Transform.hpp"
 #include "Components/Rigidbody2D.hpp"
 #include "Renderer/Renderer2D.hpp"
+#include "Scripting/ScriptEngine.hpp"
 
 namespace fox
 {
@@ -25,7 +26,11 @@ namespace fox
     void SettingsPanel::OnImGui()
     {
         ImGui::Begin("Settings");
-            ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
+        ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
+        if (ImGui::Button("Reload C# Assembly"))
+        {
+            ScriptEngine::ReloadAppDomain();
+        }
         ImGui::End();
 
         if (m_ShowPhysicsColliders)

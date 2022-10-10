@@ -7,6 +7,7 @@
 
 #include "Scene/Scene.hpp"
 #include "Ecs/Entity.hpp"
+#include "GCManager.hpp"
 
 #include <filesystem>
 #include <string>
@@ -24,6 +25,8 @@ extern "C" {
 class BoxCollider2D;
 namespace fox
 {
+    struct ScriptComponent;
+
     enum class ScriptFieldType
     {
         None = 0,
@@ -31,6 +34,7 @@ namespace fox
         Bool, Char, Byte, Short, Int, Long,
         UByte, UShort, UInt, ULong,
         Vector2, Vector3, Vector4,
+        String,
         Entity
     };
 
@@ -58,7 +62,7 @@ namespace fox
         }
 
         template<typename T>
-        T GetValue()
+        T GetValue() const
         {
             static_assert(sizeof(T) <= 16, "Type too large!");
             return *(T*)m_Buffer;
@@ -96,7 +100,7 @@ namespace fox
         ScriptClass() = default;
         ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore = false);
 
-        MonoObject* Instantiate();
+        GCHandle Instantiate();
         MonoMethod* GetMethod(const std::string& name, int parameterCount);
         MonoObject* InvokeMethod(MonoObject* instance, MonoMethod* method, void** params = nullptr);
 
@@ -116,6 +120,7 @@ namespace fox
     {
     public:
         ScriptInstance(ref<ScriptClass> scriptClass, Entity entity);
+        ~ScriptInstance();
 
         void InvokeOnCreate();
         void InvokeOnUpdate(float ts);
@@ -136,6 +141,12 @@ namespace fox
         }
 
         template<typename T>
+        T* GetFieldObject(const std::string& name)
+        {
+            return (T*)GetFieldObjectValueInternal(name);
+        }
+
+        template<typename T>
         void SetFieldValue(const std::string& name, T value)
         {
             static_assert(sizeof(T) <= 16, "Type too large!");
@@ -143,14 +154,21 @@ namespace fox
             SetFieldValueInternal(name, &value);
         }
 
-        MonoObject* GetManagedObject() { return m_Instance; }
+        void SetFieldValue(const std::string& name, void* value)
+        {
+            SetFieldValueInternal(name, value);
+        }
+
+        MonoObject* GetManagedObject() { return GCManager::GetReferencedObject(m_Handle); }
     private:
         bool GetFieldValueInternal(const std::string& name, void* buffer);
+        MonoObject* GetFieldObjectValueInternal(const std::string& name);
         bool SetFieldValueInternal(const std::string& name, const void* value);
     private:
         ref<ScriptClass> m_ScriptClass;
 
-        MonoObject* m_Instance = nullptr;
+        GCHandle m_Handle;
+
         MonoMethod* m_Constructor = nullptr;
         MonoMethod* m_OnCreateMethod = nullptr;
         MonoMethod* m_OnUpdateMethod = nullptr;
@@ -172,6 +190,9 @@ namespace fox
 
         static void LoadAssembly(const std::filesystem::path& filepath);
         static void LoadAppAssembly(const std::filesystem::path& filepath);
+        static void ReloadAppDomain();
+
+        static void FindClassAndRegisterTypes();
 
         static void OnRuntimeStart(Scene* scene);
         static void OnRuntimeStop();
@@ -179,6 +200,8 @@ namespace fox
         static bool EntityClassExists(const std::string& fullClassName);
         static void OnCreateEntity(Entity entity);
         static void OnUpdateEntity(Entity entity, Timestep ts);
+        static ref<ScriptInstance> CreateEntityInstance(Entity entity);
+        static ref<ScriptInstance> CreateEntityInstance(Entity entity, const ScriptComponent& component);
 
         static Scene* GetSceneContext();
         static ref<ScriptInstance> GetEntityScriptInstance(UUID entityID);
@@ -186,17 +209,16 @@ namespace fox
         static ref<ScriptClass> GetEntityClass(const std::string& name);
         static std::unordered_map<std::string, ref<ScriptClass>> GetEntityClasses();
         static ScriptFieldMap& GetScriptFieldMap(Entity entity);
+        static Entity GetEntityInstanceFromMonoObject(MonoObject* obj);
 
         static MonoImage* GetCoreAssemblyImage();
         static MonoObject* GetManagedInstance(UUID uuid);
-
-        static void InitComponentEvents(entt::registry& registry);
 
     private:
         static void InitMono();
         static void ShutdownMono();
 
-        static MonoObject* InstantiateClass(MonoClass* monoClass);
+        static GCHandle InstantiateClass(MonoClass* monoClass);
         static void LoadAssemblyClasses();
 
         friend class ScriptClass;
@@ -222,6 +244,8 @@ namespace fox
                 case ScriptFieldType::UShort:  return "UShort";
                 case ScriptFieldType::UInt:    return "UInt";
                 case ScriptFieldType::ULong:   return "ULong";
+                case ScriptFieldType::String:  return "String";
+
                 case ScriptFieldType::Vector2: return "Vector2";
                 case ScriptFieldType::Vector3: return "Vector3";
                 case ScriptFieldType::Vector4: return "Vector4";
@@ -246,6 +270,8 @@ namespace fox
             if (fieldType == "UShort")  return ScriptFieldType::UShort;
             if (fieldType == "UInt")    return ScriptFieldType::UInt;
             if (fieldType == "ULong")   return ScriptFieldType::ULong;
+            if (fieldType == "String")   return ScriptFieldType::String;
+
             if (fieldType == "Vector2") return ScriptFieldType::Vector2;
             if (fieldType == "Vector3") return ScriptFieldType::Vector3;
             if (fieldType == "Vector4") return ScriptFieldType::Vector4;

@@ -38,7 +38,7 @@ namespace fox
         {ScriptFieldType::Vector2,                 ImGuiFieldDrawer::DrawVec2},
         {ScriptFieldType::Vector3,                 ImGuiFieldDrawer::DrawVec3},
         {ScriptFieldType::Vector4,                 ImGuiFieldDrawer::DrawVec4},
-        {ScriptFieldType::Entity,                 ImGuiFieldDrawer::DrawEntityRef},
+//        {ScriptFieldType::Entity,                 ImGuiFieldDrawer::DrawEntityRef},
 //        {ScriptFieldType::Texture,  ImGuiFieldDrawer::DrawTexture},
 
 //        {ScriptFieldType::Rigidbody_BodyType,     ImGuiFieldDrawer::DrawRigidbody2D_BodyType},
@@ -207,29 +207,22 @@ namespace fox
         return false;
     }
 
-    bool ImGuiFieldDrawer::DrawEntityRef(std::string name, Reflect::Any& valueFrom)
-    {
-        Entity *en = valueFrom.TryCast<Entity>();
-//        uint64_t *id = valueFrom.TryCast<uint64_t>();
-//        if (id != nullptr)
-//        {
-//            Entity ent =
-//        }
-        ImGui::Button(en != nullptr && *en ? en->GetName().c_str() : "Entity", ImVec2(100.0f, 0.0f));
+//    bool ImGuiFieldDrawer::DrawEntityRef(std::string name, Reflect::Any& valueFrom)
+//    {
+//        Entity *en = valueFrom.TryCast<Entity>();
+//        ImGui::Button(en != nullptr && *en ? en->GetName().c_str() : "Entity", ImVec2(100.0f, 0.0f));
 //        if (ImGui::BeginDragDropTarget())
 //        {
 //            if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy")) {
 //                Entity *entity = static_cast<Entity *>(payload->Data);
-//
-//                fox::trace("Get Entity: %", entity->GetName());
 //                valueFrom = *entity;
 //                return true;
 //            }
 //            ImGui::EndDragDropTarget();
 //        }
-
-        return false;
-    }
+//
+//        return false;
+//    }
 
     bool ImGuiFieldDrawer::DrawRigidbody2D_BodyType(std::string name, Reflect::Any& valueFrom)
     {

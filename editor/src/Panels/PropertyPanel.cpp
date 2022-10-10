@@ -2,7 +2,6 @@
 // Created by samuel on 09/10/22.
 //
 
-
 #include "imgui.h"
 #include "Core/Application.hpp"
 #include "Components.hpp"
@@ -15,7 +14,6 @@
 #include "Scripting/ScriptEngine.hpp"
 #include "Reflection/Core/Reflect.hpp"
 #include "ImGui/ImGuiFieldDrawer.hpp"
-#include "Core/EditorLogger.hpp"
 #include "EditorEvent.hpp"
 
 #include <filesystem>
@@ -48,8 +46,6 @@ namespace fox
 
     void PropertyPanel::OnImGui()
     {
-        DrawLog("title");
-
         ImGui::Begin("Properties");
         {
             if (m_SelectedEntity) {
@@ -136,38 +132,59 @@ namespace fox
         });
     }
 
-    template<typename T>
-    static void DrawFieldIf(ScriptFieldType type, ScriptFieldInstance& fieldInstance, std::string name)
+    void GetFieldValue(ScriptFieldInstance scriptField, Reflect::Any& data)
     {
-        if (fieldInstance.Field.Type != type)
-            return;
-
-        Reflect::Any data = fieldInstance.GetValue<T>();
-        if (ImGuiFieldDrawer::DrawField(fieldInstance.Field.Type, name, data))
+        switch (scriptField.Field.Type)
         {
-//            if (type == ScriptFieldType::Entity)
-//            {
-//                Entity* entity = data.template TryCast<Entity>();
-////                fox::trace("En: %", entity->GetName());
-//                fieldInstance.SetValue<uint64_t>((uint64_t) entity->GetUUID());
-//            }
-//            else
-//            {
-                fieldInstance.SetValue(data.Get(), data.GetType()->GetSize());
-//            }
+            case ScriptFieldType::Float:
+                data = scriptField.GetValue<float>();
+                break;
+            case ScriptFieldType::Int:
+                data = scriptField.GetValue<int>();
+                break;
+            case ScriptFieldType::Double:
+                data = scriptField.GetValue<double>();
+                break;
+            case ScriptFieldType::Bool:
+                data = scriptField.GetValue<bool>();
+                break;
+            case ScriptFieldType::Vector2:
+                data = scriptField.GetValue<glm::vec2>();
+                break;
+            case ScriptFieldType::Vector3:
+                data = scriptField.GetValue<glm::vec3>();
+                break;
+            case ScriptFieldType::Vector4:
+                data = scriptField.GetValue<glm::vec4>();
+                break;
         }
     }
 
-    template<typename T>
-    static void DrawFieldIf(ScriptFieldType type, ScriptField field, ref<ScriptInstance>& instance, std::string name)
+    void GetFieldValue(ScriptField field, ref<ScriptInstance> instance, Reflect::Any& data)
     {
-        if (field.Type != type)
-            return;
-
-        Reflect::Any data = instance->template GetFieldValue<T>(name);
-        if (ImGuiFieldDrawer::DrawField(field.Type, name, data))
+        switch (field.Type)
         {
-            instance->SetFieldValue<T>(name, *data.template TryCast<T>());
+            case ScriptFieldType::Float:
+                data = instance->GetFieldValue<float>(field.Name);
+                break;
+            case ScriptFieldType::Int:
+                data = instance->GetFieldValue<int>(field.Name);
+                break;
+            case ScriptFieldType::Double:
+                data = instance->GetFieldValue<double>(field.Name);
+                break;
+            case ScriptFieldType::Bool:
+                data = instance->GetFieldValue<bool>(field.Name);
+                break;
+            case ScriptFieldType::Vector2:
+                data = instance->GetFieldValue<glm::vec2>(field.Name);
+                break;
+            case ScriptFieldType::Vector3:
+                data = instance->GetFieldValue<glm::vec3>(field.Name);
+                break;
+            case ScriptFieldType::Vector4:
+                data = instance->GetFieldValue<glm::vec4>(field.Name);
+                break;
         }
     }
 
@@ -275,6 +292,8 @@ namespace fox
                 return;
             }
 
+
+            // TODO: Find a wayto 'combine' the drawing of the fields
             // Fields
             bool sceneRunning = scene->IsRunning();
             if (sceneRunning)
@@ -287,22 +306,46 @@ namespace fox
                     ImGuiFieldDrawer::BeginProperties();
                     for (const auto& [name, field] : fields)
                     {
-                        DrawFieldIf<float>(ScriptFieldType::Float, field, scriptInstance, name);
-                        DrawFieldIf<int>(ScriptFieldType::Int, field, scriptInstance, name);
-                        DrawFieldIf<double>(ScriptFieldType::Double, field, scriptInstance, name);
-                        DrawFieldIf<bool>(ScriptFieldType::Bool, field, scriptInstance, name);
-                        DrawFieldIf<glm::vec2>(ScriptFieldType::Vector2, field, scriptInstance, name);
-                        DrawFieldIf<glm::vec3>(ScriptFieldType::Vector3, field, scriptInstance, name);
-                        DrawFieldIf<glm::vec4>(ScriptFieldType::Vector4, field, scriptInstance, name);
+                        Reflect::Any data;
+                        GetFieldValue(field, scriptInstance, data);
 
-//                        if (field.Type == ScriptFieldType::Float)
-//                        {
-//                            float data = scriptInstance->GetFieldValue<float>(name);
-//                            if (ImGui::DragFloat(name.c_str(), &data))
-//                            {
-//                                scriptInstance->SetFieldValue(name, data);
-//                            }
-//                        }
+                        switch (field.Type)
+                        {
+                            case ScriptFieldType::Float:
+                            case ScriptFieldType::Int:
+                            case ScriptFieldType::Double:
+                            case ScriptFieldType::Bool:
+                            case ScriptFieldType::Vector2:
+                            case ScriptFieldType::Vector3:
+                            case ScriptFieldType::Vector4:
+                            {
+                                if (ImGuiFieldDrawer::DrawField(field.Type, name, data))
+                                    scriptInstance->SetFieldValue(name, data.Get());
+                                break;
+                            }
+
+                            case ScriptFieldType::Entity:
+                            {
+                                ImGuiFieldDrawer::BeginPropertyGrid(name.c_str(), nullptr);
+                                MonoObject* entityObj = scriptInstance->template GetFieldObject<MonoObject>(name);
+                                Entity entityRef = ScriptEngine::GetEntityInstanceFromMonoObject(entityObj);
+                                ImGui::Button(entityRef ? entityRef.GetName().c_str() : "No Reference", ImVec2(100.0f, 0.0f));
+
+                                // commented because on runtime we don't want a c++ Entity class but a C# instance of Entity class
+//                                if (ImGui::BeginDragDropTarget())
+//                                {
+//                                    if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy")) {
+//                                        auto* e = static_cast<Entity *>(payload->Data);
+//                                        scriptInstance->template SetFieldValue<UUID>(name, e->GetUUID());
+//                                    }
+//                                    ImGui::EndDragDropTarget();
+//                                }
+                                ImGuiFieldDrawer::EndPropertyGrid();
+                                break;
+                            }
+                            default:
+                                break;
+                        }
                     }
                     ImGuiFieldDrawer::EndProperties();
                 }
@@ -334,15 +377,45 @@ namespace fox
 //                            fox::info("data = %", fieldInstance.GetValue<float>());
                             }
 
+                            Reflect::Any data;
                             ScriptFieldInstance& scriptField = entityFields.at(name);
-                            DrawFieldIf<float>(ScriptFieldType::Float, scriptField, name);
-                            DrawFieldIf<int>(ScriptFieldType::Int, scriptField, name);
-                            DrawFieldIf<double>(ScriptFieldType::Double, scriptField, name);
-                            DrawFieldIf<bool>(ScriptFieldType::Bool, scriptField, name);
-                            DrawFieldIf<glm::vec2>(ScriptFieldType::Vector2, scriptField, name);
-                            DrawFieldIf<glm::vec3>(ScriptFieldType::Vector3, scriptField, name);
-                            DrawFieldIf<glm::vec4>(ScriptFieldType::Vector4, scriptField, name);
-                            DrawFieldIf<Entity>(ScriptFieldType::Entity, scriptField, name);
+                            GetFieldValue(scriptField, data);
+
+                            switch (scriptField.Field.Type)
+                            {
+                                case ScriptFieldType::Float:
+                                case ScriptFieldType::Int:
+                                case ScriptFieldType::Double:
+                                case ScriptFieldType::Bool:
+                                case ScriptFieldType::Vector2:
+                                case ScriptFieldType::Vector3:
+                                case ScriptFieldType::Vector4:
+                                {
+                                    if (ImGuiFieldDrawer::DrawField(scriptField.Field.Type, name, data))
+                                        scriptField.SetValue(data.Get(), data.GetType()->GetSize());
+                                    break;
+                                }
+
+                                case ScriptFieldType::Entity:
+                                {
+                                    ImGuiFieldDrawer::BeginPropertyGrid(name.c_str(), nullptr);
+                                    Entity entityRef = scene->GetEntityByUUID(scriptField.GetValue<UUID>());
+                                    ImGui::Button(entityRef ? entityRef.GetName().c_str() : "No Reference", ImVec2(100.0f, 0.0f));
+                                    ImGuiFieldDrawer::EndPropertyGrid();
+
+                                    if (ImGui::BeginDragDropTarget())
+                                    {
+                                        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy")) {
+                                            auto* e = static_cast<Entity *>(payload->Data);
+                                            scriptField.SetValue<UUID>(e->GetUUID());
+                                        }
+                                        ImGui::EndDragDropTarget();
+                                    }
+                                    break;
+                                }
+                                default:
+                                    break;
+                            }
                         }
                         ImGuiFieldDrawer::EndProperties();
                     }

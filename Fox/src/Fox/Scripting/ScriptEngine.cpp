@@ -4,6 +4,7 @@
 
 #include "Components/ScriptComponent.hpp"
 #include "Components/Rigidbody2D.hpp"
+#include "Utils/FileSystem.hpp"
 
 #include "ScriptEngine.hpp"
 #include "ScriptGlue.hpp"
@@ -13,7 +14,12 @@
 #include "mono/metadata/object.h"
 #include "mono/metadata/tabledefs.h"
 
+#include "mono/metadata/threads.h"
+#include "mono/metadata/mono-debug.h"
 
+//#ifdef FOX_DEBUG
+#include "mono/metadata/debug-helpers.h"
+//#endif // FOX_DEBUG
 
 #include <fstream>
 
@@ -32,6 +38,7 @@ namespace fox
             { "System.UInt16", ScriptFieldType::UShort },
             { "System.UInt32", ScriptFieldType::UInt },
             { "System.UInt64", ScriptFieldType::ULong },
+            { "System.String", ScriptFieldType::String },
 
             { "Fox.Vector2", ScriptFieldType::Vector2 },
             { "Fox.Vector3", ScriptFieldType::Vector3 },
@@ -40,41 +47,15 @@ namespace fox
             { "Fox.Entity", ScriptFieldType::Entity },
         };
 
+    static const char* s_CoreAssemblyPath = "Resources/Scripts/Fox-ScriptCore.dll";
+    static const char* s_AppAssemblyPath = "SandboxProject/Assets/Scripts/Binaries/Sandbox.dll";
+
     namespace Utils
     {
-        // TODO: move to FileSystem class
-        static char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
-        {
-            std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
-
-            if (!stream)
-            {
-                // Failed to open the file
-                return nullptr;
-            }
-
-            std::streampos end = stream.tellg();
-            stream.seekg(0, std::ios::beg);
-            uint64_t size = end - stream.tellg();
-
-            if (size == 0)
-            {
-                // File is empty
-                return nullptr;
-            }
-
-            char* buffer = new char[size];
-            stream.read((char*)buffer, size);
-            stream.close();
-
-            *outSize = (uint32_t)size;
-            return buffer;
-        }
-
         static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath)
         {
             uint32_t fileSize = 0;
-            char* fileData = ReadBytes(assemblyPath, &fileSize);
+            char* fileData = FileSystem::ReadBytes(assemblyPath, &fileSize);
 
             // NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
             MonoImageOpenStatus status;
@@ -140,7 +121,7 @@ namespace fox
         MonoAssembly* AppAssembly = nullptr;
         MonoImage* AppAssemblyImage = nullptr;
 
-        ScriptClass EntityClass;
+        ref<ScriptClass> EntityClass;
 
         std::unordered_map<std::string, ref<ScriptClass>> EntityClasses;
         std::unordered_map<UUID, ref<ScriptInstance>> EntityInstances;
@@ -157,15 +138,8 @@ namespace fox
         s_Data = new ScriptEngineData();
 
         InitMono();
-        LoadAssembly("Resources/Scripts/Fox-ScriptCore.dll");
-        LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
-        LoadAssemblyClasses();
-
-        ScriptGlue::RegisterComponents();
-        ScriptGlue::RegisterFunctions();
-
-        // Retrieve and instantiate class
-        s_Data->EntityClass = ScriptClass("Fox", "Entity", true);
+        GCManager::Init();
+        ReloadAppDomain();
 
 #if 0
         // Create an object (and call constructor)
@@ -203,16 +177,6 @@ namespace fox
 #endif
     }
 
-    void ScriptEngine::InitComponentEvents(entt::registry& registry)
-    {
-//        auto view = registry.view<BoxCollider2D>();
-//
-//        for (auto e : view)
-//        {
-//            Entity entity = { e,  };
-//        }
-    }
-
     void ScriptEngine::Shutdown()
     {
         ShutdownMono();
@@ -223,29 +187,124 @@ namespace fox
     {
         mono_set_assemblies_path("mono/lib");
 
+//        static char* options[] =
+//        {
+//            "--soft-breakpoints",
+//            "--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n"
+//        };
+//        mono_jit_parse_options(sizeof(options) / sizeof(char*), (char**)options);
+//        mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+
         MonoDomain* rootDomain = mono_jit_init("FoxJITRuntime");
         FOX_ASSERT(rootDomain);
 
         // Store the root domain pointer
         s_Data->RootDomain = rootDomain;
+//        mono_debug_domain_create(s_Data->RootDomain);
+        mono_thread_set_main(mono_thread_current());
     }
 
     void ScriptEngine::ShutdownMono()
     {
-        // NOTE(Yan): mono is a little confusing to shut down, so maybe come back to this
+//        FOX_PROFILE_SCOPE();
 
-        // mono_domain_unload(s_Data->AppDomain);
+		s_Data->EntityClasses.clear();
+		s_Data->EntityScriptFields.clear();
+		s_Data->EntityInstances.clear();
+
+		GCManager::Shutdown();
+
+        mono_domain_set(s_Data->RootDomain, true);
+        mono_domain_unload(s_Data->AppDomain);
+		mono_jit_cleanup(s_Data->RootDomain);
         s_Data->AppDomain = nullptr;
-
-        // mono_jit_cleanup(s_Data->RootDomain);
         s_Data->RootDomain = nullptr;
+    }
+
+    void ScriptEngine::ReloadAppDomain()
+    {
+//        FOX_PROFILE_SCOPE();
+
+//        system("call \"../vendor/premake/bin/premake5.exe\" --file=\"../Sandbox/premake5.lua\" vs2022");
+
+        if (s_Data->AppDomain)
+        {
+            mono_domain_set(s_Data->RootDomain, true);
+            mono_domain_unload(s_Data->AppDomain);
+            s_Data->AppDomain = nullptr;
+        }
+
+        //Compile app assembly
+        {
+            std::string command = fox::format("dotnet msbuild %"
+                                              " -nologo"																	// no microsoft branding in console
+                                              " -noconlog"																// no console logs
+                                              //" -t:rebuild"																// rebuild the project
+                                              " -m"																		// multiprocess build
+                                              " -flp1:Verbosity=minimal;logfile=AssemblyBuildErrors.log;errorsonly"		// dump errors in AssemblyBuildErrors.log file
+                                              " -flp2:Verbosity=minimal;logfile=AssemblyBuildWarnings.log;warningsonly"	// dump warnings in AssemblyBuildWarnings.log file
+                                              , s_AppAssemblyPath);
+            system(command.c_str());
+
+            // Errors
+            {
+                FILE* errors = fopen("AssemblyBuildErrors.log", "r");
+
+                char buffer[4096];
+                if (errors != nullptr)
+                {
+                    while (fgets(buffer, sizeof(buffer), errors))
+                    {
+                        if (buffer)
+                        {
+                            size_t newLine = std::string_view(buffer).size() - 1;
+                            buffer[newLine] = '\0';
+                            fox::error(buffer);
+                        }
+                    }
+
+                    fclose(errors);
+                }
+            }
+
+            // Warnings
+            {
+                FILE* warns = fopen("AssemblyBuildWarnings.log", "r");
+
+                char buffer[1024];
+                if (warns != nullptr)
+                {
+                    while (fgets(buffer, sizeof(buffer), warns))
+                    {
+                        if (buffer)
+                        {
+                            size_t newLine = std::string_view(buffer).size() - 1;
+                            buffer[newLine] = '\0';
+                            fox::warn(buffer);
+                        }
+                    }
+
+                    fclose(warns);
+                }
+            }
+        }
+
+        LoadAssembly(s_CoreAssemblyPath);
+        LoadAppAssembly(s_AppAssemblyPath);
+
+        LoadAssemblyClasses();
+        FindClassAndRegisterTypes();
+
+        GCManager::CollectGarbage();
     }
 
     void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
     {
         // Create an App Domain
         s_Data->AppDomain = mono_domain_create_appdomain("FoxScriptRuntime", nullptr);
+        FOX_ASSERT(s_Data->AppDomain);
         mono_domain_set(s_Data->AppDomain, true);
+//        mono_debug_domain_create(s_Data->AppDomain);
 
         // Move this maybe
         s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath);
@@ -261,6 +320,17 @@ namespace fox
         // Utils::PrintAssemblyTypes(s_Data->AppAssembly);
     }
 
+    void ScriptEngine::FindClassAndRegisterTypes()
+    {
+        ScriptGlue::ClearTypes();
+        ScriptGlue::RegisterComponents();
+        ScriptGlue::RegisterFunctions();
+
+        // Retrieve and instantiate class
+        s_Data->EntityClass = new_ref<ScriptClass>("Fox", "Entity", true);
+    }
+
+
     void ScriptEngine::OnRuntimeStart(Scene* scene)
     {
         s_Data->SceneContext = scene;
@@ -269,13 +339,26 @@ namespace fox
     void ScriptEngine::OnRuntimeStop()
     {
         s_Data->SceneContext = nullptr;
-
         s_Data->EntityInstances.clear();
     }
 
     bool ScriptEngine::EntityClassExists(const std::string& fullClassName)
     {
         return s_Data->EntityClasses.find(fullClassName) != s_Data->EntityClasses.end();
+    }
+
+    ref<ScriptInstance> ScriptEngine::CreateEntityInstance(Entity entity)
+    {
+        ref<ScriptInstance> instance = new_ref<ScriptInstance>(s_Data->EntityClass, entity);
+        s_Data->EntityInstances[entity.GetUUID()] = instance;
+        return instance;
+    }
+
+    ref<ScriptInstance> ScriptEngine::CreateEntityInstance(Entity entity, const ScriptComponent& component)
+    {
+        ref<ScriptInstance> instance = new_ref<ScriptInstance>(s_Data->EntityClasses[component.ClassName], entity);
+        s_Data->EntityInstances[entity.GetUUID()] = instance;
+        return instance;
     }
 
     void ScriptEngine::OnCreateEntity(Entity entity)
@@ -294,29 +377,28 @@ namespace fox
                 const ScriptFieldMap& fieldMap = s_Data->EntityScriptFields.at(entityID);
                 for (const auto& [name, fieldInstance] : fieldMap)
                 {
-//                    if (fieldInstance.Field.Type == ScriptFieldType::Entity)
-//                    {
-//                        if (fieldInstance.m_Buffer == 0)
-//                            continue;
-//
-//                        Entity* ent = (Entity*)fieldInstance.m_Buffer;
-//                        if (ent == nullptr || !*ent)
-//                            continue;
-//
-//                        fox::trace("Name-: %", ent->GetName());
-//
-//                        auto inst = ScriptEngine::GetEntityScriptInstance(ent->GetUUID());
-//                        if (!instance || inst->m_Instance == nullptr)
-//                        {
-//                            inst = new_ref<ScriptInstance>(new_ref<ScriptClass>(s_Data->EntityClass), *ent);
-//                        }
-//                        instance->SetFieldValueInternal(name, inst->m_Instance);
-//                    }
-//                    else
+                    if (fieldInstance.Field.Type == ScriptFieldType::Entity)
+                    {
+                        // get the id ref of the entity
+                        UUID entityId = fieldInstance.GetValue<UUID>();
+                        if (entityId <= 0)
+                            continue;
+
+                        // TODO: Caching the instance ? (better perf ?)
+                        // if id is ok
+                        // get the entity instance in the scene
+                        Entity entityRef = s_Data->SceneContext->GetEntityByUUID(entityId);
+                        // create a new instance C#
+                        ref<ScriptInstance> obj = CreateEntityInstance(entityRef);
+                        // Set into the field
+                        instance->SetFieldValueInternal(name, obj->GetManagedObject());
+                    }
+                    else
+                    {
                         instance->SetFieldValueInternal(name, fieldInstance.m_Buffer);
+                    }
                 }
             }
-
             instance->InvokeOnCreate();
         }
     }
@@ -352,6 +434,17 @@ namespace fox
         return s_Data->EntityClasses.at(name);
     }
 
+    Entity ScriptEngine::GetEntityInstanceFromMonoObject(MonoObject* obj)
+    {
+        for (auto script : s_Data->EntityInstances)
+        {
+            if (script.second->GetManagedObject() == obj)
+                return s_Data->SceneContext->GetEntityByUUID(script.first);
+        }
+
+        return Entity();
+    }
+
 
     std::unordered_map<std::string, ref<ScriptClass>> ScriptEngine::GetEntityClasses()
     {
@@ -368,6 +461,7 @@ namespace fox
 
     void ScriptEngine::LoadAssemblyClasses()
     {
+        GCManager::CollectGarbage();
         s_Data->EntityClasses.clear();
 
         const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_Data->AppAssemblyImage, MONO_TABLE_TYPEDEF);
@@ -434,11 +528,18 @@ namespace fox
         return s_Data->EntityInstances.at(uuid)->GetManagedObject();
     }
 
-    MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)
+    GCHandle ScriptEngine::InstantiateClass(MonoClass* monoClass)
     {
-        MonoObject* instance = mono_object_new(s_Data->AppDomain, monoClass);
-        mono_runtime_object_init(instance);
-        return instance;
+//        FOX_PROFILE_SCOPE();
+
+        MonoObject* object = mono_object_new(s_Data->AppDomain, monoClass);
+        if (object)
+        {
+            mono_runtime_object_init(object);
+            return GCManager::CreateObjectReference(object, false);
+        }
+
+        return -1;
     }
 
     ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore)
@@ -447,7 +548,7 @@ namespace fox
         m_MonoClass = mono_class_from_name(isCore ? s_Data->CoreAssemblyImage : s_Data->AppAssemblyImage, classNamespace.c_str(), className.c_str());
     }
 
-    MonoObject* ScriptClass::Instantiate()
+    GCHandle ScriptClass::Instantiate()
     {
         return ScriptEngine::InstantiateClass(m_MonoClass);
     }
@@ -465,27 +566,32 @@ namespace fox
     ScriptInstance::ScriptInstance(ref<ScriptClass> scriptClass, Entity entity)
         : m_ScriptClass(scriptClass)
     {
-        m_Instance = scriptClass->Instantiate();
+        m_Handle = scriptClass->Instantiate();
 
-        m_Constructor = s_Data->EntityClass.GetMethod(".ctor", 1);
+        m_Constructor = s_Data->EntityClass->GetMethod(".ctor", 1);
         m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
         m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
 
-        m_OnCollisionEnter2DMethod = s_Data->EntityClass.GetMethod("HandleOnCollisionEnter2D", 1);
-        m_OnCollisionExit2DMethod = s_Data->EntityClass.GetMethod("HandleOnCollisionExit2D", 1);
+        m_OnCollisionEnter2DMethod = s_Data->EntityClass->GetMethod("HandleOnCollisionEnter2D", 1);
+        m_OnCollisionExit2DMethod = s_Data->EntityClass->GetMethod("HandleOnCollisionExit2D", 1);
 
         // Call Entity constructor
         {
             UUID entityID = entity.GetUUID();
             void* param = &entityID;
-            m_ScriptClass->InvokeMethod(m_Instance, m_Constructor, &param);
+            m_ScriptClass->InvokeMethod(GetManagedObject(), m_Constructor, &param);
         }
+    }
+
+    ScriptInstance::~ScriptInstance()
+    {
+        GCManager::ReleaseObjectReference(m_Handle);
     }
 
     void ScriptInstance::InvokeOnCreate()
     {
         if (m_OnCreateMethod)
-            m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod);
+            m_ScriptClass->InvokeMethod(GetManagedObject(), m_OnCreateMethod);
     }
 
     void ScriptInstance::InvokeOnUpdate(float ts)
@@ -493,20 +599,20 @@ namespace fox
         if (m_OnUpdateMethod)
         {
             void* param = &ts;
-            m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
+            m_ScriptClass->InvokeMethod(GetManagedObject(), m_OnUpdateMethod, &param);
         }
     }
 
     void ScriptInstance::InvokeOnCollisionEnter2D(Collision2DData collisionInfo)
     {
         void* params = &collisionInfo;
-        m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionEnter2DMethod, &params);
+        m_ScriptClass->InvokeMethod(GetManagedObject(), m_OnCollisionEnter2DMethod, &params);
     }
 
     void ScriptInstance::InvokeOnCollisionExit2D(Collision2DData collisionInfo)
     {
         void* params = &collisionInfo;
-        m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionExit2DMethod, &params);
+        m_ScriptClass->InvokeMethod(GetManagedObject(), m_OnCollisionExit2DMethod, &params);
     }
 
     bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer)
@@ -517,8 +623,21 @@ namespace fox
             return false;
 
         const ScriptField& field = it->second;
-        mono_field_get_value(m_Instance, field.ClassField, buffer);
+        mono_field_get_value(GetManagedObject(), field.ClassField, buffer);
         return true;
+    }
+
+    MonoObject* ScriptInstance::GetFieldObjectValueInternal(const std::string& name)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        const auto& fields = m_ScriptClass->GetFields();
+        auto it = fields.find(name);
+        if (it == fields.end())
+            return nullptr;
+
+        const ScriptField& field = it->second;
+        return mono_field_get_value_object(s_Data->AppDomain, field.ClassField, GetManagedObject());
     }
 
     bool ScriptInstance::SetFieldValueInternal(const std::string& name, const void* value)
@@ -529,7 +648,14 @@ namespace fox
             return false;
 
         const ScriptField& field = it->second;
-        mono_field_set_value(m_Instance, field.ClassField, (void*)value);
+        void* valueStore = (void*) value;
+
+        if (field.Type == ScriptFieldType::String)
+        {
+            MonoString* monoStr = mono_string_new(s_Data->AppDomain, (const char*)value);
+            valueStore = monoStr;
+        }
+        mono_field_set_value(GetManagedObject(), field.ClassField, valueStore);
         return true;
     }
 }

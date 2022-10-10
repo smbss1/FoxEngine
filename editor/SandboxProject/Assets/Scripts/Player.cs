@@ -15,12 +15,8 @@ namespace Sandbox
         {
             m_Transform = GetComponent<TransformComponent>();
             m_Rb2d = GetComponent<Rigidbody2D>();
-            
-            OnCollisionEnter2DEvent += OnCollisionEnter2D;
 
-            // EntityPrefab = FindEntityByName("Prefab");
-            Log.Trace($"{ID}");
-            Log.Trace($"{EntityPrefab?.ID}");
+            OnCollisionEnter2DEvent += OnCollisionEnter2D;
         }
 
         private void OnCollisionEnter2D(CollisionData obj)

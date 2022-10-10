@@ -9,7 +9,7 @@
 
 namespace fox
 {
-    namespace file
+    namespace FileSystem
     {
         bool WriteFile(const std::string& strFile, const std::string& strSave)
         {
@@ -33,6 +33,34 @@ namespace fox
             strOutReadContent = strStream.str();
 
             return true;
+        }
+
+        char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
+        {
+            std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
+
+            if (!stream)
+            {
+                // Failed to open the file
+                return nullptr;
+            }
+
+            std::streampos end = stream.tellg();
+            stream.seekg(0, std::ios::beg);
+            uint64_t size = end - stream.tellg();
+
+            if (size == 0)
+            {
+                // File is empty
+                return nullptr;
+            }
+
+            char* buffer = new char[size];
+            stream.read((char*)buffer, size);
+            stream.close();
+
+            *outSize = (uint32_t)size;
+            return buffer;
         }
     } // namespace file
 } // namespace fox

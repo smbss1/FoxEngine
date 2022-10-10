@@ -13,10 +13,11 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <filesystem>
 
 namespace fox
 {
-    namespace file
+    namespace FileSystem
     {
         /**
         * @brief Wrote file
@@ -33,6 +34,15 @@ namespace fox
         * @return true if the read success, otherwise false
         */
         bool ReadFile(const std::string& strFile, std::string& strOutReadContent);
+
+        /**
+        * @brief Read bytes from file
+        * @param filepath the path of the file
+        * @param[out] outSize the number of bytes read
+        * @return the bytes array read
+        */
+        char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize);
+
     } // namespace file
 
 } // namespace fox

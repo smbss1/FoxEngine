@@ -12,6 +12,8 @@ namespace fox
     public:
         static void RegisterComponents();
         static void RegisterFunctions();
+
+        static void ClearTypes();
     };
 }
 

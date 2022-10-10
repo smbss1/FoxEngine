@@ -28,114 +28,47 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9425326e-0688-4775-a9e0-e421f6f970fc" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Scripting/GCManager.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Fox/src/Fox/Scripting/GCManager.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/editor/mono_crash.0.0.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/editor/msbuild1.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/config" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/config" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/detect" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/detect" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/history" beforeDir="false" afterPath="$PROJECT_DIR$/.xmake/linux/x86_64/cache/history" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/Components.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/Components.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/Entity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/Fox-ScriptCore.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/Fox-ScriptCore.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/Fox-ScriptCore.sln.DotSettings.user" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/InternalCalls.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/InternalCalls.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/Log.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/Log.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/obj/Debug/Fox-ScriptCore.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/obj/Debug/Fox-ScriptCore.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/obj/Debug/Fox-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/obj/Debug/Fox-ScriptCore.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/obj/Fox-ScriptCore.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/obj/Fox-ScriptCore.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/obj/Release/.NETCoreApp,Version=v6.0.AssemblyAttributes.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/obj/Release/Fox-ScriptCore.GlobalUsings.g.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/obj/Release/Fox-ScriptCore.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/obj/Release/Fox-ScriptCore.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/obj/Release/Fox-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/obj/Release/Fox-ScriptCore.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox-ScriptCore/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Fox-ScriptCore/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/CameraComponent.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/CameraComponent.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/EntityName.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/EntityName.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/NativeScript.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/NativeScript.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Rigidbody2D.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Rigidbody2D.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/ScriptableBehaviour.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/ScriptableBehaviour.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Components/Transform.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Components/Transform.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Logger/Logger.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Logger/Logger.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Entity.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Ecs/Entity.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/IconsFontAwesome5.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/IconsFontAwesome5.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/IconsFontAwesome5Brands.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/IconsFontAwesome5Brands.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Core/Application.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/EditorLogger.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Core/EditorLogger.hpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiFieldDrawer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiFieldDrawer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiFieldDrawer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiFieldDrawer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/ImGui/ImGuiLayer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/TypeDescriptor.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/TypeDescriptor.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/TypeDescriptor.inl" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Reflection/Core/TypeDescriptor.inl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/Scene.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scene/Scene.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/Scene.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scene/ScriptableBehaviour.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/ScriptableBehaviour.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scene/SceneSerializer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scene/SceneSerializer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptEngine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptEngine.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptEngine.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptEngine.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptGlue.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptGlue.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/GlfwWindows/GlfwWindow.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/GlfwWindows/GlfwWindow.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Fox/src/Platform/GlfwWindows/GlfwWindow.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Platform/GlfwWindows/GlfwWindow.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptGlue.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Scripting/ScriptGlue.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/Any.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/Any.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/AnyContainer.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/DynamicArray.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/FileSystem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Utils/FileSystem.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/FileSystem.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/src/Fox/Utils/FileSystem.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/Option.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/bitsets.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fox/src/Fox/Utils/bitsets.hpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/vendor/FoxJson" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/FoxJson" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fox/vendor/yaml-cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Fox/vendor/yaml-cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Nouveau dossier/ASystem.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Nouveau dossier/ComponentArray.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Nouveau dossier/ComponentManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Nouveau dossier/Entity.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Nouveau dossier/EntityManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Nouveau dossier/Pipeline.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Nouveau dossier/Pipeline.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Nouveau dossier/System.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Nouveau dossier/World.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Nouveau dossier/World.hpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/Resources/Scripts/Fox-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/editor/Resources/Scripts/Fox-ScriptCore.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/Binaries/Fox-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/Binaries/Fox-ScriptCore.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/Sandbox.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/Sandbox.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.csproj.AssemblyReference.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Release/.NETFramework,Version=v4.5.AssemblyAttributes.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Release/Sandbox.AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Release/Sandbox.AssemblyInfoInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Release/Sandbox.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Release/Sandbox.assets.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Release/Sandbox.csproj.AssemblyReference.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Release/Sandbox.csproj.CoreCompileInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Release/Sandbox.csproj.FileListAbsolute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Release/Sandbox.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Sandbox.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/Sandbox.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/BoxColliderCallback" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/BoxColliderCallback.foxscene" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scenes/BoxColliderCallback.foxscene" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Instantiate" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/assets/Scenes/Instantiate.foxscene" beforeDir="false" afterPath="$PROJECT_DIR$/editor/assets/Scenes/Instantiate.foxscene" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/assets/fonts/icons.yml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/fox_editor" beforeDir="false" afterPath="$PROJECT_DIR$/editor/fox_editor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.0.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.1.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.2.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.3.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.0.4.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.25d6fb287.0.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.25d6fb287.1.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/mono_crash.25d6fb287.2.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/EditorEvent.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/EditorEvent.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/src/EditorLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/EditorLayer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/EditorLayer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/EditorLayer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/ConsolePanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/ConsolePanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/ConsolePanel.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/ConsolePanel.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/ContentBrowserPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/ContentBrowserPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/ContentBrowserPanel.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/ContentBrowserPanel.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/Panel.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/Panel.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/src/Panels/PropertyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/PropertyPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/PropertyPanel.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/PropertyPanel.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/SceneHierarchyPanel.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/SceneHierarchyPanel.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/src/Panels/SettingsPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/SettingsPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/SettingsPanel.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/SettingsPanel.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/StatsPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/StatsPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/src/Panels/StatsPanel.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/editor/src/Panels/StatsPanel.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sandbox/sandbox" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/sandbox" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -170,26 +103,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cf.advertisement.text.has.clang-format": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "last_opened_file_path": "/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "structure.view.defaults.are.configured": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.advertisement.text.has.clang-format&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/samuel/Git Repos/FoxEngine/Fox-ScriptCore&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/editor/SandboxProject/Assets/Scripts" />
@@ -203,10 +136,10 @@
       <recent name="$PROJECT_DIR$/Fox/src/Fox/Plugin System (Not used)" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.fox_editor">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+  <component name="RunManager" selected="Shell Script.Build &amp; Run Editor">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <configuration name="fox_editor" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="fox_lexer" TARGET_NAME="fox_editor" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="fox_lexer" RUN_TARGET_NAME="fox_editor">
@@ -247,6 +180,25 @@
     <configuration name="sandbox" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="fox_lexer" TARGET_NAME="sandbox" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="fox_lexer" RUN_TARGET_NAME="sandbox">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Build All &amp; Run Editor" type="ShConfigurationType">
+      <option name="SCRIPT_TEXT" value="xmake run fox_editor" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="false" />
+      <envs />
+      <method v="2">
+        <option name="RunConfigurationTask" enabled="true" run_configuration_name="Build Script Core DLL" run_configuration_type="ShConfigurationType" />
+        <option name="RunConfigurationTask" enabled="true" run_configuration_name="Build Sandbox DLL" run_configuration_type="ShConfigurationType" />
+        <option name="RunConfigurationTask" enabled="true" run_configuration_name="Build Editor" run_configuration_type="ShConfigurationType" />
       </method>
     </configuration>
     <configuration name="Build Editor" type="ShConfigurationType">
@@ -297,7 +249,7 @@
     <configuration name="Build &amp; Run Editor" type="ShConfigurationType">
       <option name="SCRIPT_TEXT" value="xmake run fox_editor" />
       <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
-      <option name="SCRIPT_PATH" value="" />
+      <option name="SCRIPT_PATH" value="xmake run fox_editor" />
       <option name="SCRIPT_OPTIONS" value="" />
       <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
       <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -308,8 +260,6 @@
       <option name="EXECUTE_SCRIPT_FILE" value="false" />
       <envs />
       <method v="2">
-        <option name="RunConfigurationTask" enabled="true" run_configuration_name="Build Script Core DLL" run_configuration_type="ShConfigurationType" />
-        <option name="RunConfigurationTask" enabled="true" run_configuration_name="Build Sandbox DLL" run_configuration_type="ShConfigurationType" />
         <option name="RunConfigurationTask" enabled="true" run_configuration_name="Build Editor" run_configuration_type="ShConfigurationType" />
       </method>
     </configuration>
@@ -330,6 +280,7 @@
       <item itemvalue="CMake Application.glm" />
       <item itemvalue="CMake Application.imgui" />
       <item itemvalue="CMake Application.sandbox" />
+      <item itemvalue="Shell Script.Build All &amp; Run Editor" />
       <item itemvalue="Shell Script.Build &amp; Run Editor" />
       <item itemvalue="Shell Script.Build Editor" />
       <item itemvalue="Shell Script.Build Sandbox DLL" />
@@ -356,6 +307,7 @@
       <workItem from="1665119262065" duration="20269000" />
       <workItem from="1665200691051" duration="20055000" />
       <workItem from="1665269204369" duration="37569000" />
+      <workItem from="1665361399850" duration="16703000" />
     </task>
     <servers />
   </component>
