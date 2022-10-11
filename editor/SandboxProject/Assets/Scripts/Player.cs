@@ -15,7 +15,6 @@ namespace Sandbox
         {
             m_Transform = GetComponent<TransformComponent>();
             m_Rb2d = GetComponent<Rigidbody2D>();
-
             OnCollisionEnter2DEvent += OnCollisionEnter2D;
         }
 
@@ -26,26 +25,26 @@ namespace Sandbox
 
         public void OnUpdate(float ts)
         {
-            Vector3 translation = m_Transform.Translation;
-            Vector3 velocity = Vector3.Zero;
+            Vector3 translation = m_Transform.position;
+            Vector3 velocity = Vector3.zero;
 
-            if (Input.IsKeyDown(KeyCode.Q))
+            if (Input.IsKeyPressed(KeyCode.Q))
             {
-                velocity.X = -1.0f;
+                velocity.x = -1.0f;
             }
 
-            if (Input.IsKeyDown(KeyCode.D))
+            if (Input.IsKeyPressed(KeyCode.D))
             {
-                velocity.X = 1.0f;
+                velocity.x = 1.0f;
             }
 
-            if (Input.IsKeyDown(KeyCode.E) && EntityPrefab)
+            if (Input.IsKeyPressed(KeyCode.E) && EntityPrefab)
             {
-                Instantiate(EntityPrefab).GetComponent<TransformComponent>().Translation = new Vector3(4, 3, 0);
+                // Instantiate(EntityPrefab).GetComponent<TransformComponent>().position = new Vector3(4, 3, 0);
             }
 
             velocity *= Speed;
-            m_Rb2d.ApplyLinearImpulse(velocity.XY, Vector2.Zero, true);
+            // m_Rb2d.ApplyLinearImpulse(velocity.XZ(), Vector2.zero, true);
         }
     }
 }

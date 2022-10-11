@@ -22,6 +22,7 @@
 //#include "mono/metadata/tabledefs.h"
 
 #include "box2d/b2_body.h"
+#include "Utils.hpp"
 
 
 namespace fox
@@ -45,16 +46,26 @@ namespace fox
 
         switch (level)
         {
-            case typelog::TRACE:		fox::trace(mono_string_to_utf8(formattedMessage));   break;
-            case typelog::DEBUG:		fox::debug(mono_string_to_utf8(formattedMessage));   break;
-            case typelog::INFO:		    fox::info(mono_string_to_utf8(formattedMessage));    break;
-            case typelog::WARN:		    fox::warn(mono_string_to_utf8(formattedMessage));    break;
-            case typelog::ERROR:		fox::error(mono_string_to_utf8(formattedMessage));   break;
-            case typelog::CRITICAL:	fox::critical(mono_string_to_utf8(formattedMessage));break;
-            default:					fox::info(mono_string_to_utf8(formattedMessage));   break;
+            case typelog::TRACE:		fox::trace(Utils::MonoToString(formattedMessage));   break;
+            case typelog::DEBUG:		fox::debug(Utils::MonoToString(formattedMessage));   break;
+            case typelog::INFO:		    fox::info(Utils::MonoToString(formattedMessage));    break;
+            case typelog::WARN:		    fox::warn(Utils::MonoToString(formattedMessage));    break;
+            case typelog::ERROR:		fox::error(Utils::MonoToString(formattedMessage));   break;
+            case typelog::CRITICAL:	fox::critical(Utils::MonoToString(formattedMessage));break;
+            default:					fox::info(Utils::MonoToString(formattedMessage));   break;
         }
     }
 
+    Entity GetEntity(uint64_t entityID)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        Scene* scene = ScriptEngine::GetSceneContext();
+        FOX_ASSERT(scene, "Active scene is null");
+        Entity entity = scene->GetEntityByUUID(entityID);
+        FOX_ASSERT(entity, "Entity is null");
+        return entity;
+    }
 
     static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
     {
@@ -137,6 +148,66 @@ namespace fox
         entity.get<TransformComponent>().position = *translation;
     }
 
+    void TransformComponent_GetRotation(uint64_t entityID, glm::vec3* outRotation)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        *outRotation = GetEntity(entityID).get<TransformComponent>().rotation;
+    }
+
+    void TransformComponent_SetRotation(uint64_t entityID, const glm::vec3* inRotation)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        GetEntity(entityID).get<TransformComponent>().rotation = *inRotation;
+    }
+
+    void TransformComponent_GetScale(uint64_t entityID, glm::vec3* outScale)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        *outScale = GetEntity(entityID).get<TransformComponent>().scale;
+    }
+
+    void TransformComponent_SetScale(uint64_t entityID, const glm::vec3* inScale)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        GetEntity(entityID).get<TransformComponent>().scale = *inScale;
+    }
+
+    // ------------------
+    //  Sprite Renderer
+    // ------------------
+
+    void SpriteRendererComponent_GetColor(uint64_t entityID, glm::vec4* outTint)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        *outTint = GetEntity(entityID).get<SpriteRenderer>().Color;
+    }
+
+    void SpriteRendererComponent_SetColor(uint64_t entityID, const glm::vec4* tint)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        GetEntity(entityID).get<SpriteRenderer>().Color = *tint;
+    }
+
+    void SpriteRendererComponent_GetTilingFactor(uint64_t entityID, float* outTiling)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        *outTiling = GetEntity(entityID).get<SpriteRenderer>().TilingFactor;
+    }
+
+    void SpriteRendererComponent_SetTilingFactor(uint64_t entityID, const float* tiling)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        GetEntity(entityID).get<SpriteRenderer>().TilingFactor = *tiling;
+    }
+
     static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impulse, glm::vec2* point, bool wake)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
@@ -161,14 +232,25 @@ namespace fox
         body->ApplyLinearImpulseToCenter(b2Vec2(impulse->x, impulse->y), wake);
     }
 
-    static bool Input_IsKeyDown(KeyCode keycode)
+    bool Input_IsKeyPressed(KeyCode key)
     {
-        return Input::IsKeyPressed(keycode);
+//        FOX_PROFILE_SCOPE();
+
+        return Input::IsKeyPressed(key);
     }
 
-    static bool Input_IsMouseButtonDown(Mouse button)
+    bool Input_IsMouseButtonPressed(Mouse button)
     {
+//        FOX_PROFILE_SCOPE();
+
         return Input::IsMouseButtonPressed(button);
+    }
+
+    void Input_GetMousePosition(glm::vec2* outMousePosition)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        *outMousePosition = Input::GetMousePosition();
     }
 
     #include <cxxabi.h>  // needed for abi::__cxa_demangle
@@ -247,11 +329,22 @@ namespace fox
 
         FOX_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
         FOX_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
+        FOX_ADD_INTERNAL_CALL(TransformComponent_GetRotation);
+        FOX_ADD_INTERNAL_CALL(TransformComponent_SetRotation);
+        FOX_ADD_INTERNAL_CALL(TransformComponent_GetScale);
+        FOX_ADD_INTERNAL_CALL(TransformComponent_SetScale);
+
+        FOX_ADD_INTERNAL_CALL(SpriteRendererComponent_GetColor);
+        FOX_ADD_INTERNAL_CALL(SpriteRendererComponent_SetColor);
+        FOX_ADD_INTERNAL_CALL(SpriteRendererComponent_GetTilingFactor);
+        FOX_ADD_INTERNAL_CALL(SpriteRendererComponent_SetTilingFactor);
 
         FOX_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
         FOX_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
 
-        FOX_ADD_INTERNAL_CALL(Input_IsKeyDown);
+        FOX_ADD_INTERNAL_CALL(Input_IsKeyPressed);
+        FOX_ADD_INTERNAL_CALL(Input_IsMouseButtonPressed);
+        FOX_ADD_INTERNAL_CALL(Input_GetMousePosition);
     }
 
 }

@@ -3,19 +3,18 @@
 //
 
 #include "Components/ScriptComponent.hpp"
-#include "Components/Rigidbody2D.hpp"
-#include "Utils/FileSystem.hpp"
 
 #include "ScriptEngine.hpp"
 #include "ScriptGlue.hpp"
+#include "Utils.hpp"
 
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
 #include "mono/metadata/object.h"
 #include "mono/metadata/tabledefs.h"
 
-#include "mono/metadata/threads.h"
-#include "mono/metadata/mono-debug.h"
+//#include "mono/metadata/threads.h"
+//#include "mono/metadata/mono-debug.h"
 
 //#ifdef FOX_DEBUG
 #include "mono/metadata/debug-helpers.h"
@@ -25,90 +24,8 @@
 
 namespace fox
 {
-    static std::unordered_map<std::string, ScriptFieldType> s_ScriptFieldTypeMap =
-        {
-            { "System.Single", ScriptFieldType::Float },
-            { "System.Double", ScriptFieldType::Double },
-            { "System.Boolean", ScriptFieldType::Bool },
-            { "System.Char", ScriptFieldType::Char },
-            { "System.Int16", ScriptFieldType::Short },
-            { "System.Int32", ScriptFieldType::Int },
-            { "System.Int64", ScriptFieldType::Long },
-            { "System.Byte", ScriptFieldType::Byte },
-            { "System.UInt16", ScriptFieldType::UShort },
-            { "System.UInt32", ScriptFieldType::UInt },
-            { "System.UInt64", ScriptFieldType::ULong },
-            { "System.String", ScriptFieldType::String },
-
-            { "Fox.Vector2", ScriptFieldType::Vector2 },
-            { "Fox.Vector3", ScriptFieldType::Vector3 },
-            { "Fox.Vector4", ScriptFieldType::Vector4 },
-
-            { "Fox.Entity", ScriptFieldType::Entity },
-        };
-
     static const char* s_CoreAssemblyPath = "Resources/Scripts/Fox-ScriptCore.dll";
     static const char* s_AppAssemblyPath = "SandboxProject/Assets/Scripts/Binaries/Sandbox.dll";
-
-    namespace Utils
-    {
-        static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath)
-        {
-            uint32_t fileSize = 0;
-            char* fileData = FileSystem::ReadBytes(assemblyPath, &fileSize);
-
-            // NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
-            MonoImageOpenStatus status;
-            MonoImage* image = mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
-
-            if (status != MONO_IMAGE_OK)
-            {
-                const char* errorMessage = mono_image_strerror(status);
-                // Log some error message using the errorMessage data
-                return nullptr;
-            }
-
-            std::string pathString = assemblyPath.string();
-            MonoAssembly* assembly = mono_assembly_load_from_full(image, pathString.c_str(), &status, 0);
-            mono_image_close(image);
-
-            // Don't forget to free the file data
-            delete[] fileData;
-
-            return assembly;
-        }
-
-        void PrintAssemblyTypes(MonoAssembly* assembly)
-        {
-            MonoImage* image = mono_assembly_get_image(assembly);
-            const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
-            int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
-
-            for (int32_t i = 0; i < numTypes; i++)
-            {
-                uint32_t cols[MONO_TYPEDEF_SIZE];
-                mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
-
-                const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
-                const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
-                fox::info("%.%", nameSpace, name);
-            }
-        }
-
-        ScriptFieldType MonoTypeToScriptFieldType(MonoType* monoType)
-        {
-            std::string typeName = mono_type_get_name(monoType);
-
-            auto it = s_ScriptFieldTypeMap.find(typeName);
-            if (it == s_ScriptFieldTypeMap.end())
-            {
-                fox::error("Unknown type: %", typeName);
-                return ScriptFieldType::None;
-            }
-
-            return it->second;
-        }
-    }
 
     struct ScriptEngineData
     {
@@ -139,7 +56,12 @@ namespace fox
 
         InitMono();
         GCManager::Init();
-        ReloadAppDomain();
+        ScriptGlue::RegisterFunctions();
+
+        LoadAssembly(s_CoreAssemblyPath);
+        LoadAppAssembly(s_AppAssemblyPath);
+        LoadAssemblyClasses();
+        FindClassAndRegisterTypes();
 
 #if 0
         // Create an object (and call constructor)
@@ -201,7 +123,7 @@ namespace fox
         // Store the root domain pointer
         s_Data->RootDomain = rootDomain;
 //        mono_debug_domain_create(s_Data->RootDomain);
-        mono_thread_set_main(mono_thread_current());
+//        mono_thread_set_main(mono_thread_current());
     }
 
     void ScriptEngine::ShutdownMono()
@@ -214,88 +136,12 @@ namespace fox
 
 		GCManager::Shutdown();
 
-        mono_domain_set(s_Data->RootDomain, true);
-        mono_domain_unload(s_Data->AppDomain);
+        mono_domain_set(mono_get_root_domain(), false);
+		mono_domain_unload(s_Data->AppDomain);
+		s_Data->AppDomain = nullptr;
+
 		mono_jit_cleanup(s_Data->RootDomain);
-        s_Data->AppDomain = nullptr;
-        s_Data->RootDomain = nullptr;
-    }
-
-    void ScriptEngine::ReloadAppDomain()
-    {
-//        FOX_PROFILE_SCOPE();
-
-//        system("call \"../vendor/premake/bin/premake5.exe\" --file=\"../Sandbox/premake5.lua\" vs2022");
-
-        if (s_Data->AppDomain)
-        {
-            mono_domain_set(s_Data->RootDomain, true);
-            mono_domain_unload(s_Data->AppDomain);
-            s_Data->AppDomain = nullptr;
-        }
-
-        //Compile app assembly
-        {
-            std::string command = fox::format("dotnet msbuild %"
-                                              " -nologo"																	// no microsoft branding in console
-                                              " -noconlog"																// no console logs
-                                              //" -t:rebuild"																// rebuild the project
-                                              " -m"																		// multiprocess build
-                                              " -flp1:Verbosity=minimal;logfile=AssemblyBuildErrors.log;errorsonly"		// dump errors in AssemblyBuildErrors.log file
-                                              " -flp2:Verbosity=minimal;logfile=AssemblyBuildWarnings.log;warningsonly"	// dump warnings in AssemblyBuildWarnings.log file
-                                              , s_AppAssemblyPath);
-            system(command.c_str());
-
-            // Errors
-            {
-                FILE* errors = fopen("AssemblyBuildErrors.log", "r");
-
-                char buffer[4096];
-                if (errors != nullptr)
-                {
-                    while (fgets(buffer, sizeof(buffer), errors))
-                    {
-                        if (buffer)
-                        {
-                            size_t newLine = std::string_view(buffer).size() - 1;
-                            buffer[newLine] = '\0';
-                            fox::error(buffer);
-                        }
-                    }
-
-                    fclose(errors);
-                }
-            }
-
-            // Warnings
-            {
-                FILE* warns = fopen("AssemblyBuildWarnings.log", "r");
-
-                char buffer[1024];
-                if (warns != nullptr)
-                {
-                    while (fgets(buffer, sizeof(buffer), warns))
-                    {
-                        if (buffer)
-                        {
-                            size_t newLine = std::string_view(buffer).size() - 1;
-                            buffer[newLine] = '\0';
-                            fox::warn(buffer);
-                        }
-                    }
-
-                    fclose(warns);
-                }
-            }
-        }
-
-        LoadAssembly(s_CoreAssemblyPath);
-        LoadAppAssembly(s_AppAssemblyPath);
-
-        LoadAssemblyClasses();
-        FindClassAndRegisterTypes();
-
-        GCManager::CollectGarbage();
+		s_Data->RootDomain = nullptr;
     }
 
     void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
@@ -324,10 +170,90 @@ namespace fox
     {
         ScriptGlue::ClearTypes();
         ScriptGlue::RegisterComponents();
-        ScriptGlue::RegisterFunctions();
 
         // Retrieve and instantiate class
         s_Data->EntityClass = new_ref<ScriptClass>("Fox", "Entity", true);
+    }
+
+    void ScriptEngine::CompileAppAssembly()
+    {
+        fox::info("Compile....");
+        std::string command = fox::format("dotnet msbuild %"
+//                                          " -nologo"																	// no microsoft branding in console
+//                                          " -noconlog"																// no console logs
+//                                          " -f net45"																// build with NET 4.5
+                                          //" -t:rebuild"																// rebuild the project
+                                          " -m"																		// multiprocess build
+//                                          " -flp1:Verbosity=minimal;logfile=AssemblyBuildErrors.log;errorsonly"		// dump errors in AssemblyBuildErrors.log file
+//                                          " -flp2:Verbosity=minimal;logfile=AssemblyBuildWarnings.log;warningsonly"	// dump warnings in AssemblyBuildWarnings.log file
+                                            , s_AppAssemblyPath);
+        system(command.c_str());
+
+        // Errors
+        {
+            FILE* errors = fopen("AssemblyBuildErrors.log", "r");
+
+            char buffer[4096];
+            if (errors != nullptr)
+            {
+                while (fgets(buffer, sizeof(buffer), errors))
+                {
+                    if (buffer)
+                    {
+                        size_t newLine = std::string_view(buffer).size() - 1;
+                        buffer[newLine] = '\0';
+                        fox::error(buffer);
+                    }
+                }
+
+                fclose(errors);
+            }
+        }
+
+        // Warnings
+        {
+            FILE* warns = fopen("AssemblyBuildWarnings.log", "r");
+
+            char buffer[1024];
+            if (warns != nullptr)
+            {
+                while (fgets(buffer, sizeof(buffer), warns))
+                {
+                    if (buffer)
+                    {
+                        size_t newLine = std::string_view(buffer).size() - 1;
+                        buffer[newLine] = '\0';
+                        fox::warn(buffer);
+                    }
+                }
+
+                fclose(warns);
+            }
+        }
+        fox::info("End Compile....");
+    }
+
+    void ScriptEngine::ReloadAppDomain()
+    {
+//        FOX_PROFILE_SCOPE();
+
+//        system("call \"../vendor/premake/bin/premake5.exe\" --file=\"../Sandbox/premake5.lua\" vs2022");
+        fox::info("Reloading the C# Assembly");
+        if (s_Data->AppDomain)
+        {
+            mono_domain_set(mono_get_root_domain(), false);
+            mono_domain_unload(s_Data->AppDomain);
+            s_Data->AppDomain = nullptr;
+        }
+
+//        CompileAppAssembly();
+        LoadAssembly(s_CoreAssemblyPath);
+        LoadAppAssembly(s_AppAssemblyPath);
+        LoadAssemblyClasses();
+        FindClassAndRegisterTypes();
+
+        GCManager::CollectGarbage();
+        fox::info("Finished reload the C# Assembly");
     }
 
 
@@ -483,7 +409,7 @@ namespace fox
 
             MonoClass* monoClass = mono_class_from_name(s_Data->AppAssemblyImage, nameSpace, className);
 
-            if (monoClass == entityClass)
+            if (monoClass == nullptr || monoClass == entityClass)
                 continue;
 
             bool isEntity = mono_class_is_subclass_of(monoClass, entityClass, false);
@@ -560,7 +486,11 @@ namespace fox
 
     MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* method, void** params)
     {
-        return mono_runtime_invoke(method, instance, params, nullptr);
+        MonoObject* exception = nullptr;
+        MonoObject* result = mono_runtime_invoke(method, instance, params, &exception);
+        if (Utils::HandleException(exception))
+            return nullptr;
+        return result;
     }
 
     ScriptInstance::ScriptInstance(ref<ScriptClass> scriptClass, Entity entity)

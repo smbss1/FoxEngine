@@ -136,7 +136,6 @@ namespace fox
 
                 m_ImGuiLayer->Begin();
                 {
-
                     for (Layer* layer : m_LayerStack)
                         layer->OnImGuiRender();
                 }

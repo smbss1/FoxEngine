@@ -283,6 +283,7 @@ target_sources(fox_engine PRIVATE
     "Fox/src/Fox/Scripting/Old Thing/ScriptRegistry.cpp"
     Fox/src/Fox/Scripting/ScriptGlue.cpp
     Fox/src/Fox/Scripting/ScriptEngine.cpp
+    Fox/src/Fox/Scripting/Utils.cpp
     Fox/src/Fox/Scene/Scene.cpp
     Fox/src/Fox/Scene/SceneSerializer.cpp
     Fox/src/Fox/Scene/ScriptableBehaviour.cpp

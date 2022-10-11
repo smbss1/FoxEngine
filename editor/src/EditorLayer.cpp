@@ -485,10 +485,13 @@ namespace fox
 
             case Key::S:
             {
-                if (control && shift)
-                    SaveSceneAs();
-                else if (control)
-                    SaveScene();
+                if (control)
+                {
+                    if (shift)
+                        SaveSceneAs();
+                    else
+                        SaveScene();
+                }
             }
             break;
 
@@ -503,18 +506,36 @@ namespace fox
 
             // Gizmos
             case Key::Q:
-                m_iGizmoType = -1;
+                if (!ImGuizmo::IsUsing())
+                    m_iGizmoType = -1;
+                break;
             break;
 
             case Key::W:
-                m_iGizmoType = ImGuizmo::OPERATION::TRANSLATE;
+            {
+                if (!ImGuizmo::IsUsing())
+                    m_iGizmoType = ImGuizmo::OPERATION::TRANSLATE;
                 break;
+            }
             case Key::E:
-                m_iGizmoType = ImGuizmo::OPERATION::ROTATE;
+            {
+                if (!ImGuizmo::IsUsing())
+                    m_iGizmoType = ImGuizmo::OPERATION::ROTATE;
                 break;
+            }
             case Key::R:
-                m_iGizmoType = ImGuizmo::OPERATION::SCALE;
+            {
+                if (control)
+                {
+                    ScriptEngine::ReloadAppDomain();
+                }
+                else
+                {
+                    if (!ImGuizmo::IsUsing())
+                        m_iGizmoType = ImGuizmo::OPERATION::SCALE;
+                }
                 break;
+            }
         }
         return false;
     }

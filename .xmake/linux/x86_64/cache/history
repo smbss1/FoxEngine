@@ -1,11 +1,5 @@
 {
     cmdlines = {
-        "xmake -w",
-        "xmake lua /usr/share/xmake/actions/build/statistics.lua",
-        "xmake lua /usr/share/xmake/actions/build/cleaner.lua",
-        "xmake run fox_editor",
-        "xmake -w",
-        "xmake run fox_editor",
         "xmake f -y -p linux -a x86_64 -m release",
         "xmake project -k cmake -y",
         "xmake -w",
@@ -64,6 +58,12 @@
         "xmake -w",
         "xmake -w",
         "xmake -w",
-        "xmake run fox_editor"
+        "xmake run fox_editor",
+        "xmake -w",
+        "xmake run fox_editor",
+        "xmake -w",
+        "xmake run fox_editor",
+        "xmake f -y -p linux -a x86_64 -m release",
+        "xmake project -k cmake -y"
     }
 }

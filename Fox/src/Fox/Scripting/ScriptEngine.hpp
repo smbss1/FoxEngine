@@ -220,6 +220,7 @@ namespace fox
 
         static GCHandle InstantiateClass(MonoClass* monoClass);
         static void LoadAssemblyClasses();
+        static void CompileAppAssembly();
 
         friend class ScriptClass;
         friend class ScriptGlue;

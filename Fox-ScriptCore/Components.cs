@@ -28,7 +28,10 @@ namespace Fox
 
     public class TransformComponent : Component
     {
-        public Vector3 Translation
+        /// <summary>
+        /// World space position.
+        /// </summary>
+        public Vector3 position
         {
             get
             {
@@ -39,6 +42,32 @@ namespace Fox
             {
                 InternalCalls.TransformComponent_SetTranslation(Entity.ID, ref value);
             }
+        }
+        
+        /// <summary>
+        /// World space rotation in euler angles (radians).
+        /// </summary>
+        public Vector3 rotation
+        {
+            get
+            {
+                InternalCalls.TransformComponent_GetRotation(Entity.ID, out Vector3 v);
+                return v;
+            }
+            set => InternalCalls.TransformComponent_SetRotation(Entity.ID, ref value);
+        }
+
+        /// <summary>
+        /// World space scale.
+        /// </summary>
+        public Vector3 scale
+        {
+            get
+            {
+                InternalCalls.TransformComponent_GetScale(Entity.ID, out Vector3 v);
+                return v;
+            }
+            set => InternalCalls.TransformComponent_SetScale(Entity.ID, ref value);
         }
     }
 
@@ -52,6 +81,38 @@ namespace Fox
         public void ApplyLinearImpulse(Vector2 impulse, bool wake)
         {
             InternalCalls.Rigidbody2DComponent_ApplyLinearImpulseToCenter(Entity.ID, ref impulse, wake);
+        }
+    }
+    
+    /// <summary>
+    /// Renders a sprite
+    /// </summary>
+    public class SpriteRenderer : Component
+    {
+        /// <summary>
+        /// Sprite tint color
+        /// </summary>
+        public Color color
+        {
+            get
+            {
+                InternalCalls.SpriteRendererComponent_GetColor(Entity.ID, out Color v);
+                return v;
+            }
+            set => InternalCalls.SpriteRendererComponent_SetColor(Entity.ID, ref value);
+        }
+
+        /// <summary>
+        /// Tiling factor for repeated tiling
+        /// </summary>
+        public float tilingFactor
+        {
+            get
+            {
+                InternalCalls.SpriteRendererComponent_GetTilingFactor(Entity.ID, out float v);
+                return v;
+            }
+            set => InternalCalls.SpriteRendererComponent_SetTilingFactor(Entity.ID, ref value);
         }
     }
     
