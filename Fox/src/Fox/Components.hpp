@@ -13,13 +13,6 @@
 #include "Components/IDComponent.hpp"
 #include "Components/ScriptComponent.hpp"
 
-
-// REFLECT_EXTERN(Component);
-// REFLECT_EXTERN(fox::TransformComponent);
-// REFLECT_EXTERN(SpriteRenderer);
-// REFLECT_EXTERN(CameraComponent);
-// REFLECT_EXTERN(fox::AnimationPlayer);
-
 namespace fox
 {
     template<typename... Component>

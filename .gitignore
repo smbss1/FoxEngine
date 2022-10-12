@@ -2,6 +2,9 @@
 build
 app
 cmake-build-debug
+**/Makefile
+.idea
+.xmake
 
 # Prerequisites
 *.d

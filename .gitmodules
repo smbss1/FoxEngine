@@ -4,3 +4,6 @@
 [submodule "Fox/vendor/FoxJson"]
 	path = Fox/vendor/FoxJson
 	url = https://github.com/smbss1/FoxJson/
+[submodule "Fox/vendor/glfw"]
+	path = Fox/vendor/glfw
+	url = https://github.com/smbss1/glfw
