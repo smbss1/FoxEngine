@@ -5,6 +5,7 @@ cmake-build-debug
 **/Makefile
 .idea
 .xmake
+**mono_crash**.json
 
 # Prerequisites
 *.d
