@@ -1,0 +1,74 @@
+Scene: Untitled
+Entities:
+  - Entity: 4612376377512974791
+    NameComponent:
+      Name: GameObject
+    TransformComponent:
+      Position: [-2.25547957, 2.03832245, 0]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2, 1]
+    ScriptComponent:
+      ClassName: Sandbox.Player
+    SpriteRendererComponent:
+      Color: [0.779922783, 0.108406246, 0.108406246, 1]
+      Sprite: /home/samuel/Git Repos/FoxEngine/Project/assets/Sprites/DirectoryIcon.png
+    CircleCollider2D:
+      Offset: [-2.25547957, 2.03832245]
+      Radius: 0
+      Density: 0
+      Friction: 0
+      Restitution: 0
+      RestitutionThreshold: 2
+  - Entity: 4622494659046381978
+    NameComponent:
+      Name: GameObject
+    TransformComponent:
+      Position: [-4.80000019, 2.5999999, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.0979413018, 0.845559835, 0.265361667, 1]
+      Sprite: /home/samuel/Git Repos/FoxEngine/Project/assets/Sprites/DirectoryIcon.png
+    CircleCollider2D:
+      Offset: [-4.80000019, 2.5999999]
+      Radius: 0
+      Density: 0
+      Friction: 0
+      Restitution: 0
+      RestitutionThreshold: 1
+  - Entity: 3221225472
+    NameComponent:
+      Name: Camera
+    TransformComponent:
+      Position: [-2, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 17
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+    CircleCollider2D:
+      Offset: [-2, 0]
+      Radius: 0
+      Density: 0
+      Friction: 0
+      Restitution: 0
+      RestitutionThreshold: 1
+  - Entity: 8585984815678800525
+    NameComponent:
+      Name: Circle
+    TransformComponent:
+      Position: [2.40768433, 1.72811127, 0]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2, 2]
+    CircleRenderer:
+      Color: [0.683397651, 0.562928677, 0.116098382, 1]
+      Thickness: 0.300000012
+      Fade: 0.0219999999

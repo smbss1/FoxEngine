@@ -1,46 +1,110 @@
+project "Fox"
+	kind "StaticLib"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "off"
 
--- add_requires("rttr")
-add_requires("yaml-cpp", "glfw", "opengl")
-add_requires("box2d")
-add_requires("mono")
+	targetdir ("%{wks.location}/build/" .. outputdir .. "/%{prj.name}")
+	objdir ("%{wks.location}/build/.objs/" .. outputdir .. "/%{prj.name}")
 
-includes "vendor"
+	-- pchheader "foxpch.hpp"
+	-- pchsource "src/foxpch.cpp"
 
-target "fox_engine"
-    set_kind "static"
-    set_languages "cxx17"
+	files
+	{
+		"src/**.hpp",
+		"src/**.cpp",
+		"vendor/glm/glm/**.hpp",
+		"vendor/glm/glm/**.inl",
 
-    -- add_defines("FOX_PLUGIN_DIRECTORY=$(FOX_PLUGIN_DIRECTORY)", { public = true })
-    -- add_defines "FOX_BUILD_LIB=1"
+		"vendor/ImGuizmo/ImGuizmo.h",
+		"vendor/ImGuizmo/ImGuizmo.cpp"
+	}
 
-    -- add_packages "rttr"
-    add_packages "yaml-cpp"
-    add_packages "glfw"
-    add_packages "opengl"
-    add_packages "box2d"
-    add_packages "mono"
+	defines
+	{
+		"_CRT_SECURE_NO_WARNINGS",
+		"GLFW_INCLUDE_NONE"
+	}
 
-    add_deps "imgui"
-    add_deps "fox_json"
-    add_deps "glm"
-    add_deps "glad"
+	includedirs
+	{
+		"src/Fox",
+		"src/Platform",
 
-    add_syslinks "dl"
-    add_syslinks "pthread"
+		"%{IncludeDir.box2d}",
+		"%{IncludeDir.glfw}",
+		"%{IncludeDir.glad}",
+		"%{IncludeDir.imgui}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.mono}",
+		"%{IncludeDir.yaml_cpp}",
+		"%{IncludeDir.ImGuizmo}",
+	}
 
-    add_includedirs("vendor/entt/include", { public = true })
-    add_includedirs("vendor/ImGuizmo/ImGuizmo", { public = true })
-    add_includedirs("vendor/mono/include", { public = true })
-    add_files "vendor/ImGuizmo/*.cpp"
+	links
+	{
+		"box2d",
+		"glfw",
+		"glad",
+		"ImGui",
+		"yaml-cpp",
+		"OpenGL32",
 
-    add_includedirs("src/Fox", { public = true })
-    add_includedirs("src/Platform", { public = true })
-    add_files "src/**.cpp"
+		"%{Library.mono}",
+	}
 
--- target_compile_definitions(fox_engine PUBLIC
---     $<$<CONFIG:DEBUG>:FOX_DEBUG=1>
--- )
+	filter "files:vendor/ImGuizmo/**.cpp"
+	flags { "NoPCH" }
 
+	filter "system:windows"
+		systemversion "latest"
 
+		defines
+		{
+		}
 
-links { "OpenGL32" }
+		links
+		{
+			"%{Library.WinSock}",
+			"%{Library.WinMM}",
+			"%{Library.WinVersion}",
+			"%{Library.BCrypt}",
+		}
+
+	filter "configurations:Debug"
+		defines "FOX_DEBUG"
+		runtime "Debug"
+		symbols "on"
+
+		-- links
+		-- {
+		-- 	"%{Library.ShaderC_Debug}",
+		-- 	"%{Library.SPIRV_Cross_Debug}",
+		-- 	"%{Library.SPIRV_Cross_GLSL_Debug}"
+		-- }
+
+	filter "configurations:Release"
+		defines "FOX_RELEASE"
+		runtime "Release"
+		optimize "on"
+
+		-- links
+		-- {
+		-- 	"%{Library.ShaderC_Release}",
+		-- 	"%{Library.SPIRV_Cross_Release}",
+		-- 	"%{Library.SPIRV_Cross_GLSL_Release}"
+		-- }
+
+	filter "configurations:Distribution"
+		defines "FOX_DIST"
+		runtime "Release"
+		optimize "on"
+
+		-- links
+		-- {
+		-- 	"%{Library.ShaderC_Release}",
+		-- 	"%{Library.SPIRV_Cross_Release}",
+		-- 	"%{Library.SPIRV_Cross_GLSL_Release}"
+		-- }

@@ -172,7 +172,7 @@ namespace fox
          * @param[in] type		The enum type
          * @return				String name of the enum
          */
-        static char* get_type_str(typelog type)
+        static const char* get_type_str(typelog type)
         {
             switch(type) {
                 case DEBUG: return "DEBUG";

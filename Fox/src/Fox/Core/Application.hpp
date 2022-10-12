@@ -16,10 +16,10 @@
 
 namespace fox
 {
-    namespace json
-    {
-        class Value;
-    }
+    // namespace json
+    // {
+    //     class Value;
+    // }
 
     struct ApplicationCommandLineArgs
     {
@@ -53,10 +53,10 @@ namespace fox
         void PushLayer(Layer* layer);
         void PushOverlay(Layer* layer);
 
-        void LoadConfig();
+        // void LoadConfig();
 
         Window* GetWindow() const;
-        json::Value& GetConfigs() const;
+        // json::Value& GetConfigs() const;
         static Application& Get() { return *s_Instance; }
 
         bool IsWindowMinized() const { return m_bIsMinimized; }
@@ -75,7 +75,7 @@ namespace fox
         float m_LastFrameTime = 0.0f;
         ImGuiLayer* m_ImGuiLayer = nullptr;
         LayerStack m_LayerStack;
-        scope<json::Value> m_oConfigFile;
+        // scope<json::Value> m_oConfigFile;
 
     private:
         static Application* s_Instance;

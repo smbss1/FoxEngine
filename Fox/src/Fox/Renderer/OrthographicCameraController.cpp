@@ -3,7 +3,6 @@
 //
 
 #include <Core/Input/Input.hpp>
-#include "Save for later/Time.hpp"
 #include "Renderer/OrthographicCameraController.hpp"
 
 namespace fox
@@ -15,36 +14,36 @@ namespace fox
     {
     }
 
-    void OrthographicCameraController::OnUpdate()
+    void OrthographicCameraController::OnUpdate(float deltaTime)
     {
         if (Input::IsKeyPressed(Key::A))
         {
-            m_CameraPosition.x -= cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * Time::delta_time;
-            m_CameraPosition.y -= sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * Time::delta_time;
+            m_CameraPosition.x -= cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
+            m_CameraPosition.y -= sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
         }
         else if (Input::IsKeyPressed(Key::D))
         {
-            m_CameraPosition.x += cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * Time::delta_time;
-            m_CameraPosition.y += sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * Time::delta_time;
+            m_CameraPosition.x += cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
+            m_CameraPosition.y += sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
         }
 
         if (Input::IsKeyPressed(Key::W))
         {
-            m_CameraPosition.x += -sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * Time::delta_time;
-            m_CameraPosition.y += cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * Time::delta_time;
+            m_CameraPosition.x += -sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
+            m_CameraPosition.y += cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
         }
         else if (Input::IsKeyPressed(Key::S))
         {
-            m_CameraPosition.x -= -sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * Time::delta_time;
-            m_CameraPosition.y -= cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * Time::delta_time;
+            m_CameraPosition.x -= -sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
+            m_CameraPosition.y -= cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
         }
 
         if (m_Rotation)
         {
             if (Input::IsKeyPressed(Key::Q))
-                m_CameraRotation += m_CameraRotationSpeed * Time::delta_time;
+                m_CameraRotation += m_CameraRotationSpeed * deltaTime;
             if (Input::IsKeyPressed(Key::E))
-                m_CameraRotation -= m_CameraRotationSpeed * Time::delta_time;
+                m_CameraRotation -= m_CameraRotationSpeed * deltaTime;
 
             if (m_CameraRotation > 180.0f)
                 m_CameraRotation -= 360.0f;

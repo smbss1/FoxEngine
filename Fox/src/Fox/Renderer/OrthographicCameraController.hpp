@@ -16,7 +16,7 @@ namespace fox
     public:
         explicit OrthographicCameraController(float aspectRatio, bool rotation = false);
 
-        void OnUpdate();
+        void OnUpdate(float deltaTime);
 
         void OnEvent(Event &e);
 

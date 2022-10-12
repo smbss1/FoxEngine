@@ -19,30 +19,6 @@ namespace fox
     {
     }
 
-    static void AddIconFont(float fontSize)
-    {
-//        ImGuiIO& io = ImGui::GetIO();
-//
-//        static const ImWchar icons_ranges[] = { ICON_MIN_MD, ICON_MAX_16_MD, 0 };
-//        ImFontConfig iconsConfig;
-//        // merge in icons from Font Awesome
-//        iconsConfig.MergeMode = true;
-//        iconsConfig.PixelSnapH = true;
-//        iconsConfig.GlyphOffset.y = 1.0f;
-//        iconsConfig.OversampleH = iconsConfig.OversampleV = 1;
-//        iconsConfig.GlyphMinAdvanceX = 4.0f;
-//        iconsConfig.SizePixels = 12.0f;
-
-
-// merge in icons from Font Awesome
-//        static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
-//        ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
-//        io.Fonts->AddFontFromFileTTF( FONT_ICON_FILE_NAME_FAS, 16.0f, &icons_config, icons_ranges );
-// use FONT_ICON_FILE_NAME_FAR if you want regular instead of solid
-
-//        io.Fonts->AddFontFromMemoryCompressedTTF(MaterialDesign_compressed_data, MaterialDesign_compressed_size, fontSize, &iconsConfig, icons_ranges);
-    }
-
     void ImGuiLayer::OnAttach()
     {
         // Setup Dear ImGui context
@@ -50,13 +26,10 @@ namespace fox
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-        //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
-        //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-        std::string fontFolder = fox::format("%%", FOX_PLUGIN_DIRECTORY, "editor/assets/fonts/");
+        std::string fontFolder = "./assets/fonts/";
 
         io.Fonts->AddFontFromFileTTF(fox::format("%%", fontFolder, "OpenSans-Bold.ttf").c_str(), 18.0f);
         io.FontDefault = io.Fonts->AddFontFromFileTTF(fox::format("%%", fontFolder, "OpenSans-Regular.ttf").c_str(), 18.0f);
@@ -71,7 +44,6 @@ namespace fox
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
-        //ImGui::StyleColorsClassic();
 
         // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
         ImGuiStyle& style = ImGui::GetStyle();

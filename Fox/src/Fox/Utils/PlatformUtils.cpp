@@ -2,8 +2,8 @@
 // Created by samuel on 30/06/2021.
 //
 
-#include "Save for later/FPaths.hpp"
 #include "Utils/PlatformUtils.hpp"
+#include "Core/Application.hpp"
 #include "portable-file-dialogs.hpp"
 
 #if _WIN32
@@ -16,7 +16,7 @@ namespace fox
 {
     std::string FileDialogs::OpenFile(const std::vector<std::string>& filter)
     {
-        const std::string& path = FPaths::AssetsDir().empty() ? DEFAULT_PATH : FPaths::AssetsDir();
+        const std::string& path = Application::Get().GetSpecs().WorkingDirectory.empty() ? DEFAULT_PATH : Application::Get().GetSpecs().WorkingDirectory;
         // Check that a backend is available
         if (!pfd::settings::available())
             throw std::runtime_error("Portable File Dialogs are not available on this platform.");
@@ -30,7 +30,7 @@ namespace fox
 
     std::string FileDialogs::SaveFile(const std::vector<std::string>& filter)
     {
-        const std::string& path = FPaths::AssetsDir().empty() ? DEFAULT_PATH : FPaths::AssetsDir();
+        const std::string& path = Application::Get().GetSpecs().WorkingDirectory.empty() ? DEFAULT_PATH : Application::Get().GetSpecs().WorkingDirectory;
 
         if (!pfd::settings::available())
             throw std::runtime_error("Portable File Dialogs are not available on this platform.");

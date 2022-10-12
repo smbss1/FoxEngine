@@ -4,3 +4,9 @@
 [submodule "Fox/vendor/glfw"]
 	path = Fox/vendor/glfw
 	url = https://github.com/smbss1/glfw
+[submodule "Fox/vendor/yaml-cpp"]
+	path = Fox/vendor/yaml-cpp
+	url = https://github.com/smbss1/yaml-cpp
+[submodule "Fox/vendor/box2d"]
+	path = Fox/vendor/box2d
+	url = https://github.com/smbss1/box2d

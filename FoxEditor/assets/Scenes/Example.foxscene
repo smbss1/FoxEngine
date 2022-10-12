@@ -1,0 +1,37 @@
+Scene: Untitled
+Entities:
+  - Entity: 3222483763
+    NameComponent:
+      Name: Folder
+    TransformComponent:
+      Position: [-2.07999873, 0.125724256, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0, 0.300000012, 0.200000003, 1]
+      Sprite: /home/samuel/Git Repos/FoxEngine/Project/assets/Sprites/DirectoryIcon.png
+  - Entity: 4600877384260911104
+    NameComponent:
+      Name: Camera
+    TransformComponent:
+      Position: [-2, 1.70000005, 4]
+      Rotation: [-0.404916406, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.52359879
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+    CircleCollider2D:
+      Offset: [-2, 1.70000005]
+      Radius: 4
+      Density: -0.404916406
+      Friction: 0
+      Restitution: 0
+      RestitutionThreshold: 1

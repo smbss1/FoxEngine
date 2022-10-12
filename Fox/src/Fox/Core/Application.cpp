@@ -1,6 +1,5 @@
 
 #include <Utils/FileSystem.hpp>
-#include "Save for later/StateMachine.hpp"
 #include <Renderer/RendererAPI.hpp>
 #include <Renderer/RendererCommand.hpp>
 #include <Core/Input/Input.hpp>
@@ -8,7 +7,6 @@
 #include <Renderer/Renderer2D.hpp>
 #include "Core/Application.hpp"
 #include "Core/Logger/Logger.hpp"
-#include "json.hpp"
 #include "Scripting/ScriptEngine.hpp"
 #include "Utils/PlatformUtils.hpp"
 #include "Reflection/Reflection.hpp"
@@ -22,8 +20,6 @@ namespace fox
     {
         FOX_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
-
-        m_bIsRunning = true;
 
         // Set working directory here
         if (!m_Specification.WorkingDirectory.empty())
@@ -40,6 +36,8 @@ namespace fox
         // Add the ImGui state of GUI
         m_ImGuiLayer = new ImGuiLayer;
         PushOverlay(m_ImGuiLayer);
+
+        m_bIsRunning = true;
     }
 
     Application::~Application()
@@ -80,22 +78,22 @@ namespace fox
         }
     }
 
-    void Application::LoadConfig()
-    {
-        fox::info("Starting load config.json....");
-        json::Value oConfigTemp;
-        std::string out;
-        if (fox::FileSystem::ReadFile(std::string(FOX_PLUGIN_DIRECTORY) + "config.json", out))
-            oConfigTemp = json::parse(out);
-        else
-            fox::error("Cannot read config.json");
-        if (!oConfigTemp.is_null()) {
-            m_oConfigFile = new_scope<json::Value>(oConfigTemp);
-            fox::info("config.json load successfully");
-        }
-        else
-            fox::error("Wrong configuration format for 'config.json'");
-    }
+    // void Application::LoadConfig()
+    // {
+    //     // fox::info("Starting load config.json....");
+    //     // json::Value oConfigTemp;
+    //     // std::string out;
+    //     // if (fox::FileSystem::ReadFile(std::string(FOX_PLUGIN_DIRECTORY) + "config.json", out))
+    //     //     oConfigTemp = json::parse(out);
+    //     // else
+    //     //     fox::error("Cannot read config.json");
+    //     // if (!oConfigTemp.is_null()) {
+    //     //     m_oConfigFile = new_scope<json::Value>(oConfigTemp);
+    //     //     fox::info("config.json load successfully");
+    //     // }
+    //     // else
+    //     //     fox::error("Wrong configuration format for 'config.json'");
+    // }
 
     void Application::Run()
     {
@@ -150,10 +148,10 @@ namespace fox
         return m_pWindow.get();
     }
 
-    json::Value &Application::GetConfigs() const
-    {
-        return *m_oConfigFile;
-    }
+    // json::Value &Application::GetConfigs() const
+    // {
+    //     return *m_oConfigFile;
+    // }
 
     bool Application::OnWindowClose(WindowCloseEvent& e)
     {
