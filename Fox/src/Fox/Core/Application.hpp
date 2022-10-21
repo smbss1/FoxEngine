@@ -50,6 +50,8 @@ namespace fox
         void Close();
         void OnEvent(Event& e);
 
+        void SubmitToMainThread(const std::function<void()>& function);
+
         void PushLayer(Layer* layer);
         void PushOverlay(Layer* layer);
 
@@ -66,6 +68,7 @@ namespace fox
     private:
         bool OnWindowClose(WindowCloseEvent& e);
         bool OnWindowResize(WindowResizeEvent& e);
+        void ExecuteMainThreadQueue();
 
         bool m_bIsRunning;
         bool m_bIsMinimized = false;
@@ -76,6 +79,9 @@ namespace fox
         ImGuiLayer* m_ImGuiLayer = nullptr;
         LayerStack m_LayerStack;
         // scope<json::Value> m_oConfigFile;
+
+        std::vector<std::function<void()>> m_MainThreadQueue;
+		std::mutex m_MainThreadQueueMutex;
 
     private:
         static Application* s_Instance;

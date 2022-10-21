@@ -18,9 +18,9 @@ int main(int argc, char** argv)
         pApp = fox::CreateApp({argc, argv});
         pApp->Run();
     } catch (std::exception& e) {
-        fox::error("%", e.what());
+        FOX_CORE_ERROR("%", e.what());
     }
-    fox::info("Application stopped");
+    FOX_CORE_INFO("Application stopped");
     if (pApp)
         delete pApp;
     return 0;

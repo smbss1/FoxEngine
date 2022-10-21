@@ -40,19 +40,16 @@ namespace fox
     // Logging ////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    void Log_LogMessage(typelog level, MonoString* formattedMessage)
+    void Log_LogMessage(int level, MonoString* formattedMessage)
     {
 //        FOX_PROFILE_SCOPE();
 
         switch (level)
         {
-            case typelog::TRACE:		fox::trace(Utils::MonoToString(formattedMessage));   break;
-            case typelog::DEBUG:		fox::debug(Utils::MonoToString(formattedMessage));   break;
-            case typelog::INFO:		    fox::info(Utils::MonoToString(formattedMessage));    break;
-            case typelog::WARN:		    fox::warn(Utils::MonoToString(formattedMessage));    break;
-            case typelog::ERROR:		fox::error(Utils::MonoToString(formattedMessage));   break;
-            case typelog::CRITICAL:	fox::critical(Utils::MonoToString(formattedMessage));break;
-            default:					fox::info(Utils::MonoToString(formattedMessage));   break;
+            case typelog::INFO:		    FOX_INFO(Utils::MonoToString(formattedMessage));    break;
+            case typelog::WARN:		    FOX_WARN(Utils::MonoToString(formattedMessage));    break;
+            case typelog::ERROR:		FOX_ERROR(Utils::MonoToString(formattedMessage));   break;
+            default:					FOX_INFO(Utils::MonoToString(formattedMessage));   break;
         }
     }
 
@@ -102,6 +99,16 @@ namespace fox
         FOX_ASSERT(entity);
 
         return scene->CloneEntity(entity).GetUUID();
+    }
+
+    static void Entity_Destroy(uint64_t entityToDestroy)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        FOX_ASSERT(scene);
+        Entity entity = scene->GetEntityByUUID(entityToDestroy);
+        FOX_ASSERT(entity);
+
+        scene->DestroyEntity(entity);
     }
 
     MonoString* NameComponent_GetName(uint64_t entityID)
@@ -239,6 +246,20 @@ namespace fox
         return Input::IsKeyPressed(key);
     }
 
+    bool Input_IsKeyDown(KeyCode key)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        return Input::IsKeyDown(key);
+    }
+
+    bool Input_IsKeyReleased(KeyCode key)
+    {
+//        FOX_PROFILE_SCOPE();
+
+        return Input::IsKeyReleased(key);
+    }
+
     bool Input_IsMouseButtonPressed(Mouse button)
     {
 //        FOX_PROFILE_SCOPE();
@@ -282,7 +303,7 @@ namespace fox
             MonoType* managedType = mono_reflection_type_from_name(managedTypename.data(), ScriptEngine::GetCoreAssemblyImage());
             if (!managedType)
             {
-                fox::error("Could not find component type %", managedTypename);
+                FOX_CORE_ERROR("Could not find component type %", managedTypename);
                 return;
             }
 
@@ -323,6 +344,7 @@ namespace fox
         FOX_ADD_INTERNAL_CALL(Entity_HasComponent);
         FOX_ADD_INTERNAL_CALL(Entity_FindEntityByName);
         FOX_ADD_INTERNAL_CALL(Entity_Instantiate);
+        FOX_ADD_INTERNAL_CALL(Entity_Destroy);
 
         FOX_ADD_INTERNAL_CALL(NameComponent_GetName);
         FOX_ADD_INTERNAL_CALL(NameComponent_SetName);
@@ -343,6 +365,8 @@ namespace fox
         FOX_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
 
         FOX_ADD_INTERNAL_CALL(Input_IsKeyPressed);
+        FOX_ADD_INTERNAL_CALL(Input_IsKeyDown);
+        FOX_ADD_INTERNAL_CALL(Input_IsKeyReleased);
         FOX_ADD_INTERNAL_CALL(Input_IsMouseButtonPressed);
         FOX_ADD_INTERNAL_CALL(Input_GetMousePosition);
     }

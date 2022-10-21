@@ -6,14 +6,14 @@
 
 void Test::OnStart()
 {
-    fox::info("The game started!!!");
+    FOX_INFO("The game started!!!");
 
     transform = &get_component<fox::TransformComponent>().value();
 }
 
 void Test::on_update()
 {
-    fox::info("The game update!!!");
+    FOX_INFO("The game update!!!");
 
     transform->position.x += Time::delta_time * 2.0f;
 }

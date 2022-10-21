@@ -118,9 +118,9 @@ namespace fox
                 auto value = member->Get(component);
                 const Reflect::TypeDescriptor* type = member->GetType();
 
-//                        fox::info("Name: %", member->GetName());
-//                        fox::info("Type: %", type->GetName());
-//                        fox::info("Value: %", value.Get());
+//                        FOX_CORE_INFO("Name: %", member->GetName());
+//                        FOX_CORE_INFOINFOINFO("Type: %", type->GetName());
+//                        FOX_CORE_INFO("Value: %", value.Get());
 
                 if (ImGuiFieldDrawer::Draw(type, member->GetName(), value))
                 {
@@ -373,7 +373,7 @@ namespace fox
                                 // This works for geting default value like 'Speed = 45.4f' but maybe expensive memory alloc cuz of instance creation
 //                            ScriptInstance instance = ScriptInstance(entityClass, entity);
 //                            fieldInstance.template SetValue<float>(instance.GetFieldValue<float>(name));
-//                            fox::info("data = %", fieldInstance.GetValue<float>());
+//                            FOX_CORE_INFO("data = %", fieldInstance.GetValue<float>());
                             }
 
                             Reflect::Any data;

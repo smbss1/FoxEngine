@@ -31,7 +31,7 @@ GlfwWindow::GlfwWindow(const fox::WindowProps& props)
     m_oData.width = props.Width;
     m_oData.height = props.Height;
 
-    fox::info("Creating window % (%, %)", props.Title, props.Width, props.Height);
+    FOX_CORE_INFO("Creating window % (%, %)", props.Title, props.Width, props.Height);
 
     if (s_GLFWWindowCount == 0)
     {
@@ -72,6 +72,7 @@ GlfwWindow::GlfwWindow(const fox::WindowProps& props)
         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
         auto& stateKey = data.GLFW_KEYS_STATES[key];
         stateKey.wasPressed = stateKey.isPressed;
+        stateKey.wasReleased = stateKey.isRelease;
 
 //        stateKey.isPressed = false;
 //        stateKey.isRelease = false;
@@ -207,17 +208,43 @@ void GlfwWindow::SetNativeWindow(void *data)
     m_pWindow = static_cast<GLFWwindow*>(data);
 }
 
+bool GlfwWindow::GetKey(const fox::KeyCode keycode)
+{
+    return glfwGetKey(m_pWindow, static_cast<int32_t>(keycode)) == GLFW_PRESS;
+}
+
 bool GlfwWindow::IsKeyPressed(const fox::KeyCode key)
 {
 //    auto state = glfwGetKey(m_pWindow, static_cast<int32_t>(key));
+//     auto& stateKey = m_oData.GLFW_KEYS_STATES[key];
+//     if (stateKey.isPressed && !stateKey.wasPressed)
+//     {
+//         stateKey.isPressed = false;
+//         stateKey.wasPressed = true;
+//         return true;
+//     }
+//     return stateKey.isPressed && !stateKey.wasPressed;
+
+    auto state = glfwGetKey(m_pWindow, static_cast<int32_t>(key));
+    return state == GLFW_PRESS;
+}
+
+bool GlfwWindow::IsKeyDown(const fox::KeyCode key)
+{
     auto& stateKey = m_oData.GLFW_KEYS_STATES[key];
-    if (stateKey.isPressed && !stateKey.wasPressed)
+    return stateKey.isPressed;
+}
+
+bool GlfwWindow::IsKeyReleased(const fox::KeyCode key)
+{
+    auto& stateKey = m_oData.GLFW_KEYS_STATES[key];
+    if (stateKey.isRelease && !stateKey.wasReleased)
     {
-        stateKey.isPressed = false;
-        stateKey.wasPressed = true;
+        stateKey.isRelease = false;
+        stateKey.wasReleased = true;
         return true;
     }
-    return stateKey.isPressed && !stateKey.wasPressed;
+    return stateKey.isRelease && !stateKey.wasReleased;
 }
 
 bool GlfwWindow::IsMouseButtonPressed(const fox::Mouse button)

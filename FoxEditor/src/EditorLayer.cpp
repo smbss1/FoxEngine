@@ -58,10 +58,10 @@ namespace fox
             //     oConfigTemp = json::parse(out);
             // if (!oConfigTemp.is_null()) {
             //     m_oEditorConfig = json::Value(oConfigTemp);
-            //     fox::info("editor_config.json load successfully");
+            //     FOX_CORE_INFO("editor_config.json load successfully");
             // }
             // else
-            //     fox::error("Wrong configuration format for 'editor_config.json'");
+            //     FOX_CORE_ERROR("Wrong configuration format for 'editor_config.json'");
 
             // if (!m_oEditorConfig.is_null() && !m_oEditorConfig["LastOpenedProject"].is_null()) {
             //     // Set the project directory
@@ -70,10 +70,6 @@ namespace fox
             //     m_ContentBrowserPanel.OnProjectOpen();
             // }
         // DO NOT REMOVE ------
-
-        // Add Callback to the eventsystem
-//        event::EventSystem::Get().On<RuntimeStartEvent>(FOX_BIND_EVENT_FN(EditorLayer::OnRuntimeStart));
-//        event::EventSystem::Get().On<RuntimeStopEvent>(FOX_BIND_EVENT_FN(EditorLayer::OnRuntimeStop));
 
         // Create frame buffer
         fox::FramebufferSpecification fbSpec;
@@ -101,31 +97,6 @@ namespace fox
             // InitFileWatcher();
         // DO NOT REMOVE ------
 
-        // Create a FileWatcher instance that will check the current folder for changes every 5 seconds
-
-        // Start monitoring a folder for changes and (in case of changes)
-        // run a user provided lambda function
-//        fw.start([] (std::string path_to_watch, FileStatus status) -> void {
-//            // Process only regular files, all other file types are ignored
-//            if(!std::filesystem::is_regular_file(std::filesystem::path(path_to_watch)) && status != FileStatus::erased) {
-//                return;
-//            }
-//
-//            switch(status) {
-//                case FileStatus::created:
-//                    std::cout << "File created: " << path_to_watch << '\n';
-//                    break;
-//                case FileStatus::modified:
-//                    std::cout << "File modified: " << path_to_watch << '\n';
-//                    break;
-//                case FileStatus::erased:
-//                    std::cout << "File erased: " << path_to_watch << '\n';
-//                    break;
-//                default:
-//                    std::cout << "Error! Unknown file status.\n";
-//            }
-//        });
-
         // Open a scene if provided in cmd arguments
         auto commandLineArgs = Application::Get().GetSpecs().CommandLineArgs;
         if (commandLineArgs.Count > 1)
@@ -141,7 +112,7 @@ namespace fox
         // DO NOT REMOVE ------
             // m_oEditorConfig["LastOpenedProject"] = FPaths::ProjectDir();
             // if (!fox::file::WriteFile("./editor_config.json", m_oEditorConfig.dump()))
-            //     fox::error("Failed to write to 'editor_config.json'");
+            //     FOX_CORE_ERROR("Failed to write to 'editor_config.json'");
         // DO NOT REMOVE ------
     }
 
@@ -213,7 +184,7 @@ namespace fox
         m_Framebuffer->Unbind();
     }
 
-    void EditorLayer::OnImGuiRender()
+    void EditorLayer::BeginDockspace()
     {
         // Note: Switch this to true to enable dockspace
 		static bool dockspaceOpen = true;
@@ -264,44 +235,18 @@ namespace fox
 		}
 
 		style.WindowMinSize.x = minWinSizeX;
+    }
 
+    void EditorLayer::EndDockspace()
+    {
+        ImGui::End();
+    }
 
-        if (ImGui::BeginMenuBar())
-        {
-            if (ImGui::BeginMenu("File"))
-            {
-                // if (ImGui::MenuItem("New Project"))
-                //     NewProject();
+    void EditorLayer::OnImGuiRender()
+    {
+        BeginDockspace();
 
-                // if (ImGui::MenuItem("Open Project", "Ctrl+O"))
-                //     OpenProject();
-
-                if (ImGui::MenuItem("New Scene", "Ctrl+N"))
-                    NewScene();
-
-                if (ImGui::MenuItem("Open Scene...", "Ctrl+O"))
-                    OpenScene();
-
-                if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
-                    SaveScene();
-
-                if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
-                    SaveSceneAs();
-
-                if (ImGui::MenuItem("Exit"))
-                    Application::Get().Close();
-                ImGui::EndMenu();
-            }
-
-            if (ImGui::BeginMenu("Assets"))
-            {
-                if (ImGui::MenuItem("Create Script"))
-                    NewScript();
-                ImGui::EndMenu();
-            }
-
-            ImGui::EndMenuBar();
-        }
+        UI_MenuBar();
 
         m_OnImGuiRenderEvent.Invoke();
 
@@ -318,7 +263,6 @@ namespace fox
 
                 m_vViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
                 m_vViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
-
 
                 m_bViewportFocused = ImGui::IsWindowFocused();
                 m_bViewportHovered = ImGui::IsWindowHovered();
@@ -346,7 +290,7 @@ namespace fox
 
                 // Gizmos
                 Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-                if (selectedEntity && m_iGizmoType != -1)
+                if (selectedEntity && m_iGizmoType != -1 && !Input::IsKeyPressed(Key::LeftAlt))
                 {
                     ImGuizmo::SetOrthographic(false);
                     ImGuizmo::SetDrawlist();
@@ -393,7 +337,47 @@ namespace fox
         ImGui::PopStyleVar();
 
         UI_Toolbar();
-        ImGui::End();
+        EndDockspace();
+    }
+
+    void EditorLayer::UI_MenuBar()
+    {
+        if (ImGui::BeginMenuBar())
+        {
+            if (ImGui::BeginMenu("File"))
+            {
+                // if (ImGui::MenuItem("New Project"))
+                //     NewProject();
+
+                // if (ImGui::MenuItem("Open Project", "Ctrl+O"))
+                //     OpenProject();
+
+                if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+                    NewScene();
+
+                if (ImGui::MenuItem("Open Scene...", "Ctrl+O"))
+                    OpenScene();
+
+                if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+                    SaveScene();
+
+                if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
+                    SaveSceneAs();
+
+                if (ImGui::MenuItem("Exit"))
+                    Application::Get().Close();
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Assets"))
+            {
+                if (ImGui::MenuItem("Create Script"))
+                    NewScript();
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndMenuBar();
+        }
     }
 
     void EditorLayer::UI_Toolbar()
@@ -598,8 +582,8 @@ namespace fox
                                     "\nvoid " + strName + "::on_update()\n{\n}\n"
          );
 
-        fox::info("Create Cpp File in '%'", cpp_filepath);
-        fox::info("Create Hpp File in '%'", hpp_filepath);
+        FOX_CORE_INFO("Create Cpp File in '%'", cpp_filepath);
+        FOX_CORE_INFO("Create Hpp File in '%'", hpp_filepath);
     }
 
     ////////////////////////////////////////////
@@ -678,7 +662,7 @@ namespace fox
 
         if (path.extension().string() != ".foxscene")
         {
-            fox::warn("Could not load % - not a scene file", path.filename().string());
+            FOX_CORE_WARN("Could not load % - not a scene file", path.filename().string());
             return;
         }
 

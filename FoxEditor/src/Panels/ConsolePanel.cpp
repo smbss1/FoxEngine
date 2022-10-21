@@ -17,12 +17,9 @@ namespace fox
     {
 //        FOX_PROFILE_SCOPE();
 
-//        s_MessageBufferRenderFilter |= ConsolePanel::loglevel::Trace;
         s_MessageBufferRenderFilter |=ConsolePanel::loglevel::INFO;
-        s_MessageBufferRenderFilter |= ConsolePanel::loglevel::DEBUG;
         s_MessageBufferRenderFilter |= ConsolePanel::loglevel::WARN;
         s_MessageBufferRenderFilter |= ConsolePanel::loglevel::ERROR;
-//        s_MessageBufferRenderFilter |= ConsolePanel::loglevel::Critical;
 
         event::EventSystem::Get().On<OnConsoleLogEvent>(FOX_BIND_EVENT_FN(ConsolePanel::OnLog));
         m_MessageBuffer = std::vector<ref<ConsolePanel::Message>>(m_Capacity);
@@ -125,7 +122,7 @@ namespace fox
 
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-        for(int i = 0; i < ConsolePanel::loglevel::COUNT; i++)
+        for(int i = 0; i < 3; i++)
         {
             ImGui::SameLine();
             auto level = ConsolePanel::loglevel(i);
@@ -305,12 +302,9 @@ namespace fox
     {
         switch (level)
         {
-            case ConsolePanel::loglevel::TRACE:			return { 0.75f, 0.75f, 0.75f, 1.00f }; // White-ish gray
             case ConsolePanel::loglevel::INFO:			return { 0.20f, 0.80f, 0.20f, 1.00f }; // Green
-            case ConsolePanel::loglevel::DEBUG:			return { 0.00f, 0.50f, 0.50f, 1.00f }; // Cyan
             case ConsolePanel::loglevel::WARN:			return { 0.80f, 0.80f, 0.20f, 1.00f }; // Yellow
             case ConsolePanel::loglevel::ERROR:			return { 0.90f, 0.25f, 0.25f, 1.00f }; // Red
-            case ConsolePanel::loglevel::CRITICAL:		return { 0.60f, 0.20f, 0.80f, 1.00f }; // Purple
         }
 
         return { 1.00f, 1.00f, 1.00f, 1.00f };
@@ -320,12 +314,9 @@ namespace fox
     {
         switch(level)
         {
-            case ConsolePanel::loglevel::TRACE:				return ICON_FA_COMMENT_ALT;
             case ConsolePanel::loglevel::INFO:				return ICON_FA_INFO;
-            case ConsolePanel::loglevel::DEBUG:				return ICON_FA_BUG;
             case ConsolePanel::loglevel::WARN:				return ICON_FA_EXCLAMATION_TRIANGLE;
             case ConsolePanel::loglevel::ERROR:				return ICON_FA_EXCLAMATION;
-            case ConsolePanel::loglevel::CRITICAL:			return ICON_FA_EXCLAMATION_TRIANGLE;
         }
 
         return "Unknown name";

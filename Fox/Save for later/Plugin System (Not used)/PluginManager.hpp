@@ -32,7 +32,7 @@ namespace fox
             Path::paths vPluginsPaths = oPath.get_all_files(DL_EXT);
             for (auto path : vPluginsPaths)
             {
-                fox::info("Load Plugin: %", path.string());
+                FOX_CORE_INFO("Load Plugin: %", path.string());
                 LoadPlugin(path.string());
             }
         }
@@ -72,12 +72,12 @@ namespace fox
 
         void InitializePlugins(fox::Application& app)
         {
-            fox::info("Initialize plugins");
+            FOX_CORE_INFO("Initialize plugins");
             for (auto& it : m_vPlugins)
             {
                 it->plug(app);
             }
-            fox::info("Initialization of plugins done");
+            FOX_CORE_INFO("Initialization of plugins done");
         }
 
     private:

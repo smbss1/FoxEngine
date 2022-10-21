@@ -154,7 +154,12 @@ public:
     [[nodiscard]] void* GetNativeWindow() const override;
     void SetNativeWindow(void* data) override;
 
+    bool GetKey(const fox::KeyCode keycode) override;
+
     bool IsKeyPressed(const fox::KeyCode key) override;
+    bool IsKeyDown(const fox::KeyCode key) override;
+    bool IsKeyReleased(const fox::KeyCode key) override;
+
     bool IsMouseButtonPressed(const fox::Mouse button) override;
     glm::vec2 GetMousePosition() override;
 

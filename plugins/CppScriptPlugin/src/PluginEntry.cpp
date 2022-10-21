@@ -19,14 +19,14 @@ namespace fox
 //        app.get_world().system<NativeScript>().kind(ecs::OnUpdate)
 //            .each([&](Entity& e, NativeScript& script)
 //                  {
-//                fox::info("Native Update");
+//                FOX_CORE_INFO("Native Update");
 //                      script.on_update();
 //                  });
 //
 //        app.get_world().system<NativeScript>().kind(ecs::OnAdd)
 //            .each([&](Entity& e, NativeScript& script)
 //                  {
-//                      fox::info("Native OnAdd");
+//                      FOX_CORE_INFO("Native OnAdd");
 //
 //                      script.m_pWorld = e.get_world();
 //                      script.on_create_all(e.get_id(), app);
@@ -35,7 +35,7 @@ namespace fox
 //        app.get_world().system<NativeScript>().kind(ecs::OnAddScript)
 //            .each([&](Entity& e, NativeScript& script)
 //              {
-//                  fox::info("Native OnAddScript");
+//                  FOX_CORE_INFO("Native OnAddScript");
 //
 //                  script.on_create(e.get_id(), app);
 //              });

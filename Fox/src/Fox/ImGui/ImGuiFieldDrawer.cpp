@@ -199,7 +199,7 @@ namespace fox
                 // if (texture->IsLoaded())
                 // 	component.Sprite = texture;
                 // else
-                // 	fox::warn("Could not load texture %", texturePath.filename().string());
+                // 	FOX_CORE_WARN("Could not load texture %", texturePath.filename().string());
             }
             ImGui::EndDragDropTarget();
         }

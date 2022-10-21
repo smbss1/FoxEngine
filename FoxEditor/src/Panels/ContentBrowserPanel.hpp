@@ -5,9 +5,10 @@
 #ifndef FOXENGINE_CONTENTBROWSERPANEL_HPP
 #define FOXENGINE_CONTENTBROWSERPANEL_HPP
 
-#include <filesystem>
 #include "Renderer/Texture.hpp"
 #include "Panel.hpp"
+#include <unordered_map>
+#include <filesystem>
 
 namespace fox
 {
@@ -24,6 +25,7 @@ namespace fox
 
         ref<Texture2D> m_pFolderIcon = nullptr;
         ref<Texture2D> m_pFileIcon = nullptr;
+        std::unordered_map<std::string, ref<Texture2D>> m_ImageIcons;
     };
 }
 

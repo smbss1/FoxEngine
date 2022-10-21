@@ -16,7 +16,7 @@ namespace fox
 
     OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)
     {
-        fox::info("Construct VertexBuffer");
+        FOX_CORE_INFO("Construct VertexBuffer");
 
         GLCall(glGenBuffers(1, &m_RendererID));
         GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
@@ -25,7 +25,7 @@ namespace fox
 
     OpenGLVertexBuffer::OpenGLVertexBuffer(const void *data, uint32_t size)
     {
-        fox::info("Construct VertexBuffer");
+        FOX_CORE_INFO("Construct VertexBuffer");
 
         // Generate a new ID
         GLCall(glGenBuffers(1, &m_RendererID));
@@ -37,7 +37,7 @@ namespace fox
 
     OpenGLVertexBuffer::~OpenGLVertexBuffer()
     {
-        fox::info("Destroy VertexBuffer");
+        FOX_CORE_INFO("Destroy VertexBuffer");
         GLCall(glDeleteBuffers(1, &m_RendererID));
     }
 

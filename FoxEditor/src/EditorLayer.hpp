@@ -44,6 +44,10 @@ namespace fox
 
     private:
 
+        void BeginDockspace();
+        void EndDockspace();
+        void UI_MenuBar();
+
         bool OnKeyPressed(KeyPressedEvent &e);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 

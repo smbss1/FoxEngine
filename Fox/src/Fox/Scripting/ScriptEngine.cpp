@@ -20,6 +20,9 @@
 #include "mono/metadata/debug-helpers.h"
 //#endif // FOX_DEBUG
 
+#include "FileWatch.hpp"
+#include "Core/Application.hpp"
+
 #include <fstream>
 
 namespace fox
@@ -44,11 +47,28 @@ namespace fox
         std::unordered_map<UUID, ref<ScriptInstance>> EntityInstances;
         std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
 
+        scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
+		bool AssemblyReloadPending = false;
+
         // Runtime
         Scene* SceneContext = nullptr;
     };
 
     static ScriptEngineData* s_Data = nullptr;
+
+    static void OnAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event change_type)
+	{
+		if (!s_Data->AssemblyReloadPending && change_type == filewatch::Event::modified)
+		{
+			s_Data->AssemblyReloadPending = true;
+
+			Application::Get().SubmitToMainThread([]()
+			{
+				s_Data->AppAssemblyFileWatcher.reset();
+				ScriptEngine::ReloadAppDomain();
+			});
+		}
+	}
 
     void ScriptEngine::Init()
     {
@@ -164,6 +184,9 @@ namespace fox
         s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
         s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
         // Utils::PrintAssemblyTypes(s_Data->AppAssembly);
+
+        s_Data->AppAssemblyFileWatcher = new_scope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
+		s_Data->AssemblyReloadPending = false;
     }
 
     void ScriptEngine::FindClassAndRegisterTypes()
@@ -177,7 +200,7 @@ namespace fox
 
     void ScriptEngine::CompileAppAssembly()
     {
-        fox::info("Compile....");
+        FOX_CORE_INFO("Compile....");
         std::string command = fox::format("dotnet msbuild %"
 //                                          " -nologo"																	// no microsoft branding in console
 //                                          " -noconlog"																// no console logs
@@ -202,7 +225,7 @@ namespace fox
                     {
                         size_t newLine = std::string_view(buffer).size() - 1;
                         buffer[newLine] = '\0';
-                        fox::error(buffer);
+                        FOX_CORE_ERROR(buffer);
                     }
                 }
 
@@ -223,14 +246,14 @@ namespace fox
                     {
                         size_t newLine = std::string_view(buffer).size() - 1;
                         buffer[newLine] = '\0';
-                        fox::warn(buffer);
+                        FOX_CORE_WARN(buffer);
                     }
                 }
 
                 fclose(warns);
             }
         }
-        fox::info("End Compile....");
+        FOX_CORE_INFO("End Compile....");
     }
 
     void ScriptEngine::ReloadAppDomain()
@@ -238,7 +261,7 @@ namespace fox
 //        FOX_PROFILE_SCOPE();
 
 //        system("call \"../vendor/premake/bin/premake5.exe\" --file=\"../Sandbox/premake5.lua\" vs2022");
-        fox::info("Reloading the C# Assembly");
+        FOX_CORE_INFO("Reloading the C# Assembly");
         if (s_Data->AppDomain)
         {
             mono_domain_set(mono_get_root_domain(), false);
@@ -253,7 +276,7 @@ namespace fox
         FindClassAndRegisterTypes();
 
         GCManager::CollectGarbage();
-        fox::info("Finished reload the C# Assembly");
+        FOX_CORE_INFO("Finished reload the C# Assembly");
     }
 
 
@@ -425,7 +448,7 @@ namespace fox
             // to iterate over all of the elements. When no more values are available, the return value is NULL.
 
             int fieldCount = mono_class_num_fields(monoClass);
-            fox::warn("% has % fields:", className, fieldCount);
+            FOX_CORE_WARN("% has % fields:", className, fieldCount);
             void* iterator = nullptr;
             while (MonoClassField* field = mono_class_get_fields(monoClass, &iterator))
             {
@@ -435,7 +458,7 @@ namespace fox
                 {
                     MonoType* type = mono_field_get_type(field);
                     ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
-                    fox::warn("  % (%)", fieldName, Utils::ScriptFieldTypeToString(fieldType));
+                    FOX_CORE_WARN("  % (%)", fieldName, Utils::ScriptFieldTypeToString(fieldType));
 
                     scriptClass->m_Fields[fieldName] = { fieldType, fieldName, field };
                 }

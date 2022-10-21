@@ -54,15 +54,15 @@
 //            std::string out;
 //            if (fox::file::ReadFile(strFilepath, out))
 //            {
-//                fox::info("Parse animation file: %", strFilepath);
+//                FOX_CORE_INFO("Parse animation file: %", strFilepath);
 //
 //                fox::json::Value anim_json = fox::json::parse(out);
 //
 //                std::string strAnimName = anim_json["name"].get<std::string>();
 //                auto anim = anim_json.get<scope<Timeline>>();
 //
-//                fox::info("Animation Name: %", strAnimName);
-//                fox::info("Animation Tracks count: %", anim->Tracks.get().size());
+//                FOX_CORE_INFO("Animation Name: %", strAnimName);
+//                FOX_CORE_INFO("Animation Tracks count: %", anim->Tracks.get().size());
 //                anim->Name = strAnimName;
 //                Timeline *ptr = anim.get();
 //                m_vAnimations.push_back(std::move(anim));

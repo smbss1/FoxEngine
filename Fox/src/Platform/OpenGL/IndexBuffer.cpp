@@ -13,7 +13,7 @@ namespace fox
     OpenGLIndexBuffer::OpenGLIndexBuffer(const unsigned int* data, unsigned int count)
         : m_Count(count)
     {
-        fox::info("Construct IndexBuffer");
+        FOX_CORE_INFO("Construct IndexBuffer");
 
         assert(sizeof(uint32_t) == sizeof(GLuint));
         // Generate a new ID for the indices
@@ -26,7 +26,7 @@ namespace fox
 
     OpenGLIndexBuffer::~OpenGLIndexBuffer()
     {
-        fox::info("Destroy IndexBuffer");
+        FOX_CORE_INFO("Destroy IndexBuffer");
         GLCall(glDeleteBuffers(1, &m_RendererID));
     }
 

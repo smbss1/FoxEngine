@@ -58,14 +58,14 @@ namespace fox
 ////                uint64_t id_1 = (uint64_t)*bodyUserData_1;
 ////                uint64_t id_2 = (uint64_t)*bodyUserData_2;
 ////
-////                fox::info("Id 1: %", id_1);
-////                fox::info("Id 2: %", id_2);
+////                FOX_CORE_INFOINFOINFOINFOINFOINFOINFOINFOINFOINFOINFO("Id 1: %", id_1);
+////                FOX_CORE_INFO("Id 2: %", id_2);
 ////
 ////                Entity entity_1 = m_Scene->GetEntityByUUID(id_1);
 ////                Entity entity_2 = m_Scene->GetEntityByUUID(id_2);
 ////
-////                fox::info("Entity Id 1: %", entity_1.GetUUID());
-////                fox::info("Entity Id 2: %", entity_2.GetUUID());
+////                FOX_CORE_INFO("Entity Id 1: %", entity_1.GetUUID());
+////                FOX_CORE_INFO("Entity Id 2: %", entity_2.GetUUID());
 ////
 ////                entity_1.get<BoxCollider2D>().OnTriggerEnter(entity_2.get<BoxCollider2D>());
 ////                entity_2.get<BoxCollider2D>().OnTriggerEnter(entity_1.get<BoxCollider2D>());
@@ -761,6 +761,9 @@ namespace fox
         std::string name = entity.GetName();
         Entity newEntity = NewEntity(name);
         CopyComponentIfExists(AllComponents{}, newEntity, entity);
+
+        if (newEntity.has<ScriptComponent>() && m_IsRunning)
+            ScriptEngine::OnCreateEntity(newEntity);
         return newEntity;
     }
 

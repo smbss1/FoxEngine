@@ -81,6 +81,15 @@ namespace Fox
             ulong entityId = InternalCalls.Entity_Instantiate(entity.ID);
             return new Entity(entityId);
         }
-    }
 
+        public void Destroy(Entity entity)
+        {
+            InternalCalls.Entity_Destroy(entity.ID);
+        }
+
+        public void Destroy()
+        {
+            InternalCalls.Entity_Destroy(ID);
+        }
+    }
 }

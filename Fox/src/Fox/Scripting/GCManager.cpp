@@ -32,7 +32,7 @@ namespace fox
 
         if (!s_GCState->StrongRefMap.empty())
         {
-            fox::error("Memory leak detected\n Not all GCHandles have been cleaned up!");
+            FOX_CORE_ERROR("Memory leak detected\n Not all GCHandles have been cleaned up!");
 
             for (const auto& [handle, object] : s_GCState->StrongRefMap)
                 mono_gchandle_free(handle);
@@ -42,7 +42,7 @@ namespace fox
 
         if (!s_GCState->WeakRefMap.empty())
         {
-            fox::error("Memory leak detected\n Not all GCHandles have been cleaned up!");
+            FOX_CORE_ERROR("Memory leak detected\n Not all GCHandles have been cleaned up!");
 
             for (const auto& [handle, object] : s_GCState->WeakRefMap)
                 mono_gchandle_free(handle);
@@ -109,7 +109,7 @@ namespace fox
         }
         else
         {
-            fox::error("Trying to release an object reference using invalid handle");
+            FOX_CORE_ERROR("Trying to release an object reference using invalid handle");
             return;
         }
 

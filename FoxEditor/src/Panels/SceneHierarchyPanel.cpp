@@ -35,6 +35,7 @@ namespace fox
 
     void SceneHierarchyPanel::OnImGui()
     {
+        // ImGui::ShowDemoWindow();
         ImGui::Begin("Scene Hierarchy");
         {
             if (m_pContext)
@@ -69,18 +70,22 @@ namespace fox
         flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 
         bool expanded = ImGui::TreeNodeEx((void*)(uint64_t)entity.GetUUID(), flags, "%s", name.name.c_str());
+        
+        // after a click
+        if (ImGui::IsItemDeactivated())
+        {
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_None))
+            {
+                m_SelectedEntity = entity;
+                event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
+            }
+        }
 
         if (ImGui::BeginDragDropSource())
         {
             ImGui::SetDragDropPayload("SceneHierarchy", &entity, sizeof(Entity));
             ImGui::Text(name.name.c_str());
             ImGui::EndDragDropSource();
-        }
-
-        if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && !m_SelectedEntity)
-        {
-            m_SelectedEntity = entity;
-            event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
         }
 
         bool bIsDeleted = false; // Is the entity deleted ?
@@ -101,16 +106,6 @@ namespace fox
         //        ImGui::TreePop();
             ImGui::TreePop();
         }
-
-//        if (ImGui::BeginDragDropTarget())
-//        {
-//            const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SceneHierarchy");
-//            if (payload != nullptr) {
-//                Entity *e = static_cast<Entity *>(payload->Data);
-//                fox::info("Entity name: %", e->get<EntityName>().name);
-//            }
-//            ImGui::EndDragDropTarget();
-//        }
 
         if (bIsDeleted) {
             m_pContext->DestroyEntity(m_SelectedEntity);

@@ -1,5 +1,5 @@
-/home/samuel/Git Repos/FoxEngine/editor/Resources/Scripts/Fox-ScriptCore.dll
-/home/samuel/Git Repos/FoxEngine/editor/Resources/Scripts/Fox-ScriptCore.pdb
+/home/samuel/Git Repos/FoxEngine/FoxEditor/Resources/Scripts/Fox-ScriptCore.dll
+/home/samuel/Git Repos/FoxEngine/FoxEditor/Resources/Scripts/Fox-ScriptCore.pdb
 /home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Debug/Fox-ScriptCore.GeneratedMSBuildEditorConfig.editorconfig
 /home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Debug/Fox-ScriptCore.AssemblyInfoInputs.cache
 /home/samuel/Git Repos/FoxEngine/Fox-ScriptCore/obj/Debug/Fox-ScriptCore.AssemblyInfo.cs

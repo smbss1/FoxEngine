@@ -74,7 +74,7 @@ namespace fox
 
                 const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
                 const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
-                fox::info("%.%", nameSpace, name);
+                FOX_CORE_INFO("%.%", nameSpace, name);
             }
         }
 
@@ -85,7 +85,7 @@ namespace fox
             auto it = s_ScriptFieldTypeMap.find(typeName);
             if (it == s_ScriptFieldTypeMap.end())
             {
-                fox::error("Unknown type: %", typeName);
+                FOX_CORE_ERROR("Unknown type: %", typeName);
                 return ScriptFieldType::None;
             }
 
@@ -107,9 +107,9 @@ namespace fox
                 MonoObject* string_exception = nullptr;
                 MonoString* string = mono_object_to_string(exception, &string_exception);
                 if (string_exception == nullptr && string != nullptr)
-                    fox::error(Utils::MonoToString(string));
+                    FOX_ERROR(Utils::MonoToString(string));
                 else
-                    fox::error("Mono Error !!");
+                    FOX_ERROR("Mono Error !!");
                 return true;
             }
             return false;

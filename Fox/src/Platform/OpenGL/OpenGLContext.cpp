@@ -23,10 +23,10 @@ namespace fox
         if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
             throw std::runtime_error("Failed to initialize Glad!");
 
-        fox::info("OpenGL Info:");
-        fox::info("   Vendor: %", glGetString(GL_VENDOR));
-        fox::info("   Renderer: %", glGetString(GL_RENDERER));
-        fox::info("   Version: %", glGetString(GL_VERSION));
+        FOX_CORE_INFO("OpenGL Info:");
+        FOX_CORE_INFO("   Vendor: %", glGetString(GL_VENDOR));
+        FOX_CORE_INFO("   Renderer: %", glGetString(GL_RENDERER));
+        FOX_CORE_INFO("   Version: %", glGetString(GL_VERSION));
 
        FOX_CORE_ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 1), "Fox requires at least OpenGL version 4.5!");
     }

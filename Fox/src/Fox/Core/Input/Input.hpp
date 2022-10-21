@@ -15,11 +15,16 @@ namespace fox
         static Window* s_Window;
     public:
         static bool IsKeyPressed(KeyCode key);
+        static bool IsKeyDown(KeyCode key);
+        static bool IsKeyReleased(KeyCode key);
 
         static bool IsMouseButtonPressed(Mouse button);
         static glm::vec2 GetMousePosition();
         static float GetMouseX();
         static float GetMouseY();
+
+        static void OnUpdate();
+
 
         static void SetWindow(Window* pWindow);
     };

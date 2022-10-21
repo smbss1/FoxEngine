@@ -9,7 +9,7 @@ namespace Sandbox
         private Rigidbody2D m_Rb2d;
 
         public float Speed = 15.2f;
-        public Entity EntityPrefab;
+        public Entity BulletPrefab;
 
         public void OnCreate()
         {
@@ -38,12 +38,14 @@ namespace Sandbox
                 velocity.x = 1.0f;
             }
 
-            if (Input.IsKeyPressed(KeyCode.E) && EntityPrefab)
+            if (Input.IsKeyDown(KeyCode.Space) && BulletPrefab != null)
             {
-                // Instantiate(EntityPrefab).GetComponent<TransformComponent>().position = new Vector3(4, 3, 0);
+                Instantiate(BulletPrefab).GetComponent<TransformComponent>().position = m_Transform.position;
             }
 
             velocity *= Speed;
+            translation += velocity * ts;
+            m_Transform.position = translation;
             // m_Rb2d.ApplyLinearImpulse(velocity.XZ(), Vector2.zero, true);
         }
     }

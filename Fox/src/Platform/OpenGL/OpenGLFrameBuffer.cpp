@@ -128,7 +128,7 @@ namespace fox
     {
         if (width == 0 || height == 0 || width > s_MaxFramebufferSize || height > s_MaxFramebufferSize)
         {
-            fox::warn("Attempted to rezize framebuffer to %, %", width, height);
+            FOX_CORE_WARN("Attempted to rezize framebuffer to %, %", width, height);
             return;
         }
         m_oSpecs.Width = width;

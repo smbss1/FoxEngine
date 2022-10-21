@@ -38,7 +38,7 @@ namespace Sandbox
         }
         
         List<Particle> m_ParticlePool;
-        int m_PoolIndex = 48;
+        int m_PoolIndex = 0;
 
         Color Lerp(Color first, Color second, float by)
         {
@@ -66,20 +66,14 @@ namespace Sandbox
 
         void OnCreate()
         {
-            m_ParticlePool = Repeated<Particle>(new Particle(), 1000);
+            m_ParticlePool = Repeated<Particle>(new Particle(), 20);
 
             foreach (var particle in m_ParticlePool)
             {
                 particle._entity = Instantiate(ParticlePrefab);
                 particle.transform = particle._entity.GetComponent<TransformComponent>();
             }
-            
-            // for (int i = 0; i < m_ParticlePool.Capacity; i++)
-            // {
-            //     m_ParticlePool.Add(new Particle());
-            //     m_ParticlePool[i]._entity = Instantiate(ParticlePrefab);
-            // }
-            
+
             m_Transform = GetComponent<TransformComponent>();
             // Init here
             m_Particle.ColorBegin = new Color(254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f);
@@ -96,22 +90,22 @@ namespace Sandbox
 
         void OnUpdate(float ts)
         {
-            // m_Particle.Position = new Vector2( m_Transform.position.x, m_Transform.position.y );
-            // for (int i = 0; i < 5; i++)
-            //     Emit(m_Particle);
+            m_Particle.Position = new Vector2( m_Transform.position.x, m_Transform.position.y );
+            for (int i = 0; i < 5; i++)
+                Emit(m_Particle);
             
-            if (Input.IsMouseButtonPressed(MouseCode.ButtonLeft))
-            {
-                // Vector2 mousePos = Input.GetMousePosition();
-                // auto width = GLCore::Application::Get().GetWindow().GetWidth();
-                // auto height = GLCore::Application::Get().GetWindow().GetHeight();
-                //
-                // x = (x / width) * bounds.GetWidth() - bounds.GetWidth() * 0.5f;
-                // y = bounds.GetHeight() * 0.5f - (y / height) * bounds.GetHeight();
-                m_Particle.Position = new Vector2( m_Transform.position.x, m_Transform.position.y );
-                for (int i = 0; i < 5; i++)
-                    Emit(m_Particle);
-            }
+            // if (Input.IsMouseButtonPressed(MouseCode.ButtonLeft))
+            // {
+            //     // Vector2 mousePos = Input.GetMousePosition();
+            //     // auto width = GLCore::Application::Get().GetWindow().GetWidth();
+            //     // auto height = GLCore::Application::Get().GetWindow().GetHeight();
+            //     //
+            //     // x = (x / width) * bounds.GetWidth() - bounds.GetWidth() * 0.5f;
+            //     // y = bounds.GetHeight() * 0.5f - (y / height) * bounds.GetHeight();
+            //     m_Particle.Position = new Vector2( m_Transform.position.x, m_Transform.position.y );
+            //     for (int i = 0; i < 5; i++)
+            //         Emit(m_Particle);
+            // }
             
             foreach (var particle in m_ParticlePool)
             {
@@ -121,7 +115,6 @@ namespace Sandbox
 
                 if (particle.LifeRemaining <= 0.0f)
                 {
-
                     particle.Active = false;
                     continue;
                 }

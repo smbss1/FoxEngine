@@ -116,13 +116,9 @@ namespace fox
 
     enum typelog
     {
-        TRACE,
-        DEBUG,
         INFO,
         WARN,
-        ERROR,
-        CRITICAL,
-        COUNT
+        ERROR
     };
 
     struct OnConsoleLogEvent
@@ -175,12 +171,9 @@ namespace fox
         static const char* get_type_str(typelog type)
         {
             switch(type) {
-                case DEBUG: return "DEBUG";
                 case INFO:  return "INFO ";
                 case WARN:  return "WARN ";
                 case ERROR: return "ERROR";
-                case TRACE: return "TRACE";
-                case CRITICAL: return "CRITICAL";
             }
             return "Unknown name";
         }
@@ -259,27 +252,16 @@ namespace fox
     {
         log(ERROR, msg, args...);
     }
-
-    template <typename... Args,
-            std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
-    void debug(const std::string& msg, const Args&... args)
-    {
-        log(DEBUG, msg, args...);
-    }
-
-    template <typename... Args,
-        std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
-    void trace(const std::string& msg, const Args&... args)
-    {
-        log(TRACE, msg, args...);
-    }
-
-    template <typename... Args,
-        std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
-    void critical(const std::string& msg, const Args&... args)
-    {
-        log(CRITICAL, msg, args...);
-    }
 }
+
+// Core log macros
+#define FOX_CORE_INFO(...)     ::fox::info(__VA_ARGS__)
+#define FOX_CORE_WARN(...)     ::fox::warn(__VA_ARGS__)
+#define FOX_CORE_ERROR(...)    ::fox::error(__VA_ARGS__)
+
+// Client log macros
+#define FOX_INFO(...)          ::fox::info(__VA_ARGS__)
+#define FOX_WARN(...)          ::fox::warn(__VA_ARGS__)
+#define FOX_ERROR(...)         ::fox::error(__VA_ARGS__)
 
 #endif //TCPSERVER_LOGGER_HPP

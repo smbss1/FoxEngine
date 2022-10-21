@@ -18,12 +18,12 @@
 
 //     m_AnimationPlayer = &oAnimPlayer;
 
-//     fox::info("%", rttr::type::get<fox::AnimationPlayer>().get_name());
+//     FOX_CORE_INFO("%", rttr::type::get<fox::AnimationPlayer>().get_name());
 
 
 // //    oAnimPlayer.current.add_update_event([](property<Timeline*>* pAnim)
 // //       {
-// //           fox::info("Current Animation: %", (*pAnim)->Name);
+// //           FOX_CORE_INFO("Current Animation: %", (*pAnim)->Name);
 // //       });
 // }
 
@@ -43,7 +43,7 @@
 //     m_AnimationPlayer->Run();
 
 // //    if (m_AnimationPlayer->Current.get())
-// //        fox::info("Current Animation: %", m_AnimationPlayer->Current.get()->Name);
+// //        FOX_CORE_INFO("Current Animation: %", m_AnimationPlayer->Current.get()->Name);
 
 //     if (fox::Input::IsKeyPressed(fox::KeyCode::G))
 //         m_AnimationPlayer->play("Idle");

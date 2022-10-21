@@ -80,24 +80,31 @@ namespace fox
 
     // void Application::LoadConfig()
     // {
-    //     // fox::info("Starting load config.json....");
+    //     // FOX_CORE_INFO("Starting load config.json....");
     //     // json::Value oConfigTemp;
     //     // std::string out;
     //     // if (fox::FileSystem::ReadFile(std::string(FOX_PLUGIN_DIRECTORY) + "config.json", out))
     //     //     oConfigTemp = json::parse(out);
     //     // else
-    //     //     fox::error("Cannot read config.json");
+    //     //     FOX_CORE_ERROR("Cannot read config.json");
     //     // if (!oConfigTemp.is_null()) {
     //     //     m_oConfigFile = new_scope<json::Value>(oConfigTemp);
-    //     //     fox::info("config.json load successfully");
+    //     //     FOX_CORE_INFO("config.json load successfully");
     //     // }
     //     // else
-    //     //     fox::error("Wrong configuration format for 'config.json'");
+    //     //     FOX_CORE_ERROR("Wrong configuration format for 'config.json'");
     // }
+
+    void Application::SubmitToMainThread(const std::function<void()>& function)
+	{
+		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+
+		m_MainThreadQueue.emplace_back(function);
+	}
 
     void Application::Run()
     {
-        fox::info("Starting Application...");
+        FOX_CORE_INFO("Starting Application...");
 
         // LoadConfig();
 
@@ -120,12 +127,14 @@ namespace fox
 
         // plugin_manager.InitializePlugins(*this);
 
-        fox::info("Application is running");
+        FOX_CORE_INFO("Application is running");
         while (m_bIsRunning)
         {
             float time = Time::GetTime();
             Timestep timestep = time - m_LastFrameTime;
             m_LastFrameTime = time;
+
+            ExecuteMainThreadQueue();
 
             if (!m_bIsMinimized)
             {
@@ -139,6 +148,7 @@ namespace fox
                 }
                 m_ImGuiLayer->End();
             }
+            Input::OnUpdate();
             m_pWindow->OnUpdate();
         }
     }
@@ -172,6 +182,16 @@ namespace fox
 
         return false;
     }
+
+    void Application::ExecuteMainThreadQueue()
+	{
+		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+
+		for (auto& func : m_MainThreadQueue)
+			func();
+
+		m_MainThreadQueue.clear();
+	}
 
 //    std::unordered_map<size_t, ScriptCreator> &Application::GetScripts()
 //    {

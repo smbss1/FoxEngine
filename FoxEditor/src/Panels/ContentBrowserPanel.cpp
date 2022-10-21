@@ -29,10 +29,21 @@ namespace fox
 
         if (!m_oCurrentDirectory.empty())
         {
-            if (m_oCurrentDirectory != std::filesystem::path(g_AssetPath)) {
-                if (ImGui::Button(ICON_FA_ARROW_LEFT)) {
+            if (m_oCurrentDirectory != std::filesystem::path(g_AssetPath))
+            {
+                if (ImGui::Button(ICON_FA_ARROW_LEFT))
+                {
                     m_oCurrentDirectory = m_oCurrentDirectory.parent_path();
                 }
+            }
+
+            // Make sure cached texture icons exist, if they dont remove them from cache
+            for (auto it = m_ImageIcons.cbegin(), next_it = it; it != m_ImageIcons.cend(); it = next_it)
+            {
+                ++next_it;
+
+                if (!std::filesystem::exists((*it).first))
+                    m_ImageIcons.erase(it);
             }
 
             float cellSize = thumbnailSize + padding;
@@ -54,6 +65,14 @@ namespace fox
 
                 int texResourceId = id++;
                 ImGui::PushID(texResourceId);
+
+                if (path.extension().string() == ".png")
+                {
+                    if (m_ImageIcons.find(path.string()) == m_ImageIcons.end())
+                        m_ImageIcons[path.string()] = Texture2D::Create(path.string());
+
+                    icon = m_ImageIcons[path.string()];
+                }
 
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
                 ImGui::ImageButton((ImTextureID)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1}, { 1, 0});

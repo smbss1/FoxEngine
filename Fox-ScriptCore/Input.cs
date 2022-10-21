@@ -8,6 +8,8 @@ namespace Fox
         /// <param name="keycode">KeyCode</param>
         /// <returns>true if key is held down, otherwise false.</returns>
         public static bool IsKeyPressed(KeyCode keycode) => InternalCalls.Input_IsKeyPressed(keycode);
+        public static bool IsKeyDown(KeyCode keycode) => InternalCalls.Input_IsKeyDown(keycode);
+        public static bool IsKeyReleased(KeyCode keycode) => InternalCalls.Input_IsKeyReleased(keycode);
 
         /// <summary>
         /// Mouse button held down.

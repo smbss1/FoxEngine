@@ -358,11 +358,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/samuel/Git Repos/FoxEngine/editor/SandboxProject/Assets/Scripts/Sandbox.csproj",
+      "projectUniqueName": "/home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Assets/Scripts/Sandbox.csproj",
       "projectName": "Sandbox",
-      "projectPath": "/home/samuel/Git Repos/FoxEngine/editor/SandboxProject/Assets/Scripts/Sandbox.csproj",
+      "projectPath": "/home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Assets/Scripts/Sandbox.csproj",
       "packagesPath": "/home/samuel/.nuget/packages/",
-      "outputPath": "/home/samuel/Git Repos/FoxEngine/editor/SandboxProject/Assets/Scripts/obj/",
+      "outputPath": "/home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Assets/Scripts/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/samuel/.nuget/NuGet/NuGet.Config"

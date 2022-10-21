@@ -178,7 +178,7 @@ namespace fox
         int location;
         GLCall(location = glGetUniformLocation(m_RendererID, name.c_str()));
         if (location == -1)
-            fox::warn("Uniform '%' doesn't exist!", name);
+            FOX_CORE_WARN("Uniform '%' doesn't exist!", name);
         m_LocationCache[name] = location;
         return location;
     }
@@ -199,12 +199,12 @@ namespace fox
             }
             else
             {
-                fox::error("Could not read from file '%'", filepath);
+                FOX_CORE_ERROR("Could not read from file '%'", filepath);
             }
         }
         else
         {
-            fox::error("Could not open file '%'", filepath);
+            FOX_CORE_ERROR("Could not open file '%'", filepath);
         }
 
         return result;
@@ -263,7 +263,7 @@ namespace fox
                 std::vector<GLchar> message(length);
 
                 GLCall(glGetShaderInfoLog(shader, length, &length, message.data()));
-                fox::error("Failed to compile shader: %", message.data());
+                FOX_CORE_ERROR("Failed to compile shader: %", message.data());
                 FOX_CORE_ASSERT(false, "Shader compilation failure!");
                 GLCall(glDeleteShader(shader));
                 return;
@@ -293,7 +293,7 @@ namespace fox
                 GLCall(glDeleteShader(id));
             }
 
-            fox::error("Failed to link program: %", message.data());
+            FOX_CORE_ERROR("Failed to link program: %", message.data());
             FOX_CORE_ASSERT(false, "Shader link failure!");
             return;
         }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "J76W7rdZNvy7X5g0AmGBtYFmk/47OsPA1pW6BQ6fwahYZCf3IaclrYzfYyUjDHhQ7hYBvina53o/hmwZlCUslA==",
+  "dgSpecHash": "Gxu6JydACUCXGwTY1d5fj9Tt9hqaoo+X3GdlOkSi+yK/1qvRFbelq5GUZm8nigetsqhIjJ5aNvgAC8kHTRu8Ug==",
   "success": true,
-  "projectFilePath": "/home/samuel/Git Repos/FoxEngine/editor/SandboxProject/Assets/Scripts/Sandbox.csproj",
+  "projectFilePath": "/home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Assets/Scripts/Sandbox.csproj",
   "expectedPackageFiles": [
     "/home/samuel/.nuget/packages/microsoft.netframework.referenceassemblies/1.0.2/microsoft.netframework.referenceassemblies.1.0.2.nupkg.sha512",
     "/home/samuel/.nuget/packages/microsoft.netframework.referenceassemblies.net45/1.0.2/microsoft.netframework.referenceassemblies.net45.1.0.2.nupkg.sha512"
