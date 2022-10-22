@@ -76,7 +76,7 @@ namespace fox
 
         return ScriptFieldType::None;
     }
-
+    
     bool ManagedType::IsSubClassOf(ManagedClass* otherClass) const
     {
         return mono_class_is_subclass_of(TypeClass->Class, otherClass->Class, false);

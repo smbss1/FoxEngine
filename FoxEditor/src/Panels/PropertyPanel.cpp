@@ -286,6 +286,9 @@ namespace fox
                     for (const auto fieldID : fields)
                     {
                         ManagedField* field = ScriptCache::GetFieldByID(fieldID);
+                        if (!field->IsWritable())
+                            continue;
+
                         FieldStorage& storage = *ScriptCache::GetFieldStorage(fieldID);
                         std::string name = field->DisplayName;
 

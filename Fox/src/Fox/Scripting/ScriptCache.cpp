@@ -17,12 +17,10 @@
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/appdomain.h>
 
-
 #include <unordered_map>
 
 namespace fox
 {
-
 #define FOX_CACHE_CLASS(className, monoClass) \
 	{\
 		MonoType* classType = mono_class_get_type(monoClass);\
@@ -390,6 +388,8 @@ namespace fox
                     managedField.Flags |= (uint64_t)FieldFlag::Private;
                     break;
             }
+
+            managedField.DisplayName = managedField.FullName.substr(managedField.FullName.find_last_of(':') + 1);
 
 //            if (managedField.HasAttribute("Fox.ShowInEditorAttribute"))
 //            {
