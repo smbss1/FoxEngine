@@ -1,4 +1,4 @@
-/// @ref gtc_matrix_integer
+/// @Ref gtc_matrix_integer
 /// @file glm/gtc/matrix_integer.hpp
 ///
 /// @see core (dependence)

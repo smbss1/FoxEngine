@@ -12,7 +12,7 @@ namespace fox
     class SceneSerializer
     {
     public:
-        explicit SceneSerializer(const ref<Scene>& scene);
+        explicit SceneSerializer(const Ref<Scene>& scene);
 
         void Serialize(const std::string& filepath);
         void SerializeRuntime(const std::string& filepath);
@@ -21,7 +21,7 @@ namespace fox
         bool DeserializeRuntime(const std::string& filepath);
 
     private:
-        ref<Scene> m_pScene;
+        Ref<Scene> m_pScene;
     };
 }
 

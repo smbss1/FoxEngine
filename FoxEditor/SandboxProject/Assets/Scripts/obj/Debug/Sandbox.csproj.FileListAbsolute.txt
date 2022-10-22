@@ -9,4 +9,3 @@
 /home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.csproj.CopyComplete
 /home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.dll
 /home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Assets/Scripts/obj/Debug/Sandbox.pdb
-/home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Assets/Scripts/Binaries/Fox-ScriptCore.dll

@@ -1,4 +1,4 @@
-/// @ref gtc_precision
+/// @Ref gtc_precision
 
 namespace glm
 {

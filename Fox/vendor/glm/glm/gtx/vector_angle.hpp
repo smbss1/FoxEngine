@@ -1,4 +1,4 @@
-/// @ref gtx_vector_angle
+/// @Ref gtx_vector_angle
 /// @file glm/gtx/vector_angle.hpp
 ///
 /// @see core (dependence)
@@ -49,7 +49,7 @@ namespace glm
 	//! Parameters need to be normalized.
 	/// @see gtx_vector_angle extension.
 	template<typename T, qualifier Q>
-	GLM_FUNC_DECL T orientedAngle(vec<3, T, Q> const& x, vec<3, T, Q> const& y, vec<3, T, Q> const& ref);
+	GLM_FUNC_DECL T orientedAngle(vec<3, T, Q> const& x, vec<3, T, Q> const& y, vec<3, T, Q> const& Ref);
 
 	/// @}
 }// namespace glm

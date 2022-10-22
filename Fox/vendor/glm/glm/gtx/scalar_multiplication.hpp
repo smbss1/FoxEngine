@@ -1,4 +1,4 @@
-/// @ref gtx
+/// @Ref gtx
 /// @file glm/gtx/scalar_multiplication.hpp
 /// @author Joshua Moerman
 ///

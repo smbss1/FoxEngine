@@ -10,6 +10,7 @@
 #include "Scripting/ScriptEngine.hpp"
 #include "Utils/PlatformUtils.hpp"
 #include "Reflection/Reflection.hpp"
+#include "Project.hpp"
 
 namespace fox
 {
@@ -23,7 +24,9 @@ namespace fox
 
         // Set working directory here
         if (!m_Specification.WorkingDirectory.empty())
+        {
             std::filesystem::current_path(m_Specification.WorkingDirectory);
+        }
 
         m_pWindow = Window::Create(WindowProps(m_Specification.Name));
         m_pWindow->SetEventCallback(FOX_BIND_EVENT_FN(Application::OnEvent));
@@ -107,6 +110,7 @@ namespace fox
         FOX_CORE_INFO("Starting Application...");
 
         // LoadConfig();
+//        Project::SetActive(new_ref<Project>());
 
         // PluginManager& plugin_manager = get_or_create<fox::PluginManager>().value();
         // plugin_manager.FindAndLoadPlugins(std::string(FOX_PLUGIN_DIRECTORY) + (*m_oConfigFile)["plugins directory"].get<std::string>());

@@ -52,7 +52,7 @@ Handle macros/functions
  *   MonoObjectHandleOut,
  *   MonoObjectHandleInOut;
  *
- * Out is intended for out parameters, InOut is intended for ref parameters.
+ * Out is intended for out parameters, InOut is intended for Ref parameters.
  * This is not enforced.
  * Internal helper functions are also generated.
  */

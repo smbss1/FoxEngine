@@ -24,10 +24,10 @@ public:
 private:
     fox::OrthographicCameraController m_Camera;
 
-    fox::ref<fox::Texture2D> m_pSpriteSheet;
-    fox::ref<fox::SubTexture2D> m_TextureStairs;
-    fox::ref<fox::SubTexture2D> m_TextureBarrel;
-    fox::ref<fox::SubTexture2D> m_TextureTree;
+    fox::Ref<fox::Texture2D> m_pSpriteSheet;
+    fox::Ref<fox::SubTexture2D> m_TextureStairs;
+    fox::Ref<fox::SubTexture2D> m_TextureBarrel;
+    fox::Ref<fox::SubTexture2D> m_TextureTree;
 };
 
 

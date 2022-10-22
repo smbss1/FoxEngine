@@ -1,4 +1,4 @@
-/// @ref core
+/// @Ref core
 /// @file glm/ext/vector_uint3.hpp
 
 #pragma once

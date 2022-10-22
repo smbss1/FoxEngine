@@ -19,10 +19,10 @@ namespace fox
     {
     public:
         explicit PropertyPanel();
-        explicit PropertyPanel(const ref<Scene>& context);
+        explicit PropertyPanel(const Ref<Scene>& context);
         ~PropertyPanel();
 
-        void SetContext(const ref<Scene>& context);
+        void SetContext(const Ref<Scene>& context);
         void OnImGui() override;
 
     private:
@@ -35,7 +35,7 @@ namespace fox
         void DisplayAddComponentEntry(const std::string& entryName);
 
     private:
-        ref<Scene> m_pContext = nullptr;
+        Ref<Scene> m_pContext = nullptr;
         Entity m_SelectedEntity;
     };
 }

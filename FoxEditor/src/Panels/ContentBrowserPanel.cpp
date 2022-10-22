@@ -7,29 +7,36 @@
 #include "ContentBrowserPanel.hpp"
 #include "EditorLayer.hpp"
 #include "ImGui/IconsFontAwesome5.hpp"
+#include "Scene/EntitySerializer.hpp"
+#include "EditorEvent.hpp"
 
 namespace fox
 {
-    // Once we have projects, change this
-	extern const std::filesystem::path g_AssetPath = "./assets";
-
     static float padding = 17.0f; // Padding between folders and files
     static float thumbnailSize = 80.f; // Size of the thumbnail (icon)
 
     ContentBrowserPanel::ContentBrowserPanel()
-        : m_oCurrentDirectory(g_AssetPath)
+//        : m_oCurrentDirectory(Project::AssetsDir())
     {
         m_pFolderIcon = Texture2D::Create("Resources/ContentBrowser/Icons/DirectoryIcon.png");
         m_pFileIcon = Texture2D::Create("Resources/ContentBrowser/Icons/FileIcon.png");
+
+        event::EventSystem::Get().On<OnProjectChangeEvent>(FOX_BIND_EVENT_FN(ContentBrowserPanel::OnProjectChange));
+    }
+
+    void ContentBrowserPanel::OnProjectChange(const OnProjectChangeEvent& event)
+    {
+         m_oCurrentDirectory = Project::AssetsDir();
     }
 
     void ContentBrowserPanel::OnImGui()
     {
         ImGui::Begin(ICON_FA_FOLDER" Content Browser");
+        ImGui::BeginChild("###Content Browser");
 
         if (!m_oCurrentDirectory.empty())
         {
-            if (m_oCurrentDirectory != std::filesystem::path(g_AssetPath))
+            if (m_oCurrentDirectory != Project::AssetsDir())
             {
                 if (ImGui::Button(ICON_FA_ARROW_LEFT))
                 {
@@ -79,7 +86,7 @@ namespace fox
 
                 if (ImGui::BeginDragDropSource())
                 {
-                    auto relativePath = std::filesystem::relative(path, g_AssetPath);
+                    auto relativePath = std::filesystem::relative(path, Project::AssetsDir());
                     // auto relativePath = std::filesystem::relative(path, FPaths::AssetsDir());
 
                     const char* itemPath = relativePath.c_str();
@@ -116,16 +123,24 @@ namespace fox
                 ImGui::PopID();
             }
             ImGui::Columns(1);
-
-//            ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
-//            ImGui::SliderFloat("Padding", &padding, 0, 32);
         }
 
-        ImGui::End();
-    }
+        ImGui::EndChild();
 
-    void ContentBrowserPanel::OnProjectOpen()
-    {
-        // m_oCurrentDirectory = FPaths::AssetsDir();
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy"))
+            {
+                auto* e = static_cast<Entity *>(payload->Data);
+                if (!e || !*e)
+                    return;
+
+                std::filesystem::path path(m_oCurrentDirectory);
+                path /= std::string(e->GetName() + ".foxprefab").c_str();
+                EntitySerializer::SerializeEntityAsPrefab(path.string().c_str(), *e);
+            }
+            ImGui::EndDragDropTarget();
+        }
+        ImGui::End();
     }
 }

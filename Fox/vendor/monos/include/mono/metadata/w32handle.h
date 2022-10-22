@@ -34,7 +34,7 @@ typedef enum {
 
 typedef struct {
 	MonoW32Type type;
-	guint ref;
+	guint Ref;
 	gboolean signalled;
 	gboolean in_use;
 	MonoCoopMutex signal_mutex;
@@ -52,7 +52,7 @@ typedef enum {
 	MONO_W32HANDLE_WAIT_RET_NOT_OWNED_BY_CALLER = -5
 } MonoW32HandleWaitRet;
 
-typedef struct 
+typedef struct
 {
 	void (*close)(gpointer data);
 

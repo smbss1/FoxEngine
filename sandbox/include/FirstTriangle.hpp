@@ -23,8 +23,8 @@ public:
 private:
     fox::OrthographicCameraController m_Camera;
 
-    fox::ref<fox::VertexArray> va;
-    fox::ref<fox::Shader> shader;
+    fox::Ref<fox::VertexArray> va;
+    fox::Ref<fox::Shader> shader;
 };
 
 

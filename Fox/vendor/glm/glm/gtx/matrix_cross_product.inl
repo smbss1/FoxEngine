@@ -1,4 +1,4 @@
-/// @ref gtx_matrix_cross_product
+/// @Ref gtx_matrix_cross_product
 
 namespace glm
 {

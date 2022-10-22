@@ -189,7 +189,7 @@ namespace fox
             return result;
         }
 
-        void ImageWithAspect(ref<Texture2D> texture, ImVec2 texture_size, ImVec2 size, const ImVec2& _uv0,
+        void ImageWithAspect(Ref<Texture2D> texture, ImVec2 texture_size, ImVec2 size, const ImVec2& _uv0,
                              const ImVec2& _uv1, const ImVec4& tint_col, const ImVec4& border_col)
         {
             ImVec2 uv0 = _uv0;

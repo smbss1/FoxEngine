@@ -1,4 +1,4 @@
-/// @ref core
+/// @Ref core
 /// @file glm/ext/vector_bool2_precision.hpp
 
 #pragma once

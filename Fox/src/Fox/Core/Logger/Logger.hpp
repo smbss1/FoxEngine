@@ -116,9 +116,9 @@ namespace fox
 
     enum typelog
     {
-        INFO,
-        WARN,
-        ERROR
+        INFO = (1 << 0),
+        WARN = (1 << 1),
+        ERROR = (1 << 2)
     };
 
     struct OnConsoleLogEvent
@@ -186,7 +186,7 @@ namespace fox
          */
         template <typename... Args,
                 std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
-        void log(typelog type, const std::string& msg, const Args&... args)
+        void log(typelog type, std::string_view tag, const std::string& msg, const Args&... args)
         {
             // Lock the output
             std::lock_guard<std::mutex> locker(mutex);
@@ -195,6 +195,10 @@ namespace fox
             // Put and flush the message
             stream << print(msg, args...);
             *output_stream << "[" << get_type_str(type) << "] ";
+            if (!tag.empty())
+            {
+                *output_stream << "[" << tag << "] ";
+            }
             *output_stream << stream.str() << std::endl;
 
             event::EventSystem::Get().template Emit(OnConsoleLogEvent(stream.str(), type));
@@ -227,41 +231,51 @@ namespace fox
 
     template <typename... Args,
             std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
-    void log(typelog type, const std::string& msg, const Args&... args)
+    void log(typelog type, std::string_view tag, const std::string& msg, const Args&... args)
     {
-        Logger::instance().log(type, msg, args...);
+        Logger::instance().log(type, tag, msg, args...);
     }
 
     template <typename... Args,
             std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
-    void info(const std::string& msg, const Args&... args)
+    void info(std::string_view tag, const std::string& msg, const Args&... args)
     {
-        log(INFO, msg, args...);
+        log(INFO, tag, msg, args...);
     }
 
     template <typename... Args,
             std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
-    void warn(const std::string& msg, const Args&... args)
+    void warn(std::string_view tag, const std::string& msg, const Args&... args)
     {
-        log(WARN, msg, args...);
+        log(WARN, tag, msg, args...);
     }
 
     template <typename... Args,
             std::enable_if_t<std::conjunction_v<is_ostreamable<Args>...>, int> = 0>
-    void error(const std::string& msg, const Args&... args)
+    void error(std::string_view tag, const std::string& msg, const Args&... args)
     {
-        log(ERROR, msg, args...);
+        log(ERROR, tag, msg, args...);
     }
 }
 
 // Core log macros
-#define FOX_CORE_INFO(...)     ::fox::info(__VA_ARGS__)
-#define FOX_CORE_WARN(...)     ::fox::warn(__VA_ARGS__)
-#define FOX_CORE_ERROR(...)    ::fox::error(__VA_ARGS__)
+#define FOX_CORE_INFO(...)     ::fox::info("", __VA_ARGS__)
+#define FOX_CORE_WARN(...)     ::fox::warn("", __VA_ARGS__)
+#define FOX_CORE_ERROR(...)    ::fox::error("", __VA_ARGS__)
 
 // Client log macros
-#define FOX_INFO(...)          ::fox::info(__VA_ARGS__)
-#define FOX_WARN(...)          ::fox::warn(__VA_ARGS__)
-#define FOX_ERROR(...)         ::fox::error(__VA_ARGS__)
+#define FOX_INFO(...)          ::fox::info("", __VA_ARGS__)
+#define FOX_WARN(...)          ::fox::warn("", __VA_ARGS__)
+#define FOX_ERROR(...)         ::fox::error("", __VA_ARGS__)
+
+// Core log macros
+#define FOX_CORE_INFO_TAG(tag, ...)     ::fox::info(tag, __VA_ARGS__)
+#define FOX_CORE_WARN_TAG(tag, ...)     ::fox::warn(tag, __VA_ARGS__)
+#define FOX_CORE_ERROR_TAG(tag, ...)    ::fox::error(tag, __VA_ARGS__)
+
+// Client log macros
+#define FOX_INFO_TAG(tag, ...)          ::fox::info(tag, __VA_ARGS__)
+#define FOX_WARN_TAG(tag, ...)          ::fox::warn(tag, __VA_ARGS__)
+#define FOX_ERROR_TAG(tag, ...)         ::fox::error(tag, __VA_ARGS__)
 
 #endif //TCPSERVER_LOGGER_HPP

@@ -16,6 +16,9 @@
 
 namespace fox
 {
+    class EntitySerializer;
+    class Prefab;
+    class TransformComponent;
     class Entity
     {
     public:
@@ -44,6 +47,7 @@ namespace fox
 
         UUID GetUUID();
         const std::string& GetName();
+        TransformComponent& GetTransform();
 
         bool operator==(const Entity& other) const
         {
@@ -75,7 +79,6 @@ namespace fox
         {
             FOX_ASSERT(!has<T>(), "Entity already has component!");
             T& component = m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
-            m_Scene->OnComponentAdded<T>(*this, component);
             return component;
         }
 
@@ -84,7 +87,6 @@ namespace fox
         {
             FOX_ASSERT(!has<T>(), "Entity already has component!");
             T& component = m_Scene->m_Registry.emplace<T>(m_EntityHandle);
-            m_Scene->OnComponentAdded<T>(*this, component);
             return component;
         }
 
@@ -92,7 +94,6 @@ namespace fox
         T& add_or_replace(Args&&... args)
         {
             T& component = m_Scene->m_Registry.emplace_or_replace<T>(m_EntityHandle, std::forward<Args>(args)...);
-            m_Scene->OnComponentAdded<T>(*this, component);
             return component;
         }
 
@@ -129,13 +130,17 @@ namespace fox
 
         Entity clone()
         {
-            return m_Scene->CloneEntity(*this);
+            return m_Scene->CloneEntity(*this, {});
         }
 
 
     private:
         entt::entity m_EntityHandle { entt::null };
         Scene* m_Scene = nullptr;
+
+        friend Scene;
+        friend EntitySerializer;
+        friend Prefab;
     };
 }
 #endif

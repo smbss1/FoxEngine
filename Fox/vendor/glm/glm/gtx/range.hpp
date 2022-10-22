@@ -1,4 +1,4 @@
-/// @ref gtx_range
+/// @Ref gtx_range
 /// @file glm/gtx/range.hpp
 /// @author Joshua Moerman
 ///

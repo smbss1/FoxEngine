@@ -1,4 +1,4 @@
-/// @ref gtx_spline
+/// @Ref gtx_spline
 
 namespace glm
 {

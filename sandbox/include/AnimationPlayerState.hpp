@@ -25,7 +25,7 @@
 // private:
 //     fox::OrthographicCameraController m_Camera;
 
-//     fox::ref<fox::Scene> m_pActiveScene;
+//     fox::Ref<fox::Scene> m_pActiveScene;
 
 //     fox::AnimationPlayer* m_AnimationPlayer{};
 // };

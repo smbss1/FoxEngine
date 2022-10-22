@@ -57,7 +57,7 @@ namespace fox
         bool SwapChainTarget = false;
     };
 
-    class Framebuffer
+    class Framebuffer : public RefCounted
     {
     public:
         virtual ~Framebuffer() = default;
@@ -74,7 +74,7 @@ namespace fox
 
         [[nodiscard]] virtual const FramebufferSpecification& GetSpecification() const = 0;
 
-        static ref<Framebuffer> Create(const FramebufferSpecification& spec);
+        static Ref<Framebuffer> Create(const FramebufferSpecification& spec);
     };
 
 }

@@ -1,4 +1,4 @@
-/// @ref core
+/// @Ref core
 /// @file glm/glm.cpp
 
 #ifndef GLM_ENABLE_EXPERIMENTAL

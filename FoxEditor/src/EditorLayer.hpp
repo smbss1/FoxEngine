@@ -20,6 +20,7 @@
 #include "Core/Layer.hpp"
 #include "Events/Signal.hpp"
 #include "Panels/Panel.hpp"
+#include "Core/UserPreferences.hpp"
 
 class RuntimeStartEvent;
 class RuntimeStopEvent;
@@ -29,8 +30,8 @@ namespace fox
     class EditorLayer : public Layer
     {
     public:
-        EditorLayer()
-                : m_CameraController(1280.f / 720.f), Layer("Editor")
+        EditorLayer(Ref<UserPreferences> UserPrefs)
+                : m_CameraController(1280.f / 720.f), m_UserPrefs(UserPrefs), Layer("Editor")
         {
         }
 
@@ -52,7 +53,10 @@ namespace fox
         bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 
         // void NewProject();
-        // void OpenProject();
+        void OpenProject();
+        void OpenProject(const std::string& filepath);
+        void CloseProject(bool unloadProject = true);
+        void SaveProject();
 
         void NewScene();
         void OpenScene(const std::filesystem::path& path);
@@ -81,14 +85,14 @@ namespace fox
         fox::OrthographicCameraController m_CameraController;
 
         Vec2 m_oViewportSize = {0, 0};
-        fox::ref<Framebuffer> m_Framebuffer;
+        fox::Ref<Framebuffer> m_Framebuffer;
         bool m_bViewportFocused = false;
         bool m_bViewportHovered = false;
-        ref<Scene> m_pActiveScene;
-        ref<Scene> m_pEditorScene;
+        Ref<Scene> m_pActiveScene;
+        Ref<Scene> m_pEditorScene;
 
         SceneHierarchyPanel m_SceneHierarchyPanel;
-        std::vector<ref<Panel>> m_Panels;
+        std::vector<Ref<Panel>> m_Panels;
 
         EditorCamera m_oEditorCamera;
 
@@ -98,7 +102,7 @@ namespace fox
         Entity m_oHoveredEntity;
         std::string m_EditorScenePath;
 
-        // json::Value m_oEditorConfig;
+        fox::Ref<fox::UserPreferences> m_UserPrefs;
         // scope<FileWatcher> m_oWatcher;
         enum class SceneState
         {
@@ -107,7 +111,7 @@ namespace fox
         SceneState m_SceneState = SceneState::Edit;
 
         // Editor resources
-        ref<Texture2D> m_IconPlay, m_IconSimulate, m_IconStop;
+        Ref<Texture2D> m_IconPlay, m_IconSimulate, m_IconStop;
 
         // Events Defs
         SIGNAL(OnImGuiRenderEvent);

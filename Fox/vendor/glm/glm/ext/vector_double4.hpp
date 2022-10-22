@@ -1,4 +1,4 @@
-/// @ref core
+/// @Ref core
 /// @file glm/ext/vector_double4.hpp
 
 #pragma once

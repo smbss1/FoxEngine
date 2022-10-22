@@ -1,4 +1,4 @@
-/// @ref ext_quaternion_common
+/// @Ref ext_quaternion_common
 /// @file glm/ext/quaternion_common.hpp
 ///
 /// @defgroup ext_quaternion_common GLM_EXT_quaternion_common

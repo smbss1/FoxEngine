@@ -9,9 +9,9 @@ using System.Runtime.CompilerServices;
 	{
 		internal enum LogLevel
 		{
-			Info		= 0,
-			Warn		= 1,
-			Error		= 2,
+			Info		= (1 << 0),
+			Warn		= (1 << 1),
+			Error		= (1 << 2),
 		}
 
 	#region Info Overloads

@@ -14,11 +14,10 @@
 #include "ImGuiExtension.hpp"
 #include "Components/Rigidbody2D.hpp"
 #include "Scripting/ScriptEngine.hpp"
+#include "Core/Project.hpp"
 
 namespace fox
 {
-    extern const std::filesystem::path g_AssetPath;
-
     std::unordered_map<const Reflect::TypeDescriptor *, std::function<bool(std::string, Reflect::Any&)>> ImGuiFieldDrawer::m_Drawers = {
         {Reflect::Resolve<int>(),                       ImGuiFieldDrawer::DrawInt},
         {Reflect::Resolve<float>(),                     ImGuiFieldDrawer::DrawFloat},
@@ -26,7 +25,7 @@ namespace fox
         {Reflect::Resolve<glm::vec2>(),                 ImGuiFieldDrawer::DrawVec2},
         {Reflect::Resolve<glm::vec3>(),                 ImGuiFieldDrawer::DrawVec3},
         {Reflect::Resolve<glm::vec4>(),                 ImGuiFieldDrawer::DrawVec4},
-        {Reflect::Resolve<fox::ref<fox::Texture2D>>(),  ImGuiFieldDrawer::DrawTexture},
+        {Reflect::Resolve<fox::Ref<fox::Texture2D>>(),  ImGuiFieldDrawer::DrawTexture},
 
         {Reflect::Resolve<Rigidbody2D::BodyType>(),     ImGuiFieldDrawer::DrawRigidbody2D_BodyType},
     };
@@ -191,8 +190,8 @@ namespace fox
         {
             if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                 const char *path = (const char *) payload->Data;
-                std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
-                ref<Texture2D> texture = Texture2D::Create(texturePath.string());
+                std::filesystem::path texturePath = Project::AssetsDir() / path;
+                Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
                 valueFrom = texture;
                 return true;
 

@@ -154,15 +154,11 @@ namespace fox
 
     bool Input::IsKeyDown(KeyCode key)
     {
-        // return s_Window->IsKeyDown(key);
-
         return s_Window->GetKey(key) && !s_KeyStateMap[key];
     }
 
     bool Input::IsKeyReleased(KeyCode key)
     {
-        // return s_Window->IsKeyReleased(key);
-
         return !s_Window->GetKey(key) && s_KeyStateMap[key];
     }
 

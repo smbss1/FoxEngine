@@ -1,4 +1,4 @@
-/// @ref gtx_compatibility
+/// @Ref gtx_compatibility
 /// @file glm/gtx/compatibility.hpp
 ///
 /// @see core (dependence)

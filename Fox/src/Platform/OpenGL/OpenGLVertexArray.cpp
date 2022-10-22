@@ -51,7 +51,7 @@ namespace fox
         GLCall(glBindVertexArray(0));
     }
 
-    void OpenGLVertexArray::AddVertexBuffer(const ref<VertexBuffer> &vertexBuffer)
+    void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)
     {
         FOX_CORE_ASSERT(!vertexBuffer->GetLayout().GetElements().empty(), "Vertex Buffer has no layout!");
         GLCall(glBindVertexArray(m_RendererID));
@@ -125,19 +125,19 @@ namespace fox
         m_vVerticesBuffers.push_back(vertexBuffer);
     }
 
-    void OpenGLVertexArray::SetIndexBuffer(const ref<IndexBuffer> &indexBuffer)
+    void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer> &indexBuffer)
     {
         GLCall(glBindVertexArray(m_RendererID));
         indexBuffer->Bind();
         m_pIndexBuffer = indexBuffer;
     }
 
-    const std::vector<ref<VertexBuffer>> &OpenGLVertexArray::GetVertexBuffers() const
+    const std::vector<Ref<VertexBuffer>> &OpenGLVertexArray::GetVertexBuffers() const
     {
         return m_vVerticesBuffers;
     }
 
-    const ref<IndexBuffer> &OpenGLVertexArray::GetIndexBuffer() const
+    const Ref<IndexBuffer> &OpenGLVertexArray::GetIndexBuffer() const
     {
         return m_pIndexBuffer;
     }

@@ -5,9 +5,11 @@
 #ifndef FOXENGINE_PANEL_HPP
 #define FOXENGINE_PANEL_HPP
 
+#include "Core/Ref.hpp"
+
 namespace fox
 {
-    class Panel
+    class Panel : public RefCounted
     {
     public:
         virtual void OnImGui() = 0;

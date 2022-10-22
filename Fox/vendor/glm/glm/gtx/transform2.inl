@@ -1,4 +1,4 @@
-/// @ref gtx_transform2
+/// @Ref gtx_transform2
 
 namespace glm
 {

@@ -119,7 +119,7 @@ mono_thread_manage_internal (void);
  * machine threads are detached later.
  */
 typedef struct {
-  MonoRefCount ref;
+  MonoRefCount Ref;
   MonoCoopMutex *synch_cs;
 } MonoLongLivedThreadData;
 
@@ -490,7 +490,7 @@ typedef struct {
 		const char *guid;
 
 #ifndef MONO_PRIVATE_CRASHES
-		// We use ifdef to make it a compile-time error to store this 
+		// We use ifdef to make it a compile-time error to store this
 		// symbolicated string on release builds
 		const char *name;
 #endif

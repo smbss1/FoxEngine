@@ -41,17 +41,17 @@ namespace fox
         }
     }
 
-    ref<VertexBuffer> VertexBuffer::Create(float *vertices, uint32_t size)
+    Ref<VertexBuffer> VertexBuffer::Create(float *vertices, uint32_t size)
     {
         return new_ref<OpenGLVertexBuffer>(vertices, size);
     }
 
-    ref<VertexBuffer> VertexBuffer::Create(uint32_t size)
+    Ref<VertexBuffer> VertexBuffer::Create(uint32_t size)
     {
         return new_ref<OpenGLVertexBuffer>(size);
     }
 
-    ref<IndexBuffer> IndexBuffer::Create(uint32_t *indices, uint32_t count)
+    Ref<IndexBuffer> IndexBuffer::Create(uint32_t *indices, uint32_t count)
     {
         return new_ref<OpenGLIndexBuffer>(indices, count);
     }

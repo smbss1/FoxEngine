@@ -20,6 +20,15 @@ namespace fox
         }
         IDComponent(const IDComponent&) = default;
     };
+
+    struct PrefabComponent
+    {
+        UUID PrefabID;
+        UUID EntityID;
+
+        PrefabComponent() = default;
+        PrefabComponent(const PrefabComponent&) = default;
+    };
 }
 
 #endif //FOX_ENGINE_IDCOMPONENT_HPP

@@ -1,4 +1,4 @@
-/// @ref gtc_quaternion
+/// @Ref gtc_quaternion
 /// @file glm/gtc/quaternion.hpp
 ///
 /// @see core (dependence)

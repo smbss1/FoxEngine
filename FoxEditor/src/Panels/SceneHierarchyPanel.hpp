@@ -30,7 +30,7 @@ namespace fox
         void OnContextChangeChange(const OnContextChangeEvent& event);
 
     private:
-        ref<Scene> m_pContext = nullptr;
+        Ref<Scene> m_pContext = nullptr;
         Entity m_SelectedEntity;
     };
 }

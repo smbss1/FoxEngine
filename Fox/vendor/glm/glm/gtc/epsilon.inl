@@ -1,4 +1,4 @@
-/// @ref gtc_epsilon
+/// @Ref gtc_epsilon
 
 // Dependency:
 #include "glm/vector_relational.hpp"

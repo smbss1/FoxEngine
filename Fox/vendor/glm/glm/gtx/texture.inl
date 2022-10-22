@@ -1,4 +1,4 @@
-/// @ref gtx_texture
+/// @Ref gtx_texture
 
 namespace glm
 {

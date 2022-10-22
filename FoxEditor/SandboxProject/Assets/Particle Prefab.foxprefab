@@ -1,0 +1,16 @@
+Prefab: 6286037715757871646
+Entities:
+  - Entity: 15210951530788161123
+    NameComponent:
+      Name: Particle Prefab
+    TransformComponent:
+      Position: [-2.97108412, -0.694173574, -6.10351562e-05]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CircleRenderer:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.00499999989
+    PrefabComponent:
+      Prefab: 6286037715757871646
+      Entity: 6009032050099904590

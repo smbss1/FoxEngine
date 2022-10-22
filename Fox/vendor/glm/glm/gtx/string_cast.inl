@@ -1,4 +1,4 @@
-/// @ref gtx_string_cast
+/// @Ref gtx_string_cast
 
 #include <cstdarg>
 #include <cstdio>

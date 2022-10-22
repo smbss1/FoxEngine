@@ -1,4 +1,4 @@
-/// @ref gtx_functions
+/// @Ref gtx_functions
 
 #include "glm/exponential.hpp"
 

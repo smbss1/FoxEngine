@@ -1,4 +1,4 @@
-/// @ref ext_vector_integer
+/// @Ref ext_vector_integer
 /// @file glm/ext/vector_integer.hpp
 ///
 /// @see core (dependence)

@@ -1,4 +1,4 @@
-/// @ref gtx_scalar_relational
+/// @Ref gtx_scalar_relational
 /// @file glm/gtx/scalar_relational.hpp
 ///
 /// @see core (dependence)

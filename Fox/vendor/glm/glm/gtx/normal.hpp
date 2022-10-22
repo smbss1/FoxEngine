@@ -1,4 +1,4 @@
-/// @ref gtx_normal
+/// @Ref gtx_normal
 /// @file glm/gtx/normal.hpp
 ///
 /// @see core (dependence)

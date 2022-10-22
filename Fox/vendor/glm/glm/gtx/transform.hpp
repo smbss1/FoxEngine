@@ -1,4 +1,4 @@
-/// @ref gtx_transform
+/// @Ref gtx_transform
 /// @file glm/gtx/transform.hpp
 ///
 /// @see core (dependence)

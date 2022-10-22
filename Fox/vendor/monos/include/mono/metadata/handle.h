@@ -32,7 +32,7 @@ The handle stack is designed so it's efficient to pop a large amount of entries 
 The stack is made out of a series of fixed size segments.
 
 To do bulk operations you use a stack mark.
-	
+
 */
 
 /*
@@ -559,9 +559,9 @@ mono_null_value_handle (void)
 
 #if __cplusplus
 
-// Use this to convert a THandle to a raw T** such as for a ref or out parameter, without
+// Use this to convert a THandle to a raw T** such as for a Ref or out parameter, without
 // copying back and forth through an intermediate. The handle must already be allocated,
-// such as icall marshaling does for out and ref parameters.
+// such as icall marshaling does for out and Ref parameters.
 #define MONO_HANDLE_REF(h) (h.Ref ())
 
 #else
@@ -573,9 +573,9 @@ mono_handle_ref (void volatile* p)
 	return p;
 }
 
-// Use this to convert a THandle to a raw T** such as for a ref or out parameter, without
+// Use this to convert a THandle to a raw T** such as for a Ref or out parameter, without
 // copying back and forth through an intermediate. The handle must already be allocated,
-// such as icall marshaling does for out and ref parameters.
+// such as icall marshaling does for out and Ref parameters.
 #define MONO_HANDLE_REF(handle) (MONO_TYPEOF_CAST ((handle).__raw, mono_handle_ref ((handle).__raw)))
 
 #endif

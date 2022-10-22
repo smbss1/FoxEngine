@@ -1,4 +1,4 @@
-/// @ref gtx_bit
+/// @Ref gtx_bit
 
 namespace glm
 {

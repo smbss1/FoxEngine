@@ -38,6 +38,13 @@ namespace fox
             data = stbi_load(path.c_str(), &width, &height, &channels, 0);
         }
         FOX_CORE_ASSERT(data, "Failed to load image!");
+
+        if (!data)
+        {
+            return;
+        }
+
+        m_IsLoaded = true;
         m_uWidth = width;
         m_uHeight = height;
 

@@ -1,4 +1,4 @@
-/// @ref gtx_integer
+/// @Ref gtx_integer
 /// @file glm/gtx/integer.hpp
 ///
 /// @see core (dependence)

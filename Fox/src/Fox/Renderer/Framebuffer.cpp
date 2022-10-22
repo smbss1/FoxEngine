@@ -8,7 +8,7 @@
 
 namespace fox
 {
-    ref<Framebuffer> Framebuffer::Create(const FramebufferSpecification &spec)
+    Ref<Framebuffer> Framebuffer::Create(const FramebufferSpecification &spec)
     {
         return new_ref<OpenGLFrameBuffer>(spec);
     }

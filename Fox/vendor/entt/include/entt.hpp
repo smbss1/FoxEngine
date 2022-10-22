@@ -2892,8 +2892,8 @@ class connection {
 template<typename>
 friend class sink;
 
-connection(delegate<void(void *)> fn, void *ref)
-: disconnect{fn}, signal{ref}
+connection(delegate<void(void *)> fn, void *Ref)
+: disconnect{fn}, signal{Ref}
 {}
 
 public:
@@ -3017,11 +3017,11 @@ sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>();
 public:
 /**
      * @brief Constructs a sink that is allowed to modify a given signal.
-     * @param ref A valid reference to a signal object.
+     * @param Ref A valid reference to a signal object.
      */
-sink(sigh<Ret(Args...)> &ref) ENTT_NOEXCEPT
+sink(sigh<Ret(Args...)> &Ref) ENTT_NOEXCEPT
 : offset{},
-signal{&ref}
+signal{&Ref}
 {}
 
 /**
@@ -3606,8 +3606,8 @@ friend class sparse_set<Entity>;
 using packed_type = std::vector<Entity>;
 using index_type = typename traits_type::difference_type;
 
-sparse_set_iterator(const packed_type &ref, const index_type idx) ENTT_NOEXCEPT
-: packed{&ref}, index{idx}
+sparse_set_iterator(const packed_type &Ref, const index_type idx) ENTT_NOEXCEPT
+: packed{&Ref}, index{idx}
 {}
 
 public:
@@ -4251,8 +4251,8 @@ friend class storage<Entity, Type>;
 using instance_type = std::conditional_t<Const, const std::vector<Type>, std::vector<Type>>;
 using index_type = typename traits_type::difference_type;
 
-storage_iterator(instance_type &ref, const index_type idx) ENTT_NOEXCEPT
-: instances{&ref}, index{idx}
+storage_iterator(instance_type &Ref, const index_type idx) ENTT_NOEXCEPT
+: instances{&Ref}, index{idx}
 {}
 
 public:
@@ -4894,8 +4894,8 @@ template<typename Component>
 using pool_type = std::conditional_t<std::is_const_v<Component>, const storage<Entity, std::remove_const_t<Component>>, storage<Entity, Component>>;
 
 // we could use pool_type<Type> &..., but vs complains about it and refuses to compile for unknown reasons (most likely a bug)
-basic_group(sparse_set<Entity> &ref, storage<Entity, std::remove_const_t<Get>> &... gpool) ENTT_NOEXCEPT
-: handler{&ref},
+basic_group(sparse_set<Entity> &Ref, storage<Entity, std::remove_const_t<Get>> &... gpool) ENTT_NOEXCEPT
+: handler{&Ref},
 pools{&gpool...}
 {}
 
@@ -5330,10 +5330,10 @@ template<typename Component>
 using component_iterator = decltype(std::declval<pool_type<Component>>().begin());
 
 // we could use pool_type<Type> &..., but vs complains about it and refuses to compile for unknown reasons (most likely a bug)
-basic_group(const std::size_t &ref, const std::size_t &extent, storage<Entity, std::remove_const_t<Owned>> &... opool, storage<Entity, std::remove_const_t<Get>> &... gpool) ENTT_NOEXCEPT
+basic_group(const std::size_t &Ref, const std::size_t &extent, storage<Entity, std::remove_const_t<Owned>> &... opool, storage<Entity, std::remove_const_t<Get>> &... gpool) ENTT_NOEXCEPT
 : pools{&opool..., &gpool...},
 length{&extent},
-super{&ref}
+super{&Ref}
 {}
 
 template<typename Func, typename... Strong, typename... Weak>
@@ -6377,8 +6377,8 @@ update(0, instance.*member);
 
 template<typename Component>
 void remove_if_exists() {
-for(auto &&ref: remloc) {
-const auto local = ref.second.first;
+for(auto &&Ref: remloc) {
+const auto local = Ref.second.first;
 
 if(reg->valid(local)) {
 reg->template remove_if_exists<Component>(local);
@@ -7146,8 +7146,8 @@ friend class basic_registry<Entity>;
 
 using pool_type = std::conditional_t<std::is_const_v<Component>, const storage<Entity, std::remove_const_t<Component>>, storage<Entity, Component>>;
 
-basic_view(pool_type &ref) ENTT_NOEXCEPT
-: pool{&ref}
+basic_view(pool_type &Ref) ENTT_NOEXCEPT
+: pool{&Ref}
 {}
 
 public:
@@ -9195,21 +9195,21 @@ other.entt = null;
 
 /**
      * @brief Constructs an actor from a given registry.
-     * @param ref An instance of the registry class.
+     * @param Ref An instance of the registry class.
      */
-explicit basic_actor(registry_type &ref)
-: entt{ref.create()}, reg{&ref}
+explicit basic_actor(registry_type &Ref)
+: entt{Ref.create()}, reg{&Ref}
 {}
 
 /**
      * @brief Constructs an actor from a given entity.
      * @param entity A valid entity identifier.
-     * @param ref An instance of the registry class.
+     * @param Ref An instance of the registry class.
      */
-explicit basic_actor(entity_type entity, registry_type &ref) ENTT_NOEXCEPT
-: entt{entity}, reg{&ref}
+explicit basic_actor(entity_type entity, registry_type &Ref) ENTT_NOEXCEPT
+: entt{entity}, reg{&Ref}
 {
-ENTT_ASSERT(ref.valid(entity));
+ENTT_ASSERT(Ref.valid(entity));
 }
 
 /*! @brief Default destructor. */
@@ -10116,7 +10116,7 @@ return service;
      *
      * @return A reference to the service implementation currently set, if any.
      */
-static Service & ref() ENTT_NOEXCEPT {
+static Service & Ref() ENTT_NOEXCEPT {
 return *service;
 }
 
@@ -11428,11 +11428,11 @@ destroy(from);
 }
 };
 
-meta_any(const internal::meta_type_node *curr, void *ref) ENTT_NOEXCEPT
+meta_any(const internal::meta_type_node *curr, void *Ref) ENTT_NOEXCEPT
 : meta_any{}
 {
 node = curr;
-instance = ref;
+instance = Ref;
 }
 
 public:
@@ -11667,7 +11667,7 @@ void emplace(Args &&... args) {
      * @brief Aliasing constructor.
      * @return A meta any that shares a reference to an unmanaged object.
      */
-meta_any ref() const ENTT_NOEXCEPT {
+meta_any Ref() const ENTT_NOEXCEPT {
 return meta_any{node, instance};
 }
 
@@ -11676,7 +11676,7 @@ return meta_any{node, instance};
      * @return A meta any that shares a reference to an unmanaged object.
      */
 meta_any operator *() const ENTT_NOEXCEPT {
-return ref();
+return Ref();
 }
 
 /**
@@ -14705,8 +14705,8 @@ next_type next;
 };
 
 struct continuation {
-continuation(process_handler *ref)
-: handler{ref}
+continuation(process_handler *Ref)
+: handler{Ref}
 {
 ENTT_ASSERT(handler);
 }
@@ -16666,8 +16666,8 @@ class connection {
 template<typename>
 friend class sink;
 
-connection(delegate<void(void *)> fn, void *ref)
-: disconnect{fn}, signal{ref}
+connection(delegate<void(void *)> fn, void *Ref)
+: disconnect{fn}, signal{Ref}
 {}
 
 public:
@@ -16791,11 +16791,11 @@ sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>();
 public:
 /**
      * @brief Constructs a sink that is allowed to modify a given signal.
-     * @param ref A valid reference to a signal object.
+     * @param Ref A valid reference to a signal object.
      */
-sink(sigh<Ret(Args...)> &ref) ENTT_NOEXCEPT
+sink(sigh<Ret(Args...)> &Ref) ENTT_NOEXCEPT
 : offset{},
-signal{&ref}
+signal{&Ref}
 {}
 
 /**
@@ -17357,18 +17357,18 @@ on_list.remove_if(pred);
 }
 }
 
-void publish(const Event &event, Derived &ref) {
+void publish(const Event &event, Derived &Ref) {
 container_type swap_list;
 once_list.swap(swap_list);
 
 publishing = true;
 
 for(auto &&element: on_list) {
-element.first ? void() : element.second(event, ref);
+element.first ? void() : element.second(event, Ref);
 }
 
 for(auto &&element: swap_list) {
-element.first ? void() : element.second(event, ref);
+element.first ? void() : element.second(event, Ref);
 }
 
 publishing = false;

@@ -30,7 +30,8 @@ namespace fox
             ScriptComponent,
             Rigidbody2D,
             BoxCollider2D,
-            CircleCollider2D
+            CircleCollider2D,
+            PrefabComponent
         >;
 }
 

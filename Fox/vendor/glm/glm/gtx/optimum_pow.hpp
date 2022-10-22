@@ -1,4 +1,4 @@
-/// @ref gtx_optimum_pow
+/// @Ref gtx_optimum_pow
 /// @file glm/gtx/optimum_pow.hpp
 ///
 /// @see core (dependence)

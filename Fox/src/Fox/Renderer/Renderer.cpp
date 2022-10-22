@@ -27,7 +27,7 @@ namespace fox
     {
     }
 
-    void Renderer::Submit(const ref<Shader>& shader, const ref<VertexArray> &pVertexArray, const glm::mat4& transform)
+    void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray> &pVertexArray, const glm::mat4& transform)
     {
         shader->Bind();
         shader->SetUniform("u_ViewProjection", m_SceneData.ViewProjectionMatrix);

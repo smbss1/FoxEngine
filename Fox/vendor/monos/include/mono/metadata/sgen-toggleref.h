@@ -6,7 +6,7 @@
  *
  * Author:
  *  Rodrigo Kumpera (kumpera@gmail.com)
- * 
+ *
  * Licensed under the MIT license. See LICENSE file in the project root for full license information.
  */
 
@@ -15,7 +15,7 @@
 
 #include <mono/utils/mono-publib.h>
 
-/* GC toggle ref support */
+/* GC toggle Ref support */
 
 typedef enum {
 	MONO_TOGGLE_REF_DROP,

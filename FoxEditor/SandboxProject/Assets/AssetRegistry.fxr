@@ -1,0 +1,31 @@
+Assets:
+  - Handle: 371421742870263473
+    FilePath: Scenes/Physics Box.foxscene
+    Type: Scene
+  - Handle: 1245117496011154168
+    FilePath: Scenes/Game.foxscene
+    Type: Scene
+  - Handle: 1397602154982604969
+    FilePath: Scenes/Game2.foxscene
+    Type: Scene
+  - Handle: 2250225605053858380
+    FilePath: Bullet.foxprefab
+    Type: Prefab
+  - Handle: 3690917000108275979
+    FilePath: Particle Prefab.foxprefab
+    Type: Prefab
+  - Handle: 7686648977835893021
+    FilePath: Scenes/Instantiate.foxscene
+    Type: Scene
+  - Handle: 8169539724552739296
+    FilePath: Scenes/Particles.foxscene
+    Type: Scene
+  - Handle: 10815925266536047992
+    FilePath: Scenes/BoxColliderCallback.foxscene
+    Type: Scene
+  - Handle: 11612002399608038935
+    FilePath: Scenes/Example2.foxscene
+    Type: Scene
+  - Handle: 17440553422992547864
+    FilePath: Scenes/Example.foxscene
+    Type: Scene

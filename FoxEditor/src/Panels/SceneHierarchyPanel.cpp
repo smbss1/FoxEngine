@@ -8,13 +8,13 @@
 #include "Events/EventSystem.hpp"
 #include "SceneHierarchyPanel.hpp"
 #include "EditorEvent.hpp"
+#include "Scene/EntitySerializer.hpp"
+#include "Core/Project.hpp"
 
 #include <filesystem>
 
 namespace fox
 {
-    extern const std::filesystem::path g_AssetPath;
-
     SceneHierarchyPanel::SceneHierarchyPanel()
     {
         event::EventSystem::Get().On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(SceneHierarchyPanel::OnContextChangeChange));
@@ -22,7 +22,7 @@ namespace fox
 
     SceneHierarchyPanel::~SceneHierarchyPanel()
     {
-        m_pContext.reset();
+        m_pContext.Reset();
     }
 
     void SceneHierarchyPanel::OnContextChangeChange(const OnContextChangeEvent& event)
@@ -37,16 +37,17 @@ namespace fox
     {
         // ImGui::ShowDemoWindow();
         ImGui::Begin("Scene Hierarchy");
+        ImGui::BeginChild("###Scene Hierarchy");
         {
             if (m_pContext)
             {
                 m_pContext->m_Registry.each([&](auto entityID)
                 {
-                    Entity entity {entityID, m_pContext.get()};
+                    Entity entity {entityID, m_pContext.Raw()};
                     DrawEntityNode(entity);
                 });
 
-                if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
+                if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
                     m_SelectedEntity = {};
                     event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
                 }
@@ -60,17 +61,33 @@ namespace fox
                 }
             }
         }
+        ImGui::EndChild();
+        if (ImGui::BeginDragDropTarget() && m_pContext)
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+            {
+                const char* path = (const char*)payload->Data;
+                auto filepath = Project::AssetsDir() / path;
+
+                if (filepath.extension() == ".foxprefab")
+                {
+                    Entity entity = EntitySerializer::DeserializeEntityAsPrefab(filepath.c_str(), *m_pContext);
+                    event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(entity));
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
         ImGui::End();
     }
 
-    void SceneHierarchyPanel::DrawEntityNode(Entity &entity)
+    void SceneHierarchyPanel::DrawEntityNode(Entity& entity)
     {
         auto &name = entity.get<EntityName>();
         ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_OpenOnArrow : 0) | ImGuiTreeNodeFlags_Selected;
         flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 
         bool expanded = ImGui::TreeNodeEx((void*)(uint64_t)entity.GetUUID(), flags, "%s", name.name.c_str());
-        
+
         // after a click
         if (ImGui::IsItemDeactivated())
         {
@@ -91,6 +108,7 @@ namespace fox
         bool bIsDeleted = false; // Is the entity deleted ?
         if (ImGui::BeginPopupContextItem())
         {
+            m_SelectedEntity = entity;
             if (ImGui::MenuItem("Delete Entity"))
                 bIsDeleted = true;
 
@@ -107,7 +125,8 @@ namespace fox
             ImGui::TreePop();
         }
 
-        if (bIsDeleted) {
+        if (bIsDeleted && m_SelectedEntity)
+        {
             m_pContext->DestroyEntity(m_SelectedEntity);
             if (m_SelectedEntity == entity) {
                 m_SelectedEntity = {};

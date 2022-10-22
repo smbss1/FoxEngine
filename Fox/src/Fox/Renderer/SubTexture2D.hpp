@@ -10,17 +10,17 @@
 
 namespace fox
 {
-    class SubTexture2D
+    class SubTexture2D : public RefCounted
     {
     public:
-        SubTexture2D(const ref<Texture2D> &texture, const glm::vec2& min, const glm::vec2& max);
+        SubTexture2D(const Ref<Texture2D> &texture, const glm::vec2& min, const glm::vec2& max);
 
-        [[nodiscard]] const ref<Texture2D>& GetTexture() const { return m_pTexture; }
+        [[nodiscard]] const Ref<Texture2D>& GetTexture() const { return m_pTexture; }
         [[nodiscard]] const glm::vec2* GetTexCoords() const { return m_TexCoords; }
 
-        static ref<SubTexture2D> CreateFromCoords(const ref<Texture2D> &texture, const glm::vec2 &cellSize, const glm::vec2& coords, const glm::vec2& spriteSize = glm::vec2(1.0f));
+        static Ref<SubTexture2D> CreateFromCoords(const Ref<Texture2D> &texture, const glm::vec2 &cellSize, const glm::vec2& coords, const glm::vec2& spriteSize = glm::vec2(1.0f));
     private:
-        ref<Texture2D> m_pTexture;
+        Ref<Texture2D> m_pTexture;
         glm::vec2 m_TexCoords[4];
     };
 }

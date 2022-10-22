@@ -9,7 +9,7 @@
 
 namespace fox
 {
-    ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding)
+    Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding)
     {
 //        switch (Renderer::GetAPI())
 //        {

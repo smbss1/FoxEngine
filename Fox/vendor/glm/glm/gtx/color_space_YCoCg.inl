@@ -1,4 +1,4 @@
-/// @ref gtx_color_space_YCoCg
+/// @Ref gtx_color_space_YCoCg
 
 namespace glm
 {

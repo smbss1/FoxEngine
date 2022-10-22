@@ -8,6 +8,9 @@
 #include "Scene/Scene.hpp"
 #include "Ecs/Entity.hpp"
 #include "GCManager.hpp"
+#include "ScriptTypes.hpp"
+#include "ScriptCache.hpp"
+#include "FieldStorage.hpp"
 
 #include <filesystem>
 #include <string>
@@ -20,166 +23,61 @@ extern "C" {
     typedef struct _MonoAssembly MonoAssembly;
     typedef struct _MonoImage MonoImage;
     typedef struct _MonoClassField MonoClassField;
+    typedef struct _MonoDomain MonoDomain;
 }
 
-class BoxCollider2D;
+//class BoxCollider2D;
 namespace fox
 {
     struct ScriptComponent;
-
-    enum class ScriptFieldType
-    {
-        None = 0,
-        Float, Double,
-        Bool, Char, Byte, Short, Int, Long,
-        UByte, UShort, UInt, ULong,
-        Vector2, Vector3, Vector4,
-        String,
-        Entity
-    };
 
     struct Collision2DData
     {
         uint64_t OtherEntityID = 0;
     };
 
-    struct ScriptField
-    {
-        ScriptFieldType Type;
-        std::string Name;
-
-        MonoClassField* ClassField;
-    };
-
-    // ScriptField + data storage
-    struct ScriptFieldInstance
-    {
-        ScriptField Field;
-
-        ScriptFieldInstance()
-        {
-            memset(m_Buffer, 0, sizeof(m_Buffer));
-        }
-
-        template<typename T>
-        T GetValue() const
-        {
-            static_assert(sizeof(T) <= 16, "Type too large!");
-            return *(T*)m_Buffer;
-        }
-
-        void* GetValue()
-        {
-            return m_Buffer;
-        }
-
-        template<typename T>
-        void SetValue(T value)
-        {
-            static_assert(sizeof(T) <= 16, "Type too large!");
-            memcpy(m_Buffer, &value, sizeof(T));
-        }
-
-        void SetValue(void* value, size_t size)
-        {
-            memcpy(m_Buffer, value, size);
-        }
-
-    private:
-        uint8_t m_Buffer[16];
-
-        friend class ScriptEngine;
-        friend class ScriptInstance;
-    };
-
-    using ScriptFieldMap = std::unordered_map<std::string, ScriptFieldInstance>;
-
-    class ScriptClass
+    class ScriptInstance : public RefCounted
     {
     public:
-        ScriptClass() = default;
-        ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore = false);
-
-        GCHandle Instantiate();
-        MonoMethod* GetMethod(const std::string& name, int parameterCount);
-        MonoObject* InvokeMethod(MonoObject* instance, MonoMethod* method, void** params = nullptr);
-
-        const std::map<std::string, ScriptField>& GetFields() const { return m_Fields; }
-    private:
-        std::string m_ClassNamespace;
-        std::string m_ClassName;
-
-        std::map<std::string, ScriptField> m_Fields;
-
-        MonoClass* m_MonoClass = nullptr;
-
-        friend class ScriptEngine;
-    };
-
-    class ScriptInstance
-    {
-    public:
-        ScriptInstance(ref<ScriptClass> scriptClass, Entity entity);
+        ScriptInstance(ManagedClass* scriptClass, Entity entity);
         ~ScriptInstance();
 
         void InvokeOnCreate();
         void InvokeOnUpdate(float ts);
         void InvokeOnCollisionEnter2D(Collision2DData collisionInfo);
         void InvokeOnCollisionExit2D(Collision2DData collisionInfo);
-        ref<ScriptClass> GetScriptClass() { return m_ScriptClass; }
+        ManagedClass* GetManagedClass() { return m_ManagedClass; }
 
         template<typename T>
-        T GetFieldValue(const std::string& name)
+        T GetFieldValue(const ManagedField* field)
         {
-            static_assert(sizeof(T) <= 16, "Type too large!");
-
-            bool success = GetFieldValueInternal(name, s_FieldValueBuffer);
-            if (!success)
-                return T();
-
-            return *(T*)s_FieldValueBuffer;
+            return GetFieldValue(field).template Get<T>();
         }
 
-        template<typename T>
-        T* GetFieldObject(const std::string& name)
-        {
-            return (T*)GetFieldObjectValueInternal(name);
-        }
-
-        template<typename T>
-        void SetFieldValue(const std::string& name, T value)
-        {
-            static_assert(sizeof(T) <= 16, "Type too large!");
-
-            SetFieldValueInternal(name, &value);
-        }
-
-        void SetFieldValue(const std::string& name, void* value)
-        {
-            SetFieldValueInternal(name, value);
-        }
-
+        Utils::ValueWrapper GetFieldValue(const ManagedField* field);
+        void SetFieldValue(const ManagedField* field, const Utils::ValueWrapper& value);
         MonoObject* GetManagedObject() { return GCManager::GetReferencedObject(m_Handle); }
     private:
-        bool GetFieldValueInternal(const std::string& name, void* buffer);
-        MonoObject* GetFieldObjectValueInternal(const std::string& name);
-        bool SetFieldValueInternal(const std::string& name, const void* value);
-    private:
-        ref<ScriptClass> m_ScriptClass;
+        ManagedClass* m_ManagedClass;
 
         GCHandle m_Handle;
 
-        MonoMethod* m_Constructor = nullptr;
-        MonoMethod* m_OnCreateMethod = nullptr;
-        MonoMethod* m_OnUpdateMethod = nullptr;
+        ManagedMethod* m_OnCreateMethod = nullptr;
+        ManagedMethod* m_OnUpdateMethod = nullptr;
 
-        MonoMethod* m_OnCollisionEnter2DMethod = nullptr;
-        MonoMethod* m_OnCollisionExit2DMethod = nullptr;
-
-        inline static char s_FieldValueBuffer[16];
+        ManagedMethod* m_OnCollisionEnter2DMethod = nullptr;
+        ManagedMethod* m_OnCollisionExit2DMethod = nullptr;
 
         friend class ScriptEngine;
-        friend struct ScriptFieldInstance;
+    };
+
+    struct AssemblyInfo : public RefCounted
+    {
+        std::filesystem::path FilePath = "";
+        MonoAssembly* Assembly = nullptr;
+        MonoImage* AssemblyImage = nullptr;
+        std::vector<uint32_t> Classes;
+        bool IsCoreAssembly = false;
     };
 
     class ScriptEngine
@@ -191,6 +89,9 @@ namespace fox
         static void LoadAssembly(const std::filesystem::path& filepath);
         static void LoadAppAssembly(const std::filesystem::path& filepath);
         static void ReloadAppDomain();
+        static MonoDomain* GetAppDomain();
+        static Ref<AssemblyInfo> GetCoreAssembly();
+        static Ref<AssemblyInfo> GetAppAssembly();
 
         static void FindClassAndRegisterTypes();
 
@@ -199,89 +100,102 @@ namespace fox
 
         static bool EntityClassExists(const std::string& fullClassName);
         static void OnCreateEntity(Entity entity);
+        static void OnEntityInstantiated(Entity entityDst, Entity entitySrc);
+
         static void OnUpdateEntity(Entity entity, Timestep ts);
-        static ref<ScriptInstance> CreateEntityInstance(Entity entity);
-        static ref<ScriptInstance> CreateEntityInstance(Entity entity, const ScriptComponent& component);
 
+        static void SetSceneContext(Scene* scene);
         static Scene* GetSceneContext();
-        static ref<ScriptInstance> GetEntityScriptInstance(UUID entityID);
+        static Ref<ScriptInstance> GetEntityScriptInstance(UUID entityID);
 
-        static ref<ScriptClass> GetEntityClass(const std::string& name);
-        static std::unordered_map<std::string, ref<ScriptClass>> GetEntityClasses();
-        static ScriptFieldMap& GetScriptFieldMap(Entity entity);
-        static Entity GetEntityInstanceFromMonoObject(MonoObject* obj);
+        static ManagedClass* GetEntityClass(const std::string& name);
+        static std::unordered_map<std::string, ManagedClass*> GetEntityClasses();
 
-        static MonoImage* GetCoreAssemblyImage();
         static MonoObject* GetManagedInstance(UUID uuid);
+
+        template<typename... TConstructorArgs>
+        static MonoObject* CreateManagedObject(const std::string& className, TConstructorArgs&&... args)
+        {
+            return CreateManagedObject_Internal(ScriptCache::GetManagedClassByID(FOX_SCRIPT_CLASS_ID(className)), std::forward<TConstructorArgs>(args)...);
+        }
+
+        template<typename... TConstructorArgs>
+        static MonoObject* CreateManagedObject(uint32_t classID, TConstructorArgs&&... args)
+        {
+            return CreateManagedObject_Internal(ScriptCache::GetManagedClassByID(classID), std::forward<TConstructorArgs>(args)...);
+        }
 
     private:
         static void InitMono();
         static void ShutdownMono();
 
         static GCHandle InstantiateClass(MonoClass* monoClass);
+        static MonoObject* CreateManagedObject(MonoClass* managedClass);
+
+        template<typename... TConstructorArgs>
+        static MonoObject* CreateManagedObject_Internal(ManagedClass* managedClass, TConstructorArgs&&... args)
+        {
+//            FOX_PROFILE_SCOPE_DYNAMIC(managedClass->FullName.c_str());
+
+            if (managedClass == nullptr)
+            {
+                FOX_CORE_ERROR_TAG("ScriptEngine", "Attempting to create managed object with a null class!");
+                return nullptr;
+            }
+
+            MonoObject* obj = CreateManagedObject(managedClass->Class);
+
+            // Why doesn't mono/C# generate a default constructor if none exists... Mono requires one in order to properly initialize an object...
+            // And for whatever bizzare reason it won't work if the parent class provides a default constructor...
+            ManagedMethod* defaultConstructor = managedClass->GetMethod(".ctor", 0, true);
+            if (defaultConstructor == nullptr)
+                return obj;
+
+            InitRuntimeObject(obj);
+
+            constexpr size_t argsCount = sizeof...(args);
+            ManagedMethod* ctor = managedClass->GetMethod(".ctor", argsCount);
+            if (ctor == nullptr)
+            {
+                FOX_CORE_ERROR_TAG("ScriptEngine", "Failed to find a C# method called % with % parameters", managedClass->FullName, argsCount);
+                return nullptr;
+            }
+
+            if constexpr (argsCount > 0)
+            {
+                // TODO
+                /*if (!ScriptUtils::ValidateParameterTypes<TArgs...>(method))
+                {
+                    HZ_CORE_ERROR("[ScriptEngine]: Attempting to call method % with invalid parameters!", methodName);
+                    ScriptUtils::PrintInvalidParameters<TArgs...>(method);
+                    return;
+                }*/
+
+                // NOTE: const void** -> void** BAD. Ugly hack because unpacking const parameters into void** apparantly isn't allowed (understandable)
+                const void* data[] = { &args... };
+                managedClass->InvokeMethod(obj, ctor, (void**)data);
+            }
+            else
+            {
+                managedClass->InvokeMethod(obj, ctor);
+            }
+
+            return obj;
+        }
+
+
+        static void InitRuntimeObject(MonoClass* monoClass, MonoObject* object);
+        static void InitRuntimeObject(MonoObject* object);
+
         static void LoadAssemblyClasses();
         static void CompileAppAssembly();
 
-        friend class ScriptClass;
+        friend class ManagedClass;
         friend class ScriptGlue;
+        friend class ManagedClass;
+        friend class ScriptCache;
+        friend class FieldStorage;
     };
-
-    namespace Utils
-    {
-        inline const char* ScriptFieldTypeToString(ScriptFieldType fieldType)
-        {
-            switch (fieldType)
-            {
-                case ScriptFieldType::None:    return "None";
-                case ScriptFieldType::Float:   return "Float";
-                case ScriptFieldType::Double:  return "Double";
-                case ScriptFieldType::Bool:    return "Bool";
-                case ScriptFieldType::Char:    return "Char";
-                case ScriptFieldType::Byte:    return "Byte";
-                case ScriptFieldType::Short:   return "Short";
-                case ScriptFieldType::Int:     return "Int";
-                case ScriptFieldType::Long:    return "Long";
-                case ScriptFieldType::UByte:   return "UByte";
-                case ScriptFieldType::UShort:  return "UShort";
-                case ScriptFieldType::UInt:    return "UInt";
-                case ScriptFieldType::ULong:   return "ULong";
-                case ScriptFieldType::String:  return "String";
-
-                case ScriptFieldType::Vector2: return "Vector2";
-                case ScriptFieldType::Vector3: return "Vector3";
-                case ScriptFieldType::Vector4: return "Vector4";
-                case ScriptFieldType::Entity:  return "Entity";
-            }
-            FOX_ASSERT(false, "Unknown ScriptFieldType");
-            return "None";
-        }
-
-        inline ScriptFieldType ScriptFieldTypeFromString(std::string_view fieldType)
-        {
-            if (fieldType == "None")    return ScriptFieldType::None;
-            if (fieldType == "Float")   return ScriptFieldType::Float;
-            if (fieldType == "Double")  return ScriptFieldType::Double;
-            if (fieldType == "Bool")    return ScriptFieldType::Bool;
-            if (fieldType == "Char")    return ScriptFieldType::Char;
-            if (fieldType == "Byte")    return ScriptFieldType::Byte;
-            if (fieldType == "Short")   return ScriptFieldType::Short;
-            if (fieldType == "Int")     return ScriptFieldType::Int;
-            if (fieldType == "Long")    return ScriptFieldType::Long;
-            if (fieldType == "UByte")   return ScriptFieldType::UByte;
-            if (fieldType == "UShort")  return ScriptFieldType::UShort;
-            if (fieldType == "UInt")    return ScriptFieldType::UInt;
-            if (fieldType == "ULong")   return ScriptFieldType::ULong;
-            if (fieldType == "String")   return ScriptFieldType::String;
-
-            if (fieldType == "Vector2") return ScriptFieldType::Vector2;
-            if (fieldType == "Vector3") return ScriptFieldType::Vector3;
-            if (fieldType == "Vector4") return ScriptFieldType::Vector4;
-            if (fieldType == "Entity")  return ScriptFieldType::Entity;
-
-            FOX_ASSERT(false, "Unknown ScriptFieldType");
-            return ScriptFieldType::None;
-        }
-    }
 }
 
-#endif //FOX_LEXER_SCRIPTENGINE_HPP
+#endif //FOXENGINE_SCRIPTENGINE_HPP

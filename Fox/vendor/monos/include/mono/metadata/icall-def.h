@@ -86,7 +86,7 @@
 // At the C level, they are the same.
 //
 // If the C# managed declaration for an icall, with 7 parameters, is:
-// 	object your_internal_call (int x, object y, ref int z, IntPtr p, ref MyStruct c, ref MyClass, out string s);
+// 	object your_internal_call (int x, object y, Ref int z, IntPtr p, Ref MyStruct c, Ref MyClass, out string s);
 //
 // you should write:
 // 	HANDLES(ID_n, "your_internal_call", "ves_icall_your_internal_call", MonoObject, 7, (gint32, MonoObject, gint32_ref, gpointer, MyStruct_ref, MyClassInOut, MonoStringOut))
@@ -101,7 +101,7 @@
 // 	MonoObjectHandle ves_icall_your_internal_call (gint32, MonoObjectHandle, gint32*, gpointer, MyStruct*, MyClassHandleInOut, MonoStringOut, MonoError *error);
 //
 // Note the extra MonoError* argument.
-// Note that "ref" becomes "HandleInOut" for managed types.
+// Note that "Ref" becomes "HandleInOut" for managed types.
 // "_ref" becomes "*" for unmanaged types.
 // "_out" becomes "HandleOut" or "*".
 // "HandleIn" is the default for managed types, and is just called "Handle".
@@ -541,7 +541,7 @@ NOHANDLES(ICALL(SOCK_5, "Close_icall", ves_icall_System_Net_Sockets_Socket_Close
 HANDLES(SOCK_6, "Connect_icall", ves_icall_System_Net_Sockets_Socket_Connect_icall, void, 4, (gsize, MonoObject, gint32_ref, MonoBoolean))
 NOHANDLES(ICALL(SOCK_6a, "Disconnect_icall", ves_icall_System_Net_Sockets_Socket_Disconnect_icall))
 NOHANDLES(ICALL(SOCK_6b, "Duplicate_icall", ves_icall_System_Net_Sockets_Socket_Duplicate_icall))
-//FIXME The array is ref but the icall does not write to it.
+//FIXME The array is Ref but the icall does not write to it.
 HANDLES(SOCK_7, "GetSocketOption_arr_icall", ves_icall_System_Net_Sockets_Socket_GetSocketOption_arr_icall, void, 5, (gsize, gint32, gint32, MonoArray, gint32_ref))
 HANDLES(SOCK_8, "GetSocketOption_obj_icall", ves_icall_System_Net_Sockets_Socket_GetSocketOption_obj_icall, void, 5, (gsize, gint32, gint32, MonoObjectOut, gint32_ref))
 HANDLES(SOCK_21, "IOControl_icall", ves_icall_System_Net_Sockets_Socket_IOControl_icall, int, 5, (gsize, gint32, MonoArray, MonoArray, gint32_ref))

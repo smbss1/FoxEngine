@@ -1,4 +1,4 @@
-/// @ref gtx_io
+/// @Ref gtx_io
 /// @file glm/gtx/io.hpp
 /// @author Jan P Springer (regnirpsj@gmail.com)
 ///

@@ -100,7 +100,7 @@ namespace fox
     };
 
     // Currently Fox only supports 32-bit index buffers
-    class IndexBuffer
+    class IndexBuffer : public RefCounted
     {
     public:
         virtual ~IndexBuffer() {};
@@ -108,11 +108,11 @@ namespace fox
         virtual void Unbind() const = 0;
         virtual unsigned int GetCount() const = 0;
 
-        static ref<IndexBuffer> Create(uint32_t* indices, uint32_t size);
+        static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t size);
 
     };
 
-    class VertexBuffer
+    class VertexBuffer : public RefCounted
     {
     public:
         virtual ~VertexBuffer() {};
@@ -124,8 +124,8 @@ namespace fox
 
         virtual void SetData(const void *data, uint32_t size) = 0;
 
-        static ref<VertexBuffer> Create(uint32_t size);
-        static ref<VertexBuffer> Create(float* vertices, uint32_t size);
+        static Ref<VertexBuffer> Create(uint32_t size);
+        static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
     };
 }
 

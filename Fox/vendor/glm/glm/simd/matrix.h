@@ -1,4 +1,4 @@
-/// @ref simd
+/// @Ref simd
 /// @file glm/simd/matrix.h
 
 #pragma once

@@ -1,4 +1,4 @@
-/// @ref gtx_type_trait
+/// @Ref gtx_type_trait
 
 namespace glm
 {

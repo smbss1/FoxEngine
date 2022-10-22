@@ -1,4 +1,4 @@
-/// @ref gtc_packing
+/// @Ref gtc_packing
 
 #include "glm/ext/scalar_relational.hpp"
 #include "glm/ext/vector_relational.hpp"

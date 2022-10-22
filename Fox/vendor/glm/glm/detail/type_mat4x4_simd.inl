@@ -1,4 +1,4 @@
-/// @ref core
+/// @Ref core
 
 namespace glm
 {

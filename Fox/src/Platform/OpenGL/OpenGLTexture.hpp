@@ -27,7 +27,7 @@ namespace fox
         void Unbind() const;
 
         const std::string& GetId() const override;
-
+        bool IsLoaded() const override { return m_IsLoaded; }
 
         bool operator==(const Texture& other) const override;
 
@@ -36,6 +36,7 @@ namespace fox
         uint32_t m_RendererID{};
         uint32_t m_uWidth, m_uHeight;
         GLenum m_InternalFormat, m_DataFormat;
+        bool m_IsLoaded = false;
     };
 }
 

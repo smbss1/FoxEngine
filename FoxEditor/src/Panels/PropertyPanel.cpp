@@ -14,30 +14,32 @@
 #include "Reflection/Core/Reflect.hpp"
 #include "ImGui/ImGuiFieldDrawer.hpp"
 #include "EditorEvent.hpp"
+#include "Scripting/FieldStorage.hpp"
+#include "Scene/EntitySerializer.hpp"
+#include "Asset/AssetManager.hpp"
+#include "Scene/Prefab.hpp"
 
 #include <filesystem>
 
 namespace fox
 {
-    extern const std::filesystem::path g_AssetPath;
-
     PropertyPanel::PropertyPanel()
     {
         event::EventSystem::Get().On<OnSelectedEntityChangeEvent>(FOX_BIND_EVENT_FN(PropertyPanel::OnSelectedEntityChange));
         event::EventSystem::Get().On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(PropertyPanel::OnContextChangeChange));
     }
 
-    PropertyPanel::PropertyPanel(const ref<Scene>& context) : PropertyPanel()
+    PropertyPanel::PropertyPanel(const Ref<Scene>& context) : PropertyPanel()
     {
         SetContext(context);
     }
 
     PropertyPanel::~PropertyPanel()
     {
-        m_pContext.reset();
+        m_pContext.Reset();
     }
 
-    void PropertyPanel::SetContext(const ref<Scene>& context)
+    void PropertyPanel::SetContext(const Ref<Scene>& context)
     {
         m_pContext = context;
         m_SelectedEntity = {};
@@ -131,58 +133,39 @@ namespace fox
         });
     }
 
-    void GetFieldValue(ScriptFieldInstance scriptField, Reflect::Any& data)
+    void GetFieldValue(const FieldStorage& storage, Reflect::Any& data)
     {
-        switch (scriptField.Field.Type)
+        switch (storage.GetField()->Type.NativeType)
         {
             case ScriptFieldType::Float:
-                data = scriptField.GetValue<float>();
+                data = storage.GetValue<float>();
                 break;
             case ScriptFieldType::Int:
-                data = scriptField.GetValue<int>();
+                data = storage.GetValue<int>();
                 break;
             case ScriptFieldType::Double:
-                data = scriptField.GetValue<double>();
+                data = storage.GetValue<double>();
                 break;
             case ScriptFieldType::Bool:
-                data = scriptField.GetValue<bool>();
+                data = storage.GetValue<bool>();
                 break;
             case ScriptFieldType::Vector2:
-                data = scriptField.GetValue<glm::vec2>();
+                data = storage.GetValue<glm::vec2>();
                 break;
             case ScriptFieldType::Vector3:
-                data = scriptField.GetValue<glm::vec3>();
+                data = storage.GetValue<glm::vec3>();
                 break;
             case ScriptFieldType::Vector4:
-                data = scriptField.GetValue<glm::vec4>();
+                data = storage.GetValue<glm::vec4>();
                 break;
-        }
-    }
-
-    void GetFieldValue(ScriptField field, ref<ScriptInstance> instance, Reflect::Any& data)
-    {
-        switch (field.Type)
-        {
-            case ScriptFieldType::Float:
-                data = instance->GetFieldValue<float>(field.Name);
+            case ScriptFieldType::Entity:
+                data = storage.GetValue<UUID>();
                 break;
-            case ScriptFieldType::Int:
-                data = instance->GetFieldValue<int>(field.Name);
+            case ScriptFieldType::Prefab:
+                data = storage.GetValue<AssetHandle>();
                 break;
-            case ScriptFieldType::Double:
-                data = instance->GetFieldValue<double>(field.Name);
-                break;
-            case ScriptFieldType::Bool:
-                data = instance->GetFieldValue<bool>(field.Name);
-                break;
-            case ScriptFieldType::Vector2:
-                data = instance->GetFieldValue<glm::vec2>(field.Name);
-                break;
-            case ScriptFieldType::Vector3:
-                data = instance->GetFieldValue<glm::vec3>(field.Name);
-                break;
-            case ScriptFieldType::Vector4:
-                data = instance->GetFieldValue<glm::vec4>(field.Name);
+            case ScriptFieldType::AssetHandle:
+                data = storage.GetValue<AssetHandle>();
                 break;
         }
     }
@@ -269,7 +252,7 @@ namespace fox
         DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_pContext](auto& component) mutable
         {
             bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
-            bool IsSriptClassExists;
+            bool IsScriptClassExists;
 
             static char buffer[64];
             strncpy(buffer, component.ClassName.c_str(), sizeof(buffer));
@@ -280,8 +263,8 @@ namespace fox
             if (ImGui::InputText("Class", buffer, sizeof(buffer)))
             {
                 component.ClassName = buffer;
-                IsSriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
-                if (!IsSriptClassExists)
+                IsScriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
+                if (!IsScriptClassExists)
                     return;
             }
 
@@ -291,24 +274,25 @@ namespace fox
                 return;
             }
 
-
-            // TODO: Find a wayto 'combine' the drawing of the fields
+            // TODO: Maybe the field storage is not unique to one instance, it's may shared ? (need verification)
             // Fields
-            bool sceneRunning = scene->IsRunning();
-            if (sceneRunning)
+            if (scriptClassExists)
             {
-                ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
-                if (scriptInstance)
+                ManagedClass* entityClass = ScriptEngine::GetEntityClass(component.ClassName);
+                const auto& fields = entityClass->Fields;
+                if (fields.size() != 0)
                 {
-                    const auto& fields = scriptInstance->GetScriptClass()->GetFields();
-
                     ImGuiFieldDrawer::BeginProperties();
-                    for (const auto& [name, field] : fields)
+                    for (const auto fieldID : fields)
                     {
-                        Reflect::Any data;
-                        GetFieldValue(field, scriptInstance, data);
+                        ManagedField* field = ScriptCache::GetFieldByID(fieldID);
+                        FieldStorage& storage = *ScriptCache::GetFieldStorage(fieldID);
+                        std::string name = field->DisplayName;
 
-                        switch (field.Type)
+                        Reflect::Any data;
+                        GetFieldValue(storage, data);
+
+                        switch (storage.GetField()->Type.NativeType)
                         {
                             case ScriptFieldType::Float:
                             case ScriptFieldType::Int:
@@ -318,28 +302,46 @@ namespace fox
                             case ScriptFieldType::Vector3:
                             case ScriptFieldType::Vector4:
                             {
-                                if (ImGuiFieldDrawer::DrawField(field.Type, name, data))
-                                    scriptInstance->SetFieldValue(name, data.Get());
+                                if (ImGuiFieldDrawer::DrawField(storage.GetField()->Type.NativeType, name, data))
+                                    storage.SetValue(data.Get(), data.GetType()->GetSize());
                                 break;
                             }
 
                             case ScriptFieldType::Entity:
                             {
                                 ImGuiFieldDrawer::BeginPropertyGrid(name.c_str(), nullptr);
-                                MonoObject* entityObj = scriptInstance->template GetFieldObject<MonoObject>(name);
-                                Entity entityRef = ScriptEngine::GetEntityInstanceFromMonoObject(entityObj);
+                                Entity entityRef = scene->GetEntityByUUID(*data.template TryCast<UUID>());
                                 ImGui::Button(entityRef ? entityRef.GetName().c_str() : "No Reference", ImVec2(100.0f, 0.0f));
-
-                                // commented because on runtime we don't want a c++ Entity class but a C# instance of Entity class
-//                                if (ImGui::BeginDragDropTarget())
-//                                {
-//                                    if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy")) {
-//                                        auto* e = static_cast<Entity *>(payload->Data);
-//                                        scriptInstance->template SetFieldValue<UUID>(name, e->GetUUID());
-//                                    }
-//                                    ImGui::EndDragDropTarget();
-//                                }
                                 ImGuiFieldDrawer::EndPropertyGrid();
+
+                                if (ImGui::BeginDragDropTarget())
+                                {
+                                    if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy")) {
+                                        auto* e = static_cast<Entity *>(payload->Data);
+                                        storage.SetValue(e->GetUUID());
+                                    }
+                                    ImGui::EndDragDropTarget();
+                                }
+                                break;
+                            }
+                            case ScriptFieldType::Prefab:
+                            {
+                                ImGuiFieldDrawer::BeginPropertyGrid(name.c_str(), nullptr);
+                                AssetHandle assetHandle = *data.template TryCast<AssetHandle>();
+                                Ref<Prefab> prefab = AssetManager::GetAsset<Prefab>(assetHandle);
+                                ImGui::Button(prefab ? AssetManager::GetFileSystemPath(AssetManager::GetMetadata(assetHandle)).c_str() : "No Reference", ImVec2(100.0f, 0.0f));
+                                ImGuiFieldDrawer::EndPropertyGrid();
+
+                                if (ImGui::BeginDragDropTarget())
+                                {
+                                    if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                                    {
+                                        const char *path = (const char *) payload->Data;
+                                        std::filesystem::path prefabPath = Project::AssetsDir() / path;
+                                        storage.SetValue(AssetManager::GetAssetHandleFromFilePath(prefabPath));
+                                    }
+                                    ImGui::EndDragDropTarget();
+                                }
                                 break;
                             }
                             default:
@@ -347,77 +349,6 @@ namespace fox
                         }
                     }
                     ImGuiFieldDrawer::EndProperties();
-                }
-            }
-            else
-            {
-                if (scriptClassExists)
-                {
-                    ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(component.ClassName);
-                    const auto& fields = entityClass->GetFields();
-
-                    if (fields.size() != 0)
-                    {
-                        auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
-
-                        ImGuiFieldDrawer::BeginProperties();
-                        for (const auto& [name, field] : fields)
-                        {
-                            // Field has not been set in editor
-                            bool isSet = entityFields.find(name) != entityFields.end();
-                            if (!isSet)
-                            {
-                                ScriptFieldInstance& fieldInstance = entityFields[name];
-                                fieldInstance.Field = field;
-
-                                // This works for geting default value like 'Speed = 45.4f' but maybe expensive memory alloc cuz of instance creation
-//                            ScriptInstance instance = ScriptInstance(entityClass, entity);
-//                            fieldInstance.template SetValue<float>(instance.GetFieldValue<float>(name));
-//                            FOX_CORE_INFO("data = %", fieldInstance.GetValue<float>());
-                            }
-
-                            Reflect::Any data;
-                            ScriptFieldInstance& scriptField = entityFields.at(name);
-                            GetFieldValue(scriptField, data);
-
-                            switch (scriptField.Field.Type)
-                            {
-                                case ScriptFieldType::Float:
-                                case ScriptFieldType::Int:
-                                case ScriptFieldType::Double:
-                                case ScriptFieldType::Bool:
-                                case ScriptFieldType::Vector2:
-                                case ScriptFieldType::Vector3:
-                                case ScriptFieldType::Vector4:
-                                {
-                                    if (ImGuiFieldDrawer::DrawField(scriptField.Field.Type, name, data))
-                                        scriptField.SetValue(data.Get(), data.GetType()->GetSize());
-                                    break;
-                                }
-
-                                case ScriptFieldType::Entity:
-                                {
-                                    ImGuiFieldDrawer::BeginPropertyGrid(name.c_str(), nullptr);
-                                    Entity entityRef = scene->GetEntityByUUID(scriptField.GetValue<UUID>());
-                                    ImGui::Button(entityRef ? entityRef.GetName().c_str() : "No Reference", ImVec2(100.0f, 0.0f));
-                                    ImGuiFieldDrawer::EndPropertyGrid();
-
-                                    if (ImGui::BeginDragDropTarget())
-                                    {
-                                        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy")) {
-                                            auto* e = static_cast<Entity *>(payload->Data);
-                                            scriptField.SetValue<UUID>(e->GetUUID());
-                                        }
-                                        ImGui::EndDragDropTarget();
-                                    }
-                                    break;
-                                }
-                                default:
-                                    break;
-                            }
-                        }
-                        ImGuiFieldDrawer::EndProperties();
-                    }
                 }
             }
         });

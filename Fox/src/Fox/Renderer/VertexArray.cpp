@@ -9,7 +9,7 @@
 
 namespace fox
 {
-    ref<VertexArray> VertexArray::Create()
+    Ref<VertexArray> VertexArray::Create()
     {
         return new_ref<OpenGLVertexArray>();
     }

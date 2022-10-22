@@ -24,7 +24,7 @@ namespace fox
 
 
         bool m_ShowPhysicsColliders = false;
-        ref<Scene> m_pContext;
+        Ref<Scene> m_pContext;
 
     };
 }

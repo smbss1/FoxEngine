@@ -29,11 +29,11 @@ mono_icall_table_init (void);
 
 // It helps for types to be single tokens, though this can be relaxed in some places.
 // Marshaling a "ptr" does nothing -- just pass it on unchanged.
-// Marshaling a "ref" also does nothing at this layer, but
+// Marshaling a "Ref" also does nothing at this layer, but
 // creates a handle in  marshal-ilgen.c.
-// "ref" means "can be an interior pointer".
+// "Ref" means "can be an interior pointer".
 // "ptr" means "to a local".
-// It is generally difficult to know, and "ref" is safer.
+// It is generally difficult to know, and "Ref" is safer.
 // Presently it does not matter.
 typedef gint32  *gint32_ptr;
 typedef gsize *gsize_ptr;

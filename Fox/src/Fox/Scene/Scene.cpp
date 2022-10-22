@@ -15,6 +15,7 @@
 #include "Components/EntityName.hpp"
 #include "Components.hpp"
 #include "Ecs/Entity.hpp"
+#include "Prefab.hpp"
 
 #include "box2d/b2_world.h"
 #include "box2d/b2_body.h"
@@ -47,30 +48,6 @@ namespace fox
 
         void BeginContact(b2Contact* contact) final override
         {
-//            BoxCollider2D* bodyUserData_1 = reinterpret_cast<BoxCollider2D*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
-//            BoxCollider2D* bodyUserData_2 = reinterpret_cast<BoxCollider2D*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
-//
-//            // check if fixture A was a ball
-//            if (bodyUserData_1 && bodyUserData_2)
-//            {
-//                bodyUserData_1->OnTriggerEnter(*bodyUserData_2);
-//                bodyUserData_2->OnTriggerEnter(*bodyUserData_1);
-////                uint64_t id_1 = (uint64_t)*bodyUserData_1;
-////                uint64_t id_2 = (uint64_t)*bodyUserData_2;
-////
-////                FOX_CORE_INFOINFOINFOINFOINFOINFOINFOINFOINFOINFOINFO("Id 1: %", id_1);
-////                FOX_CORE_INFO("Id 2: %", id_2);
-////
-////                Entity entity_1 = m_Scene->GetEntityByUUID(id_1);
-////                Entity entity_2 = m_Scene->GetEntityByUUID(id_2);
-////
-////                FOX_CORE_INFO("Entity Id 1: %", entity_1.GetUUID());
-////                FOX_CORE_INFO("Entity Id 2: %", entity_2.GetUUID());
-////
-////                entity_1.get<BoxCollider2D>().OnTriggerEnter(entity_2.get<BoxCollider2D>());
-////                entity_2.get<BoxCollider2D>().OnTriggerEnter(entity_1.get<BoxCollider2D>());
-//            }
-
             b2Fixture* a = contact->GetFixtureA();
             b2Fixture* b = contact->GetFixtureB();
 
@@ -110,13 +87,13 @@ namespace fox
 //                    for (const auto& className : sc.Classes)
 //                        ScriptEngine::GetInstance(e1, className)->InvokeOnCollisionEnter2D(collisionData);
                 }
-//                else
-//                {
-////                    ScriptEngine::GetEntityScriptInstance(e1.GetUUID())->InvokeOnCollisionEnter2D(collisionData);
-//
-////                    for (const auto& className : sc.ClassName)
-////                        ScriptEngine::GetInstance(e1, sc.ClassName)->InvokeOnSensorEnter2D(collisionData);
-//                }
+               else
+               {
+//                    ScriptEngine::GetEntityScriptInstance(e1.GetUUID())->InvokeOnCollisionEnter2D(collisionData);
+
+//                    for (const auto& className : sc.ClassName)
+//                        ScriptEngine::GetInstance(e1, sc.ClassName)->InvokeOnSensorEnter2D(collisionData);
+               }
             }
 
 //            point = worldManifold.points[1];
@@ -128,7 +105,7 @@ namespace fox
             if (e2.has<ScriptComponent>())
             {
                 const auto& sc = e2.get<ScriptComponent>();
-                if (aSensor)
+                if (!aSensor)
                 {
                     ScriptEngine::GetEntityScriptInstance(e2.GetUUID())->InvokeOnCollisionEnter2D(collisionData);
 //                    for (const auto& className : sc.Classes)
@@ -148,18 +125,6 @@ namespace fox
         {
             void* bodyUserData_1 = (void *) contact->GetFixtureA()->GetBody()->GetUserData().pointer;
             void* bodyUserData_2 = (void *) contact->GetFixtureB()->GetBody()->GetUserData().pointer;
-
-//            // check if fixture A was a ball
-//            if (bodyUserData_1)
-//            {
-//                static_cast<Rigidbody2D*>(bodyUserData_1)->endContact();
-//            }
-//
-//            // check if fixture B was a ball
-//            if (bodyUserData_2)
-//            {
-//                static_cast<Rigidbody2D*>(bodyUserData_2)->endContact();
-//            }
 
             b2Fixture* a = contact->GetFixtureA();
             b2Fixture* b = contact->GetFixtureB();
@@ -233,12 +198,44 @@ namespace fox
         }
     };
 
-    Scene::Scene() : m_oApp(Application::Get())
+    Scene::Scene(bool initalize) : m_oApp(Application::Get())
     {
+        if (!initalize)
+            return;
+//        m_Registry.on_construct<ScriptComponent>().connect<&Scene::OnScriptComponentConstruct>(this);
+//        m_Registry.on_destroy<ScriptComponent>().connect<&Scene::OnScriptComponentDestroy>(this);
+
+        // This might not be the the best way, but Audio Engine needs to keep track of all audio component
+        // to have an easy way to lookup a component associated with active sound.
+//        m_Registry.on_construct<AudioComponent>().connect<&Scene::OnAudioComponentConstruct>(this);
+//        m_Registry.on_destroy<AudioComponent>().connect<&Scene::OnAudioComponentDestroy>(this);
+
+        m_Registry.on_construct<CameraComponent>().connect<&Scene::OnCameraComponentConstruct>(this);
+
+        m_Registry.on_construct<Rigidbody2D>().connect<&Scene::OnRigidBody2DComponentConstruct>(this);
+        m_Registry.on_destroy<Rigidbody2D>().connect<&Scene::OnRigidBody2DComponentDestroy>(this);
+        m_Registry.on_construct<BoxCollider2D>().connect<&Scene::OnBoxCollider2DComponentConstruct>(this);
+        m_Registry.on_destroy<BoxCollider2D>().connect<&Scene::OnBoxCollider2DComponentDestroy>(this);
+        m_Registry.on_construct<CircleCollider2D>().connect<&Scene::OnCircleCollider2DComponentConstruct>(this);
+        m_Registry.on_destroy<CircleCollider2D>().connect<&Scene::OnCircleCollider2DComponentDestroy>(this);
+
     }
 
     Scene::~Scene()
     {
+        // Clear the registry so that all callbacks are called
+        m_Registry.clear();
+
+        // Disconnect EnTT callbacks
+        m_Registry.on_construct<ScriptComponent>().disconnect(this);
+        m_Registry.on_destroy<ScriptComponent>().disconnect(this);
+
+//        m_Registry.on_construct<AudioComponent>().disconnect();
+//        m_Registry.on_destroy<AudioComponent>().disconnect();
+
+        m_Registry.on_construct<Rigidbody2D>().disconnect();
+        m_Registry.on_destroy<Rigidbody2D>().disconnect();
+
         delete m_PhysicsWorld;
     }
 
@@ -307,13 +304,46 @@ namespace fox
         tag.name = name.empty() ? "Entity" : name;
 
         m_EntityMap[uuid] = entity;
+        SortEntities();
         return entity;
+    }
+
+    void Scene::SubmitToDestroyEntity(Entity entity)
+    {
+        SubmitPostUpdateFunc([entity]() { entity.m_Scene->DestroyEntity(entity); });
     }
 
     void Scene::DestroyEntity(Entity entity)
     {
-        m_EntityMap.erase(entity.GetUUID());
+        bool isValid = m_Registry.valid((entt::entity)entity);
+        if (!isValid)
+        {
+            FOX_CORE_WARN_TAG("Scene", "Trying to destroy invalid entity! entt=%", (uint32_t)entity);
+            return;
+        }
+
+//        if (entity.has<ScriptComponent>())
+//            ScriptEngine::ShutdownScriptEntity(entity);
+
+//        if (entity.has<AudioComponent>())
+//            MiniAudioEngine::Get().UnregisterAudioComponent(m_SceneID, entity.GetUUID());
+
+        if (m_IsRunning)
+        {
+            if (entity.has<Rigidbody2D>())
+            {
+                b2Body* body = (b2Body*)entity.get<Rigidbody2D>().RuntimeBody;
+                m_PhysicsWorld->DestroyBody(body);
+            }
+        }
+
+//        if (m_OnEntityDestroyedCallback)
+//            m_OnEntityDestroyedCallback(entity);
+
+        UUID id = entity.GetUUID();
+        m_EntityMap.erase(id);
         m_Registry.destroy(entity);
+        SortEntities();
     }
 
     void Scene::OnUpdateEditor(EditorCamera &camera)
@@ -325,6 +355,31 @@ namespace fox
     {
         // Physics
         {
+            // Copies transform from Fox to Box2D
+			{
+                auto view = m_Registry.view<Rigidbody2D>();
+                for (auto e : view)
+                {
+                    Entity entity = { e, this };
+                    auto& transform = entity.get<TransformComponent>();
+                    auto& rb2d = entity.get<Rigidbody2D>();
+
+                    b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                    glm::vec3 position = transform.position;
+                    float angle = transform.rotation.z;
+
+                    const auto& bodyPosition = body->GetPosition();
+                    const float bodyAngle = body->GetAngle();
+
+                    bool awake = bodyPosition.x != transform.position.x || bodyPosition.y != transform.position.y || bodyAngle != angle;
+
+                    body->SetTransform({ position.x, position.y }, angle);
+
+                    if (awake)
+                        body->SetAwake(true);
+                }
+            }
+
             const int32_t velocityIterations = 6;
             const int32_t positionIterations = 2;
             m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
@@ -378,6 +433,31 @@ namespace fox
 
         // Physics
         {
+            // Copies transform from Fox to Box2D
+			{
+                auto view = m_Registry.view<Rigidbody2D>();
+                for (auto e : view)
+                {
+                    Entity entity = { e, this };
+                    auto& transform = entity.get<TransformComponent>();
+                    auto& rb2d = entity.get<Rigidbody2D>();
+
+                    b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                    glm::vec3 position = transform.position;
+                    float angle = transform.rotation.z;
+
+                    const auto& bodyPosition = body->GetPosition();
+                    const float bodyAngle = body->GetAngle();
+
+                    bool awake = bodyPosition.x != transform.position.x || bodyPosition.y != transform.position.y || bodyAngle != angle;
+
+                    body->SetTransform({ position.x, position.y }, angle);
+
+                    if (awake)
+                        body->SetAwake(true);
+                }
+            }
+
             const int32_t velocityIterations = 6;
             const int32_t positionIterations = 2;
             m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
@@ -422,6 +502,8 @@ namespace fox
             RenderScene();
             Renderer2D::EndScene();
         }
+
+        ProcessPostQueue();
     }
 
     void Scene::OnRuntimeStart()
@@ -442,6 +524,13 @@ namespace fox
                 ScriptEngine::OnCreateEntity(entity);
             }
         }
+    }
+
+    void Scene::ProcessPostQueue()
+    {
+        for (auto&& fn : m_PostUpdateQueue)
+            fn();
+        m_PostUpdateQueue.clear();
     }
 
     void Scene::OnRuntimeStop()
@@ -482,6 +571,7 @@ namespace fox
             bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
             bodyDef.position.Set(transform.position.x, transform.position.y);
             bodyDef.angle = transform.rotation.z;
+            bodyDef.gravityScale = rb2d.GravityScale;
 
             b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
             body->SetFixedRotation(rb2d.FixedRotation);
@@ -491,7 +581,6 @@ namespace fox
             if (entity.has<BoxCollider2D>())
             {
                 auto& bc2d = entity.get<BoxCollider2D>();
-                body->GetUserData().pointer = reinterpret_cast<uintptr_t>(&bc2d);
 
                 b2PolygonShape boxShape;
                 boxShape.SetAsBox(bc2d.Size.x * transform.scale.x, bc2d.Size.y * transform.scale.y);
@@ -620,69 +709,125 @@ namespace fox
         return {};
     }
 
-    template<typename T>
-    void Scene::OnComponentAdded(Entity &e, T &component) { }
-
-    template<>
-    void Scene::OnComponentAdded<TransformComponent>(Entity &e, TransformComponent& component)
+    void Scene::OnCameraComponentConstruct(entt::registry& registry, entt::entity entity)
     {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<SpriteRenderer>(Entity &e, SpriteRenderer& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<NativeScript>(Entity &e, NativeScript& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<EntityName>(Entity &e, EntityName& component)
-    {
-    }
-
-//    template<>
-//    void Scene::OnComponentAdded<EntityTag>(Entity &e, EntityTag& component)
-//    {
-//    }
-
-//    template<>
-//    void Scene::OnComponentAdded<AnimationPlayer>(Entity &e, AnimationPlayer& component)
-//    {
-//    }
-
-    template<>
-    void Scene::OnComponentAdded<Rigidbody2D>(Entity &e, Rigidbody2D& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<BoxCollider2D>(Entity &e, BoxCollider2D& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CircleCollider2D>(Entity &e, CircleCollider2D& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CircleRenderer>(Entity &e, CircleRenderer& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<ScriptComponent>(Entity &e, ScriptComponent& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CameraComponent>(Entity &e, CameraComponent& component)
-    {
+        Entity e = { entity, this };
         if (m_ViewportWidth > 0 && m_ViewportHeight > 0)
-            component.camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+            e.get<CameraComponent>().camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+    }
+
+    void Scene::OnRigidBody2DComponentConstruct(entt::registry& registry, entt::entity entity)
+    {
+//        FOX_PROFILE_FUNC();
+
+        if (!m_IsRunning)
+            return;
+
+        Entity e = { entity, this };
+        UUID entityID = e.get<IDComponent>().ID;
+        TransformComponent& transform = e.get<TransformComponent>();
+        auto& rb2d = registry.get<Rigidbody2D>(entity);
+
+        b2BodyDef bodyDef;
+
+        bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
+        bodyDef.position.Set(transform.position.x, transform.position.y);
+        bodyDef.angle = transform.rotation.z;
+        bodyDef.gravityScale = rb2d.GravityScale;
+
+        b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
+        body->SetFixedRotation(rb2d.FixedRotation);
+
+        b2MassData massData;
+        body->GetMassData(&massData);
+//        massData.mass = rb2d.Mass;
+        body->SetMassData(&massData);
+        body->SetGravityScale(rb2d.GravityScale);
+//        body->SetLinearDamping(rb2d.LinearDrag);
+//        body->SetAngularDamping(rb2d.AngularDrag);
+//        body->SetBullet(rb2d.IsBullet);
+//        body->GetUserData().pointer = (uintptr_t)entityID;
+
+        rb2d.RuntimeBody = body;
+    }
+
+    void Scene::OnRigidBody2DComponentDestroy(entt::registry& registry, entt::entity entity)
+    {
+//        FOX_PROFILE_FUNC();
+
+        if (!m_IsRunning)
+            return;
+    }
+
+    void Scene::OnBoxCollider2DComponentConstruct(entt::registry& registry, entt::entity entity)
+    {
+//        FOX_PROFILE_FUNC();
+
+        if (!m_IsRunning)
+            return;
+
+        Entity e = { entity, this };
+        auto& transform = e.GetTransform();
+
+        auto& bc2d = registry.get<BoxCollider2D>(entity);
+        if (e.has<Rigidbody2D>())
+        {
+            auto& rigidBody2D = e.get<Rigidbody2D>();
+            FOX_CORE_ASSERT(rigidBody2D.RuntimeBody);
+            b2Body* body = static_cast<b2Body*>(rigidBody2D.RuntimeBody);
+
+            b2PolygonShape boxShape;
+            boxShape.SetAsBox(bc2d.Size.x * transform.scale.x, bc2d.Size.y * transform.scale.y);
+
+            b2FixtureDef fixtureDef;
+            fixtureDef.shape = &boxShape;
+            fixtureDef.density = bc2d.Density;
+            fixtureDef.friction = bc2d.Friction;
+            fixtureDef.restitution = bc2d.Restitution;
+            fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
+            fixtureDef.userData.pointer = (uint32_t)entity;
+            body->CreateFixture(&fixtureDef);
+        }
+    }
+
+    void Scene::OnBoxCollider2DComponentDestroy(entt::registry& registry, entt::entity entity)
+    {
+    }
+
+    void Scene::OnCircleCollider2DComponentConstruct(entt::registry& registry, entt::entity entity)
+    {
+//        FOX_PROFILE_FUNC();
+
+        if (!m_IsRunning)
+            return;
+
+        Entity e = { entity, this };
+        auto& transform = e.GetTransform();
+
+        auto& cc2d = registry.get<CircleCollider2D>(entity);
+        if (e.has<Rigidbody2D>())
+        {
+            auto& rigidBody2D = e.get<Rigidbody2D>();
+            FOX_CORE_ASSERT(rigidBody2D.RuntimeBody);
+            b2Body* body = static_cast<b2Body*>(rigidBody2D.RuntimeBody);
+
+            b2CircleShape circleShape;
+            circleShape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
+            circleShape.m_radius = transform.scale.x * cc2d.Radius;
+
+            b2FixtureDef fixtureDef;
+            fixtureDef.shape = &circleShape;
+            fixtureDef.density = cc2d.Density;
+            fixtureDef.friction = cc2d.Friction;
+            fixtureDef.restitution = cc2d.Restitution;
+            fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
+            fixtureDef.userData.pointer = (uint32_t)entity;
+            body->CreateFixture(&fixtureDef);
+        }
+    }
+
+    void Scene::OnCircleCollider2DComponentDestroy(entt::registry& registry, entt::entity entity)
+    {
     }
 
     template<typename... Component>
@@ -723,9 +868,15 @@ namespace fox
         CopyComponentIfExists<Component...>(dst, src);
     }
 
-    ref<Scene> Scene::Copy(ref<Scene> other)
+    void Scene::CopyAllComponentsIfExists(Entity dst, Entity src)
     {
-        ref<Scene> newScene = new_ref<Scene>();
+        CopyComponentIfExists(AllComponents{}, dst, src);
+    }
+
+
+    Ref<Scene> Scene::Copy(Ref<Scene> other)
+    {
+        Ref<Scene> newScene = new_ref<Scene>();
 
         newScene->m_ViewportWidth = other->m_ViewportWidth;
         newScene->m_ViewportHeight = other->m_ViewportHeight;
@@ -756,15 +907,68 @@ namespace fox
         CopyComponentIfExists(AllComponents{}, newEntity, entity);
     }
 
-    Entity Scene::CloneEntity(Entity& entity)
+    Entity Scene::CloneEntity(Entity& entity, Entity parent, const glm::vec3* translation, const glm::vec3* rotation, const glm::vec3* scale)
     {
+//        FOX_PROFILE_FUNC();
+//        FOX_CORE_VERIFY(entity.HasComponent<PrefabComponent>());
         std::string name = entity.GetName();
         Entity newEntity = NewEntity(name);
+//        if (parent)
+//            newEntity.SetParent(parent);
         CopyComponentIfExists(AllComponents{}, newEntity, entity);
 
+        if (translation)
+            newEntity.GetTransform().position = *translation;
+        if (rotation)
+            newEntity.GetTransform().rotation = *rotation;
+        if (scale)
+            newEntity.GetTransform().scale = *scale;
+
+        // Create children
+//        for (auto childId : entity.Children())
+//            CreatePrefabEntity(entity.m_Scene->GetEntityWithUUID(childId), newEntity);
+
         if (newEntity.has<ScriptComponent>() && m_IsRunning)
-            ScriptEngine::OnCreateEntity(newEntity);
+            ScriptEngine::OnEntityInstantiated(newEntity, entity);
         return newEntity;
     }
+
+    Entity Scene::Instantiate(Ref<Prefab> prefab, const glm::vec3* translation, const glm::vec3* rotation, const glm::vec3* scale)
+    {
+//        FOX_PROFILE_FUNC();
+
+        Entity result;
+
+        // TODO: we need a better way of retrieving the "root" entity
+        auto entities = prefab->m_Scene->GetAllEntitiesWith<IDComponent>();
+//        auto entities = prefab->m_Scene->GetAllEntitiesWith<RelationshipComponent>();
+        for (auto e : entities)
+        {
+            Entity entity = { e, prefab->m_Scene.Raw() };
+//            if (!entity.GetParent())
+//            {
+//                result = CreatePrefabEntity(entity, {}, translation, rotation, scale);
+//                break;
+//            }
+            result = CloneEntity(entity, Entity(), translation, rotation, scale);
+        }
+        return result;
+    }
+
+    void Scene::SortEntities()
+    {
+        m_Registry.sort<IDComponent>([&](const auto lhs, const auto rhs)
+                                     {
+                                         auto lhsEntity = m_EntityMap.find(lhs.ID);
+                                         auto rhsEntity = m_EntityMap.find(rhs.ID);
+                                         return static_cast<uint32_t>(lhsEntity->second) < static_cast<uint32_t>(rhsEntity->second);
+                                     });
+    }
+
+    Ref<Scene> Scene::CreateEmpty()
+    {
+        return new_ref<Scene>(false);
+    }
+
 
 }// namespace fox

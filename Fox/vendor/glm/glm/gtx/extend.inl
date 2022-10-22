@@ -1,4 +1,4 @@
-/// @ref gtx_extend
+/// @Ref gtx_extend
 
 namespace glm
 {

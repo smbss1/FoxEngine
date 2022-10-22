@@ -74,7 +74,7 @@ namespace fox
         bool m_bIsMinimized = false;
 
         ApplicationSpecification m_Specification;
-        ref<Window> m_pWindow;
+        scope<Window> m_pWindow;
         float m_LastFrameTime = 0.0f;
         ImGuiLayer* m_ImGuiLayer = nullptr;
         LayerStack m_LayerStack;

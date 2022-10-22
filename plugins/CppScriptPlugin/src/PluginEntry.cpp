@@ -58,6 +58,6 @@ namespace fox
 
 extern "C" void RegisterPlugin(fox::PluginManager &pm)
 {
-//    fox::ref<fox::CppScriptPlugin> plugin = fox::new_ref<fox::CppScriptPlugin>();
+//    fox::Ref<fox::CppScriptPlugin> plugin = fox::new_ref<fox::CppScriptPlugin>();
 //    pm.AddPlugin(plugin);
 }

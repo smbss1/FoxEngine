@@ -1,4 +1,4 @@
-/// @ref gtx_vec_swizzle
+/// @Ref gtx_vec_swizzle
 /// @file glm/gtx/vec_swizzle.hpp
 ///
 /// @see core (dependence)

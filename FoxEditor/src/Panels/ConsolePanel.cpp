@@ -17,12 +17,12 @@ namespace fox
     {
 //        FOX_PROFILE_SCOPE();
 
-        s_MessageBufferRenderFilter |=ConsolePanel::loglevel::INFO;
+        s_MessageBufferRenderFilter |= ConsolePanel::loglevel::INFO;
         s_MessageBufferRenderFilter |= ConsolePanel::loglevel::WARN;
         s_MessageBufferRenderFilter |= ConsolePanel::loglevel::ERROR;
 
         event::EventSystem::Get().On<OnConsoleLogEvent>(FOX_BIND_EVENT_FN(ConsolePanel::OnLog));
-        m_MessageBuffer = std::vector<ref<ConsolePanel::Message>>(m_Capacity);
+        m_MessageBuffer = std::vector<Ref<ConsolePanel::Message>>(m_Capacity);
     }
 
     ConsolePanel::~ConsolePanel()
@@ -60,7 +60,7 @@ namespace fox
         if (m_BufferBegin == 0)
             return nullptr;
 
-        return (m_MessageBuffer.begin() + m_BufferBegin - 1)->get();
+        return (m_MessageBuffer.begin() + m_BufferBegin - 1)->Raw();
     }
 
     void ConsolePanel::Clear()
@@ -125,7 +125,7 @@ namespace fox
         for(int i = 0; i < 3; i++)
         {
             ImGui::SameLine();
-            auto level = ConsolePanel::loglevel(i);
+            auto level = ConsolePanel::loglevel(glm::pow(2, i));
 
             bool levelEnabled = s_MessageBufferRenderFilter & level;
             glm::vec4 c = Message::GetRenderColor(level);

@@ -13,12 +13,14 @@ namespace fox
         EntitySerializer();
         ~EntitySerializer();
 	    static void SerializeAllEntityComponents(YAML::Emitter& out, Entity entity);
-	    static void DeserializeAllEntryComponents(YAML::detail::iterator_value& entity, Entity& deserializedEntity);
-    
+	    static void DeserializeAllEntryComponents(YAML::Node& entity, Entity& deserializedEntity);
+        static void SerializeEntityAsPrefab(const char* filepath, Entity entity);
+        static Entity DeserializeEntityAsPrefab(const char* filepath, Scene& scene);
+
     private:
-        
+
     };
-    
+
 } // namespace fox
 
 

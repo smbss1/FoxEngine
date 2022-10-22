@@ -11,6 +11,16 @@ namespace fox
 {
     namespace FileSystem
     {
+        bool Exists(const std::filesystem::path& filepath)
+        {
+            return std::filesystem::exists(filepath);
+        }
+
+        bool Exists(const std::string& filepath)
+        {
+            return std::filesystem::exists(std::filesystem::path(filepath));
+        }
+
         bool WriteFile(const std::string& strFile, const std::string& strSave)
         {
             std::ofstream oFile(strFile); //open in constructor

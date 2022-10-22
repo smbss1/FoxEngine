@@ -24,7 +24,7 @@ public:
 private:
     fox::OrthographicCameraController m_Camera;
 
-    fox::ref<fox::Texture2D> m_pEpitechLogo;
+    fox::Ref<fox::Texture2D> m_pEpitechLogo;
 };
 
 

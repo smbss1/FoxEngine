@@ -155,10 +155,7 @@ public:
     void SetNativeWindow(void* data) override;
 
     bool GetKey(const fox::KeyCode keycode) override;
-
     bool IsKeyPressed(const fox::KeyCode key) override;
-    bool IsKeyDown(const fox::KeyCode key) override;
-    bool IsKeyReleased(const fox::KeyCode key) override;
 
     bool IsMouseButtonPressed(const fox::Mouse button) override;
     glm::vec2 GetMousePosition() override;
@@ -167,24 +164,12 @@ private:
 
     GLFWwindow* m_pWindow = nullptr;
 
-    struct KeyState
-    {
-        bool isPressed;
-        bool wasPressed;
-
-        bool isRelease;
-        bool wasReleased;
-
-        bool isHold;
-    };
-
     struct WindowData
     {
         std::string Title;
         uint32_t width, height;
         bool bIsVSync;
         EventCallbackFn EventCallback;
-        std::unordered_map<fox::KeyCode, KeyState> GLFW_KEYS_STATES;
     };
 
     WindowData m_oData;

@@ -13,12 +13,18 @@ Entities:
     ScriptComponent:
       ClassName: Sandbox.Player
       ScriptFields:
-        - Name: BulletPrefab
-          Type: Entity
-          Data: 11431865266355737168
-        - Name: Speed
-          Type: Float
-          Data: 5
+        - ID: 4002109686
+          Name: Sandbox.Player:Speed
+          Type: 12
+          Data: 15
+        - ID: 1414718891
+          Name: Sandbox.Player:BulletPrefab
+          Type: 18
+          Data: 2250225605053858380
+    Rigidbody2D:
+      BodyType: Kinematic
+      FixedRotation: true
+      GravityScale: 0
     BoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
@@ -57,6 +63,36 @@ Entities:
     ScriptComponent:
       ClassName: Sandbox.Bullet
       ScriptFields:
-        - Name: Speed
-          Type: Float
-          Data: 2
+        - ID: 2802533049
+          Name: Sandbox.Bullet:Speed
+          Type: 12
+          Data: 6
+    Rigidbody2D:
+      BodyType: Dynamic
+      FixedRotation: true
+      GravityScale: 0
+    BoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 16471339227282434742
+    NameComponent:
+      Name: Bound
+    TransformComponent:
+      Position: [0.554649353, 10.6949844, 0]
+      Rotation: [0, 0, 0]
+      Scale: [38.5999985, 2.20000005, 1]
+    Rigidbody2D:
+      BodyType: Kinematic
+      FixedRotation: true
+      GravityScale: 0
+    BoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5

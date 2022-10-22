@@ -115,7 +115,7 @@ namespace fox
         case ScriptFieldType::FieldType:                   \
         {                                                  \
             Type data = scriptField["Data"].as<Type>();    \
-            fieldInstance.SetValue(data);                  \
+            storage->SetValue(data);                  \
             break;                                         \
         }
 
@@ -139,7 +139,7 @@ namespace fox
         out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
         return out;
     }
-    
+
     static std::string RigidBody2DBodyTypeToString(Rigidbody2D::BodyType bodyType)
     {
         switch (bodyType)
@@ -166,7 +166,7 @@ namespace fox
     EntitySerializer::EntitySerializer(/* args */)
     {
     }
-    
+
     EntitySerializer::~EntitySerializer()
     {
     }
@@ -176,7 +176,7 @@ namespace fox
 	void SerializeEntityComponent(YAML::Emitter&, Entity) = delete;
 
 	template<typename Component>
-	void DeserializeEntryComponent(YAML::detail::iterator_value& entity, Entity&) = delete;
+	void DeserializeEntryComponent(YAML::Node& entity, Entity&) = delete;
 
 	template<>
 	void SerializeEntityComponent<EntityName>(YAML::Emitter& out, Entity entity)
@@ -212,7 +212,7 @@ namespace fox
 	}
 
 	template<>
-	void DeserializeEntryComponent<TransformComponent>(YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void DeserializeEntryComponent<TransformComponent>(YAML::Node& entity, Entity& deserializedEntity)
 	{
 		auto transformComponent = entity["TransformComponent"];
         if (transformComponent)
@@ -255,7 +255,7 @@ namespace fox
 	}
 
 	template<>
-	void DeserializeEntryComponent<CameraComponent>(YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void DeserializeEntryComponent<CameraComponent>(YAML::Node& entity, Entity& deserializedEntity)
 	{
 		auto cameraComponent = entity["CameraComponent"];
         if (cameraComponent)
@@ -290,8 +290,8 @@ namespace fox
 
             out << YAML::Key << "Color" << YAML::Value << oSpriteRenderer.Color;
 
-            if (oSpriteRenderer.Sprite.get())
-                out << YAML::Key << "Sprite" << YAML::Value << oSpriteRenderer.Sprite.get()->GetId();
+            if (oSpriteRenderer.Sprite.Raw())
+                out << YAML::Key << "Sprite" << YAML::Value << oSpriteRenderer.Sprite.Raw()->GetId();
             else
                 out << YAML::Key << "Sprite" << YAML::Value << "";
 
@@ -300,7 +300,7 @@ namespace fox
 	}
 
 	template<>
-	void DeserializeEntryComponent<SpriteRenderer>(YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void DeserializeEntryComponent<SpriteRenderer>(YAML::Node& entity, Entity& deserializedEntity)
 	{
 		auto spriteRendererComponent = entity["SpriteRendererComponent"];
         if (spriteRendererComponent)
@@ -333,7 +333,7 @@ namespace fox
 	}
 
 	template<>
-	void DeserializeEntryComponent<CircleRenderer>(YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void DeserializeEntryComponent<CircleRenderer>(YAML::Node& entity, Entity& deserializedEntity)
 	{
 		auto circleRenderer = entity["CircleRenderer"];
         if (circleRenderer)
@@ -357,13 +357,14 @@ namespace fox
 
             out << YAML::Key << "BodyType" << YAML::Value << RigidBody2DBodyTypeToString(rb2d.Type);
             out << YAML::Key << "FixedRotation" << YAML::Value << rb2d.FixedRotation;
+            out << YAML::Key << "GravityScale" << YAML::Value << rb2d.GravityScale;
 
             out << YAML::EndMap; // Rigidbody2D
         }
 	}
 
 	template<>
-	void DeserializeEntryComponent<Rigidbody2D>(YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void DeserializeEntryComponent<Rigidbody2D>(YAML::Node& entity, Entity& deserializedEntity)
 	{
 		auto rigidbody2DComponent = entity["Rigidbody2D"];
         if (rigidbody2DComponent)
@@ -371,6 +372,7 @@ namespace fox
             auto& rb2d = deserializedEntity.add<Rigidbody2D>();
             rb2d.Type = RigidBody2DBodyTypeFromString(rigidbody2DComponent["BodyType"].as<std::string>());
             rb2d.FixedRotation = rigidbody2DComponent["FixedRotation"].as<bool>();
+            rb2d.GravityScale = rigidbody2DComponent["GravityScale"].as<float>();
         }
 	}
 
@@ -396,7 +398,7 @@ namespace fox
 	}
 
 	template<>
-	void DeserializeEntryComponent<BoxCollider2D>(YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void DeserializeEntryComponent<BoxCollider2D>(YAML::Node& entity, Entity& deserializedEntity)
 	{
 		auto boxCollider2DComponent = entity["BoxCollider2D"];
         if (boxCollider2DComponent)
@@ -433,7 +435,7 @@ namespace fox
 	}
 
 	template<>
-	void DeserializeEntryComponent<CircleCollider2D>(YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void DeserializeEntryComponent<CircleCollider2D>(YAML::Node& entity, Entity& deserializedEntity)
 	{
 		auto circleCollider2DComponent = entity["CircleCollider2D"];
         if (circleCollider2DComponent)
@@ -473,7 +475,7 @@ namespace fox
 	}
 
 	template<>
-	void DeserializeEntryComponent<NativeScript>(YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void DeserializeEntryComponent<NativeScript>(YAML::Node& entity, Entity& deserializedEntity)
 	{
 //            auto oNativeScriptComponent = entity["NativeScriptComponent"];
 //            if (oNativeScriptComponent)
@@ -501,26 +503,34 @@ namespace fox
             out << YAML::Key << "ClassName" << YAML::Value << scriptComponent.ClassName;
 
             // Fields
-            ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(scriptComponent.ClassName);
-            const auto& fields = entityClass->GetFields();
+            ManagedClass* entityClass = ScriptEngine::GetEntityClass(scriptComponent.ClassName);
+            const auto& fields = entityClass->Fields;
             if (fields.size() > 0)
             {
                 out << YAML::Key << "ScriptFields" << YAML::Value;
-                auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
                 out << YAML::BeginSeq;
-                for (const auto& [name, field] : fields)
+                for (const auto fieldID : fields)
                 {
-                    if (entityFields.find(name) == entityFields.end())
+                    ManagedField* fieldInfo = ScriptCache::GetFieldByID(fieldID);
+                    if (!fieldInfo->Type.IsValid())
+                    {
+                        FOX_CORE_WARN("C# field % not serialized, unknown type", fieldInfo->FullName);
+                        continue;
+                    }
+
+                    if (!fieldInfo->IsWritable())
                         continue;
 
+                    FieldStorage& scriptField = *ScriptCache::GetFieldStorage(fieldID);
+
                     out << YAML::BeginMap; // ScriptField
-                    out << YAML::Key << "Name" << YAML::Value << name;
-                    out << YAML::Key << "Type" << YAML::Value << Utils::ScriptFieldTypeToString(field.Type);
+                    out << YAML::Key << "ID" << YAML::Value << fieldInfo->ID;
+                    out << YAML::Key << "Name" << YAML::Value << fieldInfo->FullName;
+                    out << YAML::Key << "Type" << YAML::Value << fieldInfo->Type.TypeEncoding;
 
                     out << YAML::Key << "Data" << YAML::Value;
-                    ScriptFieldInstance& scriptField = entityFields.at(name);
 
-                    switch (field.Type)
+                    switch (fieldInfo->Type.NativeType)
                     {
                         WRITE_SCRIPT_FIELD(Float,   float     );
                         WRITE_SCRIPT_FIELD(Double,  double    );
@@ -538,6 +548,8 @@ namespace fox
                         WRITE_SCRIPT_FIELD(Vector3, glm::vec3 );
                         WRITE_SCRIPT_FIELD(Vector4, glm::vec4 );
                         WRITE_SCRIPT_FIELD(Entity,  UUID      );
+                        WRITE_SCRIPT_FIELD(Prefab,  AssetHandle);
+                        WRITE_SCRIPT_FIELD(AssetHandle,  AssetHandle);
                     }
                     out << YAML::EndMap; // ScriptFields
                 }
@@ -549,39 +561,37 @@ namespace fox
 	}
 
 	template<>
-	void DeserializeEntryComponent<ScriptComponent>(YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void DeserializeEntryComponent<ScriptComponent>(YAML::Node& entity, Entity& deserializedEntity)
 	{
 		auto scriptComponent = entity["ScriptComponent"];
         if (scriptComponent)
         {
             auto& sc = deserializedEntity.add<ScriptComponent>();
             sc.ClassName = scriptComponent["ClassName"].as<std::string>();
+//            std::string moduleName = scriptComponent["ModuleName"] ? scriptComponent["ModuleName"].as<std::string>("") : "";
 
             auto scriptFields = scriptComponent["ScriptFields"];
             if (scriptFields)
             {
-                ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(sc.ClassName);
-                FOX_ASSERT(entityClass);
-                const auto& fields = entityClass->GetFields();
-                auto& entityFields = ScriptEngine::GetScriptFieldMap(deserializedEntity);
-
                 for (auto scriptField : scriptFields)
                 {
+                    UUID id = scriptField["ID"].as<UUID>(0);
                     std::string name = scriptField["Name"].as<std::string>();
-                    std::string typeString = scriptField["Type"].as<std::string>();
-                    ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
 
-                    ScriptFieldInstance& fieldInstance = entityFields[name];
+                    ManagedType type;
+                    ManagedField* fieldData = ScriptCache::GetFieldByID(id);
+                    if (fieldData != nullptr)
+                        type = fieldData->Type;
 
-                    // TODO(Yan): turn this assert into Hazelnut log warning
-                    if (fields.find(name) == fields.end())
+                    Ref<FieldStorage> storage = ScriptCache::GetFieldStorage(id);
+                    if (storage == nullptr)
                     {
-                        FOX_WARN("Cannot find % of type (%) in the C# class %", name, typeString, sc.ClassName);
+                        // TODO(Yan): turn this assert into FoxEditor log warning
+                        FOX_WARN("Serialized C# field % doesn't exist in script cache! This could be because the script field no longer exists or because it's been renamed.", name);
                         continue;
                     }
 
-                    fieldInstance.Field = fields.at(name);
-                    switch (type)
+                    switch (type.NativeType)
                     {
                         READ_SCRIPT_FIELD(Float,   float     );
                         READ_SCRIPT_FIELD(Double,  double    );
@@ -599,12 +609,41 @@ namespace fox
                         READ_SCRIPT_FIELD(Vector3, glm::vec3 );
                         READ_SCRIPT_FIELD(Vector4, glm::vec4 );
                         READ_SCRIPT_FIELD(Entity,  UUID      );
+                        READ_SCRIPT_FIELD(Prefab,  AssetHandle);
+                        READ_SCRIPT_FIELD(AssetHandle, AssetHandle);
                     }
                 }
             }
         }
 	}
 
+    template<>
+    void SerializeEntityComponent<PrefabComponent>(YAML::Emitter& out, Entity entity)
+    {
+        if (entity.has<PrefabComponent>())
+        {
+            auto& prefabComp = entity.get<PrefabComponent>();
+
+            out << YAML::Key << "PrefabComponent";
+            out << YAML::BeginMap; // PrefabComponent
+            out << YAML::Key << "Prefab" << YAML::Value << prefabComp.PrefabID;
+            out << YAML::Key << "Entity" << YAML::Value << prefabComp.EntityID;
+            out << YAML::EndMap; // PrefabComponent
+        }
+    }
+
+    template<>
+    void DeserializeEntryComponent<PrefabComponent>(YAML::Node& entity, Entity& deserializedEntity)
+    {
+            auto prefabComponent = entity["PrefabComponent"];
+            if (prefabComponent)
+            {
+                auto& src = deserializedEntity.add<PrefabComponent>();
+
+                src.EntityID = prefabComponent["Entity"].as<UUID>();
+                src.PrefabID = prefabComponent["Prefab"].as<UUID>();
+            }
+    }
 
 	template<typename...Component>
 	void SerializeEntityComponents(YAML::Emitter& out, Entity entity)
@@ -613,7 +652,7 @@ namespace fox
 	}
 
 	template<typename...Component>
-	void DeserializeEntryComponents(YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void DeserializeEntryComponents(YAML::Node& entity, Entity& deserializedEntity)
 	{
 		(DeserializeEntryComponent<Component>(entity, deserializedEntity), ...);
 	}
@@ -625,7 +664,7 @@ namespace fox
 	}
 
 	template<typename... PrefixComponent, typename...Component>
-	void DeserializeEntryComponents(ComponentGroup<Component...>, YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void DeserializeEntryComponents(ComponentGroup<Component...>, YAML::Node& entity, Entity& deserializedEntity)
 	{
 		DeserializeEntryComponents<PrefixComponent..., Component...>(entity, deserializedEntity);
 	}
@@ -635,8 +674,165 @@ namespace fox
 		SerializeEntityComponents<EntityName>(AllComponents{}, out, entity);
 	}
 
-	void EntitySerializer::DeserializeAllEntryComponents(YAML::detail::iterator_value& entity, Entity& deserializedEntity)
+	void EntitySerializer::DeserializeAllEntryComponents(YAML::Node& entity, Entity& deserializedEntity)
 	{
 		DeserializeEntryComponents(AllComponents{}, entity, deserializedEntity);
 	}
+
+    void EntitySerializer::SerializeEntityAsPrefab(const char* filepath, Entity entity)
+    {
+        if (entity.has<PrefabComponent>())
+        {
+            FOX_CORE_ERROR("Entity already has a prefab component!");
+            return;
+        }
+
+//        YAML::Emitter out;
+//        out << YAML::BeginMap;
+//        out << YAML::Key << "Prefab" << YAML::Value << entity.add<PrefabComponent>().ID;
+//        out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+//
+//        std::vector<Entity> entities;
+//        entities.push_back(entity);
+////        GetAllChildren(entity, entities);
+////
+////        for (const auto& child : entities)
+////        {
+////            if (child)
+////                EntitySerializer::SerializeEntity(out, child);
+////        }
+//        out << YAML::EndSeq;
+//        out << YAML::EndMap;
+//
+//        std::ofstream fout(filepath);
+//        fout << out.c_str();
+
+        YAML::Emitter out;
+
+        Ref<Scene> scene = Scene::CreateEmpty();
+        std::string name = entity.GetName();
+        Entity newEntity = scene->NewEntity(name);
+
+        entity.m_Scene->CopyAllComponentsIfExists(newEntity, entity);
+
+        // Add PrefabComponent
+        auto& prefabComp = newEntity.add<PrefabComponent>(UUID(), newEntity.GetUUID());
+        out << YAML::BeginMap; // Prefab
+        out << YAML::Key << "Prefab" << YAML::Value << prefabComp.PrefabID;
+        out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+
+        out << YAML::BeginMap; // Entity
+        out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
+        // Serialize components (except IDComponent)
+        EntitySerializer::SerializeAllEntityComponents(out, newEntity);
+        out << YAML::EndMap; // Entity
+
+        out << YAML::EndSeq;
+        out << YAML::EndMap; // Prefab
+
+        std::ofstream fout(filepath);
+        fout << out.c_str();
+    }
+
+    Entity EntitySerializer::DeserializeEntityAsPrefab(const char* filepath, Scene& scene)
+    {
+        std::ifstream stream(filepath);
+        std::stringstream strStream;
+        strStream << stream.rdbuf();
+
+        YAML::Node data = YAML::Load(strStream.str());
+        if (!data["Prefab"])
+        {
+            FOX_CORE_ERROR("Invalid prefab format: %", std::filesystem::path(filepath).filename());
+            return {};
+        }
+
+        UUID prefabID = data["Prefab"].as<UUID>();
+        if (!prefabID)
+        {
+            FOX_CORE_ERROR("Invalid prefab id : % (%)", std::filesystem::path(filepath).filename(), prefabID);
+            return {};
+        }
+
+//        auto entities = data["Entities"];
+//        FOX_CORE_INFO("Deserializing prefab : % (%)", StringUtils::GetName(filepath).c_str(), prefabID);
+//
+//        Entity root = {};
+//
+//        if (entities)
+//        {
+//            std::map<UUID, UUID> oldNewIdMap;
+//            for (const auto& entity : entities)
+//            {
+//                UUID oldUUID = entity["Entity"].as<UUID>();
+//                UUID newUUID = EntitySerializer::DeserializeAllEntryComponents(entity, scene);
+//                oldNewIdMap.emplace(oldUUID, newUUID);
+//
+//                if (!root)
+//                    root = scene.GetEntity(newUUID);
+//            }
+//
+//            root.add<PrefabComponent>().ID = prefabID;
+//
+//            // Fix parent/children UUIDs
+////            for (const auto& [oldId, newId] : oldNewIdMap)
+////            {
+////                auto& relationshipComponent = scene.GetEntity(newId).GetRelationship();
+////                UUID parent = relationshipComponent.Parent;
+////                if (parent)
+////                    relationshipComponent.Parent = oldNewIdMap.at(parent);
+////
+////                auto& children = relationshipComponent.Children;
+////                for (auto& id : children)
+////                    id = oldNewIdMap.at(id);
+////            }
+//        }
+////        else
+////        {
+////            FOX_CORE_ERROR("There are no entities in the prefab % (%) to deserialize!", StringUtils::GetName(filepath).c_str(), prefabID);
+////        }
+//
+//        return root;
+
+        FOX_CORE_INFO("Deserializing prefab : % (%)", std::filesystem::path(filepath).filename(), prefabID);
+
+        Entity root = {};
+
+        auto entities = data["Entities"];
+        if (!entities)
+            return root;
+        for (auto entity : entities)
+        {
+            uint64_t uuid = entity["Entity"].as<uint64_t>();
+
+            std::string name;
+            auto nameComponent = entity["NameComponent"];
+            if (nameComponent)
+                name = nameComponent["Name"].as<std::string>();
+
+            FOX_CORE_INFO("Deserialized entity with ID = %, name = %", uuid, name);
+
+            Entity deserializedEntity = scene.NewEntity(name);
+
+            // Deserialize components (except IDComponent and TagComponent)
+            EntitySerializer::DeserializeAllEntryComponents(entity, deserializedEntity);
+
+            if (!root)
+                root = deserializedEntity;
+        }
+        return root;
+
+//
+//        std::string name;
+//        auto nameComponent = data["NameComponent"];
+//        if (nameComponent)
+//            name = nameComponent["Name"].as<std::string>();
+//
+//
+//        Entity deserializedEntity = scene.NewEntity(name);
+//        // Deserialize components (except IDComponent and TagComponent)
+//        EntitySerializer::DeserializeAllEntryComponents(data, deserializedEntity);
+
+//        return deserializedEntity;
+    }
 } // namespace fox

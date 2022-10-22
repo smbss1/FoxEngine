@@ -87,7 +87,7 @@ gboolean
 mono_is_sr_mono_property (MonoClass *klass);
 
 MonoType*
-mono_reflection_type_get_handle (MonoReflectionType *ref, MonoError *error);
+mono_reflection_type_get_handle (MonoReflectionType *Ref, MonoError *error);
 
 gpointer
 mono_reflection_resolve_object (MonoImage *image, MonoObject *obj, MonoClass **handle_class, MonoGenericContext *context, MonoError *error);
@@ -109,7 +109,7 @@ mono_reflection_methodbuilder_from_method_builder (ReflectionMethodBuilder *rmb,
 gboolean
 mono_reflection_methodbuilder_from_ctor_builder (ReflectionMethodBuilder *rmb, MonoReflectionCtorBuilder *mb,
 						 MonoError *error);
-							    
+
 guint32
 mono_reflection_resolution_scope_from_image (MonoDynamicImage *assembly, MonoImage *image);
 

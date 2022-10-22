@@ -10,13 +10,13 @@ project(fox_lexer LANGUAGES CXX C)
 # target
 add_executable(fox_editor "")
 set_target_properties(fox_editor PROPERTIES OUTPUT_NAME "fox_editor")
-set_target_properties(fox_editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/editor")
+set_target_properties(fox_editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/FoxEditor")
 add_dependencies(fox_editor fox_engine)
 target_include_directories(fox_editor PRIVATE
-    editor/src
+    FoxEditor/src
     Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
-    Fox/vendor/mono/include
+    Fox/vendor/monos/include
     Fox/src/Fox
     Fox/src/Platform
     Fox/vendor/glad
@@ -25,26 +25,12 @@ target_include_directories(fox_editor PRIVATE
     Fox/vendor/FoxJson/submodules/GenericLexer/include
     Fox/vendor/imgui
 )
-target_compile_definitions(fox_editor PRIVATE
-    FOX_PLUGIN_DIRECTORY="/home/samuel/Git Repos/FoxEngine/"
-)
 target_compile_options(fox_editor PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
     $<$<COMPILE_LANGUAGE:CXX>:-m64>
-    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
-    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
 set_target_properties(fox_editor PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(fox_editor PRIVATE cxx_std_17)
-if(MSVC)
-    target_compile_options(fox_editor PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
-else()
-    target_compile_options(fox_editor PRIVATE -O3)
-endif()
-if(MSVC)
-else()
-    target_compile_options(fox_editor PRIVATE -fvisibility=hidden)
-endif()
 if(MSVC)
     set_property(TARGET fox_editor PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -118,14 +104,14 @@ target_link_options(fox_editor PRIVATE
     -m64
 )
 target_sources(fox_editor PRIVATE
-    editor/src/Panels/StatsPanel.cpp
-    editor/src/Panels/ContentBrowserPanel.cpp
-    editor/src/Panels/SceneHierarchyPanel.cpp
-    editor/src/Panels/ConsolePanel.cpp
-    editor/src/Panels/SettingsPanel.cpp
-    editor/src/Panels/PropertyPanel.cpp
-    editor/src/EditorApp.cpp
-    editor/src/EditorLayer.cpp
+    FoxEditor/src/Panels/StatsPanel.cpp
+    FoxEditor/src/Panels/ContentBrowserPanel.cpp
+    FoxEditor/src/Panels/SceneHierarchyPanel.cpp
+    FoxEditor/src/Panels/ConsolePanel.cpp
+    FoxEditor/src/Panels/SettingsPanel.cpp
+    FoxEditor/src/Panels/PropertyPanel.cpp
+    FoxEditor/src/EditorApp.cpp
+    FoxEditor/src/EditorLayer.cpp
 )
 
 # target
@@ -136,7 +122,7 @@ add_dependencies(fox_engine imgui fox_json glm glad)
 target_include_directories(fox_engine PRIVATE
     Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
-    Fox/vendor/mono/include
+    Fox/vendor/monos/include
     Fox/src/Fox
     Fox/src/Platform
     Fox/vendor/glad
@@ -148,7 +134,7 @@ target_include_directories(fox_engine PRIVATE
 target_include_directories(fox_engine INTERFACE
     Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
-    Fox/vendor/mono/include
+    Fox/vendor/monos/include
     Fox/src/Fox
     Fox/src/Platform
 )
@@ -160,27 +146,15 @@ target_include_directories(fox_engine PRIVATE
     /usr/lib/pkgconfig/../../include/mono-2.0
 )
 target_compile_definitions(fox_engine PRIVATE
-    FOX_PLUGIN_DIRECTORY="/home/samuel/Git Repos/FoxEngine/"
     _GLFW_X11
     GLFW_INCLUDE_NONE
 )
 target_compile_options(fox_engine PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
     $<$<COMPILE_LANGUAGE:CXX>:-m64>
-    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
-    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
 set_target_properties(fox_engine PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(fox_engine PRIVATE cxx_std_17)
-if(MSVC)
-    target_compile_options(fox_engine PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
-else()
-    target_compile_options(fox_engine PRIVATE -O3)
-endif()
-if(MSVC)
-else()
-    target_compile_options(fox_engine PRIVATE -fvisibility=hidden)
-endif()
 if(MSVC)
     set_property(TARGET fox_engine PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -274,6 +248,10 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/ImGui/ImGuiExtension.cpp
     Fox/src/Fox/ImGui/ImGuiLayer.cpp
     Fox/src/Fox/ImGui/ImGuiFieldDrawer.cpp
+    Fox/src/Fox/Asset/AssetImporter.cpp
+    Fox/src/Fox/Asset/AssetRegistry.cpp
+    Fox/src/Fox/Asset/AssetSerializer.cpp
+    Fox/src/Fox/Asset/AssetManager.cpp
     Fox/src/Fox/Components/Animator/Track.cpp
     Fox/src/Fox/Events/EventSystem.cpp
     Fox/src/Fox/Math/Quat.cpp
@@ -281,22 +259,20 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Math/Vec3.cpp
     Fox/src/Fox/Scripting/GCManager.cpp
     "Fox/src/Fox/Scripting/Old Thing/ScriptRegistry.cpp"
+    Fox/src/Fox/Scripting/ScriptTypes.cpp
+    Fox/src/Fox/Scripting/FieldStorage.cpp
     Fox/src/Fox/Scripting/ScriptGlue.cpp
+    Fox/src/Fox/Scripting/ScriptCache.cpp
     Fox/src/Fox/Scripting/ScriptEngine.cpp
     Fox/src/Fox/Scripting/Utils.cpp
+    Fox/src/Fox/Scripting/Marshal.cpp
+    Fox/src/Fox/Scene/Prefab.cpp
     Fox/src/Fox/Scene/Scene.cpp
     Fox/src/Fox/Scene/SceneSerializer.cpp
     Fox/src/Fox/Scene/ScriptableBehaviour.cpp
     Fox/src/Fox/Scene/SceneCamera.cpp
-    "Fox/src/Fox/Save for later/StateMachine.cpp"
-    "Fox/src/Fox/Save for later/AudioGroup.cpp"
-    "Fox/src/Fox/Save for later/AudioManager.cpp"
-    "Fox/src/Fox/Save for later/FPaths.cpp"
-    "Fox/src/Fox/Save for later/Time.cpp"
-    "Fox/src/Fox/Save for later/Plugin System (Not used)/PluginManager.cpp"
-    "Fox/src/Fox/Save for later/Plugin System (Not used)/PluginLoader.cpp"
-    "Fox/src/Fox/Save for later/Plugin System (Not used)/SharedLib.cpp"
-    "Fox/src/Fox/Save for later/FileWatcher.cpp"
+    Fox/src/Fox/Scene/EntitySerializer.cpp
+    Fox/src/Fox/Utils/String.cpp
     Fox/src/Fox/Utils/Path.cpp
     Fox/src/Fox/Utils/PlatformUtils.cpp
     Fox/src/Fox/Utils/FileSystem.cpp
@@ -304,12 +280,16 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Core/LayerStack.cpp
     Fox/src/Fox/Core/Layer.cpp
     Fox/src/Fox/Core/Logger.cpp
+    Fox/src/Fox/Core/ProjectSerializer.cpp
     Fox/src/Fox/Core/State.cpp
     Fox/src/Fox/Core/Input/Mouse.cpp
     Fox/src/Fox/Core/Input/Input.cpp
+    Fox/src/Fox/Core/UserPreferences.cpp
     Fox/src/Fox/Core/UUID.cpp
     Fox/src/Fox/Core/Window.cpp
     Fox/src/Fox/Core/Application.cpp
+    Fox/src/Fox/Core/Ref.cpp
+    Fox/src/Fox/Core/Project.cpp
     Fox/src/Fox/Renderer/SubTexture2D.cpp
     Fox/src/Fox/Renderer/Texture.cpp
     Fox/src/Fox/Renderer/Renderer2D.cpp
@@ -340,26 +320,12 @@ target_include_directories(fox_json PRIVATE
 target_include_directories(fox_json INTERFACE
     Fox/vendor/FoxJson/include
 )
-target_compile_definitions(fox_json PRIVATE
-    FOX_PLUGIN_DIRECTORY="/home/samuel/Git Repos/FoxEngine/"
-)
 target_compile_options(fox_json PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
     $<$<COMPILE_LANGUAGE:CXX>:-m64>
-    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
-    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
 set_target_properties(fox_json PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(fox_json PRIVATE cxx_std_17)
-if(MSVC)
-    target_compile_options(fox_json PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
-else()
-    target_compile_options(fox_json PRIVATE -O3)
-endif()
-if(MSVC)
-else()
-    target_compile_options(fox_json PRIVATE -fvisibility=hidden)
-endif()
 if(MSVC)
     set_property(TARGET fox_json PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -389,26 +355,12 @@ target_include_directories(fox_lexer PRIVATE
 target_include_directories(fox_lexer INTERFACE
     Fox/vendor/FoxJson/submodules/GenericLexer/include
 )
-target_compile_definitions(fox_lexer PRIVATE
-    FOX_PLUGIN_DIRECTORY="/home/samuel/Git Repos/FoxEngine/"
-)
 target_compile_options(fox_lexer PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
     $<$<COMPILE_LANGUAGE:CXX>:-m64>
-    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
-    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
 set_target_properties(fox_lexer PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(fox_lexer PRIVATE cxx_std_14)
-if(MSVC)
-    target_compile_options(fox_lexer PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
-else()
-    target_compile_options(fox_lexer PRIVATE -O3)
-endif()
-if(MSVC)
-else()
-    target_compile_options(fox_lexer PRIVATE -fvisibility=hidden)
-endif()
 if(MSVC)
     set_property(TARGET fox_lexer PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -436,26 +388,12 @@ target_include_directories(glad PRIVATE
 target_include_directories(glad INTERFACE
     Fox/vendor/glad
 )
-target_compile_definitions(glad PRIVATE
-    FOX_PLUGIN_DIRECTORY="/home/samuel/Git Repos/FoxEngine/"
-)
 target_compile_options(glad PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
     $<$<COMPILE_LANGUAGE:CXX>:-m64>
-    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
-    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
 set_target_properties(glad PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(glad PRIVATE cxx_std_17)
-if(MSVC)
-    target_compile_options(glad PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
-else()
-    target_compile_options(glad PRIVATE -O3)
-endif()
-if(MSVC)
-else()
-    target_compile_options(glad PRIVATE -fvisibility=hidden)
-endif()
 if(MSVC)
     set_property(TARGET glad PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -474,26 +412,12 @@ target_include_directories(glm PRIVATE
 target_include_directories(glm INTERFACE
     Fox/vendor/glm
 )
-target_compile_definitions(glm PRIVATE
-    FOX_PLUGIN_DIRECTORY="/home/samuel/Git Repos/FoxEngine/"
-)
 target_compile_options(glm PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
     $<$<COMPILE_LANGUAGE:CXX>:-m64>
-    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
-    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
 set_target_properties(glm PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(glm PRIVATE cxx_std_17)
-if(MSVC)
-    target_compile_options(glm PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
-else()
-    target_compile_options(glm PRIVATE -O3)
-endif()
-if(MSVC)
-else()
-    target_compile_options(glm PRIVATE -fvisibility=hidden)
-endif()
 if(MSVC)
     set_property(TARGET glm PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -512,26 +436,12 @@ target_include_directories(imgui PRIVATE
 target_include_directories(imgui INTERFACE
     Fox/vendor/imgui
 )
-target_compile_definitions(imgui PRIVATE
-    FOX_PLUGIN_DIRECTORY="/home/samuel/Git Repos/FoxEngine/"
-)
 target_compile_options(imgui PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
     $<$<COMPILE_LANGUAGE:CXX>:-m64>
-    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
-    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
 set_target_properties(imgui PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(imgui PRIVATE cxx_std_17)
-if(MSVC)
-    target_compile_options(imgui PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
-else()
-    target_compile_options(imgui PRIVATE -O3)
-endif()
-if(MSVC)
-else()
-    target_compile_options(imgui PRIVATE -fvisibility=hidden)
-endif()
 if(MSVC)
     set_property(TARGET imgui PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -553,7 +463,7 @@ target_include_directories(sandbox PRIVATE
     sandbox/include
     Fox/vendor/entt/include
     Fox/vendor/ImGuizmo/ImGuizmo
-    Fox/vendor/mono/include
+    Fox/vendor/monos/include
     Fox/src/Fox
     Fox/src/Platform
     Fox/vendor/glad
@@ -562,26 +472,12 @@ target_include_directories(sandbox PRIVATE
     Fox/vendor/FoxJson/submodules/GenericLexer/include
     Fox/vendor/imgui
 )
-target_compile_definitions(sandbox PRIVATE
-    FOX_PLUGIN_DIRECTORY="/home/samuel/Git Repos/FoxEngine/"
-)
 target_compile_options(sandbox PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
     $<$<COMPILE_LANGUAGE:CXX>:-m64>
-    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
-    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
 set_target_properties(sandbox PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(sandbox PRIVATE cxx_std_17)
-if(MSVC)
-    target_compile_options(sandbox PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
-else()
-    target_compile_options(sandbox PRIVATE -O3)
-endif()
-if(MSVC)
-else()
-    target_compile_options(sandbox PRIVATE -fvisibility=hidden)
-endif()
 if(MSVC)
     set_property(TARGET sandbox PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

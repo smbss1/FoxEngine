@@ -1,4 +1,4 @@
-/// @ref gtc_constants
+/// @Ref gtc_constants
 /// @file glm/gtc/constants.hpp
 ///
 /// @see core (dependence)

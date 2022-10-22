@@ -1,4 +1,4 @@
-/// @ref gtx_matrix_operation
+/// @Ref gtx_matrix_operation
 
 namespace glm
 {

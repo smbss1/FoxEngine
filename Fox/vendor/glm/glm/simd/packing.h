@@ -1,4 +1,4 @@
-/// @ref simd
+/// @Ref simd
 /// @file glm/simd/packing.h
 
 #pragma once

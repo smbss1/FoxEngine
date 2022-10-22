@@ -1,4 +1,4 @@
-/// @ref gtc_matrix_access
+/// @Ref gtc_matrix_access
 
 namespace glm
 {

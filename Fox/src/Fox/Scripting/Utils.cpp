@@ -3,11 +3,16 @@
 //
 
 #include "Utils.hpp"
+#include "Marshal.hpp"
+#include "ScriptEngine.hpp"
+#include "ScriptCache.hpp"
 #include "Utils/FileSystem.hpp"
+#include "ValueWrapper.hpp"
 
+#include <mono/metadata/class.h>
 #include "mono/metadata/assembly.h"
 #include "mono/metadata/object.h"
-#include "ScriptEngine.hpp"
+#include "Asset/Asset.hpp"
 
 namespace fox
 {
@@ -33,6 +38,7 @@ namespace fox
                 { "Fox.Vector4", ScriptFieldType::Vector4 },
 
                 { "Fox.Entity", ScriptFieldType::Entity },
+                { "Fox.Prefab", ScriptFieldType::Prefab },
             };
 
         MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath)
@@ -114,5 +120,268 @@ namespace fox
             }
             return false;
         }
+
+        Utils::ValueWrapper GetFieldValue(MonoObject* monoObject, const ManagedField* field)
+        {
+//            FOX_PROFILE_FUNC();
+            return MonoObjectToValue(GetFieldValueObject(monoObject, field), field->Type);
+        }
+
+        MonoObject* GetFieldValueObject(MonoObject* monoObject, const ManagedField* field)
+        {
+//            FOX_PROFILE_FUNC();
+
+            MonoObject* valueObject = nullptr;
+
+//            if (field->Property)
+//                valueObject = mono_property_get_value(field->Property, monoObject, nullptr, nullptr);
+//            else
+                valueObject = mono_field_get_value_object(ScriptEngine::GetAppDomain(), field->Field, monoObject);
+
+            return valueObject;
+        }
+
+        void SetFieldValue(MonoObject* monoObject, const ManagedField* field, const Utils::ValueWrapper& value)
+        {
+//            FOX_PROFILE_FUNC();
+
+            if (!field->IsWritable())
+                return;
+
+            if (monoObject == nullptr)
+                return;
+
+            if (!value.HasValue())
+                return;
+
+//            if (field->Property)
+//            {
+//                void* data[1];
+//
+//                if (field->Type.IsPrimitiveType())
+//                    data[0] = value.GetRawData();
+//                else
+//                    data[0] = ValueToMonoObject(value, field->Type);
+//
+//                mono_property_set_value(field->Property, monoObject, data, nullptr);
+//            }
+//            else
+//            {
+                mono_field_set_value(monoObject, field->Field, field->Type.IsPrimitiveType() ? value.GetRawData() : ValueToMonoObject(value, field->Type));
+//            }
+        }
+
+//        void SetFieldValue(MonoObject* monoObject, const ManagedField* field, const ManagedArray& value)
+//        {
+////            FOX_PROFILE_FUNC();
+//
+//            if (!field->IsWritable())
+//                return;
+//
+//            if (monoObject == nullptr)
+//                return;
+//
+//            if (value.Length() == 0)
+//                return;
+//
+////            if (field->Property)
+////            {
+////                void* data[] = { value.GetMonoArray() };
+////                mono_property_set_value(field->Property, monoObject, data, nullptr);
+////            }
+////            else
+////            {
+//                mono_field_set_value(monoObject, field->Field, value.GetMonoArray());
+////            }
+//        }
+
+        Utils::ValueWrapper GetDefaultValueForType(const ManagedType& type)
+        {
+//            FOX_PROFILE_FUNC();
+
+            switch (type.NativeType)
+            {
+                case ScriptFieldType::Bool: return Utils::ValueWrapper(false);
+                case ScriptFieldType::Char: return Utils::ValueWrapper(0);
+                case ScriptFieldType::Short: return Utils::ValueWrapper(0);
+                case ScriptFieldType::Int: return Utils::ValueWrapper(0);
+                case ScriptFieldType::Long: return Utils::ValueWrapper(0);
+                case ScriptFieldType::Byte: return Utils::ValueWrapper(0);
+                case ScriptFieldType::UByte: return Utils::ValueWrapper(0);
+                case ScriptFieldType::UShort: return Utils::ValueWrapper(0);
+                case ScriptFieldType::UInt: return Utils::ValueWrapper(0);
+                case ScriptFieldType::ULong: return Utils::ValueWrapper(0);
+                case ScriptFieldType::Float: return Utils::ValueWrapper(0.0f);
+                case ScriptFieldType::Double: return Utils::ValueWrapper(0.0);
+                case ScriptFieldType::String: return Utils::ValueWrapper("");
+                case ScriptFieldType::Vector2: return Utils::ValueWrapper(glm::vec2(0.0f));
+                case ScriptFieldType::Vector3: return Utils::ValueWrapper(glm::vec2(0.0f));
+                case ScriptFieldType::Vector4: return Utils::ValueWrapper(glm::vec2(0.0f));
+                case ScriptFieldType::Entity: return Utils::ValueWrapper(0);
+                case ScriptFieldType::Prefab: return Utils::ValueWrapper(0);
+                case ScriptFieldType::AssetHandle: return Utils::ValueWrapper(0);
+            }
+
+            return Utils::ValueWrapper();
+        }
+
+        Utils::ValueWrapper MonoObjectToValue(MonoObject* obj, const ManagedType& type)
+        {
+//            FOX_PROFILE_FUNC();
+
+            if (obj == nullptr)
+                return Utils::ValueWrapper();
+
+            switch (type.TypeEncoding)
+            {
+                case MONO_TYPE_BOOLEAN:		return Utils::ValueWrapper((bool)Marshal::Unbox<MonoBoolean>(obj));
+                case MONO_TYPE_CHAR:		return Utils::ValueWrapper(Marshal::Unbox<uint16_t>(obj));
+                case MONO_TYPE_I1:			return Utils::ValueWrapper(Marshal::Unbox<int8_t>(obj));
+                case MONO_TYPE_I2:			return Utils::ValueWrapper(Marshal::Unbox<int16_t>(obj));
+                case MONO_TYPE_I4:			return Utils::ValueWrapper(Marshal::Unbox<int32_t>(obj));
+                case MONO_TYPE_I8:			return Utils::ValueWrapper(Marshal::Unbox<int64_t>(obj));
+                case MONO_TYPE_U1:			return Utils::ValueWrapper(Marshal::Unbox<uint8_t>(obj));
+                case MONO_TYPE_U2:			return Utils::ValueWrapper(Marshal::Unbox<uint16_t>(obj));
+                case MONO_TYPE_U4:			return Utils::ValueWrapper(Marshal::Unbox<uint32_t>(obj));
+                case MONO_TYPE_U8:			return Utils::ValueWrapper(Marshal::Unbox<uint64_t>(obj));
+                case MONO_TYPE_R4:			return Utils::ValueWrapper(Marshal::Unbox<float>(obj));
+                case MONO_TYPE_R8:			return Utils::ValueWrapper(Marshal::Unbox<double>(obj));
+                case MONO_TYPE_STRING:		return Utils::ValueWrapper(Marshal::MonoStringToUTF8((MonoString*)obj));
+                case MONO_TYPE_VALUETYPE:
+                {
+                    ManagedClass* typeClass = type.TypeClass;
+
+                    if (typeClass == FOX_CORE_CLASS(AssetHandle))
+                        return Utils::ValueWrapper(Marshal::Unbox<AssetHandle>(obj));
+
+                    if (typeClass == FOX_CORE_CLASS(Vector2))
+                        return Utils::ValueWrapper(Marshal::Unbox<glm::vec2>(obj));
+
+                    if (typeClass == FOX_CORE_CLASS(Vector3))
+                        return Utils::ValueWrapper(Marshal::Unbox<glm::vec3>(obj));
+
+                    if (typeClass == FOX_CORE_CLASS(Vector4))
+                        return Utils::ValueWrapper(Marshal::Unbox<glm::vec4>(obj));
+
+                    break;
+                }
+                case MONO_TYPE_CLASS:
+                {
+                    ManagedClass* typeClass = type.TypeClass;
+
+                    if (type.CanAssignTo(FOX_CORE_CLASS(Entity)))
+                    {
+                        const ManagedField* field = ScriptCache::GetFieldByName(typeClass, "ID");
+                        return GetFieldValue(obj, field);
+                    }
+
+                    const ManagedField* handleField = FOX_CACHED_FIELD(typeClass->FullName, "m_Handle");
+                    if (handleField != nullptr)
+                        return GetFieldValue(obj, handleField);
+
+                    break;
+                }
+                case MONO_TYPE_ARRAY:
+                case MONO_TYPE_SZARRAY:
+                {
+                    break;
+                }
+            }
+
+            return Utils::ValueWrapper();
+        }
+
+        MonoObject* ValueToMonoObject(const Utils::ValueWrapper& value, const ManagedType& type)
+        {
+//            FOX_PROFILE_FUNC();
+
+            switch (type.NativeType)
+            {
+                case ScriptFieldType::Bool:
+                {
+                    MonoBoolean val = (MonoBoolean)value.Get<bool>();
+                    return Marshal::BoxValue(FOX_CACHED_CLASS("System.Boolean"), val);
+                }
+                case ScriptFieldType::Char: return Marshal::BoxValue(FOX_CACHED_CLASS("System.SByte"), value.Get<int8_t>());
+                case ScriptFieldType::Short: return Marshal::BoxValue(FOX_CACHED_CLASS("System.Int16"), value.Get<int16_t>());
+                case ScriptFieldType::Int: return Marshal::BoxValue(FOX_CACHED_CLASS("System.Int32"), value.Get<int32_t>());
+                case ScriptFieldType::Long: return Marshal::BoxValue(FOX_CACHED_CLASS("System.Int64"), value.Get<int64_t>());
+                case ScriptFieldType::Byte: return Marshal::BoxValue(FOX_CACHED_CLASS("System.Byte"), value.Get<uint8_t>());
+                case ScriptFieldType::UShort: return Marshal::BoxValue(FOX_CACHED_CLASS("System.UInt16"), value.Get<uint16_t>());
+                case ScriptFieldType::UInt: return Marshal::BoxValue(FOX_CACHED_CLASS("System.UInt32"), value.Get<uint32_t>());
+                case ScriptFieldType::ULong: return Marshal::BoxValue(FOX_CACHED_CLASS("System.UInt64"), value.Get<uint64_t>());
+                case ScriptFieldType::Float: return Marshal::BoxValue(FOX_CACHED_CLASS("System.Single"), value.Get<float>());
+                case ScriptFieldType::Double: return Marshal::BoxValue(FOX_CACHED_CLASS("System.Double"), value.Get<double>());
+                case ScriptFieldType::String: return (MonoObject*)Marshal::UTF8StringToMono(value.Get<std::string>());
+                case ScriptFieldType::AssetHandle: return Marshal::BoxValue(FOX_CACHED_CLASS("Fox.AssetHandle"), value.Get<AssetHandle>());
+                case ScriptFieldType::Vector2: return Marshal::BoxValue(FOX_CACHED_CLASS("Fox.Vector2"), value.Get<glm::vec2>());
+                case ScriptFieldType::Vector3: return Marshal::BoxValue(FOX_CACHED_CLASS("Fox.Vector3"), value.Get<glm::vec3>());
+                case ScriptFieldType::Vector4: return Marshal::BoxValue(FOX_CACHED_CLASS("Fox.Vector4"), value.Get<glm::vec4>());
+                case ScriptFieldType::Prefab: return ScriptEngine::CreateManagedObject("Fox.Prefab", value.Get<AssetHandle>());
+                case ScriptFieldType::Entity: return ScriptEngine::CreateManagedObject("Fox.Entity", value.Get<UUID>());
+            }
+
+            FOX_CORE_ASSERT(false, "Unsupported value type!");
+            return nullptr;
+        }
+
+        void Erase(std::string& str, const char* chars)
+        {
+            for (size_t i = 0; i < strlen(chars); i++)
+                str.erase(std::remove(str.begin(), str.end(), chars[i]), str.end());
+        }
+
+        void Erase(std::string& str, const std::string& chars)
+        {
+            Erase(str, chars.c_str());
+        }
+
+
+        std::string ResolveMonoClassName(MonoClass* monoClass)
+        {
+            const char* classNamePtr = mono_class_get_name(monoClass);
+            std::string className = classNamePtr != nullptr ? classNamePtr : "";
+
+            if (className.empty())
+                return "Unknown Class";
+
+            MonoClass* nestingClass = mono_class_get_nesting_type(monoClass);
+            if (nestingClass != nullptr)
+            {
+                className = ResolveMonoClassName(nestingClass) + "/" + className;
+            }
+            else
+            {
+                const char* classNamespacePtr = mono_class_get_namespace(monoClass);
+                if (classNamespacePtr)
+                    className = std::string(classNamespacePtr) + "." + className;
+            }
+
+            MonoType* classType = mono_class_get_type(monoClass);
+            if (mono_type_get_type(classType) == MONO_TYPE_SZARRAY || mono_type_get_type(classType) == MONO_TYPE_ARRAY)
+                Erase(className, "[]");
+
+            return className;
+        }
+
+        bool CheckMonoError(MonoError& error)
+        {
+            bool hasError = !mono_error_ok(&error);
+
+            if (hasError)
+            {
+                unsigned short errorCode = mono_error_get_error_code(&error);
+                const char* errorMessage = mono_error_get_message(&error);
+
+                FOX_CORE_ERROR_TAG("ScriptEngine", "Mono Error!");
+                FOX_CORE_ERROR_TAG("ScriptEngine", "\tError Code: %", errorCode);
+                FOX_CORE_ERROR_TAG("ScriptEngine", "\tError Message: %", errorMessage);
+                mono_error_cleanup(&error);
+                FOX_CORE_ASSERT(false);
+            }
+
+            return hasError;
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-/// @ref gtx_vector_angle
+/// @Ref gtx_vector_angle
 
 namespace glm
 {
@@ -34,11 +34,11 @@ namespace glm
 	}
 
 	template<typename T, qualifier Q>
-	GLM_FUNC_QUALIFIER T orientedAngle(vec<3, T, Q> const& x, vec<3, T, Q> const& y, vec<3, T, Q> const& ref)
+	GLM_FUNC_QUALIFIER T orientedAngle(vec<3, T, Q> const& x, vec<3, T, Q> const& y, vec<3, T, Q> const& Ref)
 	{
 		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'orientedAngle' only accept floating-point inputs");
 
 		T const Angle(acos(clamp(dot(x, y), T(-1), T(1))));
-		return mix(Angle, -Angle, dot(ref, cross(x, y)) < T(0));
+		return mix(Angle, -Angle, dot(Ref, cross(x, y)) < T(0));
 	}
 }//namespace glm

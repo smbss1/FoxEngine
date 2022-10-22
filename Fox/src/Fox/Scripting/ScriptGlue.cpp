@@ -23,6 +23,8 @@
 
 #include "box2d/b2_body.h"
 #include "Utils.hpp"
+#include "Asset/AssetManager.hpp"
+#include "Scene/Prefab.hpp"
 
 
 namespace fox
@@ -53,6 +55,16 @@ namespace fox
         }
     }
 
+#pragma region AssetHandle
+
+    bool AssetHandle_IsValid(AssetHandle* assetHandle)
+    {
+        return AssetManager::IsAssetHandleValid(*assetHandle);
+    }
+
+#pragma endregion
+
+
     Entity GetEntity(uint64_t entityID)
     {
 //        FOX_PROFILE_SCOPE();
@@ -66,6 +78,8 @@ namespace fox
 
     static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
     {
+//        FOX_PROFILE_SCOPE();
+
         Scene* scene = ScriptEngine::GetSceneContext();
         FOX_ASSERT(scene);
         Entity entity = scene->GetEntityByUUID(entityID);
@@ -78,6 +92,8 @@ namespace fox
 
     static uint64_t Entity_FindEntityByName(MonoString* name)
     {
+//        FOX_PROFILE_SCOPE();
+
         char* nameCStr = mono_string_to_utf8(name);
 
         Scene* scene = ScriptEngine::GetSceneContext();
@@ -93,26 +109,59 @@ namespace fox
 
     static uint64_t Entity_Instantiate(uint64_t entityToInstantiate)
     {
+//        FOX_PROFILE_SCOPE();
+
         Scene* scene = ScriptEngine::GetSceneContext();
         FOX_ASSERT(scene);
         Entity entity = scene->GetEntityByUUID(entityToInstantiate);
         FOX_ASSERT(entity);
 
-        return scene->CloneEntity(entity).GetUUID();
+        return scene->CloneEntity(entity, {}).GetUUID();
+    }
+
+    uint64_t Entity_InstantiatePrefab(AssetHandle* prefabHandle)
+    {
+        Ref<Scene> scene = ScriptEngine::GetSceneContext();
+
+        if (!AssetManager::IsAssetHandleValid(*prefabHandle))
+            return 0;
+
+        Ref<Prefab> prefab = AssetManager::GetAsset<Prefab>(*prefabHandle);
+        return scene->Instantiate(prefab).GetUUID();
+    }
+
+    uint64_t Entity_InstantiatePrefabWithTransform(AssetHandle* prefabHandle, glm::vec3* inPosition, glm::vec3* inRotation, glm::vec3* inScale)
+    {
+        Ref<Scene> scene = ScriptEngine::GetSceneContext();
+
+        if (!AssetManager::IsAssetHandleValid(*prefabHandle))
+            return 0;
+
+        Ref<Prefab> prefab = AssetManager::GetAsset<Prefab>(*prefabHandle);
+        return scene->Instantiate(prefab, inPosition, inRotation, inScale).GetUUID();
+    }
+
+    uint64_t Entity_InstantiatePrefabWithPosition(AssetHandle* prefabHandle, glm::vec3* inPosition)
+    {
+        return Entity_InstantiatePrefabWithTransform(prefabHandle, inPosition, nullptr, nullptr);
     }
 
     static void Entity_Destroy(uint64_t entityToDestroy)
     {
+//        FOX_PROFILE_SCOPE();
+
         Scene* scene = ScriptEngine::GetSceneContext();
         FOX_ASSERT(scene);
         Entity entity = scene->GetEntityByUUID(entityToDestroy);
         FOX_ASSERT(entity);
 
-        scene->DestroyEntity(entity);
+        scene->SubmitToDestroyEntity(entity);
     }
 
     MonoString* NameComponent_GetName(uint64_t entityID)
     {
+//        FOX_PROFILE_SCOPE();
+
         Scene* scene = ScriptEngine::GetSceneContext();
         FOX_ASSERT(scene);
         Entity entity = scene->GetEntityByUUID(entityID);
@@ -124,6 +173,8 @@ namespace fox
 
     void NameComponent_SetName(uint64_t entityID, MonoString* tag)
     {
+//        FOX_PROFILE_SCOPE();
+
         Scene* scene = ScriptEngine::GetSceneContext();
         FOX_ASSERT(scene);
         Entity entity = scene->GetEntityByUUID(entityID);
@@ -137,6 +188,8 @@ namespace fox
 
     static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation)
     {
+//        FOX_PROFILE_SCOPE();
+
         Scene* scene = ScriptEngine::GetSceneContext();
         FOX_ASSERT(scene);
         Entity entity = scene->GetEntityByUUID(entityID);
@@ -147,6 +200,8 @@ namespace fox
 
     static void TransformComponent_SetTranslation(UUID entityID, glm::vec3* translation)
     {
+//        FOX_PROFILE_SCOPE();
+
         Scene* scene = ScriptEngine::GetSceneContext();
         FOX_ASSERT(scene);
         Entity entity = scene->GetEntityByUUID(entityID);
@@ -215,8 +270,31 @@ namespace fox
         GetEntity(entityID).get<SpriteRenderer>().TilingFactor = *tiling;
     }
 
+#pragma region Rigidbody2D
+    void Rigidbody2DComponent_GetGravityScale(uint64_t entityID, float* outGravityScale)
+	{
+		// FOX_PROFILE_SCOPE();
+
+		*outGravityScale = GetEntity(entityID).get<Rigidbody2D>().GravityScale;
+	}
+
+	void Rigidbody2DComponent_SetGravityScale(uint64_t entityID, const bool* gravityScale)
+	{
+		// FOX_PROFILE_SCOPE();
+
+		auto& component = GetEntity(entityID).get<Rigidbody2D>();
+		component.GravityScale = *gravityScale;
+		if (component.RuntimeBody)
+		{
+			b2Body* body = (b2Body*)component.RuntimeBody;
+			body->SetGravityScale(component.GravityScale);
+		}
+	}
+
     static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impulse, glm::vec2* point, bool wake)
     {
+//        FOX_PROFILE_SCOPE();
+
         Scene* scene = ScriptEngine::GetSceneContext();
         FOX_ASSERT(scene);
         Entity entity = scene->GetEntityByUUID(entityID);
@@ -229,6 +307,8 @@ namespace fox
 
     static void Rigidbody2DComponent_ApplyLinearImpulseToCenter(UUID entityID, glm::vec2* impulse, bool wake)
     {
+//        FOX_PROFILE_SCOPE();
+
         Scene* scene = ScriptEngine::GetSceneContext();
         FOX_ASSERT(scene);
         Entity entity = scene->GetEntityByUUID(entityID);
@@ -238,6 +318,7 @@ namespace fox
         b2Body* body = (b2Body*)rb2d.RuntimeBody;
         body->ApplyLinearImpulseToCenter(b2Vec2(impulse->x, impulse->y), wake);
     }
+#pragma endregion
 
     bool Input_IsKeyPressed(KeyCode key)
     {
@@ -278,6 +359,8 @@ namespace fox
 
     std::shared_ptr<char> cppDemangle(const char *abiName)
     {
+//        FOX_PROFILE_SCOPE();
+
         int status;
         char *ret = abi::__cxa_demangle(abiName, 0, 0, &status);
 
@@ -290,6 +373,8 @@ namespace fox
     template<typename... Component>
     static void RegisterComponent()
     {
+//        FOX_PROFILE_SCOPE();
+
         ([]()
         {
             std::string_view typeName = typeid(Component).name();
@@ -300,7 +385,7 @@ namespace fox
             std::string_view structName = demandleTypenameView.substr(pos + 1);
             std::string managedTypename = fox::format("Fox.%", structName);
 
-            MonoType* managedType = mono_reflection_type_from_name(managedTypename.data(), ScriptEngine::GetCoreAssemblyImage());
+            MonoType* managedType = mono_reflection_type_from_name(managedTypename.data(), ScriptEngine::GetCoreAssembly()->AssemblyImage);
             if (!managedType)
             {
                 FOX_CORE_ERROR("Could not find component type %", managedTypename);
@@ -340,10 +425,13 @@ namespace fox
 
         FOX_ADD_INTERNAL_CALL(GetScriptInstance);
         FOX_ADD_INTERNAL_CALL(Log_LogMessage);
+        FOX_ADD_INTERNAL_CALL(AssetHandle_IsValid);
 
         FOX_ADD_INTERNAL_CALL(Entity_HasComponent);
         FOX_ADD_INTERNAL_CALL(Entity_FindEntityByName);
         FOX_ADD_INTERNAL_CALL(Entity_Instantiate);
+        FOX_ADD_INTERNAL_CALL(Entity_InstantiatePrefab);
+        FOX_ADD_INTERNAL_CALL(Entity_InstantiatePrefabWithPosition);
         FOX_ADD_INTERNAL_CALL(Entity_Destroy);
 
         FOX_ADD_INTERNAL_CALL(NameComponent_GetName);
@@ -363,6 +451,8 @@ namespace fox
 
         FOX_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
         FOX_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
+        FOX_ADD_INTERNAL_CALL(Rigidbody2DComponent_GetGravityScale);
+        FOX_ADD_INTERNAL_CALL(Rigidbody2DComponent_SetGravityScale);
 
         FOX_ADD_INTERNAL_CALL(Input_IsKeyPressed);
         FOX_ADD_INTERNAL_CALL(Input_IsKeyDown);

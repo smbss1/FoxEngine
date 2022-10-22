@@ -8,6 +8,7 @@
 #include "Ecs/Entity.hpp"
 #include "Components/IDComponent.hpp"
 #include "Components/EntityName.hpp"
+#include "Components/Transform.hpp"
 
 namespace fox
 {
@@ -18,4 +19,5 @@ namespace fox
 
     UUID Entity::GetUUID() { return get<IDComponent>().ID; }
     const std::string& Entity::GetName() { return get<EntityName>().name; }
+    TransformComponent& Entity::GetTransform() { return get<TransformComponent>(); }
 }

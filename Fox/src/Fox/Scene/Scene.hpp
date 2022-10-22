@@ -24,18 +24,20 @@ class b2World;
 
 namespace fox
 {
-    class Scene
+    class Prefab;
+    class Scene : public RefCounted
     {
     public:
-        Scene();
+        Scene(bool initalize = true);
         ~Scene();
 
-        static ref<Scene> Copy(ref<Scene> other);
+        static Ref<Scene> Copy(Ref<Scene> other);
 
         Entity NewEntity(const std::string& name = std::string());
         Entity NewEntityWithUUID(UUID uuid, const std::string &name);
         void DuplicateEntity(Entity entity);
-        Entity CloneEntity(Entity& entity);
+        Entity CloneEntity(Entity& entity, Entity parent, const glm::vec3* translation = nullptr, const glm::vec3* rotation = nullptr, const glm::vec3* scale = nullptr);
+        Entity Instantiate(Ref<Prefab> prefab, const glm::vec3* translation = nullptr, const glm::vec3* rotation = nullptr, const glm::vec3* scale = nullptr);
 
         template<typename... Components>
         auto GetAllEntitiesWith()
@@ -43,7 +45,15 @@ namespace fox
             return m_Registry.view<Components...>();
         }
 
+        void SubmitToDestroyEntity(Entity entity);
         void DestroyEntity(Entity entity);
+
+        template<typename Fn>
+        void SubmitPostUpdateFunc(Fn&& func)
+        {
+            m_PostUpdateQueue.emplace_back(func);
+        }
+
 
         void OnUpdateRuntime(Timestep ts);
         void OnUpdateSimulation(EditorCamera& camera, Timestep ts);
@@ -63,8 +73,11 @@ namespace fox
         Entity FindEntityByName(std::string_view name);
 
         bool IsRunning() const { return m_IsRunning; }
+        void CopyAllComponentsIfExists(Entity dst, Entity src);
 
     private:
+
+        void ProcessPostQueue();
 
         void OnPhysics2DStart();
         void OnPhysics2DStop();
@@ -72,8 +85,17 @@ namespace fox
         void RenderScene();
         void RenderScene(EditorCamera& camera);
 
-        template<typename T>
-        void OnComponentAdded(Entity &e, T &component);
+        void SortEntities();
+
+        static Ref<Scene> CreateEmpty();
+
+        void OnCameraComponentConstruct(entt::registry& registry, entt::entity entity);
+        void OnRigidBody2DComponentConstruct(entt::registry& registry, entt::entity entity);
+        void OnRigidBody2DComponentDestroy(entt::registry& registry, entt::entity entity);
+        void OnBoxCollider2DComponentConstruct(entt::registry& registry, entt::entity entity);
+        void OnBoxCollider2DComponentDestroy(entt::registry& registry, entt::entity entity);
+        void OnCircleCollider2DComponentConstruct(entt::registry& registry, entt::entity entity);
+        void OnCircleCollider2DComponentDestroy(entt::registry& registry, entt::entity entity);
 
     private:
         bool m_IsRunning = false;
@@ -83,11 +105,16 @@ namespace fox
         uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
         std::unordered_map<UUID, entt::entity> m_EntityMap;
 
+        std::vector<std::function<void()>> m_PostUpdateQueue;
+
     protected:
         const float timeStep = 1.0f / 60.0f;
         friend class Entity;
         friend class SceneSerializer;
         friend class SceneHierarchyPanel;
+        friend class EntitySerializer;
+        friend class PrefabSerializer;
+        friend class Prefab;
     };
 }
-#endif /* !SCENE_HPP_ */
+#endif /* FOX_SCENE_HPP_ */

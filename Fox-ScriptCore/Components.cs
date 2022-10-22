@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace Fox
 {
@@ -10,7 +11,7 @@ namespace Fox
     {
         public Entity Entity { get; internal set; }
     }
-    
+
     /// <summary>
     /// Contains name of the entity.
     /// </summary>
@@ -43,7 +44,7 @@ namespace Fox
                 InternalCalls.TransformComponent_SetTranslation(Entity.ID, ref value);
             }
         }
-        
+
         /// <summary>
         /// World space rotation in euler angles (radians).
         /// </summary>
@@ -73,6 +74,21 @@ namespace Fox
 
     public class Rigidbody2D : Component
     {
+        /// <summary>
+		/// Define the degree to which the Entity is affected by gravity.
+		/// </summary>
+		public float gravityScale
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get
+			{
+				InternalCalls.Rigidbody2DComponent_GetGravityScale(Entity.ID, out float v);
+				return v;
+			}
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set => InternalCalls.Rigidbody2DComponent_SetGravityScale(Entity.ID, ref value);
+		}
+
         public void ApplyLinearImpulse(Vector2 impulse, Vector2 worldPosition, bool wake)
         {
             InternalCalls.Rigidbody2DComponent_ApplyLinearImpulse(Entity.ID, ref impulse, ref worldPosition, wake);
@@ -83,7 +99,7 @@ namespace Fox
             InternalCalls.Rigidbody2DComponent_ApplyLinearImpulseToCenter(Entity.ID, ref impulse, wake);
         }
     }
-    
+
     /// <summary>
     /// Renders a sprite
     /// </summary>
@@ -115,7 +131,7 @@ namespace Fox
             set => InternalCalls.SpriteRendererComponent_SetTilingFactor(Entity.ID, ref value);
         }
     }
-    
+
     public class Collider2D : Component
     {
         // public delegate void OnTriggerEnterEvent();
@@ -133,7 +149,7 @@ namespace Fox
         //     OnTriggerEnter?.Invoke();
         // }
     }
-    
+
     public class BoxCollider2D : Collider2D
     {
     }

@@ -16,7 +16,7 @@ typedef enum {
 } MonoFDType;
 
 typedef struct {
-	MonoRefCount ref;
+	MonoRefCount Ref;
 	MonoFDType type;
 	gint fd;
 } MonoFDHandle;

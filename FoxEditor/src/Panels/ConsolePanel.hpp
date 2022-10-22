@@ -21,7 +21,7 @@ namespace fox
     {
         using loglevel = typelog;
     public:
-        struct Message
+        struct Message : public RefCounted
         {
             std::string ID;
             std::string Buffer;
@@ -65,7 +65,7 @@ namespace fox
         uint32_t s_MessageBufferRenderFilter = loglevel::INFO;
         bool m_AllowScrollingToBottom = true;
         bool m_RequestScrollToBottom = false;
-        std::vector<fox::ref<Message>> m_MessageBuffer;
+        std::vector<fox::Ref<Message>> m_MessageBuffer;
         ImGuiTextFilter m_Filter;
     };
 }

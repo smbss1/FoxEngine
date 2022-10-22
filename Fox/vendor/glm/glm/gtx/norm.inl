@@ -1,4 +1,4 @@
-/// @ref gtx_norm
+/// @Ref gtx_norm
 
 #include "glm/detail/qualifier.hpp"
 

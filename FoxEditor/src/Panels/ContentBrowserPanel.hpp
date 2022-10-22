@@ -12,20 +12,21 @@
 
 namespace fox
 {
+    struct OnProjectChangeEvent;
     class ContentBrowserPanel : public Panel
     {
     public:
         ContentBrowserPanel();
 
         void OnImGui() override;
-        void OnProjectOpen();
+        void OnProjectChange(const OnProjectChangeEvent& event);
 
     private:
         std::filesystem::path m_oCurrentDirectory;
 
-        ref<Texture2D> m_pFolderIcon = nullptr;
-        ref<Texture2D> m_pFileIcon = nullptr;
-        std::unordered_map<std::string, ref<Texture2D>> m_ImageIcons;
+        Ref<Texture2D> m_pFolderIcon = nullptr;
+        Ref<Texture2D> m_pFileIcon = nullptr;
+        std::unordered_map<std::string, Ref<Texture2D>> m_ImageIcons;
     };
 }
 

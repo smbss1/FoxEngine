@@ -1,4 +1,4 @@
-/// @ref gtc_random
+/// @Ref gtc_random
 /// @file glm/gtc/random.hpp
 ///
 /// @see core (dependence)

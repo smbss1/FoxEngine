@@ -4,10 +4,10 @@
     <xs:element name="Project">
         <xs:complexType>
             <xs:sequence>
-                <xs:group ref="msb:ProjectLevelTagExceptTargetOrImportType" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:group Ref="msb:ProjectLevelTagExceptTargetOrImportType" minOccurs="0" maxOccurs="unbounded"/>
                 <!-- must be at least one Target or Import tag-->
-                <xs:group ref="msb:TargetOrImportType"/>
-                <xs:group ref="msb:ProjectLevelTagType" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:group Ref="msb:TargetOrImportType"/>
+                <xs:group Ref="msb:ProjectLevelTagType" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
             <xs:attribute name="DefaultTargets" type="xs:string" use="optional">
                 <xs:annotation>
@@ -74,7 +74,7 @@
         </xs:annotation>
         <xs:sequence>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="msb:Task"/>
+                <xs:element Ref="msb:Task"/>
             </xs:choice>
             <xs:element name="OnError" type="msb:OnErrorType" minOccurs="0" maxOccurs="unbounded"/>
             <!-- no elements are allowed under Target after an OnError element-->
@@ -111,7 +111,7 @@
             <xs:documentation>Groups property definitions</xs:documentation>
         </xs:annotation>
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
-            <xs:element ref="msb:Property"/>
+            <xs:element Ref="msb:Property"/>
         </xs:sequence>
         <xs:attribute name="Condition" type="xs:string" use="optional">
             <xs:annotation>
@@ -125,7 +125,7 @@
             <xs:documentation>Groups item list definitions</xs:documentation>
         </xs:annotation>
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
-            <xs:element ref="msb:Item"/>
+            <xs:element Ref="msb:Item"/>
         </xs:sequence>
         <xs:attribute name="Condition" type="xs:string" use="optional">
             <xs:annotation>

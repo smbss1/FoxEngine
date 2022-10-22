@@ -1,4 +1,4 @@
-/// @ref gtx_quaternion
+/// @Ref gtx_quaternion
 /// @file glm/gtx/quaternion.hpp
 ///
 /// @see core (dependence)

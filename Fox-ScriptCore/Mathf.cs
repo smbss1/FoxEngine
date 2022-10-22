@@ -885,7 +885,7 @@ namespace Fox
 		/// <summary>Multiplies each component of <c>w</c> by the input values, and returns their sum</summary>
 		/// <param name="w">The weights (per component) to apply to the rest of the values</param>
 		/// <param name="a">The first value, weighted by <c>w.x</c></param>
-		/// <param name="b">The second value, weighted by <c>w.y</c></param>		
+		/// <param name="b">The second value, weighted by <c>w.y</c></param>
 		[MethodImpl(INLINE)] public static Vector2 WeightedSum(Vector2 w, Vector2 a, Vector2 b) => a * w.x + b * w.y;
 
 		/// <summary>Multiplies each component of <c>w</c> by the input values, and returns their sum</summary>

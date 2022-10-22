@@ -8,7 +8,6 @@
 #ifndef ECS_FILESYSTEM_HPP
 #define ECS_FILESYSTEM_HPP
 
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -42,6 +41,9 @@ namespace fox
         * @return the bytes array read
         */
         char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize);
+
+        bool Exists(const std::filesystem::path& filepath);
+        bool Exists(const std::string& filepath);
 
     } // namespace file
 

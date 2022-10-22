@@ -9,43 +9,43 @@
 
 namespace fox
 {
-    ref<Shader> Shader::Create(const std::string &path)
+    Ref<Shader> Shader::Create(const std::string &path)
     {
         return new_ref<OpenGLShader>(path);
     }
 
-    ref<Shader> Shader::Create(const std::string &name, const std::string &vertexSrc, const std::string &fragSrc)
+    Ref<Shader> Shader::Create(const std::string &name, const std::string &vertexSrc, const std::string &fragSrc)
     {
         return new_ref<OpenGLShader>(name, vertexSrc, fragSrc);
     }
 
-    void ShaderLibrary::Add(const ref<Shader> &pShader)
+    void ShaderLibrary::Add(const Ref<Shader> &pShader)
     {
         auto& name = pShader->GetName();
         Add(name, pShader);
     }
 
-    void ShaderLibrary::Add(const std::string &name, const ref<Shader> &pShader)
+    void ShaderLibrary::Add(const std::string &name, const Ref<Shader> &pShader)
     {
         FOX_CORE_ASSERT(!Exists(name), "Shader already exists!");
         m_vShaders[name] = pShader;
     }
 
-    ref<Shader> ShaderLibrary::Load(const std::string &filepath)
+    Ref<Shader> ShaderLibrary::Load(const std::string &filepath)
     {
         auto shader = Shader::Create(filepath);
         Add(shader);
         return shader;
     }
 
-    ref<Shader> ShaderLibrary::Load(const std::string &name, const std::string &filepath)
+    Ref<Shader> ShaderLibrary::Load(const std::string &name, const std::string &filepath)
     {
         auto shader = Shader::Create(filepath);
         Add(name, shader);
         return shader;
     }
 
-    ref<Shader> ShaderLibrary::Get(const std::string &name)
+    Ref<Shader> ShaderLibrary::Get(const std::string &name)
     {
         FOX_CORE_ASSERT(Exists(name), "Shader not found!");
         return m_vShaders[name];

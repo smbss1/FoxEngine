@@ -1,4 +1,4 @@
-/// @ref gtc_matrix_inverse
+/// @Ref gtc_matrix_inverse
 
 namespace glm
 {

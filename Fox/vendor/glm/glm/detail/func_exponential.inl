@@ -1,4 +1,4 @@
-/// @ref core
+/// @Ref core
 /// @file glm/detail/func_exponential.inl
 
 #include "glm/vector_relational.hpp"

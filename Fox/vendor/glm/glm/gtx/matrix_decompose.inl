@@ -1,4 +1,4 @@
-/// @ref gtx_matrix_decompose
+/// @Ref gtx_matrix_decompose
 
 #include "glm/gtc/constants.hpp"
 #include "glm/gtc/epsilon.hpp"

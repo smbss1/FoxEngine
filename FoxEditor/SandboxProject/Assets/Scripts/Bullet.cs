@@ -6,23 +6,22 @@ namespace Sandbox
     public class Bullet : Entity
     {
         private TransformComponent m_Transform;
-        // private Rigidbody2D m_Rb2d;
 
-        public float Speed = 6f;
+        public float Speed = 6.0f;
 
-        public void OnCreate()
+        void OnCreate()
         {
             m_Transform = GetComponent<TransformComponent>();
-            // m_Rb2d = GetComponent<Rigidbody2D>();
-            // OnCollisionEnter2DEvent += OnCollisionEnter2D;
+            OnCollisionEnter2DEvent += OnCollisionEnter2D;
         }
 
         private void OnCollisionEnter2D(CollisionData obj)
         {
             Log.Info($"Collide with {obj.entity.GetComponent<EntityName>().Name}");
+            Destroy();
         }
 
-        public void OnUpdate(float ts)
+        void OnUpdate(float ts)
         {
             Vector3 translation = m_Transform.position;
             Vector3 velocity = new Vector2(0, 1).XYtoXYZ();

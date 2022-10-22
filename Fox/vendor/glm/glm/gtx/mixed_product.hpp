@@ -1,4 +1,4 @@
-/// @ref gtx_mixed_product
+/// @Ref gtx_mixed_product
 /// @file glm/gtx/mixed_product.hpp
 ///
 /// @see core (dependence)

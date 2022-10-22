@@ -14,7 +14,7 @@
 
 namespace fox
 {
-    SceneSerializer::SceneSerializer(const ref<Scene> &scene) : m_pScene(scene)
+    SceneSerializer::SceneSerializer(const Ref<Scene> &scene) : m_pScene(scene)
     {
     }
 
@@ -38,7 +38,7 @@ namespace fox
         out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
         m_pScene->m_Registry.each([&](auto entityID)
          {
-             Entity entity = { entityID, m_pScene.get() };
+             Entity entity = { entityID, m_pScene.Raw() };
              if (!entity)
                  return;
 

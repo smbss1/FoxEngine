@@ -9,7 +9,7 @@ namespace Sandbox
         private Rigidbody2D m_Rb2d;
 
         public float Speed = 15.2f;
-        public Entity BulletPrefab;
+        public Prefab BulletPrefab;
 
         public void OnCreate()
         {
@@ -40,7 +40,9 @@ namespace Sandbox
 
             if (Input.IsKeyDown(KeyCode.Space) && BulletPrefab != null)
             {
-                Instantiate(BulletPrefab).GetComponent<TransformComponent>().position = m_Transform.position;
+                Vector3 pos = m_Transform.position;
+                pos.y += 2;
+                Instantiate(BulletPrefab, pos);
             }
 
             velocity *= Speed;

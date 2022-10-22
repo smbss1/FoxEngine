@@ -5,6 +5,7 @@
 #include <Core/State.hpp>
 #include <Renderer/EditorCamera.hpp>
 #include "EditorLayer.hpp"
+#include "Core/UserPreferences.hpp"
 #include <Core/Input/Input.hpp>
 // #include "ScriptableBehaviour.hpp"
 
@@ -14,8 +15,10 @@ class EditorApp : public fox::Application
         EditorApp(const fox::ApplicationSpecification& specification);
         ~EditorApp() override = default;
 
-    protected:
+
     private:
+        std::string m_ProjectPath;
+        fox::Ref<fox::UserPreferences> m_UserPrefs;
 };
 
 
@@ -55,9 +58,30 @@ namespace fox
     // };
 }
 
-EditorApp::EditorApp(const fox::ApplicationSpecification& specification) : fox::Application(specification)
+EditorApp::EditorApp(const fox::ApplicationSpecification& specification) : fox::Application(specification), m_UserPrefs(fox::new_ref<fox::UserPreferences>())
 {
-    PushLayer(new fox::EditorLayer());
+    // Open a scene if provided in cmd arguments
+    auto commandLineArgs = Application::Get().GetSpecs().CommandLineArgs;
+    if (commandLineArgs.Count > 1)
+        m_ProjectPath = commandLineArgs[1];
+    else
+        m_ProjectPath = "SandboxProject/Sandbox.foxproj";
+
+    // User Preferences
+    {
+        fox::UserPreferencesSerializer serializer(m_UserPrefs);
+        if (!std::filesystem::exists("UserPreferences.yaml"))
+            serializer.Serialize("UserPreferences.yaml");
+        else
+            serializer.Deserialize("UserPreferences.yaml");
+
+        if (!m_ProjectPath.empty())
+            m_UserPrefs->StartupProject = m_ProjectPath;
+        else if (!m_UserPrefs->StartupProject.empty())
+            m_ProjectPath = m_UserPrefs->StartupProject;
+    }
+
+    PushLayer(new fox::EditorLayer(m_UserPrefs));
 }
 
 fox::Application* fox::CreateApp(ApplicationCommandLineArgs args)

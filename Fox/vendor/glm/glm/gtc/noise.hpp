@@ -1,4 +1,4 @@
-/// @ref gtc_noise
+/// @Ref gtc_noise
 /// @file glm/gtc/noise.hpp
 ///
 /// @see core (dependence)

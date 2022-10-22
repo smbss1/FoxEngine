@@ -1,4 +1,4 @@
-/// @ref gtc_matrix_access
+/// @Ref gtc_matrix_access
 /// @file glm/gtc/matrix_access.hpp
 ///
 /// @see core (dependence)

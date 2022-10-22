@@ -1,4 +1,4 @@
-/// @ref gtx_float_normalize
+/// @Ref gtx_float_normalize
 
 #include <limits>
 

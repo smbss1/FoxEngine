@@ -34,7 +34,7 @@ gboolean
 mono_reflection_parse_type_checked (char *name, MonoTypeNameParse *info, MonoError *error);
 
 gboolean
-mono_reflection_is_usertype (MonoReflectionTypeHandle ref);
+mono_reflection_is_usertype (MonoReflectionTypeHandle Ref);
 
 MonoReflectionType*
 mono_reflection_type_resolve_user_types (MonoReflectionType *type, MonoError *error);

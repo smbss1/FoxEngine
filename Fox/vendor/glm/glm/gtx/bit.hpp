@@ -1,4 +1,4 @@
-/// @ref gtx_bit
+/// @Ref gtx_bit
 /// @file glm/gtx/bit.hpp
 ///
 /// @see core (dependence)

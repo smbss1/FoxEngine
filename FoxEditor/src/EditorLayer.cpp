@@ -18,16 +18,18 @@
 #include "Panels/StatsPanel.hpp"
 #include "Panels/SettingsPanel.hpp"
 #include "Panels/ConsolePanel.hpp"
+#include "Scene/EntitySerializer.hpp"
+#include "Core/Project.hpp"
+#include "Core/ProjectSerializer.hpp"
 
 namespace fox
 {
-    extern const std::filesystem::path g_AssetPath;
 //    FileWatcher fw {"./SandboxProject/Assets/", std::chrono::milliseconds(2000)};
 
     EditorLayer::~EditorLayer()
     {
-        m_Framebuffer.reset();
-        m_pActiveScene.reset();
+        m_Framebuffer.Reset();
+        m_pActiveScene.Reset();
     }
 
     void EditorLayer::OnAttach()
@@ -46,7 +48,7 @@ namespace fox
 
         // Bind Signals
         m_OnImGuiRenderEvent.Bind<SceneHierarchyPanel, &SceneHierarchyPanel::OnImGui>(m_SceneHierarchyPanel);
-        for (ref<Panel> panel : m_Panels)
+        for (Ref<Panel> panel : m_Panels)
         {
             m_OnImGuiRenderEvent.Bind<Panel, &Panel::OnImGui>(*panel);
         }
@@ -97,18 +99,23 @@ namespace fox
             // InitFileWatcher();
         // DO NOT REMOVE ------
 
-        // Open a scene if provided in cmd arguments
-        auto commandLineArgs = Application::Get().GetSpecs().CommandLineArgs;
-        if (commandLineArgs.Count > 1)
-        {
-            auto sceneFilePath = commandLineArgs[1];
-            OpenScene(sceneFilePath);
-        }
+//        // Open a scene if provided in cmd arguments
+//        auto commandLineArgs = Application::Get().GetSpecs().CommandLineArgs;
+//        if (commandLineArgs.Count > 1)
+//        {
+//            auto sceneFilePath = commandLineArgs[1];
+//            OpenScene(sceneFilePath);
+//        }
 
+        if (!m_UserPrefs->StartupProject.empty())
+            OpenProject(m_UserPrefs->StartupProject);
+//        else
+//            FOX_CORE_VERIFY(false, "No project provided!");
     }
 
     void EditorLayer::OnDetach()
     {
+        CloseProject(false);
         // DO NOT REMOVE ------
             // m_oEditorConfig["LastOpenedProject"] = FPaths::ProjectDir();
             // if (!fox::file::WriteFile("./editor_config.json", m_oEditorConfig.dump()))
@@ -177,7 +184,7 @@ namespace fox
         if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
         {
             int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-            m_oHoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_pActiveScene.get());
+            m_oHoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_pActiveScene.Raw());
         }
 
         OnOverlayRender();
@@ -212,9 +219,9 @@ namespace fox
 			window_flags |= ImGuiWindowFlags_NoBackground;
 
 		// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
-		// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive, 
+		// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
 		// all active windows docked into it will lose their parent and become undocked.
-		// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
+		// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
 		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
@@ -282,8 +289,18 @@ namespace fox
                     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
                     {
                         const char* path = (const char*)payload->Data;
-                        OpenScene(std::filesystem::path(g_AssetPath) / path);
-                        // OpenScene(std::filesystem::path(FPaths::AssetsDir()) / path);
+                        auto filepath = Project::AssetsDir() / path;
+
+                        if (filepath.extension() == ".foxscene")
+                        {
+                            OpenScene(Project::AssetsDir() / path);
+                        }
+
+                        if (filepath.extension() == ".foxprefab")
+                        {
+                            Entity entity = EntitySerializer::DeserializeEntityAsPrefab(filepath.c_str(), *m_pActiveScene);
+                            event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(entity));
+                        }
                     }
                     ImGui::EndDragDropTarget();
                 }
@@ -349,8 +366,11 @@ namespace fox
                 // if (ImGui::MenuItem("New Project"))
                 //     NewProject();
 
-                // if (ImGui::MenuItem("Open Project", "Ctrl+O"))
-                //     OpenProject();
+                 if (ImGui::MenuItem("Open Project", "Ctrl+O"))
+                     OpenProject();
+
+                if (ImGui::MenuItem("Save Project"))
+                    SaveProject();
 
                 if (ImGui::MenuItem("New Scene", "Ctrl+N"))
                     NewScene();
@@ -401,7 +421,7 @@ namespace fox
 
             float size = ImGui::GetWindowHeight() - 4.0f;
             {
-                ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
+                Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
                 ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
                 if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
                 {
@@ -413,7 +433,7 @@ namespace fox
             }
             ImGui::SameLine();
             {
-                ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? m_IconSimulate : m_IconStop;
+                Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? m_IconSimulate : m_IconStop;
                 //ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
                 if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
                 {
@@ -631,18 +651,78 @@ namespace fox
     //     }
     // }
 
-    // void EditorLayer::OpenProject()
-    // {
-    //     auto filepath = FileDialogs::OpenFile({"Fox Project (*.foxproject)", "*.foxproject"});
-    //     if (!filepath.empty()) {
-    //         m_pActiveScene = new_ref<Scene>(GetApp());
-    //         m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+     void EditorLayer::OpenProject()
+     {
+         auto filepath = FileDialogs::OpenFile({"Fox Project (*.foxproject)", "*.foxproject"});
+         if (!filepath.empty()) {
+             OpenProject(filepath);
+         }
+     }
 
-    //         Path path(filepath);
-    //         FPaths::SetProjectDir(path.parent_path().string());
-    //         m_ContentBrowserPanel.OnProjectOpen();
-    //     }
-    // }
+    void EditorLayer::OpenProject(const std::string& filepath)
+    {
+        if (!FileSystem::Exists(filepath))
+        {
+            FOX_CORE_ERROR("Tried to open a project that doesn't exist. Project path: %", filepath);
+            return;
+        }
+
+        if (Project::GetActive())
+            CloseProject();
+
+        Ref<Project> project = Ref<Project>::Create();
+        ProjectSerializer serializer(project);
+        serializer.Deserialize(filepath);
+        Project::SetActive(project);
+
+        auto appAssemblyPath = Project::ScriptModuleFilePath();
+        if (!appAssemblyPath.empty() && FileSystem::Exists(appAssemblyPath))
+            ScriptEngine::LoadAppAssembly(appAssemblyPath);
+        else
+            FOX_WARN("No C# assembly has been provided in the Project Settings, or it wasn't found.");
+
+        if (!project->GetConfig().StartScene.empty())
+            OpenScene((Project::AssetsDir() / project->GetConfig().StartScene).string());
+        else
+            NewScene();
+
+        //             m_ContentBrowserPanel.OnProjectOpen();
+        event::EventSystem::Get().Emit(OnProjectChangeEvent());
+
+//        // Reset cameras
+//        m_oEditorCamera = EditorCamera(45.0f, 1280.0f, 720.0f, 0.1f, 1000.0f);
+//        m_SecondEditorCamera = EditorCamera(45.0f, 1280.0f, 720.0f, 0.1f, 1000.0f);
+    }
+
+    void EditorLayer::CloseProject(bool unloadProject)
+    {
+        SaveProject();
+
+//        m_PanelManager->SetSceneContext(nullptr);
+//        ScriptEngine::UnloadAppAssembly();
+        ScriptEngine::SetSceneContext(nullptr);
+//        m_ViewportRenderer->SetScene(nullptr);
+//        m_SecondViewportRenderer->SetScene(nullptr);
+        m_pActiveScene = nullptr;
+
+        // Check that m_EditorScene is the last one (so setting it null here will destroy the scene)
+        FOX_CORE_ASSERT(m_pEditorScene->GetRefCount() == 1, "Scene will not be destroyed after project is closed - something is still holding scene refs!");
+        m_pEditorScene = nullptr;
+
+        if (unloadProject)
+            Project::SetActive(nullptr);
+    }
+
+    void EditorLayer::SaveProject()
+    {
+        if (!Project::GetActive())
+            FOX_CORE_ASSERT(false); // TODO
+
+        Ref<Project> project = Project::GetActive();
+        ProjectSerializer serializer(project);
+        serializer.Serialize(project->GetConfig().ProjectDirectory + "/" + project->GetConfig().ProjectFileName);
+    }
+
 
     ////////////////////////////////////////////
     /// Scene File
@@ -666,7 +746,7 @@ namespace fox
             return;
         }
 
-        ref<Scene> newScene = new_ref<Scene>();
+        Ref<Scene> newScene = new_ref<Scene>();
         SceneSerializer serializer(newScene);
         if (serializer.Deserialize(path.string()))
         {

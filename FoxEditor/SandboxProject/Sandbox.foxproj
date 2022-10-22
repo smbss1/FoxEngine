@@ -1,0 +1,9 @@
+Project:
+  Name: Sandbox
+  AssetDirectory: Assets
+  AssetRegistry: Assets/AssetRegistry.fxr
+  ScriptModulePath: Assets/Scripts/Binaries
+  StartScene: ""
+  ReloadAssemblyOnPlay: true
+  AutoSave: false
+  AutoSaveInterval: 300

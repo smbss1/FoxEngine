@@ -1,4 +1,4 @@
-/// @ref gtx_wrap
+/// @Ref gtx_wrap
 
 namespace glm
 {

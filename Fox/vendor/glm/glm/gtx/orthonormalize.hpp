@@ -1,4 +1,4 @@
-/// @ref gtx_orthonormalize
+/// @Ref gtx_orthonormalize
 /// @file glm/gtx/orthonormalize.hpp
 ///
 /// @see core (dependence)

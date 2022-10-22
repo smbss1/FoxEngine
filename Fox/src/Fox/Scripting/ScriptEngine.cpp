@@ -2,11 +2,14 @@
 // Created by samuel on 03/10/22.
 //
 
-#include "Components/ScriptComponent.hpp"
-
 #include "ScriptEngine.hpp"
 #include "ScriptGlue.hpp"
+#include "ScriptCache.hpp"
+#include "Marshal.hpp"
 #include "Utils.hpp"
+#include "FileWatch.hpp"
+#include "Core/Application.hpp"
+#include "Components/ScriptComponent.hpp"
 
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
@@ -20,9 +23,6 @@
 #include "mono/metadata/debug-helpers.h"
 //#endif // FOX_DEBUG
 
-#include "FileWatch.hpp"
-#include "Core/Application.hpp"
-
 #include <fstream>
 
 namespace fox
@@ -35,17 +35,13 @@ namespace fox
         MonoDomain* RootDomain = nullptr;
         MonoDomain* AppDomain = nullptr;
 
-        MonoAssembly* CoreAssembly = nullptr;
-        MonoImage* CoreAssemblyImage = nullptr;
+        Ref<AssemblyInfo> CoreAssembly = nullptr;
+        Ref<AssemblyInfo> AppAssembly = nullptr;
 
-        MonoAssembly* AppAssembly = nullptr;
-        MonoImage* AppAssemblyImage = nullptr;
+        ManagedClass* EntityClass;
 
-        ref<ScriptClass> EntityClass;
-
-        std::unordered_map<std::string, ref<ScriptClass>> EntityClasses;
-        std::unordered_map<UUID, ref<ScriptInstance>> EntityInstances;
-        std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
+        std::unordered_map<std::string, ManagedClass*> EntityClasses;
+        std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 
         scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
 		bool AssemblyReloadPending = false;
@@ -82,41 +78,6 @@ namespace fox
         LoadAppAssembly(s_AppAssemblyPath);
         LoadAssemblyClasses();
         FindClassAndRegisterTypes();
-
-#if 0
-        // Create an object (and call constructor)
-        MonoObject* instance = s_Data->EntityClass.Instantiate();
-
-        // Call method
-        MonoMethod* printMessageFunc = s_Data->EntityClass.GetMethod("PrintMessage", 0);
-        s_Data->EntityClass.InvokeMethod(instance, printMessageFunc);
-
-        // Call method with param
-        MonoMethod* printIntFunc = s_Data->EntityClass.GetMethod("PrintInt", 1);
-
-        int value = 5;
-        void* params[1] = {
-            &value,
-        };
-
-        s_Data->EntityClass.InvokeMethod(instance, printIntFunc, params);
-
-        MonoMethod* printIntsFunc = s_Data->EntityClass.GetMethod("PrintInts", 2);
-        int value2 = 508;
-        void* params[2] =
-        {
-            &value,
-            &value2
-        };
-        s_Data->EntityClass.InvokeMethod(instance, printIntsFunc, params);
-
-        MonoString* monoString = mono_string_new(s_Data->AppDomain, "Hello World from C++!");
-        MonoMethod* printCustomMessageFunc = s_Data->EntityClass.GetMethod("PrintCustomMessage", 1);
-        void* stringParam = monoString;
-        s_Data->EntityClass.InvokeMethod(instance, printCustomMessageFunc, &stringParam);
-
-        FOX_ASSERT(false);
-#endif
     }
 
     void ScriptEngine::Shutdown()
@@ -151,7 +112,6 @@ namespace fox
 //        FOX_PROFILE_SCOPE();
 
 		s_Data->EntityClasses.clear();
-		s_Data->EntityScriptFields.clear();
 		s_Data->EntityInstances.clear();
 
 		GCManager::Shutdown();
@@ -173,16 +133,22 @@ namespace fox
 //        mono_debug_domain_create(s_Data->AppDomain);
 
         // Move this maybe
-        s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath);
-        s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
+        s_Data->CoreAssembly = new_ref<AssemblyInfo>();
+        s_Data->CoreAssembly->Assembly = Utils::LoadMonoAssembly(filepath);
+        s_Data->CoreAssembly->AssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly->Assembly);
 //        Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
+
+        ScriptCache::Init();
+//        MarshalUtils::Init();
     }
 
     void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
     {
         // Move this maybe
-        s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
-        s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
+        s_Data->AppAssembly = new_ref<AssemblyInfo>();
+
+        s_Data->AppAssembly->Assembly = Utils::LoadMonoAssembly(filepath);
+        s_Data->AppAssembly->AssemblyImage = mono_assembly_get_image(s_Data->AppAssembly->Assembly);
         // Utils::PrintAssemblyTypes(s_Data->AppAssembly);
 
         s_Data->AppAssemblyFileWatcher = new_scope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
@@ -195,7 +161,7 @@ namespace fox
         ScriptGlue::RegisterComponents();
 
         // Retrieve and instantiate class
-        s_Data->EntityClass = new_ref<ScriptClass>("Fox", "Entity", true);
+        s_Data->EntityClass = ScriptCache::GetManagedClassByName("Fox.Entity");
     }
 
     void ScriptEngine::CompileAppAssembly()
@@ -264,6 +230,9 @@ namespace fox
         FOX_CORE_INFO("Reloading the C# Assembly");
         if (s_Data->AppDomain)
         {
+            ScriptCache::Shutdown();
+//            MarshalUtils::Shutdown();
+
             mono_domain_set(mono_get_root_domain(), false);
             mono_domain_unload(s_Data->AppDomain);
             s_Data->AppDomain = nullptr;
@@ -279,35 +248,44 @@ namespace fox
         FOX_CORE_INFO("Finished reload the C# Assembly");
     }
 
+    MonoDomain* ScriptEngine::GetAppDomain()
+    {
+        return s_Data->AppDomain;
+    }
+
+    Ref<AssemblyInfo> ScriptEngine::GetCoreAssembly()
+    {
+        return s_Data->CoreAssembly;
+    }
+
+    Ref<AssemblyInfo> ScriptEngine::GetAppAssembly()
+    {
+        return s_Data->AppAssembly;
+    }
 
     void ScriptEngine::OnRuntimeStart(Scene* scene)
     {
-        s_Data->SceneContext = scene;
+        SetSceneContext(scene);
     }
 
     void ScriptEngine::OnRuntimeStop()
     {
         s_Data->SceneContext = nullptr;
+
+        for (const auto& [id, instance] : s_Data->EntityInstances)
+        {
+            for (auto& fieldID : instance->m_ManagedClass->Fields)
+            {
+                auto storage = ScriptCache::GetFieldStorage(fieldID);
+                storage->UnregisterInstance(instance->m_Handle);
+            }
+        }
         s_Data->EntityInstances.clear();
     }
 
     bool ScriptEngine::EntityClassExists(const std::string& fullClassName)
     {
         return s_Data->EntityClasses.find(fullClassName) != s_Data->EntityClasses.end();
-    }
-
-    ref<ScriptInstance> ScriptEngine::CreateEntityInstance(Entity entity)
-    {
-        ref<ScriptInstance> instance = new_ref<ScriptInstance>(s_Data->EntityClass, entity);
-        s_Data->EntityInstances[entity.GetUUID()] = instance;
-        return instance;
-    }
-
-    ref<ScriptInstance> ScriptEngine::CreateEntityInstance(Entity entity, const ScriptComponent& component)
-    {
-        ref<ScriptInstance> instance = new_ref<ScriptInstance>(s_Data->EntityClasses[component.ClassName], entity);
-        s_Data->EntityInstances[entity.GetUUID()] = instance;
-        return instance;
     }
 
     void ScriptEngine::OnCreateEntity(Entity entity)
@@ -317,36 +295,37 @@ namespace fox
         {
             UUID entityID = entity.GetUUID();
 
-            ref<ScriptInstance> instance = new_ref<ScriptInstance>(s_Data->EntityClasses[sc.ClassName], entity);
+            Ref<ScriptInstance> instance = new_ref<ScriptInstance>(s_Data->EntityClasses[sc.ClassName], entity);
             s_Data->EntityInstances[entityID] = instance;
 
-            // Copy field values
-            if (s_Data->EntityScriptFields.find(entityID) != s_Data->EntityScriptFields.end())
+            ManagedClass* entityClass = instance->m_ManagedClass;
+            const auto& fields = entityClass->Fields;
+            for (const auto& id : fields)
             {
-                const ScriptFieldMap& fieldMap = s_Data->EntityScriptFields.at(entityID);
-                for (const auto& [name, fieldInstance] : fieldMap)
-                {
-                    if (fieldInstance.Field.Type == ScriptFieldType::Entity)
-                    {
-                        // get the id ref of the entity
-                        UUID entityId = fieldInstance.GetValue<UUID>();
-                        if (entityId <= 0)
-                            continue;
+                auto storage = ScriptCache::GetFieldStorage(id);
+                instance->SetFieldValue(storage->Field, storage->GetValue());
+                storage->RegisterInstance(instance->m_Handle);
+            }
+            instance->InvokeOnCreate();
+        }
+    }
 
-                        // TODO: Caching the instance ? (better perf ?)
-                        // if id is ok
-                        // get the entity instance in the scene
-                        Entity entityRef = s_Data->SceneContext->GetEntityByUUID(entityId);
-                        // create a new instance C#
-                        ref<ScriptInstance> obj = CreateEntityInstance(entityRef);
-                        // Set into the field
-                        instance->SetFieldValueInternal(name, obj->GetManagedObject());
-                    }
-                    else
-                    {
-                        instance->SetFieldValueInternal(name, fieldInstance.m_Buffer);
-                    }
-                }
+    void ScriptEngine::OnEntityInstantiated(Entity entityDst, Entity entitySrc)
+    {
+        const auto& sc = entityDst.get<ScriptComponent>();
+        if (ScriptEngine::EntityClassExists(sc.ClassName))
+        {
+            UUID entityID = entityDst.GetUUID();
+
+            Ref<ScriptInstance> instance = new_ref<ScriptInstance>(s_Data->EntityClasses[sc.ClassName], entityDst);
+            s_Data->EntityInstances[entityID] = instance;
+
+            // Copy field values from Src Entity
+            for (auto& fieldID : instance->m_ManagedClass->Fields)
+            {
+                auto storage = ScriptCache::GetFieldStorage(fieldID);
+                instance->SetFieldValue(storage->Field, storage->GetValue());
+                storage->RegisterInstance(instance->m_Handle);
             }
             instance->InvokeOnCreate();
         }
@@ -357,8 +336,13 @@ namespace fox
         UUID entityUUID = entity.GetUUID();
         FOX_ASSERT(s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end());
 
-        ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+        Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
         instance->InvokeOnUpdate(ts);
+    }
+
+    void ScriptEngine::SetSceneContext(Scene* scene)
+    {
+        s_Data->SceneContext = scene;
     }
 
     Scene* ScriptEngine::GetSceneContext()
@@ -366,7 +350,7 @@ namespace fox
         return s_Data->SceneContext;
     }
 
-    ref<ScriptInstance> ScriptEngine::GetEntityScriptInstance(UUID entityID)
+    Ref<ScriptInstance> ScriptEngine::GetEntityScriptInstance(UUID entityID)
     {
         auto it = s_Data->EntityInstances.find(entityID);
         if (it == s_Data->EntityInstances.end())
@@ -375,7 +359,7 @@ namespace fox
         return it->second;
     }
 
-    ref<ScriptClass> ScriptEngine::GetEntityClass(const std::string& name)
+    ManagedClass* ScriptEngine::GetEntityClass(const std::string& name)
     {
         if (s_Data->EntityClasses.find(name) == s_Data->EntityClasses.end())
             return nullptr;
@@ -383,54 +367,35 @@ namespace fox
         return s_Data->EntityClasses.at(name);
     }
 
-    Entity ScriptEngine::GetEntityInstanceFromMonoObject(MonoObject* obj)
-    {
-        for (auto script : s_Data->EntityInstances)
-        {
-            if (script.second->GetManagedObject() == obj)
-                return s_Data->SceneContext->GetEntityByUUID(script.first);
-        }
-
-        return Entity();
-    }
-
-
-    std::unordered_map<std::string, ref<ScriptClass>> ScriptEngine::GetEntityClasses()
+    std::unordered_map<std::string, ManagedClass*> ScriptEngine::GetEntityClasses()
     {
         return s_Data->EntityClasses;
-    }
-
-    ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity)
-    {
-        FOX_ASSERT(entity);
-
-        UUID entityID = entity.GetUUID();
-        return s_Data->EntityScriptFields[entityID];
     }
 
     void ScriptEngine::LoadAssemblyClasses()
     {
         GCManager::CollectGarbage();
         s_Data->EntityClasses.clear();
+        ScriptCache::GenerateCacheForAssembly(s_Data->AppAssembly);
 
-        const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_Data->AppAssemblyImage, MONO_TABLE_TYPEDEF);
+        const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_Data->AppAssembly->AssemblyImage, MONO_TABLE_TYPEDEF);
         int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
-        MonoClass* entityClass = mono_class_from_name(s_Data->CoreAssemblyImage, "Fox", "Entity");
+        MonoClass* entityClass = mono_class_from_name(s_Data->CoreAssembly->AssemblyImage, "Fox", "Entity");
 
         for (int32_t i = 0; i < numTypes; i++)
         {
             uint32_t cols[MONO_TYPEDEF_SIZE];
             mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
 
-            const char* nameSpace = mono_metadata_string_heap(s_Data->AppAssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
-            const char* className = mono_metadata_string_heap(s_Data->AppAssemblyImage, cols[MONO_TYPEDEF_NAME]);
+            const char* nameSpace = mono_metadata_string_heap(s_Data->AppAssembly->AssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
+            const char* className = mono_metadata_string_heap(s_Data->AppAssembly->AssemblyImage, cols[MONO_TYPEDEF_NAME]);
             std::string fullName;
             if (strlen(nameSpace) != 0)
                 fullName = fox::format("%.%", nameSpace, className);
             else
                 fullName = className;
 
-            MonoClass* monoClass = mono_class_from_name(s_Data->AppAssemblyImage, nameSpace, className);
+            MonoClass* monoClass = mono_class_from_name(s_Data->AppAssembly->AssemblyImage, nameSpace, className);
 
             if (monoClass == nullptr || monoClass == entityClass)
                 continue;
@@ -439,36 +404,9 @@ namespace fox
             if (!isEntity)
                 continue;
 
-            ref<ScriptClass> scriptClass = new_ref<ScriptClass>(nameSpace, className);
+            ManagedClass* scriptClass = ScriptCache::GetManagedClassByName(fullName);
             s_Data->EntityClasses[fullName] = scriptClass;
-
-
-            // This routine is an iterator routine for retrieving the fields in a class.
-            // You must pass a gpointer that points to zero and is treated as an opaque handle
-            // to iterate over all of the elements. When no more values are available, the return value is NULL.
-
-            int fieldCount = mono_class_num_fields(monoClass);
-            FOX_CORE_WARN("% has % fields:", className, fieldCount);
-            void* iterator = nullptr;
-            while (MonoClassField* field = mono_class_get_fields(monoClass, &iterator))
-            {
-                const char* fieldName = mono_field_get_name(field);
-                uint32_t flags = mono_field_get_flags(field);
-                if (flags & FIELD_ATTRIBUTE_PUBLIC)
-                {
-                    MonoType* type = mono_field_get_type(field);
-                    ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
-                    FOX_CORE_WARN("  % (%)", fieldName, Utils::ScriptFieldTypeToString(fieldType));
-
-                    scriptClass->m_Fields[fieldName] = { fieldType, fieldName, field };
-                }
-            }
         }
-    }
-
-    MonoImage* ScriptEngine::GetCoreAssemblyImage()
-    {
-        return s_Data->CoreAssemblyImage;
     }
 
     MonoObject* ScriptEngine::GetManagedInstance(UUID uuid)
@@ -477,53 +415,49 @@ namespace fox
         return s_Data->EntityInstances.at(uuid)->GetManagedObject();
     }
 
+    MonoObject* ScriptEngine::CreateManagedObject(MonoClass* managedClass)
+    {
+        MonoObject* monoObject = mono_object_new(s_Data->AppDomain, managedClass);
+        FOX_CORE_ASSERT(monoObject, "Failed to create MonoObject!");
+        return monoObject;
+    }
+
+    void ScriptEngine::InitRuntimeObject(MonoClass* monoClass, MonoObject* object)
+    {
+        // Why doesn't mono/C# generate a default constructor if none exists... Mono requires one in order to properly initialize an object...
+        // And for whatever bizzare reason it won't work if the parent class provides a default constructor...
+        MonoMethod* defaultConstructor = mono_class_get_method_from_name(monoClass, ".ctor", 0);
+        if (defaultConstructor == nullptr)
+            return;
+        InitRuntimeObject(object);
+    }
+
+    void ScriptEngine::InitRuntimeObject(MonoObject* object)
+    {
+        mono_runtime_object_init(object);
+    }
+
     GCHandle ScriptEngine::InstantiateClass(MonoClass* monoClass)
     {
 //        FOX_PROFILE_SCOPE();
 
-        MonoObject* object = mono_object_new(s_Data->AppDomain, monoClass);
+        MonoObject* object = CreateManagedObject(monoClass);
         if (object)
         {
-            mono_runtime_object_init(object);
+            InitRuntimeObject(monoClass, object);
             return GCManager::CreateObjectReference(object, false);
         }
 
         return -1;
     }
 
-    ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore)
-        : m_ClassNamespace(classNamespace), m_ClassName(className)
+    ScriptInstance::ScriptInstance(ManagedClass* managedClass, Entity entity)
+        : m_ManagedClass(managedClass)
     {
-        m_MonoClass = mono_class_from_name(isCore ? s_Data->CoreAssemblyImage : s_Data->AppAssemblyImage, classNamespace.c_str(), className.c_str());
-    }
+        m_Handle = m_ManagedClass->Instantiate();
 
-    GCHandle ScriptClass::Instantiate()
-    {
-        return ScriptEngine::InstantiateClass(m_MonoClass);
-    }
-
-    MonoMethod* ScriptClass::GetMethod(const std::string& name, int parameterCount)
-    {
-        return mono_class_get_method_from_name(m_MonoClass, name.c_str(), parameterCount);
-    }
-
-    MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* method, void** params)
-    {
-        MonoObject* exception = nullptr;
-        MonoObject* result = mono_runtime_invoke(method, instance, params, &exception);
-        if (Utils::HandleException(exception))
-            return nullptr;
-        return result;
-    }
-
-    ScriptInstance::ScriptInstance(ref<ScriptClass> scriptClass, Entity entity)
-        : m_ScriptClass(scriptClass)
-    {
-        m_Handle = scriptClass->Instantiate();
-
-        m_Constructor = s_Data->EntityClass->GetMethod(".ctor", 1);
-        m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
-        m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
+        m_OnCreateMethod = m_ManagedClass->GetMethod("OnCreate", 0);
+        m_OnUpdateMethod = m_ManagedClass->GetMethod("OnUpdate", 1);
 
         m_OnCollisionEnter2DMethod = s_Data->EntityClass->GetMethod("HandleOnCollisionEnter2D", 1);
         m_OnCollisionExit2DMethod = s_Data->EntityClass->GetMethod("HandleOnCollisionExit2D", 1);
@@ -531,8 +465,7 @@ namespace fox
         // Call Entity constructor
         {
             UUID entityID = entity.GetUUID();
-            void* param = &entityID;
-            m_ScriptClass->InvokeMethod(GetManagedObject(), m_Constructor, &param);
+            m_ManagedClass->CallMethod(m_Handle, ".ctor", entityID);
         }
     }
 
@@ -544,7 +477,7 @@ namespace fox
     void ScriptInstance::InvokeOnCreate()
     {
         if (m_OnCreateMethod)
-            m_ScriptClass->InvokeMethod(GetManagedObject(), m_OnCreateMethod);
+            m_ManagedClass->InvokeMethod(GetManagedObject(), m_OnCreateMethod);
     }
 
     void ScriptInstance::InvokeOnUpdate(float ts)
@@ -552,63 +485,29 @@ namespace fox
         if (m_OnUpdateMethod)
         {
             void* param = &ts;
-            m_ScriptClass->InvokeMethod(GetManagedObject(), m_OnUpdateMethod, &param);
+            m_ManagedClass->InvokeMethod(GetManagedObject(), m_OnUpdateMethod, &param);
         }
     }
 
     void ScriptInstance::InvokeOnCollisionEnter2D(Collision2DData collisionInfo)
     {
         void* params = &collisionInfo;
-        m_ScriptClass->InvokeMethod(GetManagedObject(), m_OnCollisionEnter2DMethod, &params);
+        m_ManagedClass->InvokeMethod(GetManagedObject(), m_OnCollisionEnter2DMethod, &params);
     }
 
     void ScriptInstance::InvokeOnCollisionExit2D(Collision2DData collisionInfo)
     {
         void* params = &collisionInfo;
-        m_ScriptClass->InvokeMethod(GetManagedObject(), m_OnCollisionExit2DMethod, &params);
+        m_ManagedClass->InvokeMethod(GetManagedObject(), m_OnCollisionExit2DMethod, &params);
     }
 
-    bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer)
+    Utils::ValueWrapper ScriptInstance::GetFieldValue(const ManagedField* field)
     {
-        const auto& fields = m_ScriptClass->GetFields();
-        auto it = fields.find(name);
-        if (it == fields.end())
-            return false;
-
-        const ScriptField& field = it->second;
-        mono_field_get_value(GetManagedObject(), field.ClassField, buffer);
-        return true;
+        return Utils::GetFieldValue(GetManagedObject(), field);
     }
 
-    MonoObject* ScriptInstance::GetFieldObjectValueInternal(const std::string& name)
+    void ScriptInstance::SetFieldValue(const ManagedField* field, const Utils::ValueWrapper& value)
     {
-//        FOX_PROFILE_SCOPE();
-
-        const auto& fields = m_ScriptClass->GetFields();
-        auto it = fields.find(name);
-        if (it == fields.end())
-            return nullptr;
-
-        const ScriptField& field = it->second;
-        return mono_field_get_value_object(s_Data->AppDomain, field.ClassField, GetManagedObject());
-    }
-
-    bool ScriptInstance::SetFieldValueInternal(const std::string& name, const void* value)
-    {
-        const auto& fields = m_ScriptClass->GetFields();
-        auto it = fields.find(name);
-        if (it == fields.end())
-            return false;
-
-        const ScriptField& field = it->second;
-        void* valueStore = (void*) value;
-
-        if (field.Type == ScriptFieldType::String)
-        {
-            MonoString* monoStr = mono_string_new(s_Data->AppDomain, (const char*)value);
-            valueStore = monoStr;
-        }
-        mono_field_set_value(GetManagedObject(), field.ClassField, valueStore);
-        return true;
+        Utils::SetFieldValue(GetManagedObject(), field, value);
     }
 }

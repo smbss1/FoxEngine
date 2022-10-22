@@ -32,7 +32,7 @@ struct _MonoType {
 	} data;
 	unsigned int attrs    : 16; /* param attributes or field flags */
 	MonoTypeEnum type     : 8;
-	unsigned int has_cmods : 1;  
+	unsigned int has_cmods : 1;
 	unsigned int byref    : 1;
 	unsigned int pinned   : 1;  /* valid when included in a local var signature */
 };
@@ -130,14 +130,14 @@ mono_type_get_custom_modifier (const MonoType *ty, uint8_t idx, gboolean *requir
 // memory unsafety on the stack and/or heap, when we try to traverse
 // this array.
 //
-// Use mono_sizeof_monotype 
+// Use mono_sizeof_monotype
 // to get the size of the memory to copy.
 #define MONO_SIZEOF_TYPE sizeof (MonoType)
 
-size_t 
+size_t
 mono_sizeof_type_with_mods (uint8_t num_mods, gboolean aggregate);
 
-size_t 
+size_t
 mono_sizeof_type (const MonoType *ty);
 
 size_t
@@ -206,8 +206,8 @@ typedef struct _MonoAssemblyContext {
 } MonoAssemblyContext;
 
 struct _MonoAssembly {
-	/* 
-	 * The number of appdomains which have this assembly loaded plus the number of 
+	/*
+	 * The number of appdomains which have this assembly loaded plus the number of
 	 * assemblies referencing this assembly through an entry in their image->references
 	 * arrays. The latter is needed because entries in the image->references array
 	 * might point to assemblies which are only loaded in some appdomains, and without
@@ -238,7 +238,7 @@ struct _MonoAssembly {
 
 typedef struct {
 	/*
-	 * indexed by MonoMethodSignature 
+	 * indexed by MonoMethodSignature
 	 * Protected by the marshal lock
 	 */
 	GHashTable *delegate_invoke_cache;
@@ -291,7 +291,7 @@ struct _MonoTableInfo {
 	 * A 32 bit value can encode the resulting size
 	 *
 	 * The top eight bits encode the number of columns in the table.
-	 * we only need 4, but 8 is aligned no shift required. 
+	 * we only need 4, but 8 is aligned no shift required.
 	 */
 	guint32   size_bitfield;
 };
@@ -319,7 +319,7 @@ typedef struct {
  *
  */
 typedef struct {
-	MonoRefCount ref;
+	MonoRefCount Ref;
 
 	/* key used for lookups.  owned by this image storage. */
 	char *key;
@@ -406,14 +406,14 @@ struct _MonoImage {
 	MonoMemPool         *mempool; /*protected by the image lock*/
 
 	char                *raw_metadata;
-			    
+
 	MonoStreamHeader     heap_strings;
 	MonoStreamHeader     heap_us;
 	MonoStreamHeader     heap_blob;
 	MonoStreamHeader     heap_guid;
 	MonoStreamHeader     heap_tables;
 	MonoStreamHeader     heap_pdb;
-			    
+
 	const char          *tables_base;
 
 	/* For PPDB files */
@@ -504,7 +504,7 @@ struct _MonoImage {
 	GHashTable *native_func_wrapper_cache;
 
 	/*
-	 * indexed by MonoMethod pointers 
+	 * indexed by MonoMethod pointers
 	 */
 	GHashTable *wrapper_param_names;
 	GHashTable *array_accessor_cache;
@@ -958,7 +958,7 @@ mono_metadata_parse_mh_full                 (MonoImage             *image,
 					     const char            *ptr,
 						 MonoError *error);
 
-MonoMethodSignature  *mono_metadata_parse_signature_checked (MonoImage *image, 
+MonoMethodSignature  *mono_metadata_parse_signature_checked (MonoImage *image,
 							     uint32_t    token,
 							     MonoError *error);
 
@@ -1064,7 +1064,7 @@ gboolean       mono_metadata_generic_inst_equal (gconstpointer ka, gconstpointer
 
 MONO_API void
 mono_metadata_field_info_with_mempool (
-					  MonoImage *meta, 
+					  MonoImage *meta,
 				      guint32       table_index,
 				      guint32      *offset,
 				      guint32      *rva,
@@ -1113,7 +1113,7 @@ mono_type_create_from_typespec_checked (MonoImage *image, guint32 type_spec, Mon
 
 MonoMethodSignature*
 mono_method_get_signature_checked (MonoMethod *method, MonoImage *image, guint32 token, MonoGenericContext *context, MonoError *error);
-	
+
 MonoMethod *
 mono_get_method_checked (MonoImage *image, guint32 token, MonoClass *klass, MonoGenericContext *context, MonoError *error);
 

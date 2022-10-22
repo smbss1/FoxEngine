@@ -21,10 +21,10 @@ namespace fox
 
         ~OpenGLVertexArray() override;
 
-        void AddVertexBuffer(const ref<VertexBuffer>& vertexBuffer) override;
-        void SetIndexBuffer(const ref<IndexBuffer>& indexBuffer) override;
-        [[nodiscard]] const std::vector<ref<VertexBuffer>>& GetVertexBuffers() const override;
-        [[nodiscard]] const ref<IndexBuffer>& GetIndexBuffer() const override;
+        void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) override;
+        void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer) override;
+        [[nodiscard]] const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const override;
+        [[nodiscard]] const Ref<IndexBuffer>& GetIndexBuffer() const override;
 
         void Bind() const override;
 
@@ -33,8 +33,8 @@ namespace fox
     private:
         uint32_t m_RendererID = 0;
         uint32_t m_uVertexBufferIndex = 0;
-        std::vector<ref<VertexBuffer>> m_vVerticesBuffers;
-        ref<IndexBuffer> m_pIndexBuffer;
+        std::vector<Ref<VertexBuffer>> m_vVerticesBuffers;
+        Ref<IndexBuffer> m_pIndexBuffer;
     };
 }
 

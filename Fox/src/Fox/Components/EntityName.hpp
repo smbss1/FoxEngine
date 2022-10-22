@@ -32,26 +32,5 @@ namespace fox
          */
         explicit EntityName(const std::string& strName) : name(strName) {}
     };
-//
-//    struct EntityTag
-//    {
-//        std::string tag;
-//        /**
-//         * @brief Default Constructor
-//         * @param tag the tag
-//         */
-//        EntityTag() = default;
-//
-//        /**
-//         * @brief Default Copy Constructor
-//         */
-//        EntityTag(const EntityTag&) = default;
-//
-//        /**
-//         * @brief Constructor
-//         * @param tag the tag
-//         */
-//        explicit EntityTag(const std::string& strTag) : tag(strTag) {}
-//    };
 }
 #endif

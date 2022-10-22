@@ -81,6 +81,18 @@ namespace Fox
             ulong entityId = InternalCalls.Entity_Instantiate(entity.ID);
             return new Entity(entityId);
         }
+        
+        public Entity Instantiate(Prefab prefab)
+        {
+            ulong entityId = InternalCalls.Entity_InstantiatePrefab(ref prefab.m_Handle);
+            return entityId == 0 ? null : new Entity(entityId);
+        }
+        
+        public Entity Instantiate(Prefab prefab, Vector3 position)
+        {
+            ulong entityID = InternalCalls.Entity_InstantiatePrefabWithPosition(ref prefab.m_Handle, ref position);
+            return entityID == 0 ? null : new Entity(entityID);
+        }
 
         public void Destroy(Entity entity)
         {

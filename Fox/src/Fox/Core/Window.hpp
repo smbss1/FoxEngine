@@ -30,7 +30,7 @@ namespace fox
     };
 
     // Interface representing a desktop system based Window
-    class Window
+    class Window : public RefCounted
     {
     public:
         using EventCallbackFn = std::function<void(Event&)>;
@@ -56,8 +56,6 @@ namespace fox
          */
         virtual bool GetKey(const KeyCode keycode) = 0;
         virtual bool IsKeyPressed(const KeyCode key) = 0;
-        virtual bool IsKeyDown(const KeyCode key) = 0;
-        virtual bool IsKeyReleased(const KeyCode key) = 0;
 
         virtual bool IsMouseButtonPressed(const Mouse button) = 0;
         virtual glm::vec2 GetMousePosition() = 0;

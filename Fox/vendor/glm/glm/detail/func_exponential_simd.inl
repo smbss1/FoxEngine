@@ -1,4 +1,4 @@
-/// @ref core
+/// @Ref core
 /// @file glm/detail/func_exponential_simd.inl
 
 #include "glm/simd/exponential.h"

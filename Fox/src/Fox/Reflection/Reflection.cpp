@@ -97,7 +97,8 @@ namespace fox
         Reflect::Reflect<Rigidbody2D>("Rigidbody2D")
             .AddConstructor<>()
             .AddDataMember(&Rigidbody2D::Type, "Body Type")
-            .AddDataMember(&Rigidbody2D::FixedRotation, "Fixed Rotation");
+            .AddDataMember(&Rigidbody2D::FixedRotation, "Fixed Rotation")
+            .AddDataMember(&Rigidbody2D::GravityScale, "GravityScale");
 
         // Camera
 //        Reflect::Reflect<CameraComponent>("Camera")

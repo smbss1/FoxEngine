@@ -7,7 +7,7 @@
     APIs: gl=4.6
     Profile: compatibility
     Extensions:
-        
+
     Loader: True
     Local files: False
     Omit khrplatform: False
@@ -2025,7 +2025,7 @@ GLAPI PFNGLBLENDFUNCPROC glad_glBlendFunc;
 typedef void (APIENTRYP PFNGLLOGICOPPROC)(GLenum opcode);
 GLAPI PFNGLLOGICOPPROC glad_glLogicOp;
 #define glLogicOp glad_glLogicOp
-typedef void (APIENTRYP PFNGLSTENCILFUNCPROC)(GLenum func, GLint ref, GLuint mask);
+typedef void (APIENTRYP PFNGLSTENCILFUNCPROC)(GLenum func, GLint Ref, GLuint mask);
 GLAPI PFNGLSTENCILFUNCPROC glad_glStencilFunc;
 #define glStencilFunc glad_glStencilFunc
 typedef void (APIENTRYP PFNGLSTENCILOPPROC)(GLenum fail, GLenum zfail, GLenum zpass);
@@ -2733,7 +2733,7 @@ GLAPI PFNGLEVALMESH2PROC glad_glEvalMesh2;
 typedef void (APIENTRYP PFNGLEVALPOINT2PROC)(GLint i, GLint j);
 GLAPI PFNGLEVALPOINT2PROC glad_glEvalPoint2;
 #define glEvalPoint2 glad_glEvalPoint2
-typedef void (APIENTRYP PFNGLALPHAFUNCPROC)(GLenum func, GLfloat ref);
+typedef void (APIENTRYP PFNGLALPHAFUNCPROC)(GLenum func, GLfloat Ref);
 GLAPI PFNGLALPHAFUNCPROC glad_glAlphaFunc;
 #define glAlphaFunc glad_glAlphaFunc
 typedef void (APIENTRYP PFNGLPIXELZOOMPROC)(GLfloat xfactor, GLfloat yfactor);
@@ -3333,7 +3333,7 @@ GLAPI PFNGLDRAWBUFFERSPROC glad_glDrawBuffers;
 typedef void (APIENTRYP PFNGLSTENCILOPSEPARATEPROC)(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
 GLAPI PFNGLSTENCILOPSEPARATEPROC glad_glStencilOpSeparate;
 #define glStencilOpSeparate glad_glStencilOpSeparate
-typedef void (APIENTRYP PFNGLSTENCILFUNCSEPARATEPROC)(GLenum face, GLenum func, GLint ref, GLuint mask);
+typedef void (APIENTRYP PFNGLSTENCILFUNCSEPARATEPROC)(GLenum face, GLenum func, GLint Ref, GLuint mask);
 GLAPI PFNGLSTENCILFUNCSEPARATEPROC glad_glStencilFuncSeparate;
 #define glStencilFuncSeparate glad_glStencilFuncSeparate
 typedef void (APIENTRYP PFNGLSTENCILMASKSEPARATEPROC)(GLenum face, GLuint mask);

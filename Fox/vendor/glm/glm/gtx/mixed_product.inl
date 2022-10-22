@@ -1,4 +1,4 @@
-/// @ref gtx_mixed_product
+/// @Ref gtx_mixed_product
 
 namespace glm
 {

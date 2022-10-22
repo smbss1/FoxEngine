@@ -21,8 +21,8 @@ namespace fox
     class PluginManager
     {
         /// Map of plugins by their associated file names
-        using PluginMap = std::map<std::string, ref<fox::PluginLoader>>;
-        using PluginVec = std::vector<ref<fox::IPlugin>>;
+        using PluginMap = std::map<std::string, Ref<fox::PluginLoader>>;
+        using PluginVec = std::vector<Ref<fox::IPlugin>>;
 //        using GraphicsPlugins = std::vector<fox::GraphicPlugin*>;
 
     public:
@@ -48,7 +48,7 @@ namespace fox
             }
         }
 
-        FOX_API void AddPlugin(const ref<IPlugin>& plugin)
+        FOX_API void AddPlugin(const Ref<IPlugin>& plugin)
         {
             auto it = std::find(m_vPlugins.begin(), m_vPlugins.end(), plugin);
             if (it == m_vPlugins.end())
@@ -60,12 +60,12 @@ namespace fox
             return m_oGraphicService;
         }
 
-        ref<fox::WindowPlugin> GetWindowPlugin()
+        Ref<fox::WindowPlugin> GetWindowPlugin()
         {
             return m_pWindowPlugin;
         }
 
-        void SetWindowPlugin(const ref<fox::WindowPlugin>& pPlugin)
+        void SetWindowPlugin(const Ref<fox::WindowPlugin>& pPlugin)
         {
             m_pWindowPlugin = pPlugin;
         }
@@ -88,7 +88,7 @@ namespace fox
         /// Manages graphics-related tasks for the engine
         GraphicsService m_oGraphicService;
 
-        ref<fox::WindowPlugin> m_pWindowPlugin;
+        Ref<fox::WindowPlugin> m_pWindowPlugin;
     };
 }
 

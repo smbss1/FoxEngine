@@ -16,7 +16,7 @@ namespace fox
         SpriteRenderer() = default;
         SpriteRenderer(const SpriteRenderer&) = default;
 
-        fox::ref<fox::Texture2D> Sprite;
+        fox::Ref<fox::Texture2D> Sprite;
         glm::vec4 Color { 1.0f, 1.0f, 1.0f, 1.0f };
         float TilingFactor = 1.0f;
         int Depth = 0;

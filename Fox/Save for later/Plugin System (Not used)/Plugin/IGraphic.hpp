@@ -49,7 +49,7 @@ namespace fox
 
         /// <summary>A vector of graphics drivers</summary>
     private:
-        typedef std::vector<ref<fox::GraphicPlugin>> GraphicsPluginVector;
+        typedef std::vector<Ref<fox::GraphicPlugin>> GraphicsPluginVector;
 
         /// <summary>Releases the resources of the graphics server</summary>
     public:
@@ -57,7 +57,7 @@ namespace fox
 
         /// <summary>Allows plugins to add new graphics drivers</summary>
         /// <param name="graphicsDriver">Graphics driver that will be added</param>
-        FOX_API void AddGraphicsPlugin(ref<fox::GraphicPlugin> pGraphicPlugin)
+        FOX_API void AddGraphicsPlugin(Ref<fox::GraphicPlugin> pGraphicPlugin)
         {
             m_vGraphicsPlugin.push_back(pGraphicPlugin);
         }

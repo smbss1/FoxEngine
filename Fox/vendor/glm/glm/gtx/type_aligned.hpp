@@ -1,4 +1,4 @@
-/// @ref gtx_type_aligned
+/// @Ref gtx_type_aligned
 /// @file glm/gtx/type_aligned.hpp
 ///
 /// @see core (dependence)

@@ -1,4 +1,4 @@
-/// @ref gtx_rotate_normalized_axis
+/// @Ref gtx_rotate_normalized_axis
 
 namespace glm
 {

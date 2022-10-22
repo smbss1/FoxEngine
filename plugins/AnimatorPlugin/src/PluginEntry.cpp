@@ -40,6 +40,6 @@ namespace fox
 
 extern "C" void RegisterPlugin(fox::PluginManager &pm)
 {
-//    fox::ref<fox::AnimatorPlugin> plugin = fox::new_ref<fox::AnimatorPlugin>();
+//    fox::Ref<fox::AnimatorPlugin> plugin = fox::new_ref<fox::AnimatorPlugin>();
 //    pm.AddPlugin(plugin);
 }

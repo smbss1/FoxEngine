@@ -27,7 +27,7 @@ namespace fox
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
-    void OpenGLRendererAPI::DrawIndexed(const ref<VertexArray> &pVertexArray, uint32_t uIndexCount)
+    void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray> &pVertexArray, uint32_t uIndexCount)
     {
         pVertexArray->Bind();
         uint32_t count = uIndexCount ? uIndexCount : pVertexArray->GetIndexBuffer()->GetCount();
@@ -39,7 +39,7 @@ namespace fox
         GLCall(glViewport(x, y, width, height));
     }
 
-    void OpenGLRendererAPI::DrawLines(const ref<VertexArray>& vertexArray, uint32_t vertexCount)
+    void OpenGLRendererAPI::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
     {
         vertexArray->Bind();
         glDrawArrays(GL_LINES, 0, vertexCount);

@@ -21,10 +21,17 @@ namespace fox
 
     struct OnContextChangeEvent
     {
-        OnContextChangeEvent(ref<fox::Scene> scene) : Context(scene)
+        OnContextChangeEvent(Ref<fox::Scene> scene) : Context(scene)
         {
         }
-        ref<fox::Scene> Context;
+        Ref<fox::Scene> Context;
+    };
+
+    struct OnProjectChangeEvent
+    {
+        OnProjectChangeEvent()
+        {
+        }
     };
 }
 

@@ -1,4 +1,4 @@
-/// @ref gtx_easing
+/// @Ref gtx_easing
 /// @file glm/gtx/easing.hpp
 /// @author Robert Chisholm
 ///

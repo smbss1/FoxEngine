@@ -1,4 +1,4 @@
-/// @ref gtx_perpendicular
+/// @Ref gtx_perpendicular
 
 namespace glm
 {

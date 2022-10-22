@@ -10,7 +10,7 @@ namespace fox
     class VertexBuffer;
     class IndexBuffer;
 
-    class VertexArray
+    class VertexArray : public RefCounted
     {
     public:
         virtual ~VertexArray() = default;
@@ -18,13 +18,13 @@ namespace fox
         virtual void Bind() const = 0;
         virtual void Unbind() const = 0;
 
-        virtual void AddVertexBuffer(const ref<VertexBuffer>& vertexBuffer) = 0;
-        virtual void SetIndexBuffer(const ref<IndexBuffer>& indexBuffer) = 0;
+        virtual void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) = 0;
+        virtual void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer) = 0;
 
-        [[nodiscard]] virtual const std::vector<ref<VertexBuffer>>& GetVertexBuffers() const = 0;
-        [[nodiscard]] virtual const ref<IndexBuffer>& GetIndexBuffer() const = 0;
+        [[nodiscard]] virtual const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const = 0;
+        [[nodiscard]] virtual const Ref<IndexBuffer>& GetIndexBuffer() const = 0;
 
-        static ref<VertexArray> Create();
+        static Ref<VertexArray> Create();
     };
 }
 
