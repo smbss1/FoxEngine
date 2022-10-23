@@ -783,7 +783,9 @@ namespace fox
             {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteRenderer>(entity);
 
-                Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+                Entity e = Entity(entity, this);
+                glm::mat4 transformMatrice = GetWorldSpaceTransformMatrix(e);
+                Renderer2D::DrawSprite(transformMatrice, sprite, (int)entity);
             }
         }
 
@@ -794,7 +796,9 @@ namespace fox
             {
                 auto [transform, circle] = view.get<TransformComponent, CircleRenderer>(entity);
 
-                Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
+                Entity e = Entity(entity, this);
+                glm::mat4 transformMatrice = GetWorldSpaceTransformMatrix(e);
+                Renderer2D::DrawCircle(transformMatrice, circle.Color, circle.Thickness, circle.Fade, (int)entity);
             }
         }
     }

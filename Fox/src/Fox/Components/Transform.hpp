@@ -71,6 +71,7 @@ namespace fox
         {
             DecomposeTransform(transform, position, rotation, scale);
             rotationQuat = glm::quat(rotation);
+//            rotation = glm::eulerAngles(rotationQuat);
         }
 
 //        void SetRotationEuler(const glm::vec3& euler)

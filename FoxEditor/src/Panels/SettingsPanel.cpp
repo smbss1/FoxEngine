@@ -46,11 +46,14 @@ namespace fox
                 {
                     auto [tc, bc2d] = view.get<TransformComponent, BoxCollider2D>(entity);
 
-                    glm::vec3 translation = tc.position + glm::vec3(bc2d.Offset, 0.001f);
-                    glm::vec3 scale = tc.scale * glm::vec3(bc2d.Size * 2.0f, 1.0f);
+                    Entity e = Entity(entity, m_pContext.Raw());
+                    TransformComponent transformComp = m_pContext->GetWorldSpaceTransform(e);
+
+                    glm::vec3 translation = transformComp.position + glm::vec3(bc2d.Offset, 0.001f);
+                    glm::vec3 scale = transformComp.scale * glm::vec3(bc2d.Size * 2.0f, 1.0f);
 
                     glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
-                                          * glm::rotate(glm::mat4(1.0f), tc.GetRotation().z, glm::vec3(0.0f, 0.0f, 1.0f))
+                                          * glm::rotate(glm::mat4(1.0f), transformComp.GetRotation().z, glm::vec3(0.0f, 0.0f, 1.0f))
                                           * glm::scale(glm::mat4(1.0f), scale);
 
                     Renderer2D::DrawRect(transform, glm::vec4(0, 1, 0, 1));
@@ -63,9 +66,11 @@ namespace fox
                 for (auto entity : view)
                 {
                     auto [tc, cc2d] = view.get<TransformComponent, CircleCollider2D>(entity);
+                    Entity e = Entity(entity, m_pContext.Raw());
+                    TransformComponent transformComp = m_pContext->GetWorldSpaceTransform(e);
 
-                    glm::vec3 translation = tc.position + glm::vec3(cc2d.Offset, 0.001f);
-                    glm::vec3 scale = tc.scale * glm::vec3(cc2d.Radius * 2.0f);
+                    glm::vec3 translation = transformComp.position + glm::vec3(cc2d.Offset, 0.001f);
+                    glm::vec3 scale = transformComp.scale * glm::vec3(cc2d.Radius * 2.0f);
 
                     glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
                                           * glm::scale(glm::mat4(1.0f), scale);

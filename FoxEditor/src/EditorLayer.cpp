@@ -286,7 +286,8 @@ namespace fox
 
                     // Entity transform
                     auto& tc = selectedEntity.get<TransformComponent>();
-                    glm::mat4 transform = tc.GetTransform();
+//                    glm::mat4 transform = tc.GetTransform();
+                    glm::mat4 transform = m_pActiveScene->GetWorldSpaceTransformMatrix(selectedEntity);
 
                     // Snapping
                     bool snap = Input::IsKeyPressed(Key::LeftControl);
@@ -303,13 +304,65 @@ namespace fox
 
                     if (ImGuizmo::IsUsing())
                     {
-                        glm::vec3 position, rotation, scale;
+                        Entity parent = m_pActiveScene->TryGetEntityByUUID(selectedEntity.GetParentUUID());
+                        if (parent)
+                        {
+                            glm::mat4 parentTransform = m_pActiveScene->GetWorldSpaceTransformMatrix(parent);
+                            transform = glm::inverse(parentTransform) * transform;
+                        }
+
+                        // Manipulated transform is now in local space of parent (= world space if no parent)
+                        // We can decompose into translation, rotation, and scale and compare with original
+                        // to figure out how to best update entity transform
+                        //
+                        // Why do we do this instead of just setting the entire entity transform?
+                        // Because it's more robust to set only those components of transform
+                        // that we are meant to be changing (dictated by m_GizmoType).  That way we avoid
+                        // small drift (particularly in rotation and scale) due numerical precision issues
+                        // from all those matrix operations.
+                        glm::vec3 position;
+                        glm::quat rotation;
+                        glm::vec3 scale;
                         DecomposeTransform(transform, position, rotation, scale);
 
-                        glm::vec3 deltaRotation = rotation - tc.GetRotation();
-                        tc.position = position;
-                        tc.SetRotation(tc.GetRotation() + deltaRotation);
-                        tc.scale = scale;
+                        switch (m_iGizmoType)
+                        {
+                            case ImGuizmo::TRANSLATE:
+                            {
+                                tc.position = position;
+                                break;
+                            }
+                            case ImGuizmo::ROTATE:
+                            {
+                                // Do this in Euler in an attempt to preserve any full revolutions (> 360)
+                                glm::vec3 originalRotationEuler = tc.GetRotation();
+
+                                // Map original rotation to range [-180, 180] which is what ImGuizmo gives us
+                                originalRotationEuler.x = fmodf(originalRotationEuler.x + glm::pi<float>(), glm::two_pi<float>()) - glm::pi<float>();
+                                originalRotationEuler.y = fmodf(originalRotationEuler.y + glm::pi<float>(), glm::two_pi<float>()) - glm::pi<float>();
+                                originalRotationEuler.z = fmodf(originalRotationEuler.z + glm::pi<float>(), glm::two_pi<float>()) - glm::pi<float>();
+
+                                glm::vec3 deltaRotationEuler = glm::eulerAngles(rotation) - originalRotationEuler;
+
+                                // Try to avoid drift due numeric precision
+                                if (fabs(deltaRotationEuler.x) < 0.001) deltaRotationEuler.x = 0.0f;
+                                if (fabs(deltaRotationEuler.y) < 0.001) deltaRotationEuler.y = 0.0f;
+                                if (fabs(deltaRotationEuler.z) < 0.001) deltaRotationEuler.z = 0.0f;
+
+                                tc.SetRotation(tc.GetRotation() + deltaRotationEuler);
+                                break;
+                            }
+                            case ImGuizmo::SCALE:
+                            {
+                                tc.scale = scale;
+                                break;
+                            }
+                        }
+
+//                        glm::vec3 deltaRotation = rotation - tc.GetRotation();
+//                        tc.position = position;
+//                        tc.SetRotation(tc.GetRotation() + deltaRotation);
+//                        tc.scale = scale;
                     }
                 }
             }
@@ -456,7 +509,8 @@ namespace fox
         if (Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity())
         {
             const TransformComponent& transform = selectedEntity.get<TransformComponent>();
-            Renderer2D::DrawRect(transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+            glm::mat4 transformMatrice = m_pActiveScene->GetWorldSpaceTransformMatrix(selectedEntity);
+            Renderer2D::DrawRect(transformMatrice, glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
         }
 
         Renderer2D::EndScene();
