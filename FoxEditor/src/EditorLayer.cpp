@@ -368,8 +368,13 @@ namespace fox
     void EditorLayer::UI_Toolbar()
     {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(10, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(12, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 4.0f);
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+
+
         auto& colors = ImGui::GetStyle().Colors;
         const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
@@ -382,10 +387,10 @@ namespace fox
         const float numberOfButtons = 2.0f;
         const float backgroundWidth = edgeOffset * 6.0f + buttonSize * numberOfButtons + edgeOffset * (numberOfButtons - 1.0f) * 2.0f;
 
-        float toolbarX = (m_vViewportBounds[0].x + m_vViewportBounds[1].x) / 2.0f;
-        ImGui::SetNextWindowPos(ImVec2(toolbarX - (backgroundWidth / 2.0f), m_vViewportBounds[0].y + edgeOffset));
+        float toolbarX = (m_vViewportBounds[0].x + m_vViewportBounds[1].x) * 0.5f;
+        ImGui::SetNextWindowPos(ImVec2(toolbarX - (backgroundWidth * 0.5f), m_vViewportBounds[0].y + edgeOffset));
         ImGui::SetNextWindowSize(ImVec2(backgroundWidth, windowHeight));
-        ImGui::SetNextWindowBgAlpha(0.0f);
+        ImGui::SetNextWindowBgAlpha(0.7f);
         ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking);
         {
             bool toolbarEnabled = (bool)m_pActiveScene;
@@ -393,7 +398,8 @@ namespace fox
             ImVec4 tintColor = ImVec4(1, 1, 1, 1);
             if (!toolbarEnabled)
                 tintColor.w = 0.5f;
-            ImGui::SameLine(0, 12);
+            float spacing = ImGui::GetStyle().ItemInnerSpacing.x;
+            ImGui::SameLine(0, spacing);
             {
                 Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
                 const float height = std::min((float)icon->GetHeight(), buttonSize);
@@ -424,7 +430,7 @@ namespace fox
                 }
             }
         }
-        ImGui::PopStyleVar(2);
+        ImGui::PopStyleVar(5);
         ImGui::PopStyleColor(3);
         ImGui::End();
     }
