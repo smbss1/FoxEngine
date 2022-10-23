@@ -771,8 +771,10 @@ namespace fox
 
         auto entities = data["Entities"];
         if (!entities)
+        {
             FOX_CORE_ERROR("There are no entities in the prefab % (%) to deserialize!", filename, prefabID);
             return root;
+        }
 
         for (auto entity : entities)
         {
