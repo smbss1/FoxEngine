@@ -376,19 +376,31 @@ namespace fox
         const auto& buttonActive = colors[ImGuiCol_ButtonActive];
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
-        ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse);
+        const float buttonSize = 27.0f;
+        const float edgeOffset = 4.0f;
+        const float windowHeight = 32.0f; // annoying limitation of ImGui, window can't be smaller than 32 pixels
+        const float numberOfButtons = 2.0f;
+        const float backgroundWidth = edgeOffset * 6.0f + buttonSize * numberOfButtons + edgeOffset * (numberOfButtons - 1.0f) * 2.0f;
+
+        float toolbarX = (m_vViewportBounds[0].x + m_vViewportBounds[1].x) / 2.0f;
+        ImGui::SetNextWindowPos(ImVec2(toolbarX - (backgroundWidth / 2.0f), m_vViewportBounds[0].y + edgeOffset));
+        ImGui::SetNextWindowSize(ImVec2(backgroundWidth, windowHeight));
+        ImGui::SetNextWindowBgAlpha(0.0f);
+        ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking);
         {
             bool toolbarEnabled = (bool)m_pActiveScene;
 
             ImVec4 tintColor = ImVec4(1, 1, 1, 1);
             if (!toolbarEnabled)
                 tintColor.w = 0.5f;
-
-            float size = ImGui::GetWindowHeight() - 4.0f;
+            ImGui::SameLine(0, 12);
             {
                 Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
-                ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-                if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+                const float height = std::min((float)icon->GetHeight(), buttonSize);
+                const float width = (float)icon->GetWidth() / (float)icon->GetHeight() * height;
+
+//                ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+                if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
                 {
                     if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
                         OnScenePlay();
@@ -399,8 +411,11 @@ namespace fox
             ImGui::SameLine();
             {
                 Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? m_IconSimulate : m_IconStop;
+                const float height = std::min((float)icon->GetHeight(), buttonSize);
+                const float width = (float)icon->GetWidth() / (float)icon->GetHeight() * height;
+
                 //ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-                if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+                if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
                 {
                     if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
                         OnSceneSimulate();
