@@ -43,8 +43,10 @@ namespace fox
             {
                 m_pContext->m_Registry.each([&](auto entityID)
                 {
-                    Entity entity {entityID, m_pContext.Raw()};
-                    DrawEntityNode(entity);
+                    Entity entity { entityID, m_pContext.Raw() };
+
+                    if (entity.GetParentUUID() == 0)
+                        DrawEntityNode(entity);
                 });
 
                 if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
@@ -80,11 +82,14 @@ namespace fox
         ImGui::End();
     }
 
-    void SceneHierarchyPanel::DrawEntityNode(Entity& entity)
+    void SceneHierarchyPanel::DrawEntityNode(const Entity& entity)
     {
         auto &name = entity.get<EntityName>();
         ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_OpenOnArrow : 0) | ImGuiTreeNodeFlags_Selected;
         flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+
+        if (!entity.HasChildren())
+            flags |= ImGuiTreeNodeFlags_Leaf;
 
         bool expanded = ImGui::TreeNodeEx((void*)(uint64_t)entity.GetUUID(), flags, "%s", name.name.c_str());
 
@@ -100,9 +105,28 @@ namespace fox
 
         if (ImGui::BeginDragDropSource())
         {
-            ImGui::SetDragDropPayload("SceneHierarchy", &entity, sizeof(Entity));
+            UUID entityID = entity.GetUUID();
+            ImGui::SetDragDropPayload("SceneHierarchy", &entityID, sizeof(UUID));
             ImGui::Text(name.name.c_str());
             ImGui::EndDragDropSource();
+        }
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SceneHierarchy");
+
+            if (payload)
+            {
+                size_t count = payload->DataSize / sizeof(UUID);
+                for (size_t i = 0; i < count; i++)
+                {
+                    UUID droppedEntityID = *(((UUID*)payload->Data) + i);
+                    Entity droppedEntity = m_pContext->GetEntityByUUID(droppedEntityID);
+                    m_pContext->ParentEntity(droppedEntity, entity);
+                }
+            }
+
+            ImGui::EndDragDropTarget();
         }
 
         bool bIsDeleted = false; // Is the entity deleted ?
@@ -115,13 +139,22 @@ namespace fox
             ImGui::EndPopup();
         }
 
+//        if (expanded)
+//        {
+//           // Draw tree child node
+//        //    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+//        //    bool xpanded = ImGui::TreeNodeEx((void*)5446, flags, "%s", name.name.c_str());
+//        //    if (xpanded)
+//        //        ImGui::TreePop();
+//            ImGui::TreePop();
+//        }
+
+        // Draw children
+        //--------------
         if (expanded)
         {
-           // Draw tree child node
-        //    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
-        //    bool xpanded = ImGui::TreeNodeEx((void*)5446, flags, "%s", name.name.c_str());
-        //    if (xpanded)
-        //        ImGui::TreePop();
+            for (auto child : entity.Children())
+                DrawEntityNode(m_pContext->GetEntityByUUID(child));
             ImGui::TreePop();
         }
 

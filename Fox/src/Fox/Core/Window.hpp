@@ -55,7 +55,7 @@ namespace fox
          * @param callback the callback
          */
         virtual bool GetKey(const KeyCode keycode) = 0;
-        virtual bool IsKeyPressed(const KeyCode key) = 0;
+        virtual bool IsKeyDown(const KeyCode key) = 0;
 
         virtual bool IsMouseButtonPressed(const Mouse button) = 0;
         virtual glm::vec2 GetMousePosition() = 0;

@@ -320,8 +320,15 @@ namespace fox
                                 if (ImGui::BeginDragDropTarget())
                                 {
                                     if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy")) {
-                                        auto* e = static_cast<Entity *>(payload->Data);
-                                        storage.SetValue(e->GetUUID());
+                                        size_t count = payload->DataSize / sizeof(UUID);
+                                        if (count == 1)
+                                        {
+                                            UUID droppedEntityID = *(((UUID*)payload->Data));
+                                            Entity droppedEntity = scene->GetEntityByUUID(droppedEntityID);
+                                            storage.SetValue(droppedEntity.GetUUID());
+                                        }
+                                        else
+                                            FOX_INFO_TAG("PropertyPanel", "Cannot set reference of multiple entityin a field which need only one reference");
                                     }
                                     ImGui::EndDragDropTarget();
                                 }
@@ -332,7 +339,7 @@ namespace fox
                                 ImGuiFieldDrawer::BeginPropertyGrid(name.c_str(), nullptr);
                                 AssetHandle assetHandle = *data.template TryCast<AssetHandle>();
                                 Ref<Prefab> prefab = AssetManager::GetAsset<Prefab>(assetHandle);
-                                ImGui::Button(prefab ? AssetManager::GetFileSystemPath(AssetManager::GetMetadata(assetHandle)).c_str() : "No Reference", ImVec2(100.0f, 0.0f));
+                                ImGui::Button(prefab ? AssetManager::GetFileSystemPath(AssetManager::GetMetadata(assetHandle)).stem().c_str() : "No Reference", ImVec2(100.0f, 0.0f));
                                 ImGuiFieldDrawer::EndPropertyGrid();
 
                                 if (ImGui::BeginDragDropTarget())
@@ -341,7 +348,11 @@ namespace fox
                                     {
                                         const char *path = (const char *) payload->Data;
                                         std::filesystem::path prefabPath = Project::AssetsDir() / path;
-                                        storage.SetValue(AssetManager::GetAssetHandleFromFilePath(prefabPath));
+
+                                        if (prefabPath.extension() == ".foxprefab")
+                                        {
+                                            storage.SetValue(AssetManager::GetAssetHandleFromFilePath(prefabPath));
+                                        }
                                     }
                                     ImGui::EndDragDropTarget();
                                 }

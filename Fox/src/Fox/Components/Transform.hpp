@@ -17,18 +17,20 @@
 #include "Utils/Vec3.hpp"
 #include "Utils/Quat.hpp"
 
+#include "Core/UUID.hpp"
+#include "Math/Math.hpp"
+
 namespace fox
 {
     struct TransformComponent
     {
-        glm::vec3 position = { 0.0f, 0.0f, 0.0f };
+    private:
         glm::vec3 rotation = { 0.0f, 0.0f, 0.0f };
+        glm::quat rotationQuat = { 1.0f, 0.0f, 0.0f, 0.0f };
+
+    public:
+        glm::vec3 position = { 0.0f, 0.0f, 0.0f };
         glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
-
-        glm::vec3 local_position{};
-        glm::vec3 local_rotation{};
-
-        TransformComponent* parent = nullptr;
 
         /**
         * @brief Contructor
@@ -58,15 +60,50 @@ namespace fox
 
         glm::mat4 GetTransform() const
         {
-            glm::mat4 rot = glm::toMat4(glm::quat(rotation));
+            glm::mat4 rot = glm::toMat4(rotationQuat);
             glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
                                   * rot
                                   * glm::scale(glm::mat4(1.0f), scale);
-
-            if (parent)
-                return transform * parent->GetTransform();
             return transform;
         }
+
+        void SetTransform(const glm::mat4& transform)
+        {
+            DecomposeTransform(transform, position, rotation, scale);
+            rotationQuat = glm::quat(rotation);
+        }
+
+//        void SetRotationEuler(const glm::vec3& euler)
+//        {
+//            rotationEuler = euler;
+//            rotation = glm::quat(rotationEuler);
+//        }
+
+        void SetRotation(const glm::vec3& euler)
+        {
+            rotation = euler;
+            rotationQuat = glm::quat(rotation);
+        }
+
+        void SetRotationQuat(const glm::quat& quat)
+        {
+            rotationQuat = quat;
+            rotation = glm::eulerAngles(rotationQuat);
+        }
+
+        glm::vec3 GetRotation() const
+        {
+            return rotation;
+        }
+    };
+
+    struct HierarchyComponent
+    {
+        UUID ParentID = 0;
+        std::vector<UUID> Children;
+
+        HierarchyComponent() = default;
+        HierarchyComponent(const HierarchyComponent& other) = default;
     };
 }
 

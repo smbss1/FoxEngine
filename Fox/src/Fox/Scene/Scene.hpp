@@ -24,6 +24,7 @@ class b2World;
 
 namespace fox
 {
+    class TransformComponent;
     class Prefab;
     class Scene : public RefCounted
     {
@@ -34,9 +35,22 @@ namespace fox
         static Ref<Scene> Copy(Ref<Scene> other);
 
         Entity NewEntity(const std::string& name = std::string());
+        Entity NewChildEntity(Entity parent, const std::string& name = std::string());
         Entity NewEntityWithUUID(UUID uuid, const std::string &name);
+        Entity GetEntityByUUID(UUID uuid);
+        Entity TryGetEntityByUUID(UUID uuid);
+        Entity FindEntityByName(std::string_view name);
+        void ParentEntity(Entity entity, Entity parent);
+        void UnparentEntity(Entity entity, bool convertToWorldSpace = true);
+
+        void ConvertToLocalSpace(Entity entity);
+        void ConvertToWorldSpace(Entity entity);
+        glm::mat4 GetWorldSpaceTransformMatrix(Entity entity);
+        TransformComponent GetWorldSpaceTransform(Entity entity);
+
+
         void DuplicateEntity(Entity entity);
-        Entity CloneEntity(Entity& entity, Entity parent, const glm::vec3* translation = nullptr, const glm::vec3* rotation = nullptr, const glm::vec3* scale = nullptr);
+        Entity CloneEntity(Entity entity, Entity parent, const glm::vec3* translation = nullptr, const glm::vec3* rotation = nullptr, const glm::vec3* scale = nullptr);
         Entity Instantiate(Ref<Prefab> prefab, const glm::vec3* translation = nullptr, const glm::vec3* rotation = nullptr, const glm::vec3* scale = nullptr);
 
         template<typename... Components>
@@ -69,8 +83,6 @@ namespace fox
         Entity GetPrimaryCameraEntity();
 
         Application& GetApp();
-        Entity GetEntityByUUID(UUID uuid);
-        Entity FindEntityByName(std::string_view name);
 
         bool IsRunning() const { return m_IsRunning; }
         void CopyAllComponentsIfExists(Entity dst, Entity src);

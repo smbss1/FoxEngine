@@ -31,7 +31,8 @@ namespace fox
             Rigidbody2D,
             BoxCollider2D,
             CircleCollider2D,
-            PrefabComponent
+            PrefabComponent,
+            HierarchyComponent
         >;
 }
 

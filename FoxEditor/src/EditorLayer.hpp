@@ -115,10 +115,12 @@ namespace fox
 
         // Events Defs
         SIGNAL(OnImGuiRenderEvent);
+        SIGNAL(OnOverlayRenderEvent);
 
     public:
         // Events
         OnImGuiRenderEvent m_OnImGuiRenderEvent;
+        OnOverlayRenderEvent m_OnOverlayRenderEvent;
     };
 }
 

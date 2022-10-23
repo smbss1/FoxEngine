@@ -18,6 +18,7 @@ namespace fox
     public:
         SettingsPanel();
         void OnImGui() override;
+        void OnOverlayRender() override;
 
     private:
         void OnContextChangeChange(const OnContextChangeEvent& event);

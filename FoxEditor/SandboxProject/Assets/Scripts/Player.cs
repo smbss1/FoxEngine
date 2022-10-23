@@ -28,17 +28,17 @@ namespace Sandbox
             Vector3 translation = m_Transform.position;
             Vector3 velocity = Vector3.zero;
 
-            if (Input.IsKeyPressed(KeyCode.Q))
+            if (Input.IsKeyDown(KeyCode.Q))
             {
                 velocity.x = -1.0f;
             }
 
-            if (Input.IsKeyPressed(KeyCode.D))
+            if (Input.IsKeyDown(KeyCode.D))
             {
                 velocity.x = 1.0f;
             }
 
-            if (Input.IsKeyDown(KeyCode.Space) && BulletPrefab != null)
+            if (Input.IsKeyPressed(KeyCode.Space) && BulletPrefab != null)
             {
                 Vector3 pos = m_Transform.position;
                 pos.y += 2;

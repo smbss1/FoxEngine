@@ -163,15 +163,6 @@ namespace fox
         return Rigidbody2D::BodyType::Static;
     }
 
-    EntitySerializer::EntitySerializer(/* args */)
-    {
-    }
-
-    EntitySerializer::~EntitySerializer()
-    {
-    }
-
-
     template<typename Component>
 	void SerializeEntityComponent(YAML::Emitter&, Entity) = delete;
 
@@ -204,7 +195,7 @@ namespace fox
             out << YAML::BeginMap; // TransformComponent
 
             out << YAML::Key << "Position" << YAML::Value << oTransform.position;
-            out << YAML::Key << "Rotation" << YAML::Value << oTransform.rotation;
+            out << YAML::Key << "Rotation" << YAML::Value << oTransform.GetRotation();
             out << YAML::Key << "Scale" << YAML::Value << oTransform.scale;
 
             out << YAML::EndMap; // TransformComponent
@@ -220,12 +211,51 @@ namespace fox
             // Entities always have transforms
             auto& tc = deserializedEntity.get<TransformComponent>();
             tc.position = transformComponent["Position"].as<glm::vec3>();
-            tc.rotation = transformComponent["Rotation"].as<glm::vec3>();
+            tc.SetRotation(transformComponent["Rotation"].as<glm::vec3>());
             tc.scale = transformComponent["Scale"].as<glm::vec3>();
         }
 	}
 
-	template<>
+    template<>
+    void SerializeEntityComponent<HierarchyComponent>(YAML::Emitter& out, Entity entity)
+    {
+        if (entity.has<HierarchyComponent>())
+        {
+            auto& hierarchyComp = entity.get<HierarchyComponent>();
+            out << YAML::Key << "Parent" << YAML::Value << hierarchyComp.ParentID;
+
+            out << YAML::Key << "Children";
+            out << YAML::Value << YAML::BeginSeq;
+
+            for (auto child : hierarchyComp.Children)
+            {
+                out << YAML::BeginMap;
+                out << YAML::Key << "Handle" << YAML::Value << child;
+                out << YAML::EndMap;
+            }
+            out << YAML::EndSeq;
+        }
+    }
+
+    template<>
+    void DeserializeEntryComponent<HierarchyComponent>(YAML::Node& entity, Entity& deserializedEntity)
+    {
+        auto& hierarchyComp = deserializedEntity.get<HierarchyComponent>();
+        uint64_t parentHandle = entity["Parent"] ? entity["Parent"].as<uint64_t>() : 0;
+        hierarchyComp.ParentID = parentHandle;
+
+        auto children = entity["Children"];
+        if (children)
+        {
+            for (auto child : children)
+            {
+                uint64_t childHandle = child["Handle"].as<uint64_t>();
+                hierarchyComp.Children.push_back(childHandle);
+            }
+        }
+    }
+
+    template<>
 	void SerializeEntityComponent<CameraComponent>(YAML::Emitter& out, Entity entity)
 	{
 		if (entity.has<CameraComponent>())
@@ -687,26 +717,6 @@ namespace fox
             return;
         }
 
-//        YAML::Emitter out;
-//        out << YAML::BeginMap;
-//        out << YAML::Key << "Prefab" << YAML::Value << entity.add<PrefabComponent>().ID;
-//        out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-//
-//        std::vector<Entity> entities;
-//        entities.push_back(entity);
-////        GetAllChildren(entity, entities);
-////
-////        for (const auto& child : entities)
-////        {
-////            if (child)
-////                EntitySerializer::SerializeEntity(out, child);
-////        }
-//        out << YAML::EndSeq;
-//        out << YAML::EndMap;
-//
-//        std::ofstream fout(filepath);
-//        fout << out.c_str();
-
         YAML::Emitter out;
 
         Ref<Scene> scene = Scene::CreateEmpty();
@@ -747,60 +757,23 @@ namespace fox
             return {};
         }
 
+        std::string filename = std::filesystem::path(filepath).filename();
         UUID prefabID = data["Prefab"].as<UUID>();
         if (!prefabID)
         {
-            FOX_CORE_ERROR("Invalid prefab id : % (%)", std::filesystem::path(filepath).filename(), prefabID);
+            FOX_CORE_ERROR("Invalid prefab id : % (%)", filename, prefabID);
             return {};
         }
 
-//        auto entities = data["Entities"];
-//        FOX_CORE_INFO("Deserializing prefab : % (%)", StringUtils::GetName(filepath).c_str(), prefabID);
-//
-//        Entity root = {};
-//
-//        if (entities)
-//        {
-//            std::map<UUID, UUID> oldNewIdMap;
-//            for (const auto& entity : entities)
-//            {
-//                UUID oldUUID = entity["Entity"].as<UUID>();
-//                UUID newUUID = EntitySerializer::DeserializeAllEntryComponents(entity, scene);
-//                oldNewIdMap.emplace(oldUUID, newUUID);
-//
-//                if (!root)
-//                    root = scene.GetEntity(newUUID);
-//            }
-//
-//            root.add<PrefabComponent>().ID = prefabID;
-//
-//            // Fix parent/children UUIDs
-////            for (const auto& [oldId, newId] : oldNewIdMap)
-////            {
-////                auto& relationshipComponent = scene.GetEntity(newId).GetRelationship();
-////                UUID parent = relationshipComponent.Parent;
-////                if (parent)
-////                    relationshipComponent.Parent = oldNewIdMap.at(parent);
-////
-////                auto& children = relationshipComponent.Children;
-////                for (auto& id : children)
-////                    id = oldNewIdMap.at(id);
-////            }
-//        }
-////        else
-////        {
-////            FOX_CORE_ERROR("There are no entities in the prefab % (%) to deserialize!", StringUtils::GetName(filepath).c_str(), prefabID);
-////        }
-//
-//        return root;
-
-        FOX_CORE_INFO("Deserializing prefab : % (%)", std::filesystem::path(filepath).filename(), prefabID);
+        FOX_CORE_INFO("Deserializing prefab : % (%)", filename, prefabID);
 
         Entity root = {};
 
         auto entities = data["Entities"];
         if (!entities)
+            FOX_CORE_ERROR("There are no entities in the prefab % (%) to deserialize!", filename, prefabID);
             return root;
+
         for (auto entity : entities)
         {
             uint64_t uuid = entity["Entity"].as<uint64_t>();
@@ -821,18 +794,5 @@ namespace fox
                 root = deserializedEntity;
         }
         return root;
-
-//
-//        std::string name;
-//        auto nameComponent = data["NameComponent"];
-//        if (nameComponent)
-//            name = nameComponent["Name"].as<std::string>();
-//
-//
-//        Entity deserializedEntity = scene.NewEntity(name);
-//        // Deserialize components (except IDComponent and TagComponent)
-//        EntitySerializer::DeserializeAllEntryComponents(data, deserializedEntity);
-
-//        return deserializedEntity;
     }
 } // namespace fox

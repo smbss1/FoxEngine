@@ -213,8 +213,16 @@ namespace fox
 //        if (ImGui::BeginDragDropTarget())
 //        {
 //            if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy")) {
-//                Entity *entity = static_cast<Entity *>(payload->Data);
-//                valueFrom = *entity;
+//                size_t count = payload->DataSize / sizeof(UUID);
+//
+//                for (size_t i = 0; i < count; i++)
+//                {
+//                    UUID droppedEntityID = *(((UUID*)payload->Data) + i);
+//                    Entity droppedEntity = m_pContext->GetEntityByUUID(droppedEntityID);
+//                }
+//
+//                //Entity *entity = static_cast<Entity *>(payload->Data);
+//                //valueFrom = *entity;
 //                return true;
 //            }
 //            ImGui::EndDragDropTarget();

@@ -201,10 +201,10 @@ bool GlfwWindow::GetKey(const fox::KeyCode keycode)
     return glfwGetKey(m_pWindow, static_cast<int32_t>(keycode)) == GLFW_PRESS;
 }
 
-bool GlfwWindow::IsKeyPressed(const fox::KeyCode key)
+bool GlfwWindow::IsKeyDown(const fox::KeyCode key)
 {
     auto state = glfwGetKey(m_pWindow, static_cast<int32_t>(key));
-    return state == GLFW_PRESS;
+    return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
 bool GlfwWindow::IsMouseButtonPressed(const fox::Mouse button)

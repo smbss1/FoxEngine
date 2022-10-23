@@ -15,6 +15,7 @@ namespace fox
 {
     SettingsPanel::SettingsPanel()
     {
+        EnableOverlay = true;
         event::EventSystem::Get().On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(SettingsPanel::OnContextChangeChange));
     }
 
@@ -32,7 +33,10 @@ namespace fox
             ScriptEngine::ReloadAppDomain();
         }
         ImGui::End();
+    }
 
+    void SettingsPanel::OnOverlayRender()
+    {
         if (m_ShowPhysicsColliders)
         {
             // Box Colliders
@@ -46,7 +50,7 @@ namespace fox
                     glm::vec3 scale = tc.scale * glm::vec3(bc2d.Size * 2.0f, 1.0f);
 
                     glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
-                                          * glm::rotate(glm::mat4(1.0f), tc.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+                                          * glm::rotate(glm::mat4(1.0f), tc.GetRotation().z, glm::vec3(0.0f, 0.0f, 1.0f))
                                           * glm::scale(glm::mat4(1.0f), scale);
 
                     Renderer2D::DrawRect(transform, glm::vec4(0, 1, 0, 1));

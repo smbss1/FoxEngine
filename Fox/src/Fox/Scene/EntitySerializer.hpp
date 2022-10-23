@@ -10,8 +10,6 @@ namespace fox
     class EntitySerializer
     {
     public:
-        EntitySerializer();
-        ~EntitySerializer();
 	    static void SerializeAllEntityComponents(YAML::Emitter& out, Entity entity);
 	    static void DeserializeAllEntryComponents(YAML::Node& entity, Entity& deserializedEntity);
         static void SerializeEntityAsPrefab(const char* filepath, Entity entity);

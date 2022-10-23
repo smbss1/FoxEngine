@@ -12,8 +12,6 @@ namespace fox
 {
     void Reflection::Init()
     {
-//        case ScriptFieldType::Entity:  return "Entity";
-
         Reflect::Reflect<int>("Int");
         Reflect::Reflect<long>("Long");
         Reflect::Reflect<bool>("Bool");
@@ -56,7 +54,7 @@ namespace fox
         Reflect::Reflect<TransformComponent>("Transform")
             .AddConstructor<>()
             .AddDataMember(&TransformComponent::position, "Position")
-            .AddDataMember(&TransformComponent::rotation, "Rotation")
+            .AddDataMember<&TransformComponent::SetRotation, &TransformComponent::GetRotation>("Rotation")
             .AddDataMember(&TransformComponent::scale, "Scale");
 
         // Sprite Renderer

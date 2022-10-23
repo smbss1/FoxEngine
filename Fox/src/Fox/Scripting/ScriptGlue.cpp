@@ -214,14 +214,14 @@ namespace fox
     {
 //        FOX_PROFILE_SCOPE();
 
-        *outRotation = GetEntity(entityID).get<TransformComponent>().rotation;
+        *outRotation = GetEntity(entityID).get<TransformComponent>().GetRotation();
     }
 
     void TransformComponent_SetRotation(uint64_t entityID, const glm::vec3* inRotation)
     {
 //        FOX_PROFILE_SCOPE();
 
-        GetEntity(entityID).get<TransformComponent>().rotation = *inRotation;
+        GetEntity(entityID).get<TransformComponent>().SetRotation(*inRotation);
     }
 
     void TransformComponent_GetScale(uint64_t entityID, glm::vec3* outScale)

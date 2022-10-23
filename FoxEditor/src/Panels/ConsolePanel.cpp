@@ -13,7 +13,6 @@
 namespace fox
 {
     ConsolePanel::ConsolePanel(const char* name)
-//        : BasePanel(name, ICON_MDI_CONSOLE, true)
     {
 //        FOX_PROFILE_SCOPE();
 

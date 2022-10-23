@@ -16,17 +16,22 @@ namespace fox
     static float thumbnailSize = 80.f; // Size of the thumbnail (icon)
 
     ContentBrowserPanel::ContentBrowserPanel()
-//        : m_oCurrentDirectory(Project::AssetsDir())
     {
         m_pFolderIcon = Texture2D::Create("Resources/ContentBrowser/Icons/DirectoryIcon.png");
         m_pFileIcon = Texture2D::Create("Resources/ContentBrowser/Icons/FileIcon.png");
 
         event::EventSystem::Get().On<OnProjectChangeEvent>(FOX_BIND_EVENT_FN(ContentBrowserPanel::OnProjectChange));
+        event::EventSystem::Get().On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(ContentBrowserPanel::OnContextChange));
     }
 
     void ContentBrowserPanel::OnProjectChange(const OnProjectChangeEvent& event)
     {
          m_oCurrentDirectory = Project::AssetsDir();
+    }
+
+    void ContentBrowserPanel::OnContextChange(const OnContextChangeEvent& event)
+    {
+        m_Context = event.Context;
     }
 
     void ContentBrowserPanel::OnImGui()
@@ -131,13 +136,17 @@ namespace fox
         {
             if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy"))
             {
-                auto* e = static_cast<Entity *>(payload->Data);
-                if (!e || !*e)
-                    return;
+                size_t count = payload->DataSize / sizeof(UUID);
 
-                std::filesystem::path path(m_oCurrentDirectory);
-                path /= std::string(e->GetName() + ".foxprefab").c_str();
-                EntitySerializer::SerializeEntityAsPrefab(path.string().c_str(), *e);
+                for (size_t i = 0; i < count; i++)
+                {
+                    UUID droppedEntityID = *(((UUID*)payload->Data) + i);
+                    Entity droppedEntity = m_Context->GetEntityByUUID(droppedEntityID);
+
+                    std::filesystem::path path(m_oCurrentDirectory);
+                    path /= std::string(droppedEntity.GetName() + ".foxprefab").c_str();
+                    EntitySerializer::SerializeEntityAsPrefab(path.string().c_str(), droppedEntity);
+                }
             }
             ImGui::EndDragDropTarget();
         }

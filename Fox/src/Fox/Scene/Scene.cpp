@@ -295,17 +295,60 @@ namespace fox
         return NewEntityWithUUID(UUID(), name);
     }
 
+    Entity Scene::NewChildEntity(Entity parent, const std::string& name)
+    {
+//        FOX_PROFILE_FUNC();
+
+        Entity entity = NewEntityWithUUID(UUID(), name);
+        if (parent)
+            entity.SetParent(parent);
+        return entity;
+    }
+
     Entity Scene::NewEntityWithUUID(UUID uuid, const std::string &name)
     {
+        //        FOX_PROFILE_FUNC();
         Entity entity = { m_Registry.create(), this };
-        entity.add<IDComponent>(uuid);
-        entity.add<TransformComponent>();
         auto& tag = entity.add<EntityName>();
         tag.name = name.empty() ? "Entity" : name;
 
+        entity.add<IDComponent>(uuid);
+        entity.add<TransformComponent>();
+        entity.add<HierarchyComponent>();
+
+        FOX_CORE_ASSERT(m_EntityMap.find(uuid) == m_EntityMap.end());
         m_EntityMap[uuid] = entity;
         SortEntities();
         return entity;
+    }
+
+    Entity Scene::GetEntityByUUID(UUID uuid)
+    {
+//        FOX_PROFILE_FUNC();
+        FOX_CORE_ASSERT(m_EntityMap.find(id) != m_EntityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");
+        return { m_EntityMap.at(uuid), this };
+    }
+
+    Entity Scene::TryGetEntityByUUID(UUID uuid)
+    {
+//        FOX_PROFILE_FUNC();
+        try {
+            return GetEntityByUUID(uuid);
+        } catch (const std::out_of_range& e) {
+            return Entity {};
+        }
+    }
+
+    Entity Scene::FindEntityByName(std::string_view name)
+    {
+        auto view = m_Registry.view<EntityName>();
+        for (auto entity : view)
+        {
+            const EntityName& tc = view.get<EntityName>(entity);
+            if (tc.name == name)
+                return Entity{ entity, this };
+        }
+        return {};
     }
 
     void Scene::SubmitToDestroyEntity(Entity entity)
@@ -346,6 +389,104 @@ namespace fox
         SortEntities();
     }
 
+
+    void Scene::ParentEntity(Entity entity, Entity parent)
+    {
+//        FOX_PROFILE_FUNC();
+
+        if (parent.IsDescendantOf(entity))
+        {
+            UnparentEntity(parent);
+
+            Entity newParent = TryGetEntityByUUID(entity.GetParentUUID());
+            if (newParent)
+            {
+                UnparentEntity(entity);
+                ParentEntity(parent, newParent);
+            }
+        }
+        else
+        {
+            Entity previousParent = TryGetEntityByUUID(entity.GetParentUUID());
+
+            if (previousParent)
+                UnparentEntity(entity);
+        }
+
+        entity.SetParentUUID(parent.GetUUID());
+        parent.Children().push_back(entity.GetUUID());
+
+        ConvertToLocalSpace(entity);
+    }
+
+    void Scene::UnparentEntity(Entity entity, bool convertToWorldSpace)
+    {
+//        FOX_PROFILE_FUNC();
+
+        Entity parent = TryGetEntityByUUID(entity.GetParentUUID());
+        if (!parent)
+            return;
+
+        auto& parentChildren = parent.Children();
+        parentChildren.erase(std::remove(parentChildren.begin(), parentChildren.end(), entity.GetUUID()), parentChildren.end());
+
+        if (convertToWorldSpace)
+            ConvertToWorldSpace(entity);
+
+        entity.SetParentUUID(0);
+    }
+
+    void Scene::ConvertToLocalSpace(Entity entity)
+    {
+//        FOX_PROFILE_FUNC();
+
+        Entity parent = TryGetEntityByUUID(entity.GetParentUUID());
+        if (!parent)
+            return;
+
+        auto& transform = entity.GetTransform();
+        glm::mat4 parentTransform = GetWorldSpaceTransformMatrix(parent);
+        glm::mat4 localTransform = glm::inverse(parentTransform) * transform.GetTransform();
+        transform.SetTransform(localTransform);
+    }
+
+    void Scene::ConvertToWorldSpace(Entity entity)
+    {
+//        FOX_PROFILE_FUNC();
+
+        Entity parent = TryGetEntityByUUID(entity.GetParentUUID());
+        if (!parent)
+            return;
+
+        glm::mat4 transform = GetWorldSpaceTransformMatrix(entity);
+        auto& entityTransform = entity.GetTransform();
+        entityTransform.SetTransform(transform);
+    }
+
+    glm::mat4 Scene::GetWorldSpaceTransformMatrix(Entity entity)
+    {
+//        FOX_PROFILE_FUNC();
+
+        glm::mat4 transform(1.0f);
+
+        Entity parent = TryGetEntityByUUID(entity.GetParentUUID());
+        if (parent)
+            transform = GetWorldSpaceTransformMatrix(parent);
+
+        return transform * entity.GetTransform().GetTransform();
+    }
+
+    // TODO: Definitely cache this at some point
+    TransformComponent Scene::GetWorldSpaceTransform(Entity entity)
+    {
+//        FOX_PROFILE_FUNC();
+
+        glm::mat4 transform = GetWorldSpaceTransformMatrix(entity);
+        TransformComponent transformComponent;
+        transformComponent.SetTransform(transform);
+        return transformComponent;
+    }
+
     void Scene::OnUpdateEditor(EditorCamera &camera)
     {
         RenderScene(camera);
@@ -366,7 +507,7 @@ namespace fox
 
                     b2Body* body = (b2Body*)rb2d.RuntimeBody;
                     glm::vec3 position = transform.position;
-                    float angle = transform.rotation.z;
+                    float angle = transform.GetRotation().z;
 
                     const auto& bodyPosition = body->GetPosition();
                     const float bodyAngle = body->GetAngle();
@@ -396,7 +537,10 @@ namespace fox
                 const auto& position = body->GetPosition();
                 transform.position.x = position.x;
                 transform.position.y = position.y;
-                transform.rotation.z = body->GetAngle();
+
+                auto rotation = transform.GetRotation();
+                rotation.z = body->GetAngle();
+                transform.SetRotation(rotation);
             }
         }
 
@@ -444,7 +588,7 @@ namespace fox
 
                     b2Body* body = (b2Body*)rb2d.RuntimeBody;
                     glm::vec3 position = transform.position;
-                    float angle = transform.rotation.z;
+                    float angle = transform.GetRotation().z;
 
                     const auto& bodyPosition = body->GetPosition();
                     const float bodyAngle = body->GetAngle();
@@ -474,7 +618,9 @@ namespace fox
                 const auto& position = body->GetPosition();
                 transform.position.x = position.x;
                 transform.position.y = position.y;
-                transform.rotation.z = body->GetAngle();
+                auto rotation = transform.GetRotation();
+                rotation.z = body->GetAngle();
+                transform.SetRotation(rotation);
             }
         }
 
@@ -570,7 +716,7 @@ namespace fox
             b2BodyDef bodyDef;
             bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
             bodyDef.position.Set(transform.position.x, transform.position.y);
-            bodyDef.angle = transform.rotation.z;
+            bodyDef.angle = transform.GetRotation().z;
             bodyDef.gravityScale = rb2d.GravityScale;
 
             b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
@@ -688,27 +834,6 @@ namespace fox
         return m_oApp;
     }
 
-    Entity Scene::GetEntityByUUID(UUID uuid)
-    {
-        // TODO(Yan): Maybe should be assert
-        if (m_EntityMap.find(uuid) != m_EntityMap.end())
-            return { m_EntityMap.at(uuid), this };
-
-        return {};
-    }
-
-    Entity Scene::FindEntityByName(std::string_view name)
-    {
-        auto view = m_Registry.view<EntityName>();
-        for (auto entity : view)
-        {
-            const EntityName& tc = view.get<EntityName>(entity);
-            if (tc.name == name)
-                return Entity{ entity, this };
-        }
-        return {};
-    }
-
     void Scene::OnCameraComponentConstruct(entt::registry& registry, entt::entity entity)
     {
         Entity e = { entity, this };
@@ -732,7 +857,7 @@ namespace fox
 
         bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
         bodyDef.position.Set(transform.position.x, transform.position.y);
-        bodyDef.angle = transform.rotation.z;
+        bodyDef.angle = transform.GetRotation().z;
         bodyDef.gravityScale = rb2d.GravityScale;
 
         b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
@@ -907,26 +1032,26 @@ namespace fox
         CopyComponentIfExists(AllComponents{}, newEntity, entity);
     }
 
-    Entity Scene::CloneEntity(Entity& entity, Entity parent, const glm::vec3* translation, const glm::vec3* rotation, const glm::vec3* scale)
+    Entity Scene::CloneEntity(Entity entity, Entity parent, const glm::vec3* translation, const glm::vec3* rotation, const glm::vec3* scale)
     {
 //        FOX_PROFILE_FUNC();
 //        FOX_CORE_VERIFY(entity.HasComponent<PrefabComponent>());
         std::string name = entity.GetName();
         Entity newEntity = NewEntity(name);
-//        if (parent)
-//            newEntity.SetParent(parent);
+        if (parent)
+            newEntity.SetParent(parent);
         CopyComponentIfExists(AllComponents{}, newEntity, entity);
 
         if (translation)
             newEntity.GetTransform().position = *translation;
         if (rotation)
-            newEntity.GetTransform().rotation = *rotation;
+            newEntity.GetTransform().SetRotation(*rotation);
         if (scale)
             newEntity.GetTransform().scale = *scale;
 
         // Create children
-//        for (auto childId : entity.Children())
-//            CreatePrefabEntity(entity.m_Scene->GetEntityWithUUID(childId), newEntity);
+        for (auto childId : entity.Children())
+            CloneEntity(entity.m_Scene->GetEntityByUUID(childId), newEntity);
 
         if (newEntity.has<ScriptComponent>() && m_IsRunning)
             ScriptEngine::OnEntityInstantiated(newEntity, entity);
@@ -940,17 +1065,15 @@ namespace fox
         Entity result;
 
         // TODO: we need a better way of retrieving the "root" entity
-        auto entities = prefab->m_Scene->GetAllEntitiesWith<IDComponent>();
-//        auto entities = prefab->m_Scene->GetAllEntitiesWith<RelationshipComponent>();
+        auto entities = prefab->m_Scene->GetAllEntitiesWith<HierarchyComponent>();
         for (auto e : entities)
         {
             Entity entity = { e, prefab->m_Scene.Raw() };
-//            if (!entity.GetParent())
-//            {
-//                result = CreatePrefabEntity(entity, {}, translation, rotation, scale);
-//                break;
-//            }
-            result = CloneEntity(entity, Entity(), translation, rotation, scale);
+            if (!entity.GetParent())
+            {
+                result = CloneEntity(entity, Entity(), translation, rotation, scale);
+                break;
+            }
         }
         return result;
     }

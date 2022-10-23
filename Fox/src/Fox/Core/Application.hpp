@@ -85,6 +85,8 @@ namespace fox
 
     private:
         static Application* s_Instance;
+        Timestep m_Frametime;
+        Timestep m_TimeStep;
 
 
 //        std::unordered_map<size_t, ScriptCreator> m_vScripts;

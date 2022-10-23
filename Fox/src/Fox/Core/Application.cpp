@@ -81,23 +81,6 @@ namespace fox
         }
     }
 
-    // void Application::LoadConfig()
-    // {
-    //     // FOX_CORE_INFO("Starting load config.json....");
-    //     // json::Value oConfigTemp;
-    //     // std::string out;
-    //     // if (fox::FileSystem::ReadFile(std::string(FOX_PLUGIN_DIRECTORY) + "config.json", out))
-    //     //     oConfigTemp = json::parse(out);
-    //     // else
-    //     //     FOX_CORE_ERROR("Cannot read config.json");
-    //     // if (!oConfigTemp.is_null()) {
-    //     //     m_oConfigFile = new_scope<json::Value>(oConfigTemp);
-    //     //     FOX_CORE_INFO("config.json load successfully");
-    //     // }
-    //     // else
-    //     //     FOX_CORE_ERROR("Wrong configuration format for 'config.json'");
-    // }
-
     void Application::SubmitToMainThread(const std::function<void()>& function)
 	{
 		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
@@ -108,9 +91,6 @@ namespace fox
     void Application::Run()
     {
         FOX_CORE_INFO("Starting Application...");
-
-        // LoadConfig();
-//        Project::SetActive(new_ref<Project>());
 
         // PluginManager& plugin_manager = get_or_create<fox::PluginManager>().value();
         // plugin_manager.FindAndLoadPlugins(std::string(FOX_PLUGIN_DIRECTORY) + (*m_oConfigFile)["plugins directory"].get<std::string>());
@@ -134,16 +114,12 @@ namespace fox
         FOX_CORE_INFO("Application is running");
         while (m_bIsRunning)
         {
-            float time = Time::GetTime();
-            Timestep timestep = time - m_LastFrameTime;
-            m_LastFrameTime = time;
-
             ExecuteMainThreadQueue();
 
             if (!m_bIsMinimized)
             {
                 for (Layer* layer : m_LayerStack)
-                    layer->OnUpdate(timestep);
+                    layer->OnUpdate(m_TimeStep);
 
                 m_ImGuiLayer->Begin();
                 {
@@ -154,6 +130,11 @@ namespace fox
             }
             Input::OnUpdate();
             m_pWindow->OnUpdate();
+
+            float time = Time::GetTime();
+            m_Frametime = time - m_LastFrameTime;
+            m_TimeStep = glm::min<float>(m_Frametime, 0.0333f);
+            m_LastFrameTime = time;
         }
     }
 
@@ -161,11 +142,6 @@ namespace fox
     {
         return m_pWindow.get();
     }
-
-    // json::Value &Application::GetConfigs() const
-    // {
-    //     return *m_oConfigFile;
-    // }
 
     bool Application::OnWindowClose(WindowCloseEvent& e)
     {

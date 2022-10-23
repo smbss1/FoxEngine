@@ -13,6 +13,9 @@ namespace fox
     {
     public:
         virtual void OnImGui() = 0;
+        virtual void OnOverlayRender() {}
+
+        bool EnableOverlay = false;
     };
 }
 #endif //FOXENGINE_PANEL_HPP

@@ -45,9 +45,23 @@ namespace fox
         operator entt::entity () const { return m_EntityHandle; }
         operator uint32_t() const { return (uint32_t)m_EntityHandle; }
 
-        UUID GetUUID();
-        const std::string& GetName();
-        TransformComponent& GetTransform();
+        UUID GetUUID() const;
+        const std::string& GetName() const;
+        TransformComponent& GetTransform() const;
+
+        void SetParentUUID(UUID parent);
+        [[nodiscard]] UUID GetParentUUID() const;
+        std::vector<UUID>& Children();
+        [[nodiscard]] const std::vector<UUID>& Children() const;
+        [[nodiscard]] bool HasChildren() const;
+
+        bool RemoveChild(Entity child);
+        bool IsAncesterOf(Entity entity) const;
+        bool IsDescendantOf(Entity entity) const;
+
+        Entity GetParent() const;
+
+        void SetParent(Entity parent);
 
         bool operator==(const Entity& other) const
         {
@@ -104,7 +118,7 @@ namespace fox
          * @return fox::Option<T&> an optionnal value
          */
         template<typename T>
-        T& get()
+        T& get() const
         {
             FOX_ASSERT(has<T>(), "Entity does not have component!");
             return m_Scene->m_Registry.get<T>(m_EntityHandle);
@@ -128,7 +142,7 @@ namespace fox
             m_Scene->m_Registry.remove<T>(m_EntityHandle);
         }
 
-        Entity clone()
+        Entity Clone()
         {
             return m_Scene->CloneEntity(*this, {});
         }

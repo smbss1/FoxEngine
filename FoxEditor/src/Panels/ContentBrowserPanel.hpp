@@ -13,6 +13,8 @@
 namespace fox
 {
     struct OnProjectChangeEvent;
+    struct OnContextChangeEvent;
+    class Scene;
     class ContentBrowserPanel : public Panel
     {
     public:
@@ -20,9 +22,11 @@ namespace fox
 
         void OnImGui() override;
         void OnProjectChange(const OnProjectChangeEvent& event);
+        void OnContextChange(const OnContextChangeEvent& event);
 
     private:
         std::filesystem::path m_oCurrentDirectory;
+        Ref<Scene> m_Context;
 
         Ref<Texture2D> m_pFolderIcon = nullptr;
         Ref<Texture2D> m_pFileIcon = nullptr;

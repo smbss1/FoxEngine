@@ -26,7 +26,7 @@ namespace fox
         void SetSelectedEntity(const Entity& e) { m_SelectedEntity = e; }
 
     private:
-        void DrawEntityNode(Entity& e);
+        void DrawEntityNode(const Entity& e);
         void OnContextChangeChange(const OnContextChangeEvent& event);
 
     private:
