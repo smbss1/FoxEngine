@@ -16,8 +16,6 @@ namespace fox
 
     OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)
     {
-        FOX_CORE_INFO("Construct VertexBuffer");
-
         GLCall(glGenBuffers(1, &m_RendererID));
         GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
         GLCall(glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW));

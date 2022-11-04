@@ -109,7 +109,6 @@ namespace fox
         virtual unsigned int GetCount() const = 0;
 
         static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t size);
-
     };
 
     class VertexBuffer : public RefCounted

@@ -13,12 +13,10 @@ namespace fox
     OpenGLIndexBuffer::OpenGLIndexBuffer(const unsigned int* data, unsigned int count)
         : m_Count(count)
     {
-        FOX_CORE_INFO("Construct IndexBuffer");
-
         assert(sizeof(uint32_t) == sizeof(GLuint));
         // Generate a new ID for the indices
         GLCall(glGenBuffers(1, &m_RendererID));
-        // Init the ID as a array
+        // Init the ID as an array
         GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID));
         // Fill the array
         GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), data, GL_STATIC_DRAW));

@@ -20,11 +20,6 @@ static void GLFWErrorCallback(int error, const char* description)
     throw std::runtime_error("GLFW Error (" + std::to_string(error) + "): " + description);
 }
 
-extern "C" void* libGetProcAddress(const char *name)
-{
-    return (void*) glfwGetProcAddress(name);
-}
-
 GlfwWindow::GlfwWindow(const fox::WindowProps& props)
 {
     m_oData.Title = props.Title;
