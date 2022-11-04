@@ -31,7 +31,3 @@ target "fox_engine"
     add_includedirs("src/Fox", { public = true })
     add_includedirs("src/Platform", { public = true })
     add_files "src/**.cpp"
-
--- target_compile_definitions(fox_engine PUBLIC
---     $<$<CONFIG:DEBUG>:FOX_DEBUG=1>
--- )

@@ -14,8 +14,15 @@ namespace fox
     {
         enum class BodyType { Static = 0, Dynamic, Kinematic };
         BodyType Type = BodyType::Static;
+        uint32_t LayerID = 0;
+
         bool FixedRotation = false;
         float GravityScale = 1.0f;
+
+        float Mass = 1.0f;
+        float LinearDrag = 0.01f;
+        float AngularDrag = 0.05f;
+        bool IsBullet = false;
 
         // Storage for runtime
         void* RuntimeBody = nullptr;
