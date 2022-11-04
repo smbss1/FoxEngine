@@ -7,7 +7,7 @@
 
 #include "Ecs/Entity.hpp"
 #include "Components/IDComponent.hpp"
-#include "Components/EntityName.hpp"
+#include "Components/NameComponent.hpp"
 #include "Components/Transform.hpp"
 
 namespace fox
@@ -18,7 +18,7 @@ namespace fox
     }
 
     UUID Entity::GetUUID() const { return get<IDComponent>().ID; }
-    const std::string& Entity::GetName() const { return get<EntityName>().name; }
+    const std::string& Entity::GetName() const { return get<NameComponent>().name; }
     TransformComponent& Entity::GetTransform() const { return get<TransformComponent>(); }
 
     void Entity::SetParentUUID(UUID parent) { get<HierarchyComponent>().ParentID = parent; }
@@ -87,7 +87,6 @@ namespace fox
             if (m_Scene->GetEntityByUUID(child).IsAncesterOf(entity))
                 return true;
         }
-
         return false;
     }
 }

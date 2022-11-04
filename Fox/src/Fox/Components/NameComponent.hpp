@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2020
 ** B-YEP-400-TLS-4-1-indiestudio-thomas.marches
 ** File description:
-** EntityName.hpp
+** NameComponent.hpp
 */
 
 #ifndef FOX_ENTITY_NAME_HPP_
@@ -12,25 +12,25 @@
 
 namespace fox
 {
-    struct EntityName
+    struct NameComponent
     {
         std::string name;
         /**
          * @brief Default Constructor
          * @param tag the tag
          */
-        EntityName() = default;
+        NameComponent() = default;
 
         /**
          * @brief Default Copy Constructor
          */
-        EntityName(const EntityName&) = default;
+        NameComponent(const NameComponent&) = default;
 
         /**
          * @brief Constructor
          * @param tag the tag
          */
-        explicit EntityName(const std::string& strName) : name(strName) {}
+        explicit NameComponent(const std::string& strName) : name(strName) {}
     };
 }
 #endif

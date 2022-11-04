@@ -13,7 +13,7 @@ namespace fox
 {
     using AssetHandle = UUID;
 
-class Asset : public RefCounted
+    class Asset : public RefCounted
     {
     public:
         AssetHandle Handle = 0;
