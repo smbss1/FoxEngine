@@ -6,12 +6,13 @@
 #include "Components/Transform.hpp"
 #include "Components/SpriteRenderer.hpp"
 #include "Components/CameraComponent.hpp"
-#include "Components/EntityName.hpp"
+#include "Components/NameComponent.hpp"
 #include "Components/NativeScript.hpp"
 //#include "Components/Animator/AnimationPlayer.hpp"
 #include "Components/Rigidbody2D.hpp"
 #include "Components/IDComponent.hpp"
 #include "Components/ScriptComponent.hpp"
+#include "Components/Light.hpp"
 
 namespace fox
 {
@@ -26,13 +27,15 @@ namespace fox
             SpriteRenderer,
             CircleRenderer,
             CameraComponent,
-            NativeScript,
+//            NativeScript,
             ScriptComponent,
             Rigidbody2D,
             BoxCollider2D,
             CircleCollider2D,
             PrefabComponent,
-            HierarchyComponent
+            HierarchyComponent,
+            ParticleSystem,
+            Animator
         >;
 }
 

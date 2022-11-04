@@ -6,6 +6,7 @@
 #define FOXENGINE_SUPPORTEDFILEFORMAT_HPP
 
 #include <vector>
+#include <string>
 
 namespace fox
 {

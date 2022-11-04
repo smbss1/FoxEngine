@@ -100,8 +100,8 @@ namespace fox
 
     struct HierarchyComponent
     {
-        UUID ParentID = 0;
-        std::vector<UUID> Children;
+        UUID ParentID = UUID::Empty();
+        std::vector<UUID> Children = {};
 
         HierarchyComponent() = default;
         HierarchyComponent(const HierarchyComponent& other) = default;

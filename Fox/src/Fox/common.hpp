@@ -16,7 +16,9 @@
 
 namespace fox
 {
-	template<typename T>
+    using byte = uint8_t;
+
+    template<typename T>
 	using scope = std::unique_ptr<T>;
 
 	template<typename T, typename ... Args>

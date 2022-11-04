@@ -12,7 +12,7 @@
 #include "Core/Application.hpp"
 #include "Components/ScriptableBehaviour.hpp"
 #include "Components/NativeScript.hpp"
-#include "Components/EntityName.hpp"
+#include "Components/NameComponent.hpp"
 #include "Components.hpp"
 #include "Ecs/Entity.hpp"
 #include "Prefab.hpp"
@@ -25,6 +25,9 @@
 #include "box2d/b2_contact.h"
 #include "Core/Assert.hpp"
 #include "Scripting/ScriptEngine.hpp"
+#include "Asset/AssetManager.hpp"
+#include "Renderer/Renderer.hpp"
+#include "Physics2D.hpp"
 
 namespace fox
 {
@@ -54,8 +57,8 @@ namespace fox
             bool aSensor = a->IsSensor();
             bool bSensor = b->IsSensor();
 
-            Entity e1 = { (entt::entity)(uint32_t)a->GetUserData().pointer, m_Scene };
-            Entity e2 = { (entt::entity)(uint32_t)b->GetUserData().pointer, m_Scene };
+            Entity e1 = { (entt::entity)(uint32_t)a->GetBody()->GetUserData().pointer, m_Scene };
+            Entity e2 = { (entt::entity)(uint32_t)b->GetBody()->GetUserData().pointer, m_Scene };
 
 //            if (e1.has<BuoyancyEffector2DComponent>() && aSensor
 //                && !e2.HasComponent<BuoyancyEffector2DComponent>() && b->GetBody()->GetType() == b2_dynamicBody)
@@ -123,15 +126,12 @@ namespace fox
 
         void EndContact(b2Contact* contact) final override
         {
-            void* bodyUserData_1 = (void *) contact->GetFixtureA()->GetBody()->GetUserData().pointer;
-            void* bodyUserData_2 = (void *) contact->GetFixtureB()->GetBody()->GetUserData().pointer;
-
             b2Fixture* a = contact->GetFixtureA();
             b2Fixture* b = contact->GetFixtureB();
             bool aSensor = a->IsSensor();
             bool bSensor = b->IsSensor();
-            Entity e1 = { (entt::entity)(uint32_t)a->GetUserData().pointer, m_Scene };
-            Entity e2 = { (entt::entity)(uint32_t)b->GetUserData().pointer, m_Scene };
+            Entity e1 = { (entt::entity)(uint32_t)a->GetBody()->GetUserData().pointer, m_Scene };
+            Entity e2 = { (entt::entity)(uint32_t)b->GetBody()->GetUserData().pointer, m_Scene };
 
 //            if (e1.HasComponent<BuoyancyEffector2DComponent>() && aSensor
 //                && !e2.HasComponent<BuoyancyEffector2DComponent>() && b->GetBody()->GetType() == b2_dynamicBody)
@@ -309,7 +309,7 @@ namespace fox
     {
         //        FOX_PROFILE_FUNC();
         Entity entity = { m_Registry.create(), this };
-        auto& tag = entity.add<EntityName>();
+        auto& tag = entity.add<NameComponent>();
         tag.name = name.empty() ? "Entity" : name;
 
         entity.add<IDComponent>(uuid);
@@ -324,6 +324,8 @@ namespace fox
 
     Entity Scene::GetEntityByUUID(UUID uuid)
     {
+        if (uuid == UUID::Empty())
+            return {};
 //        FOX_PROFILE_FUNC();
         FOX_CORE_ASSERT(m_EntityMap.find(id) != m_EntityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");
         return { m_EntityMap.at(uuid), this };
@@ -341,10 +343,10 @@ namespace fox
 
     Entity Scene::FindEntityByName(std::string_view name)
     {
-        auto view = m_Registry.view<EntityName>();
+        auto view = m_Registry.view<NameComponent>();
         for (auto entity : view)
         {
-            const EntityName& tc = view.get<EntityName>(entity);
+            const NameComponent& tc = view.get<NameComponent>(entity);
             if (tc.name == name)
                 return Entity{ entity, this };
         }
@@ -356,7 +358,7 @@ namespace fox
         SubmitPostUpdateFunc([entity]() { entity.m_Scene->DestroyEntity(entity); });
     }
 
-    void Scene::DestroyEntity(Entity entity)
+    void Scene::DestroyEntity(Entity entity, bool excludeChildren, bool first)
     {
         bool isValid = m_Registry.valid((entt::entity)entity);
         if (!isValid)
@@ -382,6 +384,22 @@ namespace fox
 
 //        if (m_OnEntityDestroyedCallback)
 //            m_OnEntityDestroyedCallback(entity);
+
+        if (!excludeChildren)
+        {
+            for (size_t i = 0; i < entity.Children().size(); i++)
+            {
+                auto childId = entity.Children()[i];
+                Entity child = GetEntityByUUID(childId);
+                DestroyEntity(child, excludeChildren, false);
+            }
+        }
+
+        if (first)
+        {
+            if (auto parent = entity.GetParent(); parent)
+                parent.RemoveChild(entity);
+        }
 
         UUID id = entity.GetUUID();
         m_EntityMap.erase(id);
@@ -436,6 +454,11 @@ namespace fox
         entity.SetParentUUID(0);
     }
 
+    const std::unordered_map<UUID, entt::entity>& Scene::GetEntities() const
+    {
+        return m_EntityMap;
+    }
+
     void Scene::ConvertToLocalSpace(Entity entity)
     {
 //        FOX_PROFILE_FUNC();
@@ -487,8 +510,27 @@ namespace fox
         return transformComponent;
     }
 
-    void Scene::OnUpdateEditor(EditorCamera &camera)
+    void Scene::OnUpdateEditor(EditorCamera &camera, Timestep ts)
     {
+        // Update Animation
+        {
+            auto view = m_Registry.view<SpriteRenderer, Animator>();
+            for (auto entity : view)
+            {
+                auto [spriteRenderer, animator] = view.get<SpriteRenderer, Animator>(entity);
+                animator.Update(ts);
+
+                if (animator.CurrentAnimation && animator.CurrentAnimation->CurrentFrame)
+                {
+                    AssetHandle textureID = animator.CurrentAnimation->CurrentFrame->Texture;
+                    if (AssetManager::IsAssetHandleValid(textureID))
+                    {
+                        spriteRenderer.Sprite = textureID;
+                    }
+                }
+            }
+        }
+
         RenderScene(camera);
     }
 
@@ -574,6 +616,51 @@ namespace fox
 //              });
         }
 
+        // Update ParticleSystem
+        {
+            auto view = m_Registry.view<TransformComponent, ParticleSystem>();
+            for (auto entity : view) {
+                auto [transform, particleSystem] = view.get<TransformComponent, ParticleSystem>(entity);
+
+                if (!particleSystem.Play)
+                    continue;
+
+                particleSystem.ParticleSettings.Position = transform.position;
+
+                // Update the time that has passed between intervals
+                particleSystem.accumulator += ts;
+                while (particleSystem.accumulator >= 1.0f / particleSystem.ParticleSettings.RateOverTime) {
+                    particleSystem.Emit();
+                    particleSystem.accumulator -= 1.0f / particleSystem.ParticleSettings.RateOverTime;
+                }
+
+//                if (particleSystem.intervalTime >= particleSystem.releaseInterval) {
+//                    particleSystem.intervalTime = 0;
+//                    for (int i = 0; i < 3; i++)
+//                        particleSystem.Emit();
+//                }
+                particleSystem.Update(ts);
+            }
+        }
+
+        // Update Animation
+        {
+            auto view = m_Registry.view<SpriteRenderer, Animator>();
+            for (auto entity : view)
+            {
+                auto [spriteRenderer, animator] = view.get<SpriteRenderer, Animator>(entity);
+                animator.Update(ts);
+
+                if (animator.CurrentAnimation && animator.CurrentAnimation->CurrentFrame)
+                {
+                    AssetHandle textureID = animator.CurrentAnimation->CurrentFrame->Texture;
+                    if (AssetManager::IsAssetHandleValid(textureID))
+                    {
+                        spriteRenderer.Sprite = textureID;
+                    }
+                }
+            }
+        }
 
         // Physics
         {
@@ -625,26 +712,13 @@ namespace fox
         }
 
         // Render 2D
-        Camera* mainCamera = nullptr;
-        glm::mat4 cameraTransform;
+        Entity cameraEntity = GetPrimaryCameraEntity();
+        if (cameraEntity)
         {
-            auto view = m_Registry.view<TransformComponent, CameraComponent>();
-            for (auto entity : view)
-            {
-                auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
+            Camera& mainCamera = cameraEntity.get<CameraComponent>().camera;
+            glm::mat4 cameraTransform = cameraEntity.get<TransformComponent>().GetTransform();
 
-                if (camera.Primary)
-                {
-                    mainCamera = &camera.camera;
-                    cameraTransform = transform.GetTransform();
-                    break;
-                }
-            }
-        }
-
-        if (mainCamera)
-        {
-            Renderer2D::BeginScene(*mainCamera, cameraTransform);
+            Renderer2D::BeginScene(mainCamera.GetProjection() * glm::inverse(cameraTransform));
             RenderScene();
             Renderer2D::EndScene();
         }
@@ -660,8 +734,6 @@ namespace fox
 
         // Scripting
         {
-            ScriptEngine::OnRuntimeStart(this);
-
             // Instantiate all script entities
             auto view = m_Registry.view<ScriptComponent>();
             for (auto e : view)
@@ -710,6 +782,7 @@ namespace fox
         for (auto e : view)
         {
             Entity entity = { e, this };
+            UUID entityID = entity.GetUUID();
             auto& transform = entity.get<TransformComponent>();
             auto& rb2d = entity.get<Rigidbody2D>();
 
@@ -717,12 +790,27 @@ namespace fox
             bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
             bodyDef.position.Set(transform.position.x, transform.position.y);
             bodyDef.angle = transform.GetRotation().z;
-            bodyDef.gravityScale = rb2d.GravityScale;
 
             b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
             body->SetFixedRotation(rb2d.FixedRotation);
+
+            b2MassData massData;
+            body->GetMassData(&massData);
+            massData.mass = rb2d.Mass;
+            body->SetMassData(&massData);
+            body->SetGravityScale(rb2d.GravityScale);
+            body->SetLinearDamping(rb2d.LinearDrag);
+            body->SetAngularDamping(rb2d.AngularDrag);
+            body->SetBullet(rb2d.IsBullet);
+            body->GetUserData().pointer = (uint32_t)entity;
             rb2d.RuntimeBody = body;
-            UUID id = entity.GetUUID();
+
+            PhysicLayer* physicsLayer = nullptr;
+            if (!Physics2D::GetLayer(rb2d.LayerID, physicsLayer))
+            {
+                FOX_WARN("Invalid Layer ID (%). Set the layer to default.", rb2d.LayerID);
+                Physics2D::GetLayer(Physics2D::DefaultLayer, physicsLayer);
+            }
 
             if (entity.has<BoxCollider2D>())
             {
@@ -737,7 +825,8 @@ namespace fox
                 fixtureDef.friction = bc2d.Friction;
                 fixtureDef.restitution = bc2d.Restitution;
                 fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
-                fixtureDef.userData.pointer = (uint32_t)entity;
+                fixtureDef.filter.categoryBits = physicsLayer->AsBit();
+                fixtureDef.filter.maskBits = physicsLayer->Collisions;
                 body->CreateFixture(&fixtureDef);
             }
 
@@ -755,7 +844,6 @@ namespace fox
                 fixtureDef.friction = cc2d.Friction;
                 fixtureDef.restitution = cc2d.Restitution;
                 fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
-                fixtureDef.userData.pointer = (uint32_t)entity;
                 body->CreateFixture(&fixtureDef);
             }
         }
@@ -801,6 +889,16 @@ namespace fox
                 Renderer2D::DrawCircle(transformMatrice, circle.Color, circle.Thickness, circle.Fade, (int)entity);
             }
         }
+
+        // Draw Particle System
+        {
+            auto view = m_Registry.view<TransformComponent, ParticleSystem>();
+            for (auto entity : view)
+            {
+                auto [transform, particleSystem] = view.get<TransformComponent, ParticleSystem>(entity);
+                Renderer2D::DrawParticle(transform.GetTransform(), particleSystem);
+            }
+        }
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -833,11 +931,6 @@ namespace fox
         return {};
     }
 
-    Application &Scene::GetApp()
-    {
-        return m_oApp;
-    }
-
     void Scene::OnCameraComponentConstruct(entt::registry& registry, entt::entity entity)
     {
         Entity e = { entity, this };
@@ -862,20 +955,19 @@ namespace fox
         bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
         bodyDef.position.Set(transform.position.x, transform.position.y);
         bodyDef.angle = transform.GetRotation().z;
-        bodyDef.gravityScale = rb2d.GravityScale;
 
         b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
         body->SetFixedRotation(rb2d.FixedRotation);
 
         b2MassData massData;
         body->GetMassData(&massData);
-//        massData.mass = rb2d.Mass;
+        massData.mass = rb2d.Mass;
         body->SetMassData(&massData);
         body->SetGravityScale(rb2d.GravityScale);
-//        body->SetLinearDamping(rb2d.LinearDrag);
-//        body->SetAngularDamping(rb2d.AngularDrag);
-//        body->SetBullet(rb2d.IsBullet);
-//        body->GetUserData().pointer = (uintptr_t)entityID;
+        body->SetLinearDamping(rb2d.LinearDrag);
+        body->SetAngularDamping(rb2d.AngularDrag);
+        body->SetBullet(rb2d.IsBullet);
+        body->GetUserData().pointer = (uint32_t)entity;
 
         rb2d.RuntimeBody = body;
     }
@@ -914,7 +1006,6 @@ namespace fox
             fixtureDef.friction = bc2d.Friction;
             fixtureDef.restitution = bc2d.Restitution;
             fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
-            fixtureDef.userData.pointer = (uint32_t)entity;
             body->CreateFixture(&fixtureDef);
         }
     }
@@ -950,7 +1041,6 @@ namespace fox
             fixtureDef.friction = cc2d.Friction;
             fixtureDef.restitution = cc2d.Restitution;
             fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
-            fixtureDef.userData.pointer = (uint32_t)entity;
             body->CreateFixture(&fixtureDef);
         }
     }
@@ -1019,7 +1109,7 @@ namespace fox
         for (auto e : idView)
         {
             UUID uuid = srcSceneRegistry.get<IDComponent>(e).ID;
-            const auto& name = srcSceneRegistry.get<EntityName>(e).name;
+            const auto& name = srcSceneRegistry.get<NameComponent>(e).name;
             Entity newEntity = newScene->NewEntityWithUUID(uuid, name);
             enttMap[uuid] = (entt::entity)newEntity;
         }

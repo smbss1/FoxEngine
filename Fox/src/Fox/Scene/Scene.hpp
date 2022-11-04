@@ -43,6 +43,9 @@ namespace fox
         void ParentEntity(Entity entity, Entity parent);
         void UnparentEntity(Entity entity, bool convertToWorldSpace = true);
 
+        const std::unordered_map<UUID, entt::entity>& GetEntities() const;
+
+
         void ConvertToLocalSpace(Entity entity);
         void ConvertToWorldSpace(Entity entity);
         glm::mat4 GetWorldSpaceTransformMatrix(Entity entity);
@@ -60,7 +63,7 @@ namespace fox
         }
 
         void SubmitToDestroyEntity(Entity entity);
-        void DestroyEntity(Entity entity);
+        void DestroyEntity(Entity entity, bool excludeChildren = false, bool first = true);
 
         template<typename Fn>
         void SubmitPostUpdateFunc(Fn&& func)
@@ -68,10 +71,9 @@ namespace fox
             m_PostUpdateQueue.emplace_back(func);
         }
 
-
         void OnUpdateRuntime(Timestep ts);
         void OnUpdateSimulation(EditorCamera& camera, Timestep ts);
-        void OnUpdateEditor(EditorCamera& camera);
+        void OnUpdateEditor(EditorCamera& camera, Timestep ts);
         void OnViewportResize(uint32_t width, uint32_t height);
 
         void OnRuntimeStart();
@@ -81,8 +83,6 @@ namespace fox
         void OnSimulationStop();
 
         Entity GetPrimaryCameraEntity();
-
-        Application& GetApp();
 
         bool IsRunning() const { return m_IsRunning; }
         void CopyAllComponentsIfExists(Entity dst, Entity src);
