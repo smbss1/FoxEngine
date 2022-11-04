@@ -13,6 +13,7 @@
 
 #include "ImGui/ImGuiLayer.hpp"
 #include "Assert.hpp"
+#include "Scripting/ScriptEngine.hpp"
 
 namespace fox
 {
@@ -38,6 +39,8 @@ namespace fox
         std::string Name = "Hazel Application";
         std::string WorkingDirectory;
         ApplicationCommandLineArgs CommandLineArgs;
+
+        ScriptEngineSetting ScriptSetting;
     };
 
     class Application

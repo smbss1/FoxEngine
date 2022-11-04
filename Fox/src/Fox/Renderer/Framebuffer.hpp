@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "common.hpp"
+#include "glm/vec4.hpp"
 
 namespace fox
 {
@@ -53,6 +54,12 @@ namespace fox
         uint32_t Width = 0, Height = 0;
         FramebufferAttachmentSpecification Attachments;
         uint32_t Samples = 1;
+
+        glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+        float DepthClearValue = 0.0f;
+        bool ClearColorOnLoad = true;
+        bool ClearDepthOnLoad = true;
+
 
         bool SwapChainTarget = false;
     };

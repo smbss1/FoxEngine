@@ -4,7 +4,6 @@
 #include <Renderer/RendererCommand.hpp>
 #include <Core/Input/Input.hpp>
 #include <Renderer/Renderer.hpp>
-#include <Renderer/Renderer2D.hpp>
 #include "Core/Application.hpp"
 #include "Core/Logger/Logger.hpp"
 #include "Scripting/ScriptEngine.hpp"
@@ -33,7 +32,7 @@ namespace fox
         Input::SetWindow(m_pWindow.get());
 
         Renderer::Init();
-        ScriptEngine::Init();
+        ScriptEngine::Init(specification.ScriptSetting);
         Reflection::Init();
 
         // Add the ImGui state of GUI
@@ -46,8 +45,8 @@ namespace fox
     Application::~Application()
     {
         ScriptEngine::Shutdown();
-        Renderer2D::Shutdown();
-        RendererCommand::Shutdown();
+        Renderer::WaitAndRender();
+        Renderer::Shutdown();
     }
 
     void Application::PushLayer(Layer* layer)
@@ -121,14 +120,16 @@ namespace fox
                 for (Layer* layer : m_LayerStack)
                     layer->OnUpdate(m_TimeStep);
 
-                m_ImGuiLayer->Begin();
-                {
-                    for (Layer* layer : m_LayerStack)
+                Application* app = this;
+                RendererCommand::Submit([app]{ app->m_ImGuiLayer->Begin(); });
+                RendererCommand::Submit([app]{
+                    for (Layer* layer : app->m_LayerStack)
                         layer->OnImGuiRender();
-                }
-                m_ImGuiLayer->End();
+                });
+                RendererCommand::Submit([app]{ app->m_ImGuiLayer->End(); });
             }
             Input::OnUpdate();
+            Renderer::WaitAndRender();
             m_pWindow->OnUpdate();
 
             float time = Time::GetTime();
@@ -172,14 +173,4 @@ namespace fox
 
 		m_MainThreadQueue.clear();
 	}
-
-//    std::unordered_map<size_t, ScriptCreator> &Application::GetScripts()
-//    {
-//        return m_vScripts;
-//    }
-//
-//    void Application::SetScriptsArray(const std::unordered_map<size_t, ScriptCreator> &scripts)
-//    {
-//        m_vScripts = scripts;
-//    }
 }

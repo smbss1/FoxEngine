@@ -4,6 +4,10 @@
 
 #include "common.hpp"
 #include "UniformBuffer.hpp"
+#include "Asset/AssetManager.hpp"
+#include "Renderer.hpp"
+#include "Material.hpp"
+#include "../../../../FoxEditor/src/EditorLayer.hpp"
 #include <Renderer/Renderer2D.hpp>
 #include <Renderer/VertexArray.hpp>
 #include <Renderer/Shader.hpp>
@@ -55,12 +59,12 @@ namespace fox
 
         Ref<VertexArray> pQuadVertexArray;
         Ref<VertexBuffer> pQuadVertexBuffer;
-        Ref<Shader> QuadShader;
+        Ref<Material> QuadMaterial;
         Ref<Texture2D> pWhiteTexture;
 
         Ref<VertexArray> CircleVertexArray;
         Ref<VertexBuffer> CircleVertexBuffer;
-        Ref<Shader> CircleShader;
+        Ref<Material> CircleMaterial;
 
         Ref<VertexArray> LineVertexArray;
         Ref<VertexBuffer> LineVertexBuffer;
@@ -92,6 +96,8 @@ namespace fox
         };
         CameraData CameraBuffer;
         Ref<UniformBuffer> CameraUniformBuffer;
+
+        Ref<Shader> PointLightShader;
     };
 
     static Renderer2DData s_Data;
@@ -99,9 +105,7 @@ namespace fox
     void Renderer2D::Init()
     {
         s_Data.pQuadVertexArray = fox::VertexArray::Create();
-
         s_Data.pQuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
-
         s_Data.pQuadVertexBuffer->SetLayout({
               {fox::ShaderDataType::Float3, "a_Position"},
               {fox::ShaderDataType::Float4, "a_Color"},
@@ -133,7 +137,6 @@ namespace fox
         // Circles
         s_Data.CircleVertexArray = fox::VertexArray::Create();
         s_Data.CircleVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(CircleVertex));
-
         s_Data.CircleVertexBuffer->SetLayout({
              {fox::ShaderDataType::Float3, "a_WorldPosition"},
              {fox::ShaderDataType::Float3, "a_LocalPosition"},
@@ -148,7 +151,6 @@ namespace fox
 
         // Lines
         s_Data.LineVertexArray = VertexArray::Create();
-
         s_Data.LineVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(LineVertex));
         s_Data.LineVertexBuffer->SetLayout({
            { ShaderDataType::Float3, "a_Position" },
@@ -163,20 +165,13 @@ namespace fox
         uint32_t whiteTextureData = 0xffffffff;
         s_Data.pWhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
-        int32_t samplers[Renderer2DData::MaxTextureSlots];
-        for (uint32_t i = 0; i < Renderer2DData::MaxTextureSlots; ++i)
-            samplers[i] = i;
-
-        s_Data.QuadShader = fox::Shader::Create("assets/shaders/Renderer2D_Quad.glsl");
-        s_Data.CircleShader = fox::Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
+        s_Data.QuadMaterial = new_ref<Material>(fox::Shader::Create("assets/shaders/Renderer2D_Quad.glsl"));
+        s_Data.CircleMaterial = new_ref<Material>(fox::Shader::Create("assets/shaders/Renderer2D_Circle.glsl"));
         s_Data.LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
-
-        //        s_Data.pTextureShader->Bind();
-//        s_Data.pTextureShader->SetUniform("u_Textures", samplers, s_Data.MaxTextureSlots);
+        s_Data.PointLightShader = Shader::Create("assets/shaders/light.glsl");
 
         // Set first texture slot to 0
         s_Data.TextureSlots[0] = s_Data.pWhiteTexture;
-
 
         s_Data.QuadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
         s_Data.QuadVertexPositions[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
@@ -191,7 +186,7 @@ namespace fox
         for (uint32_t i = 0; i < Renderer2DData::MaxTextureSlots; ++i)
             s_Data.TextureSlots[i].Reset();
         s_Data.pQuadVertexBuffer.Reset();
-        s_Data.QuadShader.Reset();
+        s_Data.QuadMaterial.Reset();
         s_Data.pQuadVertexArray.Reset();
         s_Data.pWhiteTexture.Reset();
         delete[] s_Data.QuadVertexBufferBase;
@@ -199,25 +194,21 @@ namespace fox
 
     void Renderer2D::BeginScene(const OrthographicCamera &camera)
     {
-        s_Data.CameraBuffer.ViewProjection = camera.GetViewProjectionMatrix();
-        s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
-        StartBatch();
+        BeginScene(camera.GetViewProjectionMatrix());
     }
 
-    void Renderer2D::BeginScene(const Camera &camera, const glm::mat4& transform)
+    void Renderer2D::BeginScene(const glm::mat4& viewProj)
     {
-        s_Data.CameraBuffer.ViewProjection = camera.GetProjection() * glm::inverse(transform);
-        s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
-
+        RendererCommand::Submit([viewProj] {
+            s_Data.CameraBuffer.ViewProjection = viewProj;
+             s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+         });
         StartBatch();
     }
 
     void Renderer2D::BeginScene(const EditorCamera &camera)
     {
-        s_Data.CameraBuffer.ViewProjection = camera.GetViewProjection();
-        s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
-
-        StartBatch();
+        BeginScene(camera.GetViewProjection());
     }
 
     void Renderer2D::EndScene()
@@ -257,15 +248,18 @@ namespace fox
 
     void Renderer2D::Flush()
     {
-        if (s_Data.QuadIndexCount)
+        uint32_t dataSize = (uint8_t *)s_Data.QuadVertexBufferPtr - (uint8_t *)s_Data.QuadVertexBufferBase;
+        if (dataSize)
         {
-            uint32_t dataSize = (uint8_t *)s_Data.QuadVertexBufferPtr - (uint8_t *)s_Data.QuadVertexBufferBase;
             s_Data.pQuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
-            for (uint32_t i = 0; i < s_Data.TextureSlotIndex; ++i)
-                s_Data.TextureSlots[i]->Bind(i);
-            s_Data.QuadShader->Bind();
-            RendererCommand::DrawIndexed(s_Data.pQuadVertexArray, s_Data.QuadIndexCount);
+            for (uint32_t i = 0; i < s_Data.TextureSlotIndex; ++i) {
+                if (s_Data.TextureSlots[i])
+                    s_Data.QuadMaterial->Set("u_Textures", s_Data.TextureSlots[i], i);
+                else
+                    s_Data.QuadMaterial->Set("u_Textures", s_Data.pWhiteTexture, i);
+            }
+            Renderer::RenderGeometry(s_Data.QuadMaterial, s_Data.pQuadVertexArray, s_Data.QuadIndexCount);
             s_Data.Stats.DrawCalls++;
         }
 
@@ -274,8 +268,7 @@ namespace fox
             uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.CircleVertexBufferPtr - (uint8_t*)s_Data.CircleVertexBufferBase);
             s_Data.CircleVertexBuffer->SetData(s_Data.CircleVertexBufferBase, dataSize);
 
-            s_Data.CircleShader->Bind();
-            RendererCommand::DrawIndexed(s_Data.CircleVertexArray, s_Data.CircleIndexCount);
+            Renderer::RenderGeometry(s_Data.CircleMaterial, s_Data.CircleVertexArray, s_Data.CircleIndexCount);
             s_Data.Stats.DrawCalls++;
         }
 
@@ -285,8 +278,8 @@ namespace fox
             s_Data.LineVertexBuffer->SetData(s_Data.LineVertexBufferBase, dataSize);
 
             s_Data.LineShader->Bind();
-            RendererCommand::SetLineWidth(s_Data.LineWidth);
-            RendererCommand::DrawLines(s_Data.LineVertexArray, s_Data.LineVertexCount);
+            Renderer::SetLineWidth(s_Data.LineWidth);
+            Renderer::DrawLines(s_Data.LineVertexArray, s_Data.LineVertexCount);
             s_Data.Stats.DrawCalls++;
         }
     }
@@ -309,32 +302,7 @@ namespace fox
 
     void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &color)
     {
-        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-            NextBatch();
-
-        const float textureIndex = 0.0f; // White texture
-        const float tilingFactor = 1.0f;
-        constexpr glm::vec2 textureCoords[] = {
-                { 0.0f, 0.0f }, { 1.0f, 0.0f },
-                { 1.0f, 1.0f }, { 0.0f, 1.0f }
-        };
-
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
-                              glm::scale(glm::mat4(1.f), {size.x, size.y, 1.0f});
-
-        for (int i = 0; i < 4; ++i)
-        {
-            AddToVertexBuffer({
-                  .oPosition = transform * s_Data.QuadVertexPositions[i],
-                  .oColor = color,
-                  .oTexCoord = textureCoords[i],
-                  .fTexIndex = textureIndex,
-                  .fTilingFactor = tilingFactor
-            });
-        }
-        s_Data.QuadIndexCount += 6;
-
-        s_Data.Stats.QuadCount++;
+        DrawRotatedQuad(position, size, 0.f, color);
     }
 
     void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ref<Texture2D> &texture,
@@ -346,49 +314,7 @@ namespace fox
     void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture,
                               const glm::vec4 &tintColor, float tilingFactor)
     {
-        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-            NextBatch();
-
-        constexpr glm::vec4 color = glm::vec4(1.0f);
-        constexpr glm::vec2 textureCoords[] = {
-                { 0.0f, 0.0f }, { 1.0f, 0.0f },
-                { 1.0f, 1.0f }, { 0.0f, 1.0f }
-        };
-
-        float textureIndex = 0.0f;
-        for (int i = 0; i < s_Data.TextureSlotIndex; ++i)
-        {
-            if (*s_Data.TextureSlots[i] == *texture)
-            {
-                textureIndex = static_cast<float>(i);
-                break;
-            }
-        }
-
-        if (textureIndex == 0.0f)
-        {
-            textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
-            s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-            s_Data.TextureSlotIndex++;
-        }
-
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
-                              glm::scale(glm::mat4(1.f), {size.x, size.y, 1.0f});
-
-        for (int i = 0; i < 4; ++i)
-        {
-            AddToVertexBuffer({
-                  .oPosition = transform * s_Data.QuadVertexPositions[i],
-                  .oColor = color,
-                  .oTexCoord = textureCoords[i],
-                  .fTexIndex = textureIndex,
-                  .fTilingFactor = tilingFactor
-            });
-        }
-
-        s_Data.QuadIndexCount += 6;
-
-        s_Data.Stats.QuadCount++;
+        DrawRotatedQuad(position, size, 0.f, texture, tintColor, tilingFactor);
     }
 
     void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ref<SubTexture2D> &subTexture2D,
@@ -400,49 +326,8 @@ namespace fox
     void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Ref<SubTexture2D> &subTexture2D,
                               const glm::vec4 &tintColor, float tilingFactor)
     {
-        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-            NextBatch();
-
-        constexpr glm::vec4 color = glm::vec4(1.0f);
-        const glm::vec2* textureCoords = subTexture2D->GetTexCoords();
-        const Ref<Texture2D> texture = subTexture2D->GetTexture();
-
-        float textureIndex = 0.0f;
-        for (int i = 0; i < s_Data.TextureSlotIndex; ++i)
-        {
-            if (*s_Data.TextureSlots[i] == *texture)
-            {
-                textureIndex = static_cast<float>(i);
-                break;
-            }
-        }
-
-        if (textureIndex == 0.0f)
-        {
-            textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
-            s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-            s_Data.TextureSlotIndex++;
-        }
-
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
-                              glm::scale(glm::mat4(1.f), {size.x, size.y, 1.0f});
-
-        for (int i = 0; i < 4; ++i)
-        {
-            AddToVertexBuffer({
-                  .oPosition = transform * s_Data.QuadVertexPositions[i],
-                  .oColor = color,
-                  .oTexCoord = textureCoords[i],
-                  .fTexIndex = textureIndex,
-                  .fTilingFactor = tilingFactor
-            });
-        }
-
-        s_Data.QuadIndexCount += 6;
-
-        s_Data.Stats.QuadCount++;
+        DrawRotatedQuad(position, size, 0.f, subTexture2D, tintColor, tilingFactor);
     }
-
 
 
     void Renderer2D::DrawRotatedQuad(const glm::vec2 &position, const glm::vec2 &size, float rotation,
@@ -454,33 +339,11 @@ namespace fox
     void Renderer2D::DrawRotatedQuad(const glm::vec3 &position, const glm::vec2 &size, float rotation,
                                      const glm::vec4 &color)
     {
-        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-            NextBatch();
-
-        const float textureIndex = 0.0f; // White texture
-        const float tilingFactor = 1.0f;
-        constexpr glm::vec2 textureCoords[] = {
-                { 0.0f, 0.0f }, { 1.0f, 0.0f },
-                { 1.0f, 1.0f }, { 0.0f, 1.0f }
-        };
-
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
                 glm::rotate(glm::mat4(1.f), glm::radians(rotation), {0.0f, 0.0f, 1.0f}) *
                 glm::scale(glm::mat4(1.f), {size.x, size.y, 1.0f});
 
-        for (int i = 0; i < 4; ++i)
-        {
-            AddToVertexBuffer({
-                  .oPosition = transform * s_Data.QuadVertexPositions[i],
-                  .oColor = color,
-                  .oTexCoord = textureCoords[i],
-                  .fTexIndex = textureIndex,
-                  .fTilingFactor = tilingFactor
-            });
-        }
-        s_Data.QuadIndexCount += 6;
-
-        s_Data.Stats.QuadCount++;
+        DrawQuad(transform, color);
     }
 
     void Renderer2D::DrawRotatedQuad(const glm::vec2 &position, const glm::vec2 &size, float rotation,
@@ -492,50 +355,11 @@ namespace fox
     void Renderer2D::DrawRotatedQuad(const glm::vec3 &position, const glm::vec2 &size, float rotation,
                                      const Ref<Texture2D> &texture, const glm::vec4 &tintColor, float tilingFactor)
     {
-        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-            NextBatch();
-
-        constexpr glm::vec4 color = glm::vec4(1.0f);
-        constexpr glm::vec2 textureCoords[] = {
-                { 0.0f, 0.0f }, { 1.0f, 0.0f },
-                { 1.0f, 1.0f }, { 0.0f, 1.0f }
-        };
-
-        float textureIndex = 0.0f;
-        for (int i = 0; i < s_Data.TextureSlotIndex; ++i)
-        {
-            if (*s_Data.TextureSlots[i] == *texture)
-            {
-                textureIndex = static_cast<float>(i);
-                break;
-            }
-        }
-
-        if (textureIndex == 0.0f)
-        {
-            textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
-            s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-            s_Data.TextureSlotIndex++;
-        }
-
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
                               glm::rotate(glm::mat4(1.f), glm::radians(rotation), {0.0f, 0.0f, 1.0f}) *
                               glm::scale(glm::mat4(1.f), {size.x, size.y, 1.0f});
 
-        for (int i = 0; i < 4; ++i)
-        {
-            AddToVertexBuffer({
-                  .oPosition = transform * s_Data.QuadVertexPositions[i],
-                  .oColor = color,
-                  .oTexCoord = textureCoords[i],
-                  .fTexIndex = textureIndex,
-                  .fTilingFactor = tilingFactor
-            });
-        }
-
-        s_Data.QuadIndexCount += 6;
-
-        s_Data.Stats.QuadCount++;
+        DrawQuad(transform, texture, tintColor, tilingFactor);
     }
 
     void Renderer2D::DrawRotatedQuad(const glm::vec2 &position, const glm::vec2 &size, float rotation,
@@ -549,75 +373,16 @@ namespace fox
                                      const Ref<SubTexture2D> &subTexture2D, const glm::vec4 &tintColor,
                                      float tilingFactor)
     {
-        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-            NextBatch();
-
-        constexpr glm::vec4 color = glm::vec4(1.0f);
-        const glm::vec2* textureCoords = subTexture2D->GetTexCoords();
-        const Ref<Texture2D> texture = subTexture2D->GetTexture();
-
-        float textureIndex = 0.0f;
-        for (int i = 0; i < s_Data.TextureSlotIndex; ++i)
-        {
-            if (*s_Data.TextureSlots[i] == *texture)
-            {
-                textureIndex = static_cast<float>(i);
-                break;
-            }
-        }
-
-        if (textureIndex == 0.0f)
-        {
-            textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
-            s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-            s_Data.TextureSlotIndex++;
-        }
-
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
                               glm::rotate(glm::mat4(1.f), glm::radians(rotation), {0.0f, 0.0f, 1.0f}) *
                               glm::scale(glm::mat4(1.f), {size.x, size.y, 1.0f});
 
-        for (int i = 0; i < 4; ++i)
-        {
-            AddToVertexBuffer({
-                  .oPosition = transform * s_Data.QuadVertexPositions[i],
-                  .oColor = color,
-                  .oTexCoord = textureCoords[i],
-                  .fTexIndex = textureIndex,
-                  .fTilingFactor = tilingFactor
-            });
-        }
-
-        s_Data.QuadIndexCount += 6;
-
-        s_Data.Stats.QuadCount++;
+        DrawQuad(transform, subTexture2D->GetTexture(), tintColor, tilingFactor);
     }
 
     void Renderer2D::DrawQuad(const glm::mat4 &transform, const glm::vec4 &color, int entityID)
     {
-        constexpr size_t quadVertexCount = 4;
-        const float textureIndex = 0.0f; // White Texture
-        constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
-        const float tilingFactor = 1.0f;
-
-        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-            NextBatch();
-
-        for (size_t i = 0; i < quadVertexCount; i++)
-        {
-            AddToVertexBuffer({
-                  .oPosition = transform * s_Data.QuadVertexPositions[i],
-                  .oColor = color,
-                  .oTexCoord = textureCoords[i],
-                  .fTexIndex = textureIndex,
-                  .fTilingFactor = tilingFactor,
-                  .EntityID = entityID
-            });
-        }
-
-        s_Data.QuadIndexCount += 6;
-
-        s_Data.Stats.QuadCount++;
+        DrawQuad(transform, nullptr, color, 1.0f, entityID);
     }
 
     void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& tintColor, float tilingFactor, int entityID)
@@ -629,23 +394,26 @@ namespace fox
             NextBatch();
 
         float textureIndex = 0.0f;
-        for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+        if (texture)
         {
-            if (*s_Data.TextureSlots[i] == *texture)
+            for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
             {
-                textureIndex = (float)i;
-                break;
+                if (*s_Data.TextureSlots[i] == *texture)
+                {
+                    textureIndex = (float)i;
+                    break;
+                }
             }
-        }
 
-        if (textureIndex == 0.0f)
-        {
-            if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
-                NextBatch();
+            if (textureIndex == 0.0f)
+            {
+                if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
+                    NextBatch();
 
-            textureIndex = (float)s_Data.TextureSlotIndex;
-            s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-            s_Data.TextureSlotIndex++;
+                textureIndex = (float)s_Data.TextureSlotIndex;
+                s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+                s_Data.TextureSlotIndex++;
+            }
         }
 
         for (size_t i = 0; i < quadVertexCount; i++)
@@ -654,20 +422,19 @@ namespace fox
                   .oPosition = transform * s_Data.QuadVertexPositions[i],
                   .oColor = tintColor,
                   .oTexCoord = textureCoords[i],
-                  .fTexIndex = textureIndex,
+                  .fTexIndex = textureIndex, // if == 0 = White Texture
                   .fTilingFactor = tilingFactor,
                   .EntityID = entityID
             });
         }
 
         s_Data.QuadIndexCount += 6;
-
         s_Data.Stats.QuadCount++;
     }
 
     void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness /*= 1.0f*/, float fade /*= 0.005f*/, int entityID /*= -1*/)
     {
-//        HZ_PROFILE_FUNCTION();
+//        FOX_PROFILE_FUNCTION();
 
         // TODO: implement for circles
         // if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
@@ -685,16 +452,25 @@ namespace fox
         }
 
         s_Data.CircleIndexCount += 6;
-
         s_Data.Stats.QuadCount++;
     }
 
     void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRenderer& src, int entityID)
     {
-        if (src.Sprite)
-            DrawQuad(transform, src.Sprite, src.Color, src.TilingFactor, entityID);
+        if (AssetManager::IsAssetHandleValid(src.Sprite))
+            DrawQuad(transform, AssetManager::GetAsset<Texture2D>(src.Sprite), src.Color, src.TilingFactor, entityID);
         else
             DrawQuad(transform, src.Color, entityID);
+    }
+
+    void Renderer2D::DrawParticle(const glm::mat4& transform, ParticleSystem& src)
+    {
+        for (const auto& particle : src.ParticlePool)
+        {
+            if (!particle.Active)
+                continue;
+            DrawRotatedQuad(particle.Position, particle.Size, particle.Rotation, particle.Color);
+        }
     }
 
     void Renderer2D::DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color, int entityID)

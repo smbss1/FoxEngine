@@ -10,25 +10,48 @@
 
 namespace fox
 {
-    class RendererAPI;
-    class VertexArray;
+    class RenderCommandQueue
+    {
+    public:
+        typedef void(*RenderCommandFn)(void*);
+
+        RenderCommandQueue();
+        ~RenderCommandQueue();
+
+        void* Push(RenderCommandFn func, uint32_t size);
+
+        void Execute();
+    private:
+        uint8_t* m_CommandBuffer;
+        uint8_t* m_CommandBufferPtr;
+        uint32_t m_CommandCount = 0;
+    };
 
     class RendererCommand
     {
     public:
         static void Init();
         static void Shutdown();
-        static void SetClearColor(const glm::vec4& color);
-        static void Clear();
-        static void DrawIndexed(const Ref<VertexArray>& pVertexArray, uint32_t uIndexCount = 0);
+        static void WaitAndRender();
 
-        static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+        template<typename FuncT>
+        static void Submit(FuncT&& func)
+        {
+            auto renderCmd = [](void* ptr) {
+                auto pFunc = (FuncT*)ptr;
+                (*pFunc)();
 
-        static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount);
-        static void SetLineWidth(float width);
+                // NOTE: Instead of destroying we could try and enforce all items to be trivally destructible
+                // however some items like uniforms which contain std::strings still exist for now
+                // static_assert(std::is_trivially_destructible_v<FuncT>, "FuncT must be trivially destructible");
+                pFunc->~FuncT();
+            };
+            auto storageBuffer = s_CommandQueue->Push(renderCmd, sizeof(func));
+            new (storageBuffer) FuncT(std::forward<FuncT>(func));
+        }
 
     private:
-        static scope<RendererAPI> m_spRenderer;
+        static scope<RenderCommandQueue> s_CommandQueue;
     };
 }
 

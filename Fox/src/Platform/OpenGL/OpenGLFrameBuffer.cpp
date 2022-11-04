@@ -85,6 +85,7 @@ namespace fox
             {
                 case FramebufferTextureFormat::RGBA8:       return GL_RGBA8;
                 case FramebufferTextureFormat::RED_INTEGER: return GL_RED_INTEGER;
+                case FramebufferTextureFormat::DEPTH24STENCIL8: return GL_DEPTH24_STENCIL8;
             }
 
             FOX_CORE_ASSERT(false, "");
@@ -233,7 +234,6 @@ namespace fox
         }
 
         FOX_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete");
-
         GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
 }

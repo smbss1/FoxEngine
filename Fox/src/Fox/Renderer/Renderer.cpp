@@ -2,43 +2,105 @@
 // Created by samuel on 26/06/2021.
 //
 
-#include <Renderer/RendererCommand.hpp>
-#include <Renderer/Renderer2D.hpp>
+#include "Renderer/RendererCommand.hpp"
+#include "Renderer/Renderer2D.hpp"
 #include "Renderer/Renderer.hpp"
 #include "Renderer/Shader.hpp"
 #include "Renderer/VertexArray.hpp"
+#include "Renderer/RendererAPI.hpp"
+#include "Material.hpp"
 
 namespace fox
 {
-    Renderer::SceneData Renderer::m_SceneData = Renderer::SceneData();
+    scope<RendererAPI> Renderer::m_spRenderer = RendererAPI::Create();
+
+    static Ref<RenderPass> s_CurrentRenderPass = nullptr;
 
     void Renderer::Init()
     {
+        m_spRenderer->Init();
+
         RendererCommand::Init();
         Renderer2D::Init();
     }
 
-    void Renderer::BeginScene(OrthographicCamera& camera)
+    void Renderer::Shutdown()
     {
-        m_SceneData.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+        Renderer2D::Shutdown();
+        RendererCommand::Shutdown();
+        m_spRenderer = nullptr;
     }
 
-    void Renderer::EndScene()
+    void Renderer::SetClearColor(const glm::vec4 &color)
     {
+        m_spRenderer->SetClearColor(color);
     }
 
-    void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray> &pVertexArray, const glm::mat4& transform)
+    void Renderer::Clear()
     {
-        shader->Bind();
-        shader->SetUniform("u_ViewProjection", m_SceneData.ViewProjectionMatrix);
-        shader->SetUniform("u_Transform", transform);
+        m_spRenderer->Clear();
+    }
 
-        pVertexArray->Bind();
-        RendererCommand::DrawIndexed(pVertexArray);
+    void Renderer::RenderGeometry(Ref<Material> material, const Ref<VertexArray>& pVertexArray, uint32_t uIndexCount)
+    {
+        WeakRef<Material> weakMat = material;
+        RendererCommand::Submit([weakMat, pVertexArray, uIndexCount] mutable {
+            if (weakMat.IsValid())
+            {
+                weakMat->UpdateForRendering();
+                m_spRenderer->DrawIndexed(pVertexArray, uIndexCount);
+            }
+        });
+    }
+
+    void Renderer::DrawIndexed(const fox::Ref<fox::VertexArray> &pVertexArray, uint32_t uIndexCount)
+    {
+        m_spRenderer->DrawIndexed(pVertexArray, uIndexCount);
+    }
+
+    void Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+    {
+        m_spRenderer->SetViewport(x, y, width, height);
+    }
+
+    void Renderer::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
+    {
+        m_spRenderer->DrawLines(vertexArray, vertexCount);
+    }
+
+    void Renderer::SetLineWidth(float width)
+    {
+        m_spRenderer->SetLineWidth(width);
     }
 
     void Renderer::OnWindowResize(unsigned int width, unsigned int height)
     {
-        RendererCommand::SetViewport(0, 0, width, height);
+        m_spRenderer->SetViewport(0, 0, width, height);
+    }
+
+    void Renderer::BeginRenderPass(Ref<RenderPass> renderPass)
+    {
+        s_CurrentRenderPass = renderPass;
+        RendererCommand::Submit([=] mutable {
+            s_CurrentRenderPass->GetSpecs().RenderTarget->Bind();
+            SetClearColor(s_CurrentRenderPass->GetSpecs().RenderTarget->GetSpecification().ClearColor);
+            Clear();
+
+            // Clear our entity ID attachment to -1
+            s_CurrentRenderPass->GetSpecs().RenderTarget->ClearAttachment(1, -1);
+        });
+    }
+
+    void Renderer::EndRenderPass()
+    {
+        RendererCommand::Submit([=] {
+            s_CurrentRenderPass->GetSpecs().RenderTarget->Unbind();
+        });
+    }
+
+    void Renderer::WaitAndRender()
+    {
+//        FOX_PROFILE_FUNC();
+        RendererCommand::WaitAndRender();
     }
 }

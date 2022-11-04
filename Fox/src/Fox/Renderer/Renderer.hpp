@@ -5,29 +5,40 @@
 #ifndef FOXENGINE_RENDERER_HPP
 #define FOXENGINE_RENDERER_HPP
 
-#include "OrthographicCamera.hpp"
-#include "Shader.hpp"
+#include "glm/glm.hpp"
+#include "RenderPass.hpp"
 
 namespace fox
 {
+    class RenderCommandQueue;
+    class RendererAPI;
     class VertexArray;
+    class Material;
+
     class Renderer
     {
     public:
         static void Init();
-        static void BeginScene(OrthographicCamera& camera);
-        static void EndScene();
-        static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& pVertexArray, const glm::mat4& transform = glm::mat4(1.0f));
+        static void Shutdown();
+
+        static void BeginRenderPass(Ref<RenderPass> renderPass);
+        static void EndRenderPass();
 
         static void OnWindowResize(unsigned int width, unsigned int height);
+        static void SetClearColor(const glm::vec4& color);
+        static void Clear();
+        static void DrawIndexed(const Ref<VertexArray>& pVertexArray, uint32_t uIndexCount = 0);
+        static void RenderGeometry(Ref<Material> shader, const Ref<VertexArray>& pVertexArray, uint32_t uIndexCount = 0);
+
+        static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+
+        static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount);
+        static void SetLineWidth(float width);
+
+        static void WaitAndRender();
 
     private:
-        struct SceneData
-        {
-            glm::mat4 ViewProjectionMatrix;
-        };
-
-        static SceneData m_SceneData;
+        static scope<RendererAPI> m_spRenderer;
     };
 }
 

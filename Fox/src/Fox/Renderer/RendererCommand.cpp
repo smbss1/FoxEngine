@@ -2,51 +2,72 @@
 // Created by samuel on 27/06/2021.
 //
 
-#include <Core/Assert.hpp>
 #include "RendererCommand.hpp"
-#include "RendererAPI.hpp"
 
 namespace fox
 {
-    scope<RendererAPI> RendererCommand::m_spRenderer = RendererAPI::Create();
+    scope<RenderCommandQueue> RendererCommand::s_CommandQueue = nullptr;
 
     void RendererCommand::Init()
     {
-        m_spRenderer->Init();
+        s_CommandQueue = new_scope<RenderCommandQueue>();
     }
 
     void RendererCommand::Shutdown()
     {
-        m_spRenderer = nullptr;
     }
 
-    void RendererCommand::SetClearColor(const glm::vec4 &color)
+    void RendererCommand::WaitAndRender()
     {
-        m_spRenderer->SetClearColor(color);
+//        FOX_PROFILE_FUNC();
+        s_CommandQueue->Execute();
     }
 
-    void RendererCommand::Clear()
+    // -- RenderCommandQueue
+    RenderCommandQueue::RenderCommandQueue()
     {
-        m_spRenderer->Clear();
+        m_CommandBuffer = new uint8_t[10 * 1024 * 1024]; // 10mb buffer
+        m_CommandBufferPtr = m_CommandBuffer;
+        memset(m_CommandBuffer, 0, 10 * 1024 * 1024);
     }
 
-    void RendererCommand::DrawIndexed(const fox::Ref<fox::VertexArray> &pVertexArray, uint32_t uIndexCount)
+    RenderCommandQueue::~RenderCommandQueue()
     {
-        m_spRenderer->DrawIndexed(pVertexArray, uIndexCount);
+        delete[] m_CommandBuffer;
     }
 
-    void RendererCommand::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+    void* RenderCommandQueue::Push(RenderCommandFn fn, uint32_t size)
     {
-        m_spRenderer->SetViewport(x, y, width, height);
+        // TODO: alignment
+        *(RenderCommandFn*)m_CommandBufferPtr = fn;
+        m_CommandBufferPtr += sizeof(RenderCommandFn);
+
+        *(uint32_t*)m_CommandBufferPtr = size;
+        m_CommandBufferPtr += sizeof(uint32_t);
+
+        void* memory = m_CommandBufferPtr;
+        m_CommandBufferPtr += size;
+
+        m_CommandCount++;
+        return memory;
     }
 
-    void RendererCommand::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
+    void RenderCommandQueue::Execute()
     {
-        m_spRenderer->DrawLines(vertexArray, vertexCount);
-    }
+        byte* buffer = m_CommandBuffer;
 
-    void RendererCommand::SetLineWidth(float width)
-    {
-        m_spRenderer->SetLineWidth(width);
+        for (uint32_t i = 0; i < m_CommandCount; i++)
+        {
+            RenderCommandFn function = *(RenderCommandFn*)buffer;
+            buffer += sizeof(RenderCommandFn);
+
+            uint32_t size = *(uint32_t*)buffer;
+            buffer += sizeof(uint32_t);
+            function(buffer);
+            buffer += size;
+        }
+
+        m_CommandBufferPtr = m_CommandBuffer;
+        m_CommandCount = 0;
     }
 }
