@@ -4,6 +4,7 @@
 
 #include <Core/Input/Input.hpp>
 #include "Renderer/OrthographicCameraController.hpp"
+#include "Core/Logger/Logger.hpp"
 
 namespace fox
 {
@@ -16,23 +17,23 @@ namespace fox
 
     void OrthographicCameraController::OnUpdate(float deltaTime)
     {
-        if (Input::IsKeyPressed(Key::A))
+        if (Input::IsKeyDown(Key::A))
         {
             m_CameraPosition.x -= cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
             m_CameraPosition.y -= sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
         }
-        else if (Input::IsKeyPressed(Key::D))
+        else if (Input::IsKeyDown(Key::D))
         {
             m_CameraPosition.x += cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
             m_CameraPosition.y += sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
         }
 
-        if (Input::IsKeyPressed(Key::W))
+        if (Input::IsKeyDown(Key::W))
         {
             m_CameraPosition.x += -sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
             m_CameraPosition.y += cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
         }
-        else if (Input::IsKeyPressed(Key::S))
+        else if (Input::IsKeyDown(Key::S))
         {
             m_CameraPosition.x -= -sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
             m_CameraPosition.y -= cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * deltaTime;
@@ -40,9 +41,9 @@ namespace fox
 
         if (m_Rotation)
         {
-            if (Input::IsKeyPressed(Key::Q))
+            if (Input::IsKeyDown(Key::Q))
                 m_CameraRotation += m_CameraRotationSpeed * deltaTime;
-            if (Input::IsKeyPressed(Key::E))
+            if (Input::IsKeyDown(Key::E))
                 m_CameraRotation -= m_CameraRotationSpeed * deltaTime;
 
             if (m_CameraRotation > 180.0f)

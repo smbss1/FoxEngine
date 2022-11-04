@@ -60,7 +60,7 @@ namespace fox
 
     void EditorCamera::OnUpdate()
     {
-        if (Input::IsKeyPressed(Key::LeftAlt))
+        if (Input::IsKeyDown(Key::LeftAlt))
         {
             const glm::vec2& mouse{ Input::GetMouseX(), Input::GetMouseY() };
             glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;

@@ -17,9 +17,7 @@ namespace fox
         explicit OrthographicCameraController(float aspectRatio, bool rotation = false);
 
         void OnUpdate(float deltaTime);
-
         void OnEvent(Event &e);
-
         void OnResize(float width, float height);
 
         OrthographicCamera &GetCamera()
