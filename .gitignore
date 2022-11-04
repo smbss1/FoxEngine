@@ -7,6 +7,11 @@ cmake-build-debug
 .xmake
 **mono_crash**.json
 
+
+*.pdb
+*.rsp
+*.log
+
 # Prerequisites
 *.d
 
