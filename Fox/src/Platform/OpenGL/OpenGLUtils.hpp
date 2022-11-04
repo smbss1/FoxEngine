@@ -4,7 +4,7 @@
 #define FOXEGINE_OPENGL_UTILS
 
 #include "Renderer/RendererAPI.hpp"
-#include "DebugBreak.hpp"
+#include "Debug/DebugBreak.hpp"
 
 #include <glad/glad.h>
 #include <string>
