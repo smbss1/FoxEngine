@@ -20,29 +20,36 @@ namespace fox
         time_t LastOpened;
     };
 
+    class UserPreferencesSerializer;
     struct UserPreferences : public RefCounted
     {
         bool ShowWelcomeScreen = true;
+        std::string EnginePath;
         std::string StartupProject;
         std::map<time_t, RecentProject, std::greater<time_t>> RecentProjects;
 
         // Not Serialized
         std::string FilePath;
+
+        void Save(const std::filesystem::path& filepath = "");
+        void ConstructFrom(const std::filesystem::path& filepath);
+        void AddRecentProject(const std::string& name, const std::filesystem::path& filepath);
+        void AddRecentProject(std::map<time_t, RecentProject, std::greater<time_t>>::iterator it);
     };
 
     class UserPreferencesSerializer
     {
     public:
-        UserPreferencesSerializer(const Ref<UserPreferences>& preferences);
+        UserPreferencesSerializer(UserPreferences& preferences);
         ~UserPreferencesSerializer();
 
         void Serialize(const std::filesystem::path& filepath);
         void Deserialize(const std::filesystem::path& filepath);
 
     private:
-        Ref<UserPreferences> m_Preferences;
+        UserPreferences& m_Preferences;
     };
 
 }
 
-#endif //FOX_LEXER_USERPREFERENCES_HPP
+#endif //FOXENGINE_USERPREFERENCES_HPP
