@@ -15,6 +15,8 @@
 #include "Components/Rigidbody2D.hpp"
 #include "Scripting/ScriptEngine.hpp"
 #include "Core/Project.hpp"
+#include "ImGuiExtensions.hpp"
+#include "Asset/AssetManager.hpp"
 
 namespace fox
 {
@@ -26,6 +28,7 @@ namespace fox
         {Reflect::Resolve<glm::vec3>(),                 ImGuiFieldDrawer::DrawVec3},
         {Reflect::Resolve<glm::vec4>(),                 ImGuiFieldDrawer::DrawVec4},
         {Reflect::Resolve<fox::Ref<fox::Texture2D>>(),  ImGuiFieldDrawer::DrawTexture},
+//        {Reflect::Resolve<AssetHandle>(),               ImGuiFieldDrawer::DrawAsset},
 
         {Reflect::Resolve<Rigidbody2D::BodyType>(),     ImGuiFieldDrawer::DrawRigidbody2D_BodyType},
     };
@@ -43,81 +46,13 @@ namespace fox
 //        {ScriptFieldType::Rigidbody_BodyType,     ImGuiFieldDrawer::DrawRigidbody2D_BodyType},
     };
 
-    int ImGuiFieldDrawer::s_UIContextID = 0;
-    uint32_t ImGuiFieldDrawer::s_Counter = 0;
-    char ImGuiFieldDrawer::s_IDBuffer[16];
-
-    void ImGuiFieldDrawer::PushID()
-    {
-        ++s_UIContextID;
-        ImGui::PushID(s_UIContextID);
-        s_Counter = 0;
-    }
-
-    void ImGuiFieldDrawer::PopID()
-    {
-        ImGui::PopID();
-        --s_UIContextID;
-    }
-
-    void ImGuiFieldDrawer::BeginProperties(ImGuiTableFlags flags)
-    {
-        constexpr ImGuiTableFlags tableFlags = 0;
-        ImGui::BeginTable(s_IDBuffer, 2, tableFlags | flags);
-        ImGui::TableSetupColumn("PropertyName", 0, 0.5f);
-        ImGui::TableSetupColumn("Property", ImGuiTableColumnFlags_WidthStretch);
-    }
-
-    void ImGuiFieldDrawer::EndProperties()
-    {
-        ImGui::EndTable();
-    }
-
-    void ImGuiFieldDrawer::BeginPropertyGrid(const char* label, const char* tooltip, bool rightAlignNextColumn)
-    {
-        PushID();
-
-        ImGui::TableNextRow();
-        ImGui::TableNextColumn();
-
-        ImGui::PushID(label);
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetStyle().FramePadding.y * 0.5f);
-        ImGui::Text(label);
-        if (tooltip && ImGui::IsItemHovered())
-        {
-            ImGui::BeginTooltip();
-            ImGui::Text(tooltip);
-            ImGui::EndTooltip();
-        }
-
-        ImGui::TableNextColumn();
-
-        if (rightAlignNextColumn)
-            ImGui::SetNextItemWidth(-FLT_MIN);
-
-        s_IDBuffer[0] = '#';
-        s_IDBuffer[1] = '#';
-        memset(s_IDBuffer + 2, 0, 14);
-        ++s_Counter;
-        std::string s = std::to_string(s_Counter);
-        strncpy(s_IDBuffer + 2, s.c_str(), 14);
-    }
-
-    void ImGuiFieldDrawer::EndPropertyGrid()
-    {
-        ImGui::PopID();
-        PopID();
-    }
-
     bool ImGuiFieldDrawer::Draw(const Reflect::TypeDescriptor *type, std::string name, Reflect::Any& value)
     {
         try {
-            ImGuiFieldDrawer::BeginPropertyGrid(name.c_str(), nullptr);
             bool result = m_Drawers.at(type)(name, value);
-            ImGuiFieldDrawer::EndPropertyGrid();
             return result;
         }
-        catch (std::exception exception) {
+        catch (std::exception& exception) {
             return false;
         }
     }
@@ -125,9 +60,7 @@ namespace fox
     bool ImGuiFieldDrawer::DrawField(ScriptFieldType type, std::string name, Reflect::Any& value)
     {
         try {
-            ImGuiFieldDrawer::BeginPropertyGrid(name.c_str(), nullptr);
             bool result = m_FieldDrawers.at(type)(name, value);
-            ImGuiFieldDrawer::EndPropertyGrid();
             return result;
         }
         catch (std::exception exception) {
@@ -138,7 +71,7 @@ namespace fox
     bool ImGuiFieldDrawer::DrawInt(std::string name, Reflect::Any& valueFrom)
     {
         auto *value = valueFrom.TryCast<int>();
-        bool result = ImGui::DragInt(s_IDBuffer, value);
+        bool result = UI::Property(name, *value);
         valueFrom = *value;
         return result;
     }
@@ -146,7 +79,7 @@ namespace fox
     bool ImGuiFieldDrawer::DrawFloat(std::string name, Reflect::Any& valueFrom)
     {
         auto *value = valueFrom.TryCast<float>();
-        bool result = ImGui::DragFloat(s_IDBuffer, value);
+        bool result = UI::Property(name, *value);
         valueFrom = *value;
         return result;
     }
@@ -154,7 +87,7 @@ namespace fox
     bool ImGuiFieldDrawer::DrawBool(std::string name, Reflect::Any& valueFrom)
     {
         auto *value = valueFrom.TryCast<bool>();
-        bool result = ImGui::Checkbox(s_IDBuffer, value);
+        bool result = UI::Property(name, *value);
         valueFrom = *value;
         return result;
     }
@@ -162,7 +95,7 @@ namespace fox
     bool ImGuiFieldDrawer::DrawVec2(std::string name, Reflect::Any& valueFrom)
     {
         auto *value = valueFrom.TryCast<glm::vec2>();
-        bool result = ImGui::DragFloat2(s_IDBuffer, glm::value_ptr(*value));
+        bool result = UI::Property(name, *value);
         valueFrom = *value;
         return result;
     }
@@ -170,7 +103,7 @@ namespace fox
     bool ImGuiFieldDrawer::DrawVec3(std::string name, Reflect::Any& valueFrom)
     {
         auto *value = valueFrom.TryCast<glm::vec3>();
-        bool result = imgui::DrawVec3Control(s_IDBuffer, *value);
+        bool result = UI::DragScalar(name, *value);
         valueFrom = *value;
         return result;
     }
@@ -178,33 +111,55 @@ namespace fox
     bool ImGuiFieldDrawer::DrawVec4(std::string name, Reflect::Any& valueFrom)
     {
         auto *value = valueFrom.TryCast<glm::vec4>();
-        bool result = ImGui::ColorEdit4(s_IDBuffer, glm::value_ptr(*value));
+        bool result = UI::Property(name, *value);
         valueFrom = *value;
         return result;
     }
 
     bool ImGuiFieldDrawer::DrawTexture(std::string name, Reflect::Any& valueFrom)
     {
-        ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
-        if (ImGui::BeginDragDropTarget())
-        {
-            if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                const char *path = (const char *) payload->Data;
-                std::filesystem::path texturePath = Project::AssetsDir() / path;
-                Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
-                valueFrom = texture;
-                return true;
+        AssetHandle& value = *valueFrom.TryCast<AssetHandle>();
+//        ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
+        return UI::AssetField(name, value, true, {".png"});
+//        if (ImGui::BeginDragDropTarget())
+//        {
+//            if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+//                const char *path = (const char *) payload->Data;
+//                std::filesystem::path texturePath = Project::AssetsDir() / path;
+//                Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
+//                valueFrom = texture;
+//                return true;
+//
+//                // if (texture->IsLoaded())
+//                // 	component.Sprite = texture;
+//                // else
+//                // 	FOX_CORE_WARN("Could not load texture %", texturePath.filename().string());
+//            }
+//            ImGui::EndDragDropTarget();
+//        }
 
-                // if (texture->IsLoaded())
-                // 	component.Sprite = texture;
-                // else
-                // 	FOX_CORE_WARN("Could not load texture %", texturePath.filename().string());
-            }
-            ImGui::EndDragDropTarget();
-        }
-
-        return false;
+//        return false;
     }
+
+//    bool ImGuiFieldDrawer::DrawAsset(std::string name, Reflect::Any& valueFrom)
+//    {
+//        auto *value = valueFrom.TryCast<AssetHandle>();
+//        Ref<Asset> asset = AssetManager::GetAsset<Asset>(*value);
+//        if (asset == nullptr)
+//            return false;
+//        switch (asset->GetAssetType())
+//        {
+////            case AssetType::Texture:
+////                return DrawTexture(name, valueFrom);
+//
+//            default:
+//                break;
+//        }
+//
+////        valueFrom = *value;
+//        return false;
+//    }
+
 
 //    bool ImGuiFieldDrawer::DrawEntityRef(std::string name, Reflect::Any& valueFrom)
 //    {
@@ -237,35 +192,11 @@ namespace fox
         const char* bodyTypeString[] = { "Static", "Dynamic", "Kinematic" };
 
         int result = -1;
-        if (DrawEnum(s_IDBuffer, bodyTypeString, 3, (int) value, result))
+        if (UI::Property(name, bodyTypeString, 3, (int) value, result))
         {
             valueFrom = (Rigidbody2D::BodyType) result;
             return true;
         }
         return false;
-    }
-
-    bool ImGuiFieldDrawer::DrawEnum(std::string name, const char* typeString[], int size, int index, int& valueFrom)
-    {
-        bool result = false;
-        const char* currentTypeString = typeString[index];
-
-        if (ImGui::BeginCombo(name.c_str(), currentTypeString))
-        {
-            for (int i = 0; i < size; ++i)
-            {
-                bool isSelected = currentTypeString == typeString[i];
-                if (ImGui::Selectable(typeString[i], isSelected))
-                {
-                    currentTypeString = typeString[i];
-                    valueFrom = i;
-                    result = true;
-                }
-                if (isSelected)
-                    ImGui::SetItemDefaultFocus();
-            }
-            ImGui::EndCombo();
-        }
-        return result;
     }
 }

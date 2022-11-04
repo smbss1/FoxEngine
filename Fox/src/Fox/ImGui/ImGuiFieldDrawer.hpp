@@ -38,23 +38,10 @@ namespace fox
         static bool DrawVec4(std::string name, Reflect::Any& outData);
         static bool DrawEntityRef(std::string name, Reflect::Any& valueFrom);
 
-        static bool DrawEnum(std::string name, const char* typeString[], int size, int index, int& result);
         static bool DrawRigidbody2D_BodyType(std::string name, Reflect::Any& valueFrom);
-
-        static void PushID();
-        static void PopID();
-        static void BeginProperties(ImGuiTableFlags flags = ImGuiTableFlags_Resizable);
-        static void EndProperties();
-        static void BeginPropertyGrid(const char* label, const char* tooltip, bool rightAlignNextColumn = false);
-        static void EndPropertyGrid();
 
         static std::unordered_map<const Reflect::TypeDescriptor*, std::function<bool(std::string, Reflect::Any& )>> m_Drawers;
         static std::unordered_map<ScriptFieldType, std::function<bool(std::string, Reflect::Any&)>> m_FieldDrawers;
-
-    private:
-        static int s_UIContextID;
-        static uint32_t s_Counter;
-        static char s_IDBuffer[16];
     };
 }
 
