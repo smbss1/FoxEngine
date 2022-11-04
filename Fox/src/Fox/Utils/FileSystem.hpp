@@ -45,6 +45,10 @@ namespace fox
         bool Exists(const std::filesystem::path& filepath);
         bool Exists(const std::string& filepath);
 
+        bool HasEnvironmentVariable(const std::string& key);
+        bool SetEnvironmentVariable(const std::string& key, const std::string& value);
+        std::string GetEnvironmentVariable(const std::string& key);
+
     } // namespace file
 
 } // namespace fox
