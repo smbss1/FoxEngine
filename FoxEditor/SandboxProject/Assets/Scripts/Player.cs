@@ -7,20 +7,27 @@ namespace Sandbox
     {
         private TransformComponent m_Transform;
         private Rigidbody2D m_Rb2d;
+        private Animator m_Animator;
 
-        public float Speed = 15.2f;
+        public float Speed = 15.1f;
         public Prefab BulletPrefab;
 
         public void OnCreate()
         {
             m_Transform = GetComponent<TransformComponent>();
             m_Rb2d = GetComponent<Rigidbody2D>();
+            m_Animator = GetComponent<Animator>();
             OnCollisionEnter2DEvent += OnCollisionEnter2D;
+
+            // m_Animator.On("myevent", () =>
+            // {
+            //     Log.Info("My event is sended");
+            // });
         }
 
         private void OnCollisionEnter2D(CollisionData obj)
         {
-            Log.Info($"Collide with {obj.entity.GetComponent<EntityName>().Name}");
+            Log.Info($"Collide with {obj.entity.GetComponent<NameComponent>().Name}");
         }
 
         public void OnUpdate(float ts)

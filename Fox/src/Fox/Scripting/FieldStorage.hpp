@@ -17,46 +17,9 @@ namespace fox
     public:
         FieldStorage(ManagedClass* managedClass, ManagedField* field);
 
-        void RegisterInstance(GCHandle instance)
+        void SetRuntimeInstance(GCHandle instance)
         {
             m_RuntimeInstance = instance;
-
-//            if (!Field->Type.IsArray())
-//            {
-//                if (!m_DefaultValue.HasValue())
-//                    return;
-//
-////                if (m_ValueCache.find(instance) != m_ValueCache.end())
-////                    return;
-//                m_ValueCache = m_DefaultValue;
-//            }
-////            else
-////            {
-////                if (m_ArrayStorage.find(instance) != m_ArrayStorage.end())
-////                    return;
-////
-////                m_ArrayStorage[instance] = m_DefaultArrayValue.Copy();
-////            }
-        }
-
-        void UnregisterInstance(GCHandle instance)
-        {
-            m_RuntimeInstance = -1;
-
-//            if (!Field->Type.IsArray())
-//            {
-////                if (m_ValueCache.find(instance) == m_ValueCache.end())
-////                    return;
-//
-//                m_ValueCache = m_DefaultValue;
-//            }
-////            else
-////            {
-////                if (m_ArrayStorage.find(instance) == m_ArrayStorage.end())
-////                    return;
-////
-////                m_ArrayStorage.erase(instance);
-////            }
         }
 
         template<typename T>
@@ -100,6 +63,8 @@ namespace fox
                 m_ValueCache = wrappedValue;
             }
         }
+
+        void CopyFrom(const Ref<FieldStorage>& other);
 
         void Init(ManagedClass* managedClass, ManagedField* field);
 

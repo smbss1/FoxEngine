@@ -18,18 +18,15 @@
 #include "mono/metadata/reflection.h"
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
-#include "mono/metadata/object.h"
-//#include "mono/metadata/tabledefs.h"
-
 #include "box2d/b2_body.h"
 #include "Utils.hpp"
 #include "Asset/AssetManager.hpp"
 #include "Scene/Prefab.hpp"
 
-
 namespace fox
 {
     static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFuncs;
+    static std::unordered_map<UUID, MonoDelegate*> s_AnimatorEventDelegates;
 
 #define FOX_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Fox.InternalCalls::" #Name, (void*) Name)
 
@@ -38,9 +35,7 @@ namespace fox
         return ScriptEngine::GetManagedInstance(entityID);
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // Logging ////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
+#pragma region Log
 
     void Log_LogMessage(int level, MonoString* formattedMessage)
     {
@@ -54,6 +49,7 @@ namespace fox
             default:					FOX_INFO(Utils::MonoToString(formattedMessage));   break;
         }
     }
+#pragma endregion
 
 #pragma region AssetHandle
 
@@ -64,6 +60,7 @@ namespace fox
 
 #pragma endregion
 
+#pragma region Entity
 
     Entity GetEntity(uint64_t entityID)
     {
@@ -87,7 +84,11 @@ namespace fox
 
         MonoType* managedType = mono_reflection_type_get_type(componentType);
         FOX_ASSERT(s_EntityHasComponentFuncs.find(managedType) != s_EntityHasComponentFuncs.end());
-        return s_EntityHasComponentFuncs.at(managedType)(entity);
+        try {
+            return s_EntityHasComponentFuncs.at(managedType)(entity);
+        } catch (std::out_of_range& e) {
+            return false;
+        }
     }
 
     static uint64_t Entity_FindEntityByName(MonoString* name)
@@ -157,7 +158,9 @@ namespace fox
 
         scene->SubmitToDestroyEntity(entity);
     }
+#pragma endregion
 
+#pragma region Name Component
     MonoString* NameComponent_GetName(uint64_t entityID)
     {
 //        FOX_PROFILE_SCOPE();
@@ -167,7 +170,7 @@ namespace fox
         Entity entity = scene->GetEntityByUUID(entityID);
         FOX_ASSERT(entity);
 
-        const auto& name = entity.get<EntityName>();
+        const auto& name = entity.get<NameComponent>();
         return mono_string_new(mono_domain_get(), name.name.c_str());
     }
 
@@ -180,11 +183,13 @@ namespace fox
         Entity entity = scene->GetEntityByUUID(entityID);
         FOX_ASSERT(entity);
 
-        const auto& name = entity.get<EntityName>();
+        const auto& name = entity.get<NameComponent>();
 
-        entity.get<EntityName>().name = mono_string_to_utf8(tag);
+        entity.get<NameComponent>().name = mono_string_to_utf8(tag);
     }
+#pragma endregion
 
+#pragma region Transform
 
     static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation)
     {
@@ -237,10 +242,9 @@ namespace fox
 
         GetEntity(entityID).get<TransformComponent>().scale = *inScale;
     }
+#pragma endregion
 
-    // ------------------
-    //  Sprite Renderer
-    // ------------------
+#pragma region Sprite Renderer
 
     void SpriteRendererComponent_GetColor(uint64_t entityID, glm::vec4* outTint)
     {
@@ -269,6 +273,7 @@ namespace fox
 
         GetEntity(entityID).get<SpriteRenderer>().TilingFactor = *tiling;
     }
+#pragma endregion
 
 #pragma region Rigidbody2D
     void Rigidbody2DComponent_GetGravityScale(uint64_t entityID, float* outGravityScale)
@@ -320,6 +325,8 @@ namespace fox
     }
 #pragma endregion
 
+#pragma region Input
+
     bool Input_IsKeyPressed(KeyCode key)
     {
 //        FOX_PROFILE_SCOPE();
@@ -354,6 +361,35 @@ namespace fox
 
         *outMousePosition = Input::GetMousePosition();
     }
+#pragma endregion
+
+#pragma region Animator
+
+    void Animator_SubscribeToEvent(uint64_t entityID, uint64_t eventID, MonoDelegate* delegate)
+    {
+        Entity ent = GetEntity(entityID);
+        s_AnimatorEventDelegates[ent.GetUUID()] = delegate;
+        ent.get<Animator>().SubscribeToEvent(eventID, [uuid = ent.GetUUID()](UUID eventID) {
+
+            MonoDelegate* delegate = s_AnimatorEventDelegates[uuid];
+            MonoMethod* method = mono_get_delegate_invoke(mono_object_get_class((MonoObject*) delegate));
+
+            uint64_t id = eventID;
+            void* params = &id;
+
+            MonoObject *ex;
+            mono_runtime_invoke(method, delegate, &params, &ex);
+            Utils::HandleException(ex);
+        });
+    }
+
+    uint64_t Animator_GetHashID(MonoString* eventName)
+    {
+        return Hash::FNVHash(Utils::MonoToString(eventName));
+    }
+
+#pragma endregion
+
 
     #include <cxxabi.h>  // needed for abi::__cxa_demangle
 
@@ -408,7 +444,7 @@ namespace fox
     {
 //        FOX_PROFILE_SCOPE();
 
-        RegisterComponent<EntityName>();
+        RegisterComponent<NameComponent>();
         RegisterComponent(AllComponents{});
     }
 
@@ -459,6 +495,9 @@ namespace fox
         FOX_ADD_INTERNAL_CALL(Input_IsKeyReleased);
         FOX_ADD_INTERNAL_CALL(Input_IsMouseButtonPressed);
         FOX_ADD_INTERNAL_CALL(Input_GetMousePosition);
+
+        FOX_ADD_INTERNAL_CALL(Animator_SubscribeToEvent);
+        FOX_ADD_INTERNAL_CALL(Animator_GetHashID);
     }
 
 }

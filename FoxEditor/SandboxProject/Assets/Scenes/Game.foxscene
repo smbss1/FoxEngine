@@ -1,18 +1,5 @@
 Scene: Untitled
 Entities:
-  - Entity: 2175124655817697079
-    NameComponent:
-      Name: Entity
-    TransformComponent:
-      Position: [1.89769936, -0.494474441, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.822393835, 0.152412757, 0.152412757, 1]
-      Sprite: ""
-    Parent: 6131204461046171101
-    Children:
-      []
   - Entity: 6131204461046171101
     NameComponent:
       Name: Player
@@ -20,16 +7,15 @@ Entities:
       Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    SpriteRendererComponent:
+    SpriteRenderer:
       Color: [1, 1, 1, 1]
-      Sprite: ""
     ScriptComponent:
       ClassName: Sandbox.Player
       ScriptFields:
         - ID: 4002109686
           Name: Sandbox.Player:Speed
           Type: 12
-          Data: 15.1999998
+          Data: 12
         - ID: 1414718891
           Name: Sandbox.Player:BulletPrefab
           Type: 18
@@ -38,6 +24,7 @@ Entities:
       BodyType: Kinematic
       FixedRotation: true
       GravityScale: 0
+      LayerID: 0
     BoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
@@ -45,9 +32,10 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
-    Parent: 0
-    Children:
-      - Handle: 2175124655817697079
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
   - Entity: 9358953404056040341
     NameComponent:
       Name: Camera
@@ -66,30 +54,31 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
-    Parent: 0
-    Children:
-      []
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
   - Entity: 11431865266355737168
     NameComponent:
       Name: Bullet
     TransformComponent:
-      Position: [-2.83655548, 1.1641922, 0]
+      Position: [-3.66214371, 1.73459375, 0.000122069941]
       Rotation: [0, 0, 0]
       Scale: [0.200000003, 0.5, 1]
-    SpriteRendererComponent:
+    SpriteRenderer:
       Color: [1, 1, 1, 1]
-      Sprite: ""
     ScriptComponent:
       ClassName: Sandbox.Bullet
       ScriptFields:
         - ID: 2802533049
           Name: Sandbox.Bullet:Speed
           Type: 12
-          Data: 6
+          Data: 12
     Rigidbody2D:
       BodyType: Dynamic
       FixedRotation: true
       GravityScale: 0
+      LayerID: 0
     BoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
@@ -97,9 +86,10 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
-    Parent: 0
-    Children:
-      []
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
   - Entity: 16471339227282434742
     NameComponent:
       Name: Bound
@@ -111,6 +101,7 @@ Entities:
       BodyType: Kinematic
       FixedRotation: true
       GravityScale: 0
+      LayerID: 0
     BoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
@@ -118,6 +109,7 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
-    Parent: 0
-    Children:
-      []
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []

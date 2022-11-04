@@ -1,0 +1,6 @@
+Project:
+  Name: $PROJECT_NAME$
+  AssetDirectory: Assets
+  AssetRegistry: Assets/AssetRegistry.fxr
+  ScriptModulePath: Assets/Scripts/Binaries
+  DefaultNamespace: $PROJECT_NAME$

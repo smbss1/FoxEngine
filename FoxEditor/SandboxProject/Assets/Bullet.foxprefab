@@ -1,23 +1,26 @@
-Prefab: 13010742882148525234
+Prefab: 11222175801568257824
 Entities:
   - Entity: 11431865266355737168
     NameComponent:
       Name: Bullet
     TransformComponent:
-      Position: [-2.83655548, 1.1641922, 0]
+      Position: [-3.66214371, 1.73459375, 0.000122069941]
       Rotation: [0, 0, 0]
       Scale: [0.200000003, 0.5, 1]
-    SpriteRendererComponent:
+    SpriteRenderer:
       Color: [1, 1, 1, 1]
-      Sprite: ""
     ScriptComponent:
       ClassName: Sandbox.Bullet
       ScriptFields:
-        []
+        - ID: 2802533049
+          Name: Sandbox.Bullet:Speed
+          Type: 12
+          Data: 6
     Rigidbody2D:
       BodyType: Dynamic
       FixedRotation: true
       GravityScale: 0
+      LayerID: 0
     BoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
@@ -26,5 +29,9 @@ Entities:
       Restitution: 0
       RestitutionThreshold: 0.5
     PrefabComponent:
-      Prefab: 13010742882148525234
-      Entity: 17546211684554655153
+      Prefab: 11222175801568257824
+      Entity: 12430112655881987008
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []

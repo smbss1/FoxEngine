@@ -1,0 +1,71 @@
+Scene: Untitled
+Entities:
+  - Entity: 6317857770674863426
+    NameComponent:
+      Name: Entity
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRenderer:
+      Color: [1, 1, 1, 1]
+      Sprite: 15233081744778533398
+    ScriptComponent:
+      ClassName: Sandbox.Player
+      ScriptFields:
+        - ID: 4002109686
+          Name: Sandbox.Player:Speed
+          Type: 12
+          Data: 15.1999998
+        - ID: 1414718891
+          Name: Sandbox.Player:BulletPrefab
+          Type: 18
+          Data: 2250225605053858380
+    Rigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+      GravityScale: 0
+      LayerID: 0
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+    Animator:
+      Animations:
+        - Name: New Animation
+          Speed: 1
+          Loop: false
+          Frames:
+            - Texture: 15233081744778533398
+              EventID: 3782504627
+            - Texture: 10217385176812840102
+              EventID: 2301278219
+          Events:
+            - Name: myevent1
+              ID: 388188368
+            - Name: myevent2
+              ID: 2301278219
+            - Name: myevent
+              ID: 3782504627
+  - Entity: 12653897186033992287
+    NameComponent:
+      Name: Camera
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 2
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []

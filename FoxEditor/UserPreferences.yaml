@@ -1,4 +1,11 @@
 UserPrefs:
   ShowWelcomeScreen: true
+  EnginePath: /home/samuel/Git Repos/FoxEngine
+  StartupProject: SandboxProject/Sandbox.foxproj
   RecentProjects:
-    []
+    - Name: tmp
+      ProjectPath: /home/samuel/Git Repos/FoxEngine/SandProject/tmp.foxproj
+      LastOpened: 1667369773
+    - Name: Sandbox
+      ProjectPath: /home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Sandbox.foxproj
+      LastOpened: 1667181369

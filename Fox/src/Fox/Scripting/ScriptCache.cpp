@@ -21,25 +21,7 @@
 
 namespace fox
 {
-#define FOX_CACHE_CLASS(className, monoClass) \
-	{\
-		MonoType* classType = mono_class_get_type(monoClass);\
-		ManagedClass managedClass;\
-		managedClass.FullName = className;          \
-		managedClass.ID = Hash::FNVHash(managedClass.FullName);\
-        int alignment = 0;\
-		managedClass.Size = mono_type_size(classType, &alignment);\
-		managedClass.Class = monoClass;\
-		s_Cache->Classes[managedClass.ID] = managedClass;\
-		if (managedClass.FullName.find("Fox.") != std::string::npos)\
-		{\
-             auto coreAssembly = ScriptEngine::GetCoreAssembly();\
-			ScriptCache::CacheClassMethods(coreAssembly, managedClass);\
-            ScriptCache::CacheClassFields(coreAssembly, managedClass); \
-            for (auto fieldID : managedClass.Fields)\
-				s_Cache->FieldStorageMap[fieldID] = new_ref<FieldStorage>(&managedClass, &s_Cache->Fields[fieldID]);\
-        }\
-	}
+#define FOX_CACHE_CLASS(className, monoClass) ScriptCache::CacheClass(className, monoClass)
 //			ScriptCache::CacheClassProperties(coreAssembly, managedClass);
 
     struct CacheStorage
@@ -116,16 +98,47 @@ namespace fox
         s_Cache->Classes.clear();
     }
 
+    void ScriptCache::CacheClass(std::string_view className, MonoClass* monoClass)
+    {
+        MonoType* classType = mono_class_get_type(monoClass);
+		ManagedClass managedClass;
+		managedClass.FullName = className;
+		managedClass.ID = Hash::FNVHash(managedClass.FullName);
+        int alignment = 0;
+		managedClass.Size = mono_type_size(classType, &alignment);
+		managedClass.Class = monoClass;
+
+        uint32_t classFlags = mono_class_get_flags(monoClass);
+        managedClass.IsAbstract = classFlags & MONO_TYPE_ATTR_ABSTRACT;
+        managedClass.IsStruct = mono_class_is_valuetype(monoClass);
+
+		s_Cache->Classes[managedClass.ID] = managedClass;
+		if (managedClass.FullName.find("Fox.") != std::string::npos)
+		{
+             auto coreAssembly = ScriptEngine::GetCoreAssembly();
+			ScriptCache::CacheClassMethods(coreAssembly, managedClass);
+            ScriptCache::CacheClassFields(coreAssembly, managedClass);
+            for (auto fieldID : managedClass.Fields)
+				s_Cache->FieldStorageMap[fieldID] = new_ref<FieldStorage>(&managedClass, &s_Cache->Fields[fieldID]);
+        }
+    }
+
     static void BuildClassMetadata(Ref<AssemblyInfo> assemblyInfo, MonoClass* monoClass)
     {
+        const std::string& fullName = Utils::ResolveMonoClassName(monoClass);
+
+        // C# adds a .<PrivateImplementationDetails> class for some reason?
+        if (fullName.find("<PrivateImpl") != std::string::npos)
+            return;
+
         ManagedClass managedClass;
-        managedClass.FullName = Utils::ResolveMonoClassName(monoClass);
+        managedClass.FullName = fullName;
         managedClass.ID = Hash::FNVHash(managedClass.FullName);
         managedClass.Class = monoClass;
 
-        // C# adds a .<PrivateImplementationDetails> class for some reason?
-        if (managedClass.FullName.find("<PrivateImpl") != std::string::npos)
-            return;
+        uint32_t classFlags = mono_class_get_flags(monoClass);
+        managedClass.IsAbstract = classFlags & MONO_TYPE_ATTR_ABSTRACT;
+        managedClass.IsStruct = mono_class_is_valuetype(monoClass);
 
         MonoClass* parentClass = mono_class_get_parent(monoClass);
         if (parentClass != nullptr && parentClass != FOX_CACHED_CLASS_RAW("System.Object"))

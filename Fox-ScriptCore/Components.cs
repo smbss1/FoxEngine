@@ -12,10 +12,11 @@ namespace Fox
         public Entity Entity { get; internal set; }
     }
 
+#region Name Component
     /// <summary>
     /// Contains name of the entity.
     /// </summary>
-    public class EntityName : Component
+    public class NameComponent : Component
     {
     	/// <summary>
     	/// Entity name.
@@ -26,7 +27,9 @@ namespace Fox
     		set => InternalCalls.NameComponent_SetName(Entity.ID, value);
     	}
     }
+#endregion
 
+#region Transform
     public class TransformComponent : Component
     {
         /// <summary>
@@ -71,7 +74,9 @@ namespace Fox
             set => InternalCalls.TransformComponent_SetScale(Entity.ID, ref value);
         }
     }
+#endregion
 
+#region Rigidbody2D
     public class Rigidbody2D : Component
     {
         /// <summary>
@@ -99,8 +104,10 @@ namespace Fox
             InternalCalls.Rigidbody2DComponent_ApplyLinearImpulseToCenter(Entity.ID, ref impulse, wake);
         }
     }
+#endregion
 
-    /// <summary>
+#region Sprite Renderer
+/// <summary>
     /// Renders a sprite
     /// </summary>
     public class SpriteRenderer : Component
@@ -131,6 +138,9 @@ namespace Fox
             set => InternalCalls.SpriteRendererComponent_SetTilingFactor(Entity.ID, ref value);
         }
     }
+    #endregion
+  
+#region Colliders
 
     public class Collider2D : Component
     {
@@ -153,4 +163,46 @@ namespace Fox
     public class BoxCollider2D : Collider2D
     {
     }
+    #endregion
+    
+#region Animator
+
+    public class Animator : Component
+    {
+        public delegate void AnimatorEventDelegate();
+
+        private Dictionary<ulong, AnimatorEventDelegate> Events = new Dictionary<ulong, AnimatorEventDelegate>();
+
+        private void OnEventCb(ulong eventID)
+        {
+            if (Events.ContainsKey(eventID))
+            {
+                Events[eventID]?.Invoke();
+            }
+        }
+
+        public void On(string eventName, AnimatorEventDelegate callback)
+        {
+            ulong id = InternalCalls.Animator_GetHashID(eventName);
+            if (Events.ContainsKey(id))
+            {
+                Events[id] += callback;
+            }
+            else
+            {
+                Events[id] = callback;
+                InternalCalls.Animator_SubscribeToEvent(Entity.ID, id, OnEventCb);
+            }
+        }
+        
+        public void RemoveCb(string eventName, AnimatorEventDelegate callback)
+        {
+            ulong id = InternalCalls.Animator_GetHashID(eventName);
+            if (Events.ContainsKey(id))
+            {
+                Events[id] -= callback;
+            }
+        }
+    }
+#endregion
 }

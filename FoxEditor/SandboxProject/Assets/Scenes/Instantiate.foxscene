@@ -1,15 +1,73 @@
 Scene: Untitled
 Entities:
-  - Entity: 6775450798731172095
+  - Entity: 12074244336437238205
     NameComponent:
-      Name: Prefab
+      Name: Player
     TransformComponent:
-      Position: [0, 0, 0]
+      Position: [-1.65858459, 0.370100051, 0]
       Rotation: [0, 0, 0]
-      Scale: [0.5, 0.5, 0.5]
-    SpriteRendererComponent:
-      Color: [0.722007751, 0.161685139, 0.161685139, 1]
-      Sprite: ""
+      Scale: [1, 1, 1]
+    SpriteRenderer:
+      Color: [1, 1, 1, 1]
+    ScriptComponent:
+      ClassName: Sandbox.Player
+      ScriptFields:
+        - ID: 4002109686
+          Name: Sandbox.Player:Speed
+          Type: 12
+          Data: 0
+        - ID: 1414718891
+          Name: Sandbox.Player:BulletPrefab
+          Type: 18
+          Data: 94569676910399
+    Rigidbody2D:
+      BodyType: Dynamic
+      FixedRotation: false
+      GravityScale: 1
+      LayerID: 0
+    BoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+  - Entity: 13815603846296109056
+    NameComponent:
+      Name: Floor
+    TransformComponent:
+      Position: [0, -1.46003723, 0]
+      Rotation: [0, 0, -0.21938701]
+      Scale: [7.60000229, 1, 1]
+    SpriteRenderer:
+      Color: [0.702702701, 0.528255224, 0.206198469, 1]
+    Rigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+      GravityScale: 1
+      LayerID: 0
+    BoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+    CircleCollider2D:
+      Offset: [0, -1.46003723]
+      Radius: 0
+      Density: 0
+      Friction: 0
+      Restitution: 0
+      RestitutionThreshold: 7.5999999
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
   - Entity: 0
     NameComponent:
       Name: Cam
@@ -35,56 +93,20 @@ Entities:
       Friction: 0
       Restitution: 0
       RestitutionThreshold: 1
-  - Entity: 13815603846296109056
-    NameComponent:
-      Name: Floor
-    TransformComponent:
-      Position: [0, -1.46003723, 0]
-      Rotation: [0, 0, -0.21938701]
-      Scale: [7.60000229, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.702702701, 0.528255224, 0.206198469, 1]
-      Sprite: ""
-    Rigidbody2D:
-      BodyType: Static
-      FixedRotation: false
-      GravityScale: 1
-    BoxCollider2D:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-    CircleCollider2D:
-      Offset: [0, -1.46003723]
-      Radius: 0
-      Density: 0
-      Friction: 0
-      Restitution: 0
-      RestitutionThreshold: 7.5999999
-  - Entity: 12074244336437238205
-    NameComponent:
-      Name: Player
-    TransformComponent:
-      Position: [-1.65858459, 0.370100051, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
-      Sprite: ""
-    ScriptComponent:
-      ClassName: Sandbox.Player
-      ScriptFields:
+    HierarchyComponent:
+      Parent: 0
+      Children:
         []
-    Rigidbody2D:
-      BodyType: Dynamic
-      FixedRotation: false
-      GravityScale: 1
-    BoxCollider2D:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
+  - Entity: 6775450798731172095
+    NameComponent:
+      Name: Prefab
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.5, 0.5, 0.5]
+    SpriteRenderer:
+      Color: [0.722007751, 0.161685139, 0.161685139, 1]
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []

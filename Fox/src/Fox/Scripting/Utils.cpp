@@ -13,6 +13,7 @@
 #include "mono/metadata/assembly.h"
 #include "mono/metadata/object.h"
 #include "Asset/Asset.hpp"
+#include "mono/metadata/mono-debug.h"
 
 namespace fox
 {
@@ -41,7 +42,7 @@ namespace fox
                 { "Fox.Prefab", ScriptFieldType::Prefab },
             };
 
-        MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath)
+        MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPBD)
         {
             uint32_t fileSize = 0;
             char* fileData = FileSystem::ReadBytes(assemblyPath, &fileSize);
@@ -57,13 +58,27 @@ namespace fox
                 return nullptr;
             }
 
+            if (loadPBD)
+            {
+                std::filesystem::path pdbPath = assemblyPath;
+                pdbPath.replace_extension(".pdb");
+
+                if (FileSystem::Exists(pdbPath))
+                {
+                    uint32_t pdbfileSize = 0;
+                    char* pdbfileData = FileSystem::ReadBytes(pdbPath, &pdbfileSize);
+                    mono_debug_open_image_from_memory(image, (const mono_byte*)pdbfileData, pdbfileSize);
+                    FOX_INFO("Loaded PDB %", pdbPath);
+                    delete[] pdbfileData;
+                }
+            }
+
             std::string pathString = assemblyPath.string();
             MonoAssembly* assembly = mono_assembly_load_from_full(image, pathString.c_str(), &status, 0);
             mono_image_close(image);
 
             // Don't forget to free the file data
             delete[] fileData;
-
             return assembly;
         }
 

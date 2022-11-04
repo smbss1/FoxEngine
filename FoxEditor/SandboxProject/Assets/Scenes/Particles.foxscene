@@ -1,6 +1,33 @@
 Scene: Untitled
 Entities:
-  - Entity: 3321228540704341355
+  - Entity: 16058678184221121599
+    NameComponent:
+      Name: Particle System
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRenderer:
+      Color: [0.0635630116, 0.808379889, 0.850533843, 1]
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+    ParticleSystem:
+      PlayOnStart: true
+      MaxParticles: 500
+      LifeTime: 5
+      RotationSpeed: 0
+      Speed: 1
+      Velocity: [0, 0]
+      VelocityVariation: [1, 1]
+      ColorBegin: [0.996078432, 0.831372559, 0.482352942, 1]
+      ColorEnd: [0.996078432, 0.160784289, 0.160784289, 1]
+      SizeBegin: 1
+      SizeEnd: 0
+      SizeVariation: 0.300000012
+      RateOverTime: 1
+  - Entity: 6618596718671816048
     NameComponent:
       Name: Camera
     TransformComponent:
@@ -18,20 +45,7 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
-  - Entity: 13367610630462030475
-    NameComponent:
-      Name: Particle System
-    TransformComponent:
-      Position: [1.30503845, -0.513692856, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.594594598, 0.0550975502, 0.0550975502, 1]
-      Sprite: ""
-    ScriptComponent:
-      ClassName: Sandbox.ParticleSystem
-      ScriptFields:
-        - ID: 3494779207
-          Name: Sandbox.ParticleSystem:ParticlePrefab
-          Type: 18
-          Data: 3690917000108275979
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []

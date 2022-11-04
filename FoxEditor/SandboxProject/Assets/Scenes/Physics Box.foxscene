@@ -7,13 +7,13 @@ Entities:
       Position: [4.73880768, 0.748650074, 0]
       Rotation: [0, 0, 1.6823801e-08]
       Scale: [3.83999991, 3.83999991, 3.83999991]
-    SpriteRendererComponent:
+    SpriteRenderer:
       Color: [0.887254894, 0.447976768, 0.447976768, 1]
-      Sprite: assets/Sprites/Organisation Register Screen.png
     Rigidbody2D:
       BodyType: Dynamic
       FixedRotation: false
       GravityScale: 1
+      LayerID: 0
     BoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
@@ -28,6 +28,10 @@ Entities:
       Friction: 0
       Restitution: 1.6823801e-08
       RestitutionThreshold: 1
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
   - Entity: 0
     NameComponent:
       Name: Cam
@@ -53,6 +57,10 @@ Entities:
       Friction: 0
       Restitution: 0
       RestitutionThreshold: 1
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
   - Entity: 13815603846296109056
     NameComponent:
       Name: Floor
@@ -60,13 +68,13 @@ Entities:
       Position: [0, -1.46003723, 0]
       Rotation: [0, 0, -0.21938701]
       Scale: [7.60000229, 1, 1]
-    SpriteRendererComponent:
+    SpriteRenderer:
       Color: [0.702702701, 0.528255224, 0.206198469, 1]
-      Sprite: ""
     Rigidbody2D:
       BodyType: Static
       FixedRotation: false
       GravityScale: 1
+      LayerID: 0
     BoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
@@ -81,6 +89,10 @@ Entities:
       Friction: 0
       Restitution: 0
       RestitutionThreshold: 7.5999999
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
   - Entity: 12074244336437238205
     NameComponent:
       Name: Player
@@ -95,11 +107,19 @@ Entities:
     ScriptComponent:
       ClassName: Sandbox.Player
       ScriptFields:
-        []
+        - ID: 4002109686
+          Name: Sandbox.Player:Speed
+          Type: 12
+          Data: 15.1999998
+        - ID: 1414718891
+          Name: Sandbox.Player:BulletPrefab
+          Type: 18
+          Data: 2250235705053858380
     Rigidbody2D:
       BodyType: Dynamic
       FixedRotation: false
       GravityScale: 1
+      LayerID: 0
     CircleCollider2D:
       Offset: [0, 0]
       Radius: 0.5
@@ -107,3 +127,7 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []

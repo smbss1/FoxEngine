@@ -98,6 +98,8 @@ namespace fox
 
         MonoClassField* Field = nullptr;
 //        MonoProperty* Property = nullptr;
+//        bool IsProperty;
+//        Buffer DefaultValueBuffer;
 
         void* Attributes = nullptr;
 
@@ -110,6 +112,9 @@ namespace fox
         {
             return !HasFlag(FieldFlag::ReadOnly) && HasFlag(FieldFlag::Public);
         }
+
+//        bool IsArray() const { return HasFlag(FieldFlag::IsArray); }
+
 
         ~ManagedField()
         {
@@ -141,6 +146,19 @@ namespace fox
 
     class ManagedClass
     {
+    public:
+        uint32_t ID = 0;
+        std::string FullName = "";
+        std::vector<uint32_t> Fields;
+        std::vector<uint32_t> Methods;
+        uint32_t Size = 0;
+        uint32_t ParentID = 0;
+        MonoClass* Class = nullptr;
+
+        // Will also be true if class is static
+        bool IsAbstract = false;
+        bool IsStruct = false;
+
     public:
         ManagedClass() = default;
         ManagedClass(const std::string& classNamespace, const std::string& className, bool isCore = false);
@@ -193,14 +211,6 @@ namespace fox
 
             if constexpr (argsCount > 0)
             {
-                // TODO
-                /*if (!ScriptUtils::ValidateParameterTypes<TArgs...>(method))
-                {
-                    HZ_CORE_ERROR("[ScriptEngine]: Attempting to call method % with invalid parameters!", methodName);
-                    ScriptUtils::PrintInvalidParameters<TArgs...>(method);
-                    return;
-                }*/
-
                 // NOTE: const void** -> void** BAD. Ugly hack because unpacking const parameters into void** apparantly isn't allowed (understandable)
                 const void* data[] = { &args... };
                 InvokeMethod(managedObject, method, (void**)data);
@@ -293,15 +303,6 @@ namespace fox
 
             return CallMethodWithReturn<TReturn, TArgs...>(GCManager::GetReferencedObject(instance), methodName, std::forward<TArgs>(args)...);
         }
-
-        uint32_t ID = 0;
-        std::string FullName = "";
-        std::vector<uint32_t> Fields;
-        std::vector<uint32_t> Methods;
-        uint32_t Size = 0;
-        uint32_t ParentID = 0;
-        MonoClass* Class = nullptr;
-
 
     private:
         MonoObject* CreateInstance();

@@ -129,5 +129,16 @@ namespace Fox
 		[MethodImpl(MethodImplOptions.InternalCall)]
 		internal static extern void Input_GetMousePosition(out Vector2 mousePosition);
 	#endregion
+
+	#region Animator
+
+	internal delegate void AnimatorEvent(ulong eventID);
+	[MethodImpl(MethodImplOptions.InternalCall)]
+	internal extern static void Animator_SubscribeToEvent(ulong entityID, ulong eventID, AnimatorEvent callback);
+	
+	[MethodImpl(MethodImplOptions.InternalCall)]
+	internal extern static ulong Animator_GetHashID(string eventName);
+
+	#endregion
 	}
 }

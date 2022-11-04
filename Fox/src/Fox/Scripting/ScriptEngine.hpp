@@ -56,7 +56,7 @@ namespace fox
 
         Utils::ValueWrapper GetFieldValue(const ManagedField* field);
         void SetFieldValue(const ManagedField* field, const Utils::ValueWrapper& value);
-        MonoObject* GetManagedObject() { return GCManager::GetReferencedObject(m_Handle); }
+        MonoObject* GetManagedObject() const { return GCManager::GetReferencedObject(m_Handle); }
     private:
         ManagedClass* m_ManagedClass;
 
@@ -80,14 +80,21 @@ namespace fox
         bool IsCoreAssembly = false;
     };
 
+    struct ScriptEngineSetting
+    {
+        std::filesystem::path CoreAssemblyPath;
+        bool EnableDebugging;
+        bool EnableProfiling;
+    };
+
     class ScriptEngine
     {
     public:
-        static void Init();
+        static void Init(const ScriptEngineSetting& config);
         static void Shutdown();
 
-        static void LoadAssembly(const std::filesystem::path& filepath);
-        static void LoadAppAssembly(const std::filesystem::path& filepath);
+        static bool LoadAssembly();
+        static bool LoadAppAssembly();
         static void ReloadAppDomain();
         static MonoDomain* GetAppDomain();
         static Ref<AssemblyInfo> GetCoreAssembly();
@@ -99,6 +106,10 @@ namespace fox
         static void OnRuntimeStop();
 
         static bool EntityClassExists(const std::string& fullClassName);
+
+        static void InitializeScriptEntity(Entity entity);
+        static void ShutdownScriptEntity(Entity entity, bool erase = true);
+
         static void OnCreateEntity(Entity entity);
         static void OnEntityInstantiated(Entity entityDst, Entity entitySrc);
 
@@ -107,6 +118,8 @@ namespace fox
         static void SetSceneContext(Scene* scene);
         static Scene* GetSceneContext();
         static Ref<ScriptInstance> GetEntityScriptInstance(UUID entityID);
+        static const std::unordered_map<uint32_t, Ref<FieldStorage>>& GetEntityFields(UUID entityID);
+        static Ref<FieldStorage> GetFieldStorage(Entity entity, uint32_t fieldID);
 
         static ManagedClass* GetEntityClass(const std::string& name);
         static std::unordered_map<std::string, ManagedClass*> GetEntityClasses();
@@ -143,41 +156,30 @@ namespace fox
                 return nullptr;
             }
 
+            if (managedClass->IsAbstract)
+                return nullptr;
+
             MonoObject* obj = CreateManagedObject(managedClass->Class);
-
-            // Why doesn't mono/C# generate a default constructor if none exists... Mono requires one in order to properly initialize an object...
-            // And for whatever bizzare reason it won't work if the parent class provides a default constructor...
-            ManagedMethod* defaultConstructor = managedClass->GetMethod(".ctor", 0, true);
-            if (defaultConstructor == nullptr)
+            bool str = managedClass->IsStruct;
+            if (managedClass->IsStruct)
                 return obj;
-
-            InitRuntimeObject(obj);
 
             constexpr size_t argsCount = sizeof...(args);
             ManagedMethod* ctor = managedClass->GetMethod(".ctor", argsCount);
-            if (ctor == nullptr)
-            {
-                FOX_CORE_ERROR_TAG("ScriptEngine", "Failed to find a C# method called % with % parameters", managedClass->FullName, argsCount);
-                return nullptr;
-            }
+
+            // Call the default ctor with 0 params
+            InitRuntimeObject(obj);
 
             if constexpr (argsCount > 0)
             {
-                // TODO
-                /*if (!ScriptUtils::ValidateParameterTypes<TArgs...>(method))
+                if (ctor == nullptr)
                 {
-                    HZ_CORE_ERROR("[ScriptEngine]: Attempting to call method % with invalid parameters!", methodName);
-                    ScriptUtils::PrintInvalidParameters<TArgs...>(method);
-                    return;
-                }*/
+                    FOX_CORE_ERROR_TAG("ScriptEngine", "Failed to find a C# method called % with % parameters", managedClass->FullName, argsCount);
+                    return obj;
+                }
 
-                // NOTE: const void** -> void** BAD. Ugly hack because unpacking const parameters into void** apparantly isn't allowed (understandable)
                 const void* data[] = { &args... };
                 managedClass->InvokeMethod(obj, ctor, (void**)data);
-            }
-            else
-            {
-                managedClass->InvokeMethod(obj, ctor);
             }
 
             return obj;

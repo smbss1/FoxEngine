@@ -15,8 +15,6 @@
 
 namespace fox::Utils
 {
-    using byte = uint8_t;
-
     class ValueWrapper
     {
     public:
@@ -36,6 +34,8 @@ namespace fox::Utils
         ValueWrapper(const glm::vec2& value) : ValueWrapper((void*)&value, sizeof(glm::vec2)) {}
         ValueWrapper(const glm::vec3& value) : ValueWrapper((void*)&value, sizeof(glm::vec3)) {}
         ValueWrapper(const glm::vec4& value) : ValueWrapper((void*)&value, sizeof(glm::vec4)) {}
+        ValueWrapper(const glm::mat3& value) : ValueWrapper((void*)&value, sizeof(glm::mat3)) {}
+        ValueWrapper(const glm::mat4& value) : ValueWrapper((void*)&value, sizeof(glm::mat4)) {}
 
         ValueWrapper(void* data, size_t size)
             : m_Size(size)

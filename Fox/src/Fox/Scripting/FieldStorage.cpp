@@ -17,7 +17,7 @@ namespace fox
         Field = field;
         m_RuntimeInstance = -1;
 
-        MonoObject* tempInstance = ScriptEngine::CreateManagedObject_Internal(managedClass);
+//        MonoObject* tempInstance = ScriptEngine::CreateManagedObject_Internal(managedClass);
 
 //        if (Field->Type.IsArray())
 //        {
@@ -25,11 +25,31 @@ namespace fox
 //        }
 //        else
 //        {
-            m_DefaultValue = Utils::GetFieldValue(tempInstance, field);
+//            m_DefaultValue = Utils::GetFieldValue(tempInstance, field);
 
-            if (!m_DefaultValue.HasValue())
-                m_DefaultValue = Utils::GetDefaultValueForType(field->Type);
+//            if (!m_DefaultValue.HasValue())
+//                m_DefaultValue = Utils::GetDefaultValueForType(field->Type);
 //        }
         m_ValueCache = m_DefaultValue;
+    }
+
+    void FieldStorage::CopyFrom(const Ref<FieldStorage>& other)
+    {
+        Ref<FieldStorage> fieldStorage = other.As<FieldStorage>();
+
+        if (m_RuntimeInstance != -1)
+        {
+            Utils::ValueWrapper wrapper = fieldStorage->GetValue();
+            if (wrapper.HasValue())
+            {
+                SetValue(wrapper.GetRawData(), wrapper.GetDataSize());
+                wrapper.ReleaseBuffer();
+            }
+        }
+        else
+        {
+            m_ValueCache.ReleaseBuffer();
+            m_ValueCache = Utils::ValueWrapper(fieldStorage->m_ValueCache);
+        }
     }
 }

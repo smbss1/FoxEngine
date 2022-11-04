@@ -26,6 +26,10 @@ layout (location = 0) out VertexOutput Output;
 layout (location = 3) out flat float v_TexIndex;
 layout (location = 4) out flat int v_EntityID;
 
+//layout (location = 5) out vec3 v_lightPos;
+//out vec3 ex_pos;
+//vec3 lightPos = vec3(0, 0, 0);
+
 void main()
 {
 	Output.Color = a_Color;
@@ -33,6 +37,9 @@ void main()
 	Output.TilingFactor = a_TilingFactor;
 	v_TexIndex = a_TexIndex;
 	v_EntityID = a_EntityID;
+
+//	v_lightPos = lightPos;
+//	ex_pos = a_Position;
 
 	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 }
@@ -56,10 +63,33 @@ layout (location = 4) in flat int v_EntityID;
 
 layout (binding = 0) uniform sampler2D u_Textures[32];
 
+
+//struct Light
+//{
+//	vec2 position;
+//	vec3 color;
+//	float intensity;
+//};
+
+//uniform vec3 lightColor;
+//uniform vec3 lightPos;
+
+//uniform int lightCount;
+//uniform Light lights[256];
+
+//layout (location = 5) out vec3 v_lightPos;
+//in vec3 ex_pos;
+
+//float constant = 1.0f;
+//float linear = 0.09f;
+//float quadratic = 0.032f;
+//vec3 lightColor = vec3(1, 0, 0);
+//float intensity = 2.0f;
+//float radius = 5;
+
 void main()
 {
 	vec4 texColor = Input.Color;
-
 	switch(int(v_TexIndex))
 	{
 		case  0: texColor *= texture(u_Textures[ 0], Input.TexCoord * Input.TilingFactor); break;
@@ -99,6 +129,34 @@ void main()
 	if (texColor.a == 0.0)
 		discard;
 
+//	float dist = length(v_lightPos - ex_pos) / radius;
+//	float att = 1 / (constant + linear * dist + quadratic * dist * dist);
+//
+////	att *= clamp(1.0 - dist, 0.0, 1.0);
+//	//	att *= att;
+//	vec3 diffuse = clamp(att * lightColor, 0.0, 1.0);
+//	vec4 finalcolor = vec4(diffuse * intensity, 1.0);
+//	texColor *= finalcolor;
+
+
+//	float dist = distance(v_lightPos, ex_pos);
+//	float attenuation = 1.0 / (1.0 + 0.1*dist + 0.01*dist*dist);
+
+
+//	vec3 lAtt = vec3(0.0001, 0.0001, 0.001);
+//	vec2 uv = gl_FragCoord.xy;
+//	vec4 outc = vec4(0.0);
+//	float lightIntensity = 1.0f;
+//	vec3 lightColor = vec3(1, 0, 0);
+
+//	for (int i = 0; i < lightCount; i++)
+//	{
+//		float dist = distance(lightPos, uv);
+//		float att = 1.0 / (lAtt.x + lAtt.y * dist + lAtt.z * dist * dist);
+//		outc += vec4(vec3(att), 1.0) * lightIntensity * vec4(lightColor, 1.0);
+//	}
+
+//	o_Color = vec4(vec3(attenuation), 1.0);
 	o_Color = texColor;
 	o_EntityID = v_EntityID;
 }

@@ -1,0 +1,22 @@
+Panels:
+  - ID: 471749095
+    Name: Animator
+    IsOpen: false
+  - ID: 3741296424
+    Name: ConsolePanel
+    IsOpen: true
+  - ID: 707409970
+    Name: SettingsPanel
+    IsOpen: true
+  - ID: 330970078
+    Name: StatsPanel
+    IsOpen: true
+  - ID: 1254897244
+    Name: SceneHierarchyPanel
+    IsOpen: true
+  - ID: 1102538908
+    Name: ContentBrowserPanel
+    IsOpen: true
+  - ID: 1061066610
+    Name: PropertyPanel
+    IsOpen: true

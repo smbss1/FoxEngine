@@ -3,7 +3,12 @@ Project:
   AssetDirectory: Assets
   AssetRegistry: Assets/AssetRegistry.fxr
   ScriptModulePath: Assets/Scripts/Binaries
-  StartScene: ""
+  StartScene: Scenes/Game.foxscene
   ReloadAssemblyOnPlay: true
   AutoSave: false
   AutoSaveInterval: 300
+  Physics2D:
+    Layers:
+      - Name: Floor
+        CollidesWith:
+          - Name: Default

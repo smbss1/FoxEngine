@@ -31,7 +31,7 @@ namespace fox
     {
         class ValueWrapper;
 
-        MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath);
+        MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPBD = false);
         void PrintAssemblyTypes(MonoAssembly* assembly);
         ScriptFieldType MonoTypeToScriptFieldType(MonoType* monoType);
         std::string MonoToString(MonoString* monoString);

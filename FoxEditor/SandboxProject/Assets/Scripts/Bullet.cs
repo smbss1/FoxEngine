@@ -17,7 +17,7 @@ namespace Sandbox
 
         private void OnCollisionEnter2D(CollisionData obj)
         {
-            Log.Info($"Collide with {obj.entity.GetComponent<EntityName>().Name}");
+            Log.Info($"Collide with {obj.entity.GetComponent<NameComponent>().Name}");
             Destroy();
         }
 

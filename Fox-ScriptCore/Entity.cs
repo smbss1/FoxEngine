@@ -1,18 +1,34 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Fox
 {
     public class Entity
     {
+        private Dictionary<Type, Component> Components = new Dictionary<Type, Component>();
+
         protected Entity()
         {
             ID = 0;
         }
 
+
         internal Entity(ulong id)
         {
             ID = id;
+
+            // del += () =>
+            // {
+            //     Log.Info("Function call from C#");
+            // };
+            //
+            // del += () =>
+            // {
+            //     Log.Info("ijsvndvndvonj call from C#");
+            // };
+            //
+            // InternalCalls.Animator_SubscribeToEvent(id, "my event", del);
         }
 
         public readonly ulong ID;
@@ -50,7 +66,6 @@ namespace Fox
 
     #endregion
 
-
         public bool HasComponent<T>() where T : Component, new()
         {
             return InternalCalls.Entity_HasComponent(ID, typeof(T));
@@ -61,7 +76,16 @@ namespace Fox
             if (!HasComponent<T>())
                 return null;
 
-            T component = new T() { Entity = this };
+            T component = null;
+            if (!Components.ContainsKey(typeof(T)))
+            {
+                component = new T() { Entity = this };
+                Components[typeof(T)] = component;
+            }
+            else
+            {
+                component = Components[typeof(T)] as T;
+            }
             return component;
         }
 

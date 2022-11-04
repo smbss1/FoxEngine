@@ -45,6 +45,7 @@ namespace fox
         static void CacheCoreClasses();
         static void ClearCache();
 
+        static void CacheClass(std::string_view className, MonoClass* monoClass);
         static void GenerateCacheForAssembly(Ref<AssemblyInfo> assemblyInfo);
 
         static ManagedClass* GetManagedClassByName(const std::string& className);
