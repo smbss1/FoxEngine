@@ -11,7 +11,7 @@ namespace fox
 {
     class StatsPanel : public Panel
     {
-        void OnImGui() override;
+        void OnImGui(bool& isOpen) override;
     };
 }
 

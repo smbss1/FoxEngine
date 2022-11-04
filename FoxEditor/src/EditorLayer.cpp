@@ -21,67 +21,76 @@
 #include "Scene/EntitySerializer.hpp"
 #include "Core/Project.hpp"
 #include "Core/ProjectSerializer.hpp"
+#include "ImGui/ImGuiExtensions.hpp"
+#include "Panels/AnimatorSpritePanel.hpp"
+#include "EditorIcons.hpp"
+
+#include "PanelManager.hpp"
 
 namespace fox
 {
-//    FileWatcher fw {"./SandboxProject/Assets/", std::chrono::milliseconds(2000)};
+    EditorLayer* EditorLayer::s_Instance;
+
+    EditorLayer::EditorLayer(Ref<UserPreferences> UserPrefs)
+    : m_CameraController(1280.f / 720.f), m_UserPrefs(UserPrefs), Layer("Editor")
+    {
+        s_Instance = this;
+    }
 
     EditorLayer::~EditorLayer()
     {
-        m_Framebuffer.Reset();
         m_pActiveScene.Reset();
     }
 
     void EditorLayer::OnAttach()
     {
-        // Load Textures for Editor
-        m_IconPlay = Texture2D::Create("Resources/PlayButton.png");
-        m_IconSimulate = Texture2D::Create("Resources/SimulateButton.png");
-        m_IconStop = Texture2D::Create("Resources/StopButton.png");
+        EditorIcons::Init();
 
         // Create Panels
-        m_Panels.emplace_back(new_ref<PropertyPanel>());
-        m_Panels.emplace_back(new_ref<ContentBrowserPanel>());
-        m_Panels.emplace_back(new_ref<StatsPanel>());
-        m_Panels.emplace_back(new_ref<SettingsPanel>());
-        m_Panels.emplace_back(new_ref<ConsolePanel>());
+        m_PanelManager = new_scope<PanelManager>();
+        m_PanelManager->AddPanel<PropertyPanel>("PropertyPanel", "Properties", true);
+        m_PanelManager->AddPanel<ContentBrowserPanel>("ContentBrowserPanel", "Content Browser", true);
+        m_PanelManager->AddPanel<StatsPanel>("StatsPanel", "Stats", true);
+        m_PanelManager->AddPanel<SettingsPanel>("SettingsPanel", "Settings", true);
+        m_PanelManager->AddPanel<ConsolePanel>("ConsolePanel", "Console", true);
+        m_PanelManager->AddPanel<AnimatorSpritePanel>("AnimatorSpritePanel", "Animator", false);
+        m_SceneHierarchyPanel = m_PanelManager->AddPanel<SceneHierarchyPanel>("SceneHierarchyPanel", "Scene Hierarchy", true);
 
         // Bind Signals
-        m_OnImGuiRenderEvent.Bind<SceneHierarchyPanel, &SceneHierarchyPanel::OnImGui>(m_SceneHierarchyPanel);
-        for (Ref<Panel> panel : m_Panels)
-        {
-            m_OnImGuiRenderEvent.Bind<Panel, &Panel::OnImGui>(*panel);
-            if (panel->EnableOverlay)
-                m_OnOverlayRenderEvent.Bind<Panel, &Panel::OnOverlayRender>(*panel);
-        }
+        m_OnImGuiRenderEvent.Bind<PanelManager, &PanelManager::ImGuiRender>(*m_PanelManager);
+        m_OnOverlayRenderEvent.Bind<PanelManager, &PanelManager::OverlayImGuiRender>(*m_PanelManager);
 
         // Create frame buffer
         fox::FramebufferSpecification fbSpec;
         fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
         fbSpec.Width = 1280;
         fbSpec.Height = 720;
-        m_Framebuffer = fox::Framebuffer::Create(fbSpec);
+        fbSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1};
+        Ref<Framebuffer> framebuffer = fox::Framebuffer::Create(fbSpec);
+
+        RenderPassSpecification renderSpec;
+        renderSpec.RenderTarget = framebuffer;
+        m_FinalRenderPass = RenderPass::Create(renderSpec);
 
         // Init Editor Camera
         m_oEditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
         // Create a new Scene
-        m_pEditorScene = new_ref<Scene>();
-        m_pActiveScene = m_pEditorScene;
-        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
+        NewScene();
+//        m_pEditorScene = new_ref<Scene>();
+//        m_pActiveScene = m_pEditorScene;
+//        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
 
-//        // Open a scene if provided in cmd arguments
-//        auto commandLineArgs = Application::Get().GetSpecs().CommandLineArgs;
-//        if (commandLineArgs.Count > 1)
-//        {
-//            auto sceneFilePath = commandLineArgs[1];
-//            OpenScene(sceneFilePath);
-//        }
-
+        // Open a project if provided in cmd arguments
         if (!m_UserPrefs->StartupProject.empty())
             OpenProject(m_UserPrefs->StartupProject);
-//        else
-//            FOX_CORE_VERIFY(false, "No project provided!");
+        else
+        {
+            FOX_WARN("No project provided!");
+        }
+
+        if (!Project::GetActive())
+            EmptyProject();
     }
 
     void EditorLayer::OnDetach()
@@ -94,22 +103,17 @@ namespace fox
         m_pActiveScene->OnViewportResize((uint32_t)m_oViewportSize.x, (uint32_t)m_oViewportSize.y);
 
         // Resize
-        if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+        if (FramebufferSpecification spec = m_FinalRenderPass->GetSpecs().RenderTarget->GetSpecification();
                 m_oViewportSize.x > 0.0f && m_oViewportSize.y > 0.0f && // zero sized framebuffer is invalid
                 (spec.Width != m_oViewportSize.x || spec.Height != m_oViewportSize.y))
         {
-            m_Framebuffer->Resize((uint32_t)m_oViewportSize.x, (uint32_t)m_oViewportSize.y);
+            m_FinalRenderPass->GetSpecs().RenderTarget->Resize((uint32_t)m_oViewportSize.x, (uint32_t)m_oViewportSize.y);
             m_CameraController.OnResize(m_oViewportSize.x, m_oViewportSize.y);
             m_oEditorCamera.SetViewportSize(m_oViewportSize.x, m_oViewportSize.y);
         }
 
-        fox::Renderer2D::ResetStats();
-        m_Framebuffer->Bind();
-        fox::RendererCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1});
-        fox::RendererCommand::Clear();
-
-        // Clear our entity ID attachment to -1
-        m_Framebuffer->ClearAttachment(1, -1);
+        Renderer2D::ResetStats();
+        Renderer::BeginRenderPass(m_FinalRenderPass);
 
         switch (m_SceneState)
         {
@@ -119,7 +123,7 @@ namespace fox
                     m_CameraController.OnUpdate((float)ts);
 
                 m_oEditorCamera.OnUpdate();
-                m_pActiveScene->OnUpdateEditor(m_oEditorCamera);
+                m_pActiveScene->OnUpdateEditor(m_oEditorCamera, ts);
                 break;
             }
             case SceneState::Simulate:
@@ -146,15 +150,17 @@ namespace fox
         int mouseX = (int)mx;
         int mouseY = (int)my;
 
-        // Check the position of the mouse is in the viewport boundary
-        if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
-        {
-            int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-            m_oHoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_pActiveScene.Raw());
-        }
+        RendererCommand::Submit([=] {
+            // Check the position of the mouse is in the viewport boundary
+            if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
+            {
+                int pixelData = m_FinalRenderPass->GetSpecs().RenderTarget->ReadPixel(1, mouseX, mouseY);
+                m_oHoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_pActiveScene.Raw());
+            }
+        });
 
         OnOverlayRender();
-        m_Framebuffer->Unbind();
+        Renderer::EndRenderPass();
     }
 
     void EditorLayer::BeginDockspace()
@@ -163,7 +169,7 @@ namespace fox
 		static bool dockspaceOpen = true;
 		static bool opt_fullscreen_persistant = true;
 		bool opt_fullscreen = opt_fullscreen_persistant;
-		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_NoTabBar;
 
 		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 		// because it would be confusing to have two docking targets within each others.
@@ -217,8 +223,34 @@ namespace fox
 
     void EditorLayer::OnImGuiRender()
     {
-        BeginDockspace();
+//        // Submit top-level dockspace
+//        ImGuiWindowClass top_level_class;
+//        top_level_class.ClassId = ImHashStr("MyTopLevelClass");
+//        top_level_class.DockingAllowUnclassed = false;
+//        ImGui::DockSpaceOverViewport(NULL, ImGuiDockNodeFlags_None, &top_level_class);
+//
+//        // Submit top-level documents
+//        ImGui::SetNextWindowClass(&top_level_class);
+//        ImGui::Begin("ThirdPersonExampleMap");
+//            ImGuiWindowClass inside_document_class;
+//            // Choice 1: shared class for all documents (all tools can be docked into all documents)
+//            inside_document_class.ClassId = ImHashStr("InsideDocumentClass");
+//            // Choice 2: each document has its class
+//            ImGuiID dockspace_id = ImGui::GetID("MyDockSpace44");
+//            ImGui::DockSpace(dockspace_id, ImVec2(0,0), 0, &inside_document_class);
+//        ImGui::End();
+//
+//        // Submit tools
+//        ImGui::SetNextWindowClass(&inside_document_class);
+//        ImGui::Begin("Components");
+//
+//        ImGui::End();
+//
+//        ImGui::Begin("Components4");
+//
+//        ImGui::End();
 
+        BeginDockspace();
         UI_MenuBar();
 
         m_OnImGuiRenderEvent.Invoke();
@@ -245,34 +277,26 @@ namespace fox
                 ImVec2 viewportPanelSize = ImGui::GetWindowSize();
                 m_oViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
 
-                uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+                uint64_t textureID = m_FinalRenderPass->GetSpecs().RenderTarget->GetColorAttachmentRendererID();
                 // Because I use the texture from OpenGL, I need to invert the axis from the UV.
-                ImGui::Image(reinterpret_cast<void *>(textureID), viewportPanelSize, ImVec2 {0, 1}, ImVec2 {1, 0});
+                ImGui::Image(reinterpret_cast<ImTextureID>(textureID), viewportPanelSize, ImVec2 {0, 1}, ImVec2 {1, 0});
 
-                if (ImGui::BeginDragDropTarget())
-                {
-                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                UI::HandleContentBrowserPayloadCustom({".foxscene", ".foxprefab"}, [this](std::filesystem::path& filepath) {
+                    if (filepath.extension() == ".foxscene")
                     {
-                        const char* path = (const char*)payload->Data;
-                        auto filepath = Project::AssetsDir() / path;
-
-                        if (filepath.extension() == ".foxscene")
-                        {
-                            OpenScene(Project::AssetsDir() / path);
-                        }
-
-                        if (filepath.extension() == ".foxprefab")
-                        {
-                            Entity entity = EntitySerializer::DeserializeEntityAsPrefab(filepath.c_str(), *m_pActiveScene);
-                            event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(entity));
-                        }
+                        OpenScene(filepath);
                     }
-                    ImGui::EndDragDropTarget();
-                }
+
+                    if (filepath.extension() == ".foxprefab")
+                    {
+                        Entity entity = EntitySerializer::DeserializeEntityAsPrefab(filepath.c_str(), *m_pActiveScene);
+                        event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(entity));
+                    }
+                });
 
                 // Gizmos
-                Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-                if (selectedEntity && m_iGizmoType != -1 && !Input::IsKeyPressed(Key::LeftAlt))
+                Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity();
+                if (selectedEntity && m_iGizmoType != -1 && !Input::IsKeyDown(Key::LeftAlt))
                 {
                     ImGuizmo::SetOrthographic(false);
                     ImGuizmo::SetDrawlist();
@@ -286,7 +310,6 @@ namespace fox
 
                     // Entity transform
                     auto& tc = selectedEntity.get<TransformComponent>();
-//                    glm::mat4 transform = tc.GetTransform();
                     glm::mat4 transform = m_pActiveScene->GetWorldSpaceTransformMatrix(selectedEntity);
 
                     // Snapping
@@ -298,9 +321,15 @@ namespace fox
 
                     float snapValues[3] = { snapValue, snapValue, snapValue };
 
-                    ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                                        (ImGuizmo::OPERATION) m_iGizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
-                                        nullptr, snap ? snapValues : nullptr);
+                    ImGuizmo::Manipulate(
+                        glm::value_ptr(cameraView),
+                        glm::value_ptr(cameraProjection),
+                        (ImGuizmo::OPERATION) m_iGizmoType,
+                        ImGuizmo::LOCAL,
+                        glm::value_ptr(transform),
+                        nullptr,
+                        snap ? snapValues : nullptr
+                    );
 
                     if (ImGuizmo::IsUsing())
                     {
@@ -338,11 +367,38 @@ namespace fox
         {
             if (ImGui::BeginMenu("File"))
             {
-                // if (ImGui::MenuItem("New Project"))
-                //     NewProject();
+                 if (ImGui::MenuItem("New Project"))
+                     NewProject();
 
                  if (ImGui::MenuItem("Open Project", "Ctrl+O"))
                      OpenProject();
+
+                if (ImGui::BeginMenu("Open Recent")) {
+                    size_t i = 0;
+                    for (auto it = m_UserPrefs->RecentProjects.begin(); it != m_UserPrefs->RecentProjects.end(); it++)
+                    {
+                        if (i > 10)
+                            break;
+
+                        if (ImGui::MenuItem(it->second.Name.c_str()))
+                        {
+                            // stash filepath away and defer actual opening of project until it is "safe" to do so
+                            EditorLayer* layer = this;
+                            std::string filepath = it->second.FilePath;
+                            Application::Get().SubmitToMainThread([filepath, layer]() {
+                                if (layer)
+                                    layer->OpenProject(filepath);
+                            });
+
+                            m_UserPrefs->AddRecentProject(it);
+                            m_UserPrefs->Save();
+                            break;
+                        }
+
+                        i++;
+                    }
+                    ImGui::EndMenu();
+                }
 
                 if (ImGui::MenuItem("Save Project"))
                     SaveProject();
@@ -371,6 +427,13 @@ namespace fox
                 ImGui::EndMenu();
             }
 
+            if (ImGui::BeginMenu("Window"))
+            {
+                for (auto& [id, panelData] : m_PanelManager->GetPanels())
+                    if (ImGui::MenuItem(panelData.Name, nullptr, &panelData.IsOpen))
+                        m_PanelManager->Serialize();
+                ImGui::EndMenu();
+            }
             ImGui::EndMenuBar();
         }
     }
@@ -411,7 +474,7 @@ namespace fox
             float spacing = ImGui::GetStyle().ItemInnerSpacing.x;
             ImGui::SameLine(0, spacing);
             {
-                Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
+                Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? EditorIcons::IconPlay : EditorIcons::IconStop;
                 const float height = std::min((float)icon->GetHeight(), buttonSize);
                 const float width = (float)icon->GetWidth() / (float)icon->GetHeight() * height;
 
@@ -426,7 +489,7 @@ namespace fox
             }
             ImGui::SameLine();
             {
-                Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? m_IconSimulate : m_IconStop;
+                Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? EditorIcons::IconSimulate : EditorIcons::IconStop;
                 const float height = std::min((float)icon->GetHeight(), buttonSize);
                 const float width = (float)icon->GetWidth() / (float)icon->GetHeight() * height;
 
@@ -453,7 +516,7 @@ namespace fox
             if (!camera)
                 return;
 
-            Renderer2D::BeginScene(camera.get<CameraComponent>().camera, camera.get<TransformComponent>().GetTransform());
+            Renderer2D::BeginScene(camera.get<CameraComponent>().camera.GetProjection() * glm::inverse(camera.get<TransformComponent>().GetTransform()));
         }
         else
         {
@@ -463,7 +526,7 @@ namespace fox
         m_OnOverlayRenderEvent.Invoke();
 
         // Draw selected entity outline
-        if (Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity())
+        if (Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity())
         {
             const TransformComponent& transform = selectedEntity.get<TransformComponent>();
             glm::mat4 transformMatrice = m_pActiveScene->GetWorldSpaceTransformMatrix(selectedEntity);
@@ -571,8 +634,9 @@ namespace fox
     {
         if (e.GetMouseButton() == Mouse::ButtonLeft)
         {
-            if (m_bViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
-                m_SceneHierarchyPanel.SetSelectedEntity(m_oHoveredEntity);
+            if (m_bViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyDown(Key::LeftAlt)) {
+                m_SceneHierarchyPanel->SetSelectedEntity(m_oHoveredEntity);
+            }
         }
         return false;
     }
@@ -610,52 +674,113 @@ namespace fox
     ////////////////////////////////////////////
     void EditorLayer::NewScript()
     {
-        auto filepath = FileDialogs::SaveFile({"C++ (*.cpp)", "*.cpp"});
-        if (!filepath.empty())
-        {
-            Path path(filepath);
-            const std::string& root_path = path.parent_path().string();
-            const std::string& filename = path.basename();
+//        auto filepath = FileDialogs::SaveFile({"C++ (*.cpp)", "*.cpp"});
+//        if (!filepath.empty())
+//        {
+//            Path path(filepath);
+//            const std::string& root_path = path.parent_path().string();
+//            const std::string& filename = path.basename();
+//
+//            CreateClass(root_path, filename);
+//        }
+    }
 
-            CreateClass(root_path, filename);
+    static void ReplaceToken(std::string& str, const char* token, const std::string& value)
+    {
+        size_t pos = 0;
+        while ((pos = str.find(token, pos)) != std::string::npos)
+        {
+            if (pos > str.size())
+                break;
+            str.replace(pos, strlen(token), value);
+            pos += strlen(token) + 1;
         }
     }
 
     ////////////////////////////////////////////
-    /// Project File    // DO NOT DELETE -----
+    /// Project File
     ////////////////////////////////////////////
-    // void EditorLayer::NewProject()
-    // {
-    //     auto filepath = FileDialogs::SaveFile({"Fox Project (*.foxproject)", "*.foxproject"});
-    //     if (!filepath.empty())
-    //     {
-    //         Path path(filepath);
-    //         const std::string& project_root = path.parent_path().string();
-    //         const std::string& sample_scene = project_root + "/assets/Scenes/Sample.foxscene";
+     void EditorLayer::NewProject()
+     {
+         std::filesystem::path projectPath = FileDialogs::SaveFile({"Fox Project (*.foxproj)", "*.foxproj"});
+         if (!projectPath.empty())
+         {
+            std::string projectName = projectPath.stem();
+             projectPath = projectPath.remove_filename();
 
-    //         std::filesystem::create_directories(project_root + "/assets/Scenes/");
-    //         file::WriteFile(filepath, "{\n}");
-    //         file::WriteFile(sample_scene, "");
+             if (!std::filesystem::exists(projectPath))
+                 std::filesystem::create_directories(projectPath);
 
-    //         m_pActiveScene = new_ref<Scene>(GetApp());
-    //         m_SceneHierarchyPanel.SetContext(m_pActiveScene);
+             std::filesystem::copy("Resources/NewProjectTemplate", projectPath, std::filesystem::copy_options::recursive);
+             std::filesystem::path foxRootDirectory = std::filesystem::absolute("./Resources").parent_path().string();
+             std::string foxRootDirectoryString = foxRootDirectory.string();
 
-    //         SceneSerializer serializer(m_pActiveScene);
-    //         serializer.Deserialize(sample_scene);
+             if (foxRootDirectory.stem().string() == "FoxEditor")
+                 foxRootDirectoryString = foxRootDirectory.parent_path().string();
 
-    //         m_pActiveScene->OnViewportResize(m_oViewportSize.x, m_oViewportSize.y);
+#ifdef FOX_PLATFORM_WINDOWS
+             std::replace(foxRootDirectoryString.begin(), foxRootDirectoryString.end(), '\\', '/');
+#endif
+             {
+                 // premake5.lua
+                 std::string str;
+                 FileSystem::ReadFile(projectPath / "premake5.lua", str);
 
-    //         FPaths::SetProjectDir(path.parent_path().string());
-    //         m_ContentBrowserPanel.OnProjectOpen();
-    //     }
-    // }
+                 ReplaceToken(str, "$PROJECT_NAME$", projectName);
+                 FileSystem::WriteFile(projectPath / "premake5.lua", str);
+             }
+
+             {
+                 // Project File
+                 std::string ss;
+                 FileSystem::ReadFile(projectPath / "Project.foxproj", ss);
+                 ReplaceToken(ss, "$PROJECT_NAME$", projectName);
+                 FileSystem::WriteFile(projectPath / "Project.foxproj", ss);
+
+                 std::string newProjectFileName = std::string(projectName) + ".foxproj";
+                 std::filesystem::rename(projectPath / "Project.foxproj", projectPath / newProjectFileName);
+             }
+
+             std::filesystem::create_directories(projectPath / "Assets" / "Audio");
+             std::filesystem::create_directories(projectPath / "Assets" / "Scenes");
+             std::filesystem::create_directories(projectPath / "Assets" / "Scripts" / "Source");
+             std::filesystem::create_directories(projectPath / "Assets" / "Sprites");
+
+             // Add to recent project list
+             {
+                 m_UserPrefs->AddRecentProject(projectName, projectPath / (std::string(projectName) + ".foxproj"));
+                 m_UserPrefs->Save();
+             }
+
+//             RegenerateProjectScriptSolution(projectPath);
+
+             std::string batchFilePath = projectPath.string();
+#ifdef FOX_PLATFORM_LINUX
+             ReplaceToken(batchFilePath, " ", "\\ "); // Only linux
+            batchFilePath += "build.sh";
+#elif FOX_PLATFORM_WINDOWS
+              std::replace(batchFilePath.begin(), batchFilePath.end(), '/', '\\'); // Only windows
+             batchFilePath += "\\Win-CreateScriptProjects.bat";
+#endif
+             system(batchFilePath.c_str());
+             OpenProject(projectPath.string() + "/" + std::string(projectName) + ".foxproj");
+         }
+     }
 
      void EditorLayer::OpenProject()
      {
-         auto filepath = FileDialogs::OpenFile({"Fox Project (*.foxproject)", "*.foxproject"});
-         if (!filepath.empty()) {
-             OpenProject(filepath);
-         }
+         std::filesystem::path filepath = FileDialogs::OpenFile({"Fox Project (*.foxproj)", "*.foxproj"});
+         if (filepath.empty())
+             return;
+
+         EditorLayer* layer = this;
+         Application::Get().SubmitToMainThread([filepath, layer]() {
+             if (layer)
+                 layer->OpenProject(filepath);
+         });
+
+         m_UserPrefs->AddRecentProject(filepath.stem(), filepath);
+         m_UserPrefs->Save();
      }
 
     void EditorLayer::OpenProject(const std::string& filepath)
@@ -669,14 +794,14 @@ namespace fox
         if (Project::GetActive())
             CloseProject();
 
-        Ref<Project> project = Ref<Project>::Create();
+        Ref<Project> project = new_ref<Project>();
         ProjectSerializer serializer(project);
         serializer.Deserialize(filepath);
         Project::SetActive(project);
 
         auto appAssemblyPath = Project::ScriptModuleFilePath();
         if (!appAssemblyPath.empty() && FileSystem::Exists(appAssemblyPath))
-            ScriptEngine::LoadAppAssembly(appAssemblyPath);
+            ScriptEngine::LoadAppAssembly();
         else
             FOX_WARN("No C# assembly has been provided in the Project Settings, or it wasn't found.");
 
@@ -686,17 +811,17 @@ namespace fox
             NewScene();
 
         event::EventSystem::Get().Emit(OnProjectChangeEvent());
+        m_PanelManager->Deserialize();
 
-//        // Reset cameras
-//        m_oEditorCamera = EditorCamera(45.0f, 1280.0f, 720.0f, 0.1f, 1000.0f);
-//        m_SecondEditorCamera = EditorCamera(45.0f, 1280.0f, 720.0f, 0.1f, 1000.0f);
+//        SelectionManager::DeselectAll();
+//        FileSystem::StartWatching();
     }
 
     void EditorLayer::CloseProject(bool unloadProject)
     {
         SaveProject();
+        event::EventSystem::Get().Emit(OnContextChangeEvent(nullptr));
 
-//        m_PanelManager->SetSceneContext(nullptr);
 //        ScriptEngine::UnloadAppAssembly();
         ScriptEngine::SetSceneContext(nullptr);
 //        m_ViewportRenderer->SetScene(nullptr);
@@ -721,15 +846,31 @@ namespace fox
         serializer.Serialize(project->GetConfig().ProjectDirectory + "/" + project->GetConfig().ProjectFileName);
     }
 
+    void EditorLayer::EmptyProject()
+    {
+        if (Project::GetActive())
+            CloseProject();
+
+        Ref<Project> project = new_ref<Project>();
+        Project::SetActive(project);
+
+        event::EventSystem::Get().Emit(OnProjectChangeEvent());
+        m_PanelManager->Deserialize();
+        NewScene();
+
+//        SelectionManager::DeselectAll();
+//        FileSystem::StartWatching();
+    }
 
     ////////////////////////////////////////////
     /// Scene File
     ////////////////////////////////////////////
     void EditorLayer::NewScene()
     {
-        m_pActiveScene = new_ref<Scene>();
+        m_pEditorScene = new_ref<Scene>();
+        m_pActiveScene = m_pEditorScene;
         m_EditorScenePath = std::filesystem::path();
-
+        ScriptEngine::SetSceneContext(m_pActiveScene.Raw());
         event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
     }
 
@@ -751,6 +892,7 @@ namespace fox
             m_pEditorScene = newScene;
             m_pActiveScene = m_pEditorScene;
             m_EditorScenePath = path;
+            ScriptEngine::SetSceneContext(m_pActiveScene.Raw());
             event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
         }
     }
@@ -779,9 +921,15 @@ namespace fox
         auto filepath = FileDialogs::SaveFile({"Fox Scene (*.foxscene)", "*.foxscene"});
         if (!filepath.empty())
         {
+            Path path = filepath;
+            if (path.extension() != ".foxscene")
+            {
+                path.replace_extension(".foxscene");
+                filepath = path.string();
+            }
+
             SceneSerializer serializer(m_pActiveScene);
             serializer.Serialize(filepath);
-
             m_EditorScenePath = filepath;
         }
     }
@@ -792,7 +940,7 @@ namespace fox
 
         m_pActiveScene = Scene::Copy(m_pEditorScene);
         m_pActiveScene->OnRuntimeStart();
-
+        ScriptEngine::SetSceneContext(m_pActiveScene.Raw());
         event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
     }
 
@@ -820,6 +968,7 @@ namespace fox
 
         m_SceneState = SceneState::Edit;
         m_pActiveScene = m_pEditorScene;
+        ScriptEngine::SetSceneContext(m_pActiveScene.Raw());
         event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
     }
 
@@ -828,7 +977,7 @@ namespace fox
         if (m_SceneState != SceneState::Edit)
             return;
 
-        Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+        Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity();
         if (selectedEntity)
             m_pEditorScene->DuplicateEntity(selectedEntity);
     }

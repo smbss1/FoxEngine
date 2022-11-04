@@ -72,11 +72,11 @@ namespace fox
         m_BufferBegin = 0;
     }
 
-    void ConsolePanel::OnImGui()
+    void ConsolePanel::OnImGui(bool& isOpen)
     {
 //        FOX_PROFILE_SCOPE();
 
-        if (ImGui::Begin(ICON_FA_TERMINAL" Console"))
+        if (ImGui::Begin(ICON_FA_TERMINAL" Console", &isOpen))
         {
             ImGuiRenderHeader();
             ImGui::Separator();

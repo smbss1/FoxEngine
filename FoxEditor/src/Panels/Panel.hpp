@@ -12,7 +12,8 @@ namespace fox
     class Panel : public RefCounted
     {
     public:
-        virtual void OnImGui() = 0;
+        virtual ~Panel() = default;
+        virtual void OnImGui(bool& isOpen) = 0;
         virtual void OnOverlayRender() {}
 
         bool EnableOverlay = false;

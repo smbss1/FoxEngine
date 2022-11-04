@@ -20,10 +20,11 @@ namespace fox
         explicit SceneHierarchyPanel();
         ~SceneHierarchyPanel();
 
-        void OnImGui() override;
+        void OnImGui(bool& isOpen) override;
 
         const Entity& GetSelectedEntity() const { return m_SelectedEntity; }
-        void SetSelectedEntity(const Entity& e) { m_SelectedEntity = e; }
+        void SetSelectedEntity(const Entity& e);
+//        event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_oHoveredEntity));
 
     private:
         void DrawEntityNode(const Entity& e);
@@ -32,6 +33,7 @@ namespace fox
     private:
         Ref<Scene> m_pContext = nullptr;
         Entity m_SelectedEntity;
+        bool m_bIsDeleted = false; // Is the entity deleted ?
     };
 }
 

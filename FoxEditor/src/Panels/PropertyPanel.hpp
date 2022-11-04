@@ -23,7 +23,7 @@ namespace fox
         ~PropertyPanel();
 
         void SetContext(const Ref<Scene>& context);
-        void OnImGui() override;
+        void OnImGui(bool& isOpen) override;
 
     private:
 

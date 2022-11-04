@@ -7,11 +7,11 @@
 #include "imgui.h"
 #include "Renderer/Renderer2D.hpp"
 
-void fox::StatsPanel::OnImGui()
+void fox::StatsPanel::OnImGui(bool& isOpen)
 {
     ImGuiIO &io = ImGui::GetIO();
 
-    ImGui::Begin("Stats");
+    ImGui::Begin("Stats", &isOpen);
     {
         auto stats = fox::Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");

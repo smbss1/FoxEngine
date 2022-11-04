@@ -6,57 +6,19 @@
 #include <Renderer/EditorCamera.hpp>
 #include "EditorLayer.hpp"
 #include "Core/UserPreferences.hpp"
+#include "Utils/FileSystem.hpp"
 #include <Core/Input/Input.hpp>
-// #include "ScriptableBehaviour.hpp"
 
 class EditorApp : public fox::Application
 {
     public:
-        EditorApp(const fox::ApplicationSpecification& specification);
+        explicit EditorApp(const fox::ApplicationSpecification& specification);
         ~EditorApp() override = default;
-
 
     private:
         std::string m_ProjectPath;
         fox::Ref<fox::UserPreferences> m_UserPrefs;
 };
-
-
-namespace fox
-{
-    // class Test : public ScriptableBehaviour
-    // {
-    //     float value;
-    // public:
-    //     ~Test() override = default;
-
-    // protected:
-    //     void on_create() override
-    //     {
-    //         auto& translation = get_component<TransformComponent>()->position;
-    //         translation.x = rand() % 10 - 5.0f;
-    //     }
-
-    //     void on_update() override
-    //     {
-    //         auto& translation = get_component<TransformComponent>()->position;
-
-    //         float speed = 5.0f;
-
-    //         if (Input::IsKeyPressed(KeyCode::A))
-    //             translation.x -= speed * Time::delta_time;
-    //         if (Input::IsKeyPressed(KeyCode::D))
-    //             translation.x += speed * Time::delta_time;
-    //         if (Input::IsKeyPressed(KeyCode::W))
-    //             translation.y += speed * Time::delta_time;
-    //         if (Input::IsKeyPressed(KeyCode::S))
-    //             translation.y -= speed * Time::delta_time;
-    //     }
-
-    //     void on_destroy() override { }
-    //     int i = 0;
-    // };
-}
 
 EditorApp::EditorApp(const fox::ApplicationSpecification& specification) : fox::Application(specification), m_UserPrefs(fox::new_ref<fox::UserPreferences>())
 {
@@ -69,16 +31,25 @@ EditorApp::EditorApp(const fox::ApplicationSpecification& specification) : fox::
 
     // User Preferences
     {
-        fox::UserPreferencesSerializer serializer(m_UserPrefs);
         if (!std::filesystem::exists("UserPreferences.yaml"))
-            serializer.Serialize("UserPreferences.yaml");
+            m_UserPrefs->Save("UserPreferences.yaml");
         else
-            serializer.Deserialize("UserPreferences.yaml");
+            m_UserPrefs->ConstructFrom("UserPreferences.yaml");
 
         if (!m_ProjectPath.empty())
             m_UserPrefs->StartupProject = m_ProjectPath;
         else if (!m_UserPrefs->StartupProject.empty())
             m_ProjectPath = m_UserPrefs->StartupProject;
+    }
+
+    // Update the FOX_DIR environment variable every time we launch
+    {
+        std::filesystem::path workingDirectory = std::filesystem::current_path();
+        if (workingDirectory.stem().string() == "FoxEditor")
+            workingDirectory = workingDirectory.parent_path();
+//        fox::FileSystem::SetEnvironmentVariable("FOX_DIR", workingDirectory.string());
+        m_UserPrefs->EnginePath = workingDirectory.string();
+        m_UserPrefs->Save("UserPreferences.yaml");
     }
 
     PushLayer(new fox::EditorLayer(m_UserPrefs));
@@ -89,6 +60,8 @@ fox::Application* fox::CreateApp(ApplicationCommandLineArgs args)
     ApplicationSpecification spec;
     spec.Name = "Fox Editor";
     spec.CommandLineArgs = args;
+    spec.ScriptSetting.CoreAssemblyPath = "Resources/Scripts/Fox-ScriptCore.dll";
+    spec.ScriptSetting.EnableDebugging = false;
 
     return new EditorApp(spec);
 }

@@ -20,7 +20,7 @@ namespace fox
     public:
         ContentBrowserPanel();
 
-        void OnImGui() override;
+        void OnImGui(bool& isOpen) override;
         void OnProjectChange(const OnProjectChangeEvent& event);
         void OnContextChange(const OnContextChangeEvent& event);
 

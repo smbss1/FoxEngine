@@ -10,6 +10,8 @@
 #include "Scene/EntitySerializer.hpp"
 #include "EditorEvent.hpp"
 
+#define FOX_CONTENT_BROWSER_ERROR(...) FOX_CORE_ERROR_TAG("Content Browser", __VA_ARGS__)
+
 namespace fox
 {
     static float padding = 17.0f; // Padding between folders and files
@@ -34,9 +36,9 @@ namespace fox
         m_Context = event.Context;
     }
 
-    void ContentBrowserPanel::OnImGui()
+    void ContentBrowserPanel::OnImGui(bool& isOpen)
     {
-        ImGui::Begin(ICON_FA_FOLDER" Content Browser");
+        ImGui::Begin(ICON_FA_FOLDER" Content Browser", &isOpen);
         ImGui::BeginChild("###Content Browser");
 
         if (!m_oCurrentDirectory.empty())
@@ -92,8 +94,6 @@ namespace fox
                 if (ImGui::BeginDragDropSource())
                 {
                     auto relativePath = std::filesystem::relative(path, Project::AssetsDir());
-                    // auto relativePath = std::filesystem::relative(path, FPaths::AssetsDir());
-
                     const char* itemPath = relativePath.c_str();
 
                     ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (strlen(itemPath) + 1) * sizeof(char));
@@ -106,6 +106,9 @@ namespace fox
                 {
                     if (directoryEntry.is_directory())
                         m_oCurrentDirectory /= path.filename();
+                    if (path.extension().string() == ".foxscene") {
+                        EditorLayer::Get().OpenScene(path);
+                    }
                 }
 
                 // Drag for Texture files
@@ -143,6 +146,12 @@ namespace fox
                     UUID droppedEntityID = *(((UUID*)payload->Data) + i);
                     Entity droppedEntity = m_Context->GetEntityByUUID(droppedEntityID);
 
+                    if (!droppedEntity)
+                    {
+                        FOX_CONTENT_BROWSER_ERROR("Failed to find Entity with ID % in current Scene context!", droppedEntityID);
+                        continue;
+                    }
+
                     std::filesystem::path path(m_oCurrentDirectory);
                     path /= std::string(droppedEntity.GetName() + ".foxprefab").c_str();
                     EntitySerializer::SerializeEntityAsPrefab(path.string().c_str(), droppedEntity);
@@ -153,3 +162,5 @@ namespace fox
         ImGui::End();
     }
 }
+
+#undef FOX_CONTENT_BROWSER_ERROR(...)

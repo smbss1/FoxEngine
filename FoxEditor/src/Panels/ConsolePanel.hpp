@@ -50,7 +50,7 @@ namespace fox
         void Clear();
         void SetFocus() const;
 
-        virtual void OnImGui() override;
+        void OnImGui(bool& isOpen) override;
 
     private:
         void ImGuiRenderHeader();

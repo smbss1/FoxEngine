@@ -2,6 +2,7 @@
 // Created by samuel on 09/10/22.
 //
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "Core/Application.hpp"
 #include "Components.hpp"
@@ -9,7 +10,6 @@
 #include "Events/EventSystem.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "PropertyPanel.hpp"
-#include "ImGui/ImGuiExtension.hpp"
 #include "Scripting/ScriptEngine.hpp"
 #include "Reflection/Core/Reflect.hpp"
 #include "ImGui/ImGuiFieldDrawer.hpp"
@@ -18,6 +18,10 @@
 #include "Scene/EntitySerializer.hpp"
 #include "Asset/AssetManager.hpp"
 #include "Scene/Prefab.hpp"
+#include "ImGui/ImGuiExtensions.hpp"
+#include "ImGui/IconsFontAwesome5Brands.hpp"
+#include "ImGui/IconsFontAwesome5.hpp"
+#include "Physics2D.hpp"
 
 #include <filesystem>
 
@@ -45,14 +49,16 @@ namespace fox
         m_SelectedEntity = {};
     }
 
-    void PropertyPanel::OnImGui()
+    void PropertyPanel::OnImGui(bool& isOpen)
     {
-        ImGui::Begin("Properties");
+        ImGui::Begin("Properties", &isOpen);
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 2.0f));
         {
             if (m_SelectedEntity) {
                 DrawComponents(m_SelectedEntity);
             }
         }
+        ImGui::PopStyleVar();
         ImGui::End();
     }
 
@@ -68,20 +74,24 @@ namespace fox
     }
 
     template<typename T, typename UIFunction>
-    static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
+    static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction, bool manual = false)
     {
         const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
-
         if (!entity.has<T>())
             return;
+
+        float lineHeight = 0;
+        bool open = false;
         auto& component = entity.get<T>();
         ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2 {4, 4});
+        {
+            defer({ ImGui::PopStyleVar(); });
 
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
-        float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-        ImGui::Separator();
-        bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
-        ImGui::PopStyleVar();
+            lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+            ImGui::Separator();
+            open = ImGui::TreeNodeEx((void *) typeid(T).hash_code(), treeNodeFlags, name.c_str());
+        }
         ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
         if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight }))
         {
@@ -99,7 +109,11 @@ namespace fox
 
         if (open)
         {
+            if (!manual)
+                UI::BeginProperties();
             uiFunction(component);
+            if (!manual)
+                UI::EndProperties();
             ImGui::TreePop();
         }
 
@@ -114,22 +128,15 @@ namespace fox
             auto reflect = Reflect::Resolve<T>();
             auto members = reflect->GetDataMembers();
 
-            ImGuiFieldDrawer::BeginProperties();
             for (Reflect::DataMember* member : members)
             {
                 auto value = member->Get(component);
                 const Reflect::TypeDescriptor* type = member->GetType();
-
-//                        FOX_CORE_INFO("Name: %", member->GetName());
-//                        FOX_CORE_INFOINFOINFO("Type: %", type->GetName());
-//                        FOX_CORE_INFO("Value: %", value.Get());
-
                 if (ImGuiFieldDrawer::Draw(type, member->GetName(), value))
                 {
                     member->Set(component, value);
                 }
             }
-            ImGuiFieldDrawer::EndProperties();
         });
     }
 
@@ -167,19 +174,21 @@ namespace fox
             case ScriptFieldType::AssetHandle:
                 data = storage.GetValue<AssetHandle>();
                 break;
+            default:
+                break;
         }
     }
 
     void PropertyPanel::DrawComponents(Entity entity)
     {
-        if (entity.has<EntityName>())
+        if (entity.has<NameComponent>())
         {
             char buffer[256];
             memset(buffer, 0, sizeof(buffer));
-            strcpy(buffer, entity.get<EntityName>().name.c_str());
+            strcpy(buffer, entity.get<NameComponent>().name.c_str());
 
             if (ImGui::InputText("##Name", buffer, sizeof(buffer)))
-                entity.get<EntityName>().name = buffer;
+                entity.get<NameComponent>().name = buffer;
         }
 
         ImGui::SameLine();
@@ -190,15 +199,17 @@ namespace fox
 
         if (ImGui::BeginPopup("AddComponent"))
         {
+            defer({ ImGui::EndPopup(); });
+
             DisplayAddComponentEntry<CameraComponent>("Camera");
             DisplayAddComponentEntry<ScriptComponent>("Script Component");
             DisplayAddComponentEntry<SpriteRenderer>("Sprite Renderer");
             DisplayAddComponentEntry<Rigidbody2D>("Rigidbody 2D");
             DisplayAddComponentEntry<BoxCollider2D>("BoxCollider 2D");
+            DisplayAddComponentEntry<CircleCollider2D>("CircleCollider 2D");
             DisplayAddComponentEntry<CircleRenderer>("Circle Renderer");
-            DisplayAddComponentEntry<CircleCollider2D>("Circle Collider");
-
-            ImGui::EndPopup();
+            DisplayAddComponentEntry<ParticleSystem>("Particle System");
+            DisplayAddComponentEntry<Animator>("Animator");
         }
         ImGui::PopItemWidth();
 
@@ -207,52 +218,49 @@ namespace fox
         {
             auto& camera = cameraComp.camera;
 
-            ImGui::Checkbox("Primary", &cameraComp.Primary);
-
-            const char* projectionTypeString[] = { "Perspective", "Orthographic" };
+            UI::Property("Primary", cameraComp.Primary);
 
             int result = -1;
-            if (ImGuiFieldDrawer::DrawEnum("Projection", projectionTypeString, 2, (int)camera.GetProjectionType(), result))
-            {
+            const char* projectionTypeString[] = { "Perspective", "Orthographic" };
+            if (UI::Property("Projection", projectionTypeString, 2, (int)camera.GetProjectionType(), result))
                 camera.SetProjectionType((SceneCamera::ProjectionType)result);
-            }
 
             if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
             {
                 float size = camera.GetOrthographicSize();
-                if (ImGui::DragFloat("Size", &size))
+                if (UI::Property("Size", size))
                     camera.SetOrthographicSize(size);
 
                 float near = camera.GetOrthographicNearClip();
-                if (ImGui::DragFloat("Near", &near))
+                if (UI::Property("Near", near))
                     camera.SetOrthographicNearClip(near);
 
                 float far = camera.GetOrthographicFarClip();
-                if (ImGui::DragFloat("Far", &far))
+                if (UI::Property("Far", far))
                     camera.SetOrthographicFarClip(far);
 
-                ImGui::Checkbox("Fixed Aspect Ratio", &cameraComp.FixedAspectRatio);
+                UI::Property("Fixed Aspect Ratio", cameraComp.FixedAspectRatio);
             }
             else if (camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
             {
                 float fov = glm::degrees(camera.GetPerspectiveVerticalFOV());
-                if (ImGui::DragFloat("Size", &fov))
+                if (UI::Property("Size", fov))
                     camera.SetPerspectiveVerticalFOV(glm::radians(fov));
 
                 float near = camera.GetPerspectiveNearClip();
-                if (ImGui::DragFloat("Near", &near))
+                if (UI::Property("Near", near))
                     camera.SetPerspectiveNearClip(near);
 
                 float far = camera.GetPerspectiveFarClip();
-                if (ImGui::DragFloat("Far", &far))
+                if (UI::Property("Far", far))
                     camera.SetPerspectiveFarClip(far);
             }
         });
 
         DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_pContext](auto& component) mutable
         {
-            bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
             bool IsScriptClassExists;
+            bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
 
             static char buffer[64];
             strncpy(buffer, component.ClassName.c_str(), sizeof(buffer));
@@ -260,12 +268,29 @@ namespace fox
             if (!scriptClassExists)
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
 
-            if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+            std::string oldClassName = component.ClassName;
+            if (UI::PropertyInput("Class", buffer, 64))
             {
                 component.ClassName = buffer;
                 IsScriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
                 if (!IsScriptClassExists)
-                    return;
+                {
+//                    if (!scriptClassExists)
+//                        ImGui::PopStyleColor();
+
+                    bool wasCleared = scriptClassExists;
+                    if (wasCleared)
+                        component.ClassName = oldClassName; // NOTE(Peter): We need the old asset handle to properly shutdown an entity (at least during runtime)
+
+                    ScriptEngine::ShutdownScriptEntity(entity);
+
+                    if (wasCleared)
+                        component.ClassName = "";
+                }
+                else
+                {
+                    ScriptEngine::InitializeScriptEntity(entity);
+                }
             }
 
             if (!scriptClassExists)
@@ -276,103 +301,188 @@ namespace fox
 
             // TODO: Maybe the field storage is not unique to one instance, it's may shared ? (need verification)
             // Fields
-            if (scriptClassExists)
+            ManagedClass *entityClass = ScriptEngine::GetEntityClass(component.ClassName);
+            const auto &fields = entityClass->Fields;
+            if (fields.empty())
+                return;
+            for (const auto fieldID : fields)
             {
-                ManagedClass* entityClass = ScriptEngine::GetEntityClass(component.ClassName);
-                const auto& fields = entityClass->Fields;
-                if (fields.size() != 0)
+                ManagedField *field = ScriptCache::GetFieldByID(fieldID);
+                if (!field->IsWritable())
+                    continue;
+
+                FieldStorage& storage = *ScriptEngine::GetFieldStorage(entity, fieldID);
+                std::string name = field->DisplayName;
+
+                Reflect::Any data;
+                GetFieldValue(storage, data);
+
+                switch (storage.GetField()->Type.NativeType)
                 {
-                    ImGuiFieldDrawer::BeginProperties();
-                    for (const auto fieldID : fields)
+                    default:
+                        if (ImGuiFieldDrawer::DrawField(storage.GetField()->Type.NativeType, name, data))
+                            storage.SetValue(data.Get(), data.GetType()->GetSize());
+                        break;
+                    case ScriptFieldType::Entity:
                     {
-                        ManagedField* field = ScriptCache::GetFieldByID(fieldID);
-                        if (!field->IsWritable())
-                            continue;
+                        UI::BeginPropertyGrid(name.c_str(), nullptr);
+                        Entity entityRef = scene->GetEntityByUUID(*data.template TryCast<UUID>());
+                        ImGui::Button(entityRef ? entityRef.GetName().c_str() : "No Reference",
+                                      ImVec2(100.0f, 0.0f));
+                        UI::EndPropertyGrid();
 
-                        FieldStorage& storage = *ScriptCache::GetFieldStorage(fieldID);
-                        std::string name = field->DisplayName;
-
-                        Reflect::Any data;
-                        GetFieldValue(storage, data);
-
-                        switch (storage.GetField()->Type.NativeType)
+                        if (ImGui::BeginDragDropTarget())
                         {
-                            case ScriptFieldType::Float:
-                            case ScriptFieldType::Int:
-                            case ScriptFieldType::Double:
-                            case ScriptFieldType::Bool:
-                            case ScriptFieldType::Vector2:
-                            case ScriptFieldType::Vector3:
-                            case ScriptFieldType::Vector4:
+                            defer({ ImGui::EndDragDropTarget(); });
+                            if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy"))
                             {
-                                if (ImGuiFieldDrawer::DrawField(storage.GetField()->Type.NativeType, name, data))
-                                    storage.SetValue(data.Get(), data.GetType()->GetSize());
-                                break;
-                            }
-
-                            case ScriptFieldType::Entity:
-                            {
-                                ImGuiFieldDrawer::BeginPropertyGrid(name.c_str(), nullptr);
-                                Entity entityRef = scene->GetEntityByUUID(*data.template TryCast<UUID>());
-                                ImGui::Button(entityRef ? entityRef.GetName().c_str() : "No Reference", ImVec2(100.0f, 0.0f));
-                                ImGuiFieldDrawer::EndPropertyGrid();
-
-                                if (ImGui::BeginDragDropTarget())
-                                {
-                                    if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("SceneHierarchy")) {
-                                        size_t count = payload->DataSize / sizeof(UUID);
-                                        if (count == 1)
-                                        {
-                                            UUID droppedEntityID = *(((UUID*)payload->Data));
-                                            Entity droppedEntity = scene->GetEntityByUUID(droppedEntityID);
-                                            storage.SetValue(droppedEntity.GetUUID());
-                                        }
-                                        else
-                                            FOX_INFO_TAG("PropertyPanel", "Cannot set reference of multiple entityin a field which need only one reference");
-                                    }
-                                    ImGui::EndDragDropTarget();
+                                size_t count = payload->DataSize / sizeof(UUID);
+                                if (count > 1) {
+                                    FOX_INFO_TAG("PropertyPanel", "Cannot set reference of multiple entityin a field which need only one reference");
+                                    continue;
                                 }
-                                break;
-                            }
-                            case ScriptFieldType::Prefab:
-                            {
-                                ImGuiFieldDrawer::BeginPropertyGrid(name.c_str(), nullptr);
-                                AssetHandle assetHandle = *data.template TryCast<AssetHandle>();
-                                Ref<Prefab> prefab = AssetManager::GetAsset<Prefab>(assetHandle);
-                                ImGui::Button(prefab ? AssetManager::GetFileSystemPath(AssetManager::GetMetadata(assetHandle)).stem().c_str() : "No Reference", ImVec2(100.0f, 0.0f));
-                                ImGuiFieldDrawer::EndPropertyGrid();
 
-                                if (ImGui::BeginDragDropTarget())
-                                {
-                                    if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-                                    {
-                                        const char *path = (const char *) payload->Data;
-                                        std::filesystem::path prefabPath = Project::AssetsDir() / path;
-
-                                        if (prefabPath.extension() == ".foxprefab")
-                                        {
-                                            storage.SetValue(AssetManager::GetAssetHandleFromFilePath(prefabPath));
-                                        }
-                                    }
-                                    ImGui::EndDragDropTarget();
-                                }
-                                break;
+                                UUID droppedEntityID = *(((UUID *) payload->Data));
+                                Entity droppedEntity = scene->GetEntityByUUID(droppedEntityID);
+                                storage.SetValue(droppedEntity.GetUUID());
                             }
-                            default:
-                                break;
                         }
+                        break;
                     }
-                    ImGuiFieldDrawer::EndProperties();
+                    case ScriptFieldType::Prefab:
+                    {
+                        AssetHandle assetHandle = *data.template TryCast<AssetHandle>();
+                        UI::AssetField(name, assetHandle);
+
+                        UI::HandleContentBrowserPayloadCustom({".foxprefab"},
+                                                              [&storage](std::filesystem::path &filepath)
+                                                              {
+                                                                  storage.SetValue(
+                                                                      AssetManager::GetAssetHandleFromFilePath(
+                                                                          filepath));
+                                                              });
+                        break;
+                    }
                 }
             }
         });
 
-        DrawComponent<SpriteRenderer>("Sprite Renderer", entity);
+        DrawComponent<SpriteRenderer>("Sprite Renderer", entity, [](SpriteRenderer& comp)
+        {
+            UI::AssetField("Sprite", comp.Sprite, true, {".png"});
+            UI::PropertyColor("Color", comp.Color);
+            UI::Property("Tiling Factor", comp.TilingFactor);
+        });
         DrawComponent<CircleRenderer>("Circle Renderer", entity);
-        DrawComponent<Rigidbody2D>("Rigidbody 2D", entity);
+        DrawComponent<Rigidbody2D>("Rigidbody 2D", entity, [](Rigidbody2D& comp)
+        {
+            const char* bodyTypeString[] = { "Static", "Dynamic", "Kinematic" };
+            int result = -1;
+            if (UI::Property("Body Type", bodyTypeString, 3, (int) comp.Type, result))
+            {
+                comp.Type = (Rigidbody2D::BodyType) result;
+            }
+
+            auto layers = Physics2D::GetLayersName();
+            int resultLayer = -1;
+            if (UI::Property("Layer", layers.data(), layers.size(), (int) comp.LayerID, resultLayer))
+            {
+                comp.LayerID = resultLayer;
+            }
+
+            if (comp.Type == Rigidbody2D::BodyType::Dynamic)
+            {
+                UI::Property("Fixed Rotation", comp.FixedRotation);
+                UI::Property("Gravity Scale", comp.GravityScale);
+                UI::Property("Mass", comp.Mass);
+                UI::Property("Is Bullet", comp.IsBullet);
+                UI::Property("Angular Drag", comp.AngularDrag);
+                UI::Property("Linear Drag", comp.LinearDrag);
+            }
+        });
         DrawComponent<BoxCollider2D>("BoxCollider 2D", entity);
         DrawComponent<CircleCollider2D>("CircleCollider 2D", entity);
 
+        DrawComponent<ParticleSystem>("Particle System", entity, [](ParticleSystem& component)
+        {
+            ParticleProps& props = component.ParticleSettings;
+            UI::Property("Play On Start", component.Play);
+            UI::Property("Life Time", props.LifeTime, 1.0f, 0.01f, FLT_MAX);
+            if (UI::Property("Max Particles", component.MaxParticles))
+            {
+                component.Resize();
+            }
+            UI::PropertyColor("Color Begin", props.ColorBegin);
+            UI::PropertyColor("Color End", props.ColorEnd);
+            UI::Property("Size Begin", props.SizeBegin, 1.0f, 0.0f, FLT_MAX);
+            UI::Property("Size End", props.SizeEnd, 1.0f, 0.0f, FLT_MAX);
+            UI::Property("Size Variation", props.SizeVariation);
+            UI::Property("Rotation Speed", props.RotationSpeed);
+            UI::Property("Speed", props.Speed);
+            UI::Property("Velocity", props.Velocity);
+            UI::Property("Velocity Variation", props.VelocityVariation);
+            UI::Property("Rate Over Time", props.RateOverTime, 1.0f, 0.0f, FLT_MAX);
+        });
+
+        DrawComponent<Animator>("Animator", entity, [](Animator& component)
+        {
+            Ref<Animation> anim = component.CurrentAnimation;
+            if (!anim)
+                return;
+
+            Ref<Frame>& frame = anim->CurrentFrame;
+            if (frame && AssetManager::IsAssetHandleValid(frame->Texture))
+            {
+                UI::PreviewTexture(frame->Texture, {".png"});
+                ImGui::SameLine();
+            }
+            else if (frame)
+            {
+                UI::DropBoxAsset(frame->Texture, {".png"});
+            }
+            ImGui::BeginChild("##bjkbjfuhhvv", ImVec2(0, 100));
+            {
+                if (ImGui::Button(component.Play ? ICON_FA_STOP : ICON_FA_PLAY))
+                {
+                    component.TogglePlay();
+                }
+                ImGui::SameLine();
+
+                bool lastLoopState = anim->Loop;
+                if (lastLoopState)
+                    ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(15, 15, 15, 255));
+                if (ImGui::Button(ICON_FA_SPINNER))
+                {
+                    anim->Loop = !anim->Loop;
+                }
+                if (lastLoopState)
+                    ImGui::PopStyleColor();
+
+                ImGui::SameLine();
+                int max = anim->Frames.empty() ? 0 : anim->Frames.size() - 1;
+                int currentIndex = anim->GetCurrentIndex();
+                if (UI::Slider("##CurrentIndex", currentIndex, 0, max))
+                {
+                    anim->SetCurrentIndex(currentIndex);
+                }
+                if (ImGui::Button("Add Frame"))
+                {
+                    Ref<Frame> frame = new_ref<Frame>();
+                    anim->Frames.push_back(frame);
+                    anim->SetCurrentIndex(anim->Frames.size() - 1);
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Remove Frame"))
+                {
+                    if (anim->CurrentFrame)
+                    {
+                        anim->Frames.erase(std::remove(anim->Frames.begin(), anim->Frames.end(), anim->CurrentFrame), anim->Frames.end());
+                        anim->SetCurrentIndex(anim->GetCurrentIndex() - 1);
+                    }
+                }
+            }
+            ImGui::EndChild();
+        }, true);
 
 //       DrawComponent<AnimationPlayer>("AnimationPlayer", entity, [](AnimationPlayer& oAnimationPlayer)
 //       {
