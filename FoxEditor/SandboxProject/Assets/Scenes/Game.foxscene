@@ -54,6 +54,17 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
+    ScriptComponent:
+      ClassName: Sandbox.CameraFollow
+      ScriptFields:
+        - ID: 2647205277
+          Name: Sandbox.CameraFollow:Player
+          Type: 18
+          Data: 6131204461046171101
+        - ID: 3418016451
+          Name: Sandbox.CameraFollow:dampTime
+          Type: 12
+          Data: 0.699999988
     HierarchyComponent:
       Parent: 0
       Children:
@@ -109,6 +120,19 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+  - Entity: 95256646438508480
+    NameComponent:
+      Name: Entity
+    TransformComponent:
+      Position: [2.40579033, 0.619459093, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRenderer:
+      Color: [0.807829201, 0.218487605, 0.218487605, 1]
     HierarchyComponent:
       Parent: 0
       Children:

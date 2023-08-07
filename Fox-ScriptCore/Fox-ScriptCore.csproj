@@ -8,12 +8,12 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>../FoxEditor/Resources/Scripts</OutputPath>
+      <OutputPath>../../FoxEditor/Resources/Scripts</OutputPath>
       <PlatformTarget>x86</PlatformTarget>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <OutputPath>../FoxEditor/Resources/Scripts/</OutputPath>
+      <OutputPath>../../FoxEditor/Resources/Scripts/</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>

@@ -4,6 +4,7 @@
 
 #include "FieldStorage.hpp"
 #include "ScriptEngine.hpp"
+#include "ScriptTypes.hpp"
 
 namespace fox
 {

@@ -8,8 +8,10 @@
 #include "Core/Logger/Logger.hpp"
 #include "Scripting/ScriptEngine.hpp"
 #include "Utils/PlatformUtils.hpp"
-#include "Reflection/Reflection.hpp"
+#include "Reflection/Reflect.hpp"
 #include "Project.hpp"
+#include "Utils/RingBuffer.hpp"
+#include "Renderer/Commands.hpp"
 
 namespace fox
 {
@@ -18,6 +20,7 @@ namespace fox
     Application::Application(const ApplicationSpecification& specification)
             : m_Specification(specification)
     {
+        FOX_CORE_INFO("Starting Application...");
         FOX_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
 
@@ -89,27 +92,6 @@ namespace fox
 
     void Application::Run()
     {
-        FOX_CORE_INFO("Starting Application...");
-
-        // PluginManager& plugin_manager = get_or_create<fox::PluginManager>().value();
-        // plugin_manager.FindAndLoadPlugins(std::string(FOX_PLUGIN_DIRECTORY) + (*m_oConfigFile)["plugins directory"].get<std::string>());
-        // if(plugin_manager.GetGraphics().GetCount() <= 0)
-        //     throw std::runtime_error("Cannot Run the application because no Graphics Plugins found");
-
-        // if(plugin_manager.GetWindowPlugin() == nullptr)
-        //     throw std::runtime_error("Cannot Run the application because no Window Plugin found");
-
-        // GraphicPlugin& graphic_ctx = plugin_manager.GetGraphics().GetPlugin(0);
-        // RendererAPI::SetGraphicPlugin(&graphic_ctx);
-
-        // m_pWindow = plugin_manager.GetWindowPlugin()->CreateWindow(WindowProps());
-
-        // m_pWindow = Window::Create(WindowProps());
-        // m_pWindow->SetEventCallback(FOX_BIND_EVENT_FN(Application::OnEvent));
-        // Input::SetWindow(m_pWindow.get());
-
-        // plugin_manager.InitializePlugins(*this);
-
         FOX_CORE_INFO("Application is running");
         while (m_bIsRunning)
         {
@@ -121,12 +103,12 @@ namespace fox
                     layer->OnUpdate(m_TimeStep);
 
                 Application* app = this;
-                RendererCommand::Submit([app]{ app->m_ImGuiLayer->Begin(); });
-                RendererCommand::Submit([app]{
+                RendererCommand::Push<FunctionCmd>([app]{ app->m_ImGuiLayer->Begin(); });
+                RendererCommand::Push<FunctionCmd>([app]{
                     for (Layer* layer : app->m_LayerStack)
                         layer->OnImGuiRender();
                 });
-                RendererCommand::Submit([app]{ app->m_ImGuiLayer->End(); });
+                RendererCommand::Push<FunctionCmd>([app]{ app->m_ImGuiLayer->End(); });
             }
             Input::OnUpdate();
             Renderer::WaitAndRender();
@@ -135,6 +117,7 @@ namespace fox
             float time = Time::GetTime();
             m_Frametime = time - m_LastFrameTime;
             m_TimeStep = glm::min<float>(m_Frametime, 0.0333f);
+            Time::delta_time = m_TimeStep;
             m_LastFrameTime = time;
         }
     }

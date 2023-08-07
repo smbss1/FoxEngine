@@ -2,6 +2,7 @@
 add_requires("yaml-cpp", "glfw", "opengl")
 add_requires("box2d")
 add_requires("mono")
+add_requires("rttr")
 
 includes "vendor"
 
@@ -14,6 +15,7 @@ target "fox_engine"
     add_packages "opengl"
     add_packages "box2d"
     add_packages "mono"
+    add_packages "rttr"
 
     add_deps "imgui"
     add_deps "fox_json"

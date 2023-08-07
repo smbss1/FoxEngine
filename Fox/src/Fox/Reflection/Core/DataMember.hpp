@@ -4,6 +4,10 @@
 #include "TypeDescriptor.hpp"
 #include "Any.hpp"
 #include <string>
+#include <optional>
+#include <unordered_map>
+#include "Core/Logger/Logger.hpp"
+#include <exception>
 
 namespace fox::Reflect
 {
@@ -183,6 +187,60 @@ namespace fox::Reflect
 			}
 		}
 	};
+
+    class Enumeration
+    {
+    public:
+        template<typename T>
+        void Add(std::string name, T value)
+        {
+            static_assert(!std::is_convertible_v<T, uint32_t>);
+
+            if (m_Type != Details::Resolve<T>())
+                throw Exception(fox::format("Cannot convert % to %", m_Type->GetName(), typeid(T).name()));
+
+            m_NameToEnum[name] = static_cast<uint32_t>(value);
+            m_EnumToString[static_cast<uint32_t>(value)] = name;
+        }
+
+        template<typename T>
+        std::optional<std::string> GetName(T value)
+        {
+            static_assert(!std::is_convertible_v<T, uint32_t>);
+
+            if (m_Type != Details::Resolve<T>())
+                throw Exception(fox::format("Cannot convert % to %", m_Type->GetName(), typeid(T).name()));
+
+            auto it = m_EnumToString.find(static_cast<uint32_t>(value));
+            if (it != m_EnumToString.end())
+                return { m_EnumToString[static_cast<uint32_t>(value)] };
+            return std::nullopt;
+        }
+
+        template<typename T>
+        std::optional<T> GetValue(std::string name)
+        {
+            static_assert(!std::is_convertible_v<T, uint32_t>);
+
+            if (m_Type != Details::Resolve<T>())
+                throw Exception(fox::format("Cannot convert % to %", m_Type->GetName(), typeid(T).name()));
+
+            auto it = m_NameToEnum.find(name);
+            if (it != m_NameToEnum.end())
+                return { static_cast<T>(m_NameToEnum[name]) };
+            return std::nullopt;
+        }
+
+        template<typename T>
+        void Setup()
+        {
+            m_Type = Details::Resolve<T>();
+        }
+    private:
+        std::unordered_map<std::string, uint32_t> m_NameToEnum;
+        std::unordered_map<uint32_t, std::string> m_EnumToString;
+        TypeDescriptor* m_Type = nullptr;
+    };
 
 }  // namespace Reflect
 

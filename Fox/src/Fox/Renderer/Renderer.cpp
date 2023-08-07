@@ -9,6 +9,7 @@
 #include "Renderer/VertexArray.hpp"
 #include "Renderer/RendererAPI.hpp"
 #include "Material.hpp"
+#include "Commands.hpp"
 
 namespace fox
 {
@@ -44,7 +45,7 @@ namespace fox
     void Renderer::RenderGeometry(Ref<Material> material, const Ref<VertexArray>& pVertexArray, uint32_t uIndexCount)
     {
         WeakRef<Material> weakMat = material;
-        RendererCommand::Submit([weakMat, pVertexArray, uIndexCount] mutable {
+        RendererCommand::Push<FunctionCmd>([weakMat, pVertexArray, uIndexCount] mutable {
             if (weakMat.IsValid())
             {
                 weakMat->UpdateForRendering();
@@ -65,7 +66,9 @@ namespace fox
 
     void Renderer::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
     {
-        m_spRenderer->DrawLines(vertexArray, vertexCount);
+        RendererCommand::Push<FunctionCmd>([vertexArray, vertexCount] {
+            m_spRenderer->DrawLines(vertexArray, vertexCount);
+        });
     }
 
     void Renderer::SetLineWidth(float width)
@@ -81,19 +84,22 @@ namespace fox
     void Renderer::BeginRenderPass(Ref<RenderPass> renderPass)
     {
         s_CurrentRenderPass = renderPass;
-        RendererCommand::Submit([=] mutable {
-            s_CurrentRenderPass->GetSpecs().RenderTarget->Bind();
-            SetClearColor(s_CurrentRenderPass->GetSpecs().RenderTarget->GetSpecification().ClearColor);
-            Clear();
+        RendererCommand::Push<ClearColorCmd>(renderPass);
+        RendererCommand::Push<ClearAttachmentCmd>(renderPass, 1, -1);
 
-            // Clear our entity ID attachment to -1
-            s_CurrentRenderPass->GetSpecs().RenderTarget->ClearAttachment(1, -1);
-        });
+//        RendererCommand::Push<FunctionCmd>([=] mutable {
+//            s_CurrentRenderPass->GetSpecs().RenderTarget->Bind();
+//            SetClearColor(s_CurrentRenderPass->GetSpecs().RenderTarget->GetSpecification().ClearColor);
+//            Clear();
+//
+//            // Clear our entity ID attachment to -1
+//            s_CurrentRenderPass->GetSpecs().RenderTarget->ClearAttachment(1, -1);
+//        });
     }
 
     void Renderer::EndRenderPass()
     {
-        RendererCommand::Submit([=] {
+        RendererCommand::Push<FunctionCmd>([=] {
             s_CurrentRenderPass->GetSpecs().RenderTarget->Unbind();
         });
     }

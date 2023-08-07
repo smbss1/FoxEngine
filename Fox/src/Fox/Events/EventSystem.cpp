@@ -6,5 +6,7 @@
 
 namespace fox::event
 {
-    scope<EventSystem> EventSystem::m_pInstance = nullptr;
+//    scope<EventSystem> EventSystem::m_pInstance = nullptr;
+    typed_map EventSystem::m_vEvents;
+
 }

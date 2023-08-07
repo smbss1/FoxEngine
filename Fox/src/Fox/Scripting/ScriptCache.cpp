@@ -7,6 +7,8 @@
 #include "Core/Assert.hpp"
 #include "Utils.hpp"
 #include "ScriptTypes.hpp"
+#include "Asset/AssetManager.hpp"
+#include "ScriptAsset.hpp"
 
 
 #include <mono/metadata/assembly.h>
@@ -168,7 +170,7 @@ namespace fox
 
             CacheClassMethods(assemblyInfo, managedClass);
 
-            MonoObject* tempInstance = ScriptEngine::CreateManagedObject_Internal(&managedClass);
+            scope<ManagedInstance> tempInstance = ManagedInstance::From(&managedClass);
             if (tempInstance == nullptr)
                 continue;
 
@@ -182,14 +184,13 @@ namespace fox
                     s_Cache->FieldStorageMap[fieldID] = new_ref<FieldStorage>(&managedClass, &s_Cache->Fields[fieldID]);
             }
 
-//            ManagedType classType = ManagedType::FromClass(&managedClass);
-
-//            if (classType.IsSubClassOf(FOX_CACHED_CLASS("Fox.Entity")))
-//                AssetManager::CreateNamedMemoryOnlyAsset<ScriptAsset>(managedClass.FullName, classID);
+            ManagedType classType = ManagedType::FromClass(&managedClass);
+            if (classType.IsSubClassOf(FOX_CACHED_CLASS("Fox.Entity")))
+                AssetManager::CreateNamedMemoryOnlyAsset<ScriptAsset>(managedClass.FullName, classID);
         }
     }
 
-    ManagedClass* ScriptCache::GetManagedClassByName(const std::string& className)
+    ManagedClass* ScriptCache::GetManagedClassByName(const std::string_view& className)
     {
         if (s_Cache == nullptr)
             return nullptr;
@@ -237,7 +238,7 @@ namespace fox
         return GetManagedClassByName(Utils::ResolveMonoClassName(objectClass));
     }
 
-    ManagedMethod* ScriptCache::GetManagedMethod(ManagedClass* managedClass, const std::string& name, uint32_t parameterCount, bool ignoreParent)
+    ManagedMethod* ScriptCache::GetManagedMethod(ManagedClass* managedClass, const std::string_view& name, uint32_t parameterCount, bool ignoreParent)
     {
 //        FOX_PROFILE_FUNC();
 
@@ -252,7 +253,7 @@ namespace fox
 
         ManagedMethod* method = nullptr;
 
-        uint32_t methodID = Hash::FNVHash(managedClass->FullName + ":" + name);
+        uint32_t methodID = Hash::FNVHash(fox::format("%:%", managedClass->FullName, name));
         if (s_Cache->Methods.find(methodID) != s_Cache->Methods.end())
         {
             for (auto& methodCandiate : s_Cache->Methods.at(methodID))

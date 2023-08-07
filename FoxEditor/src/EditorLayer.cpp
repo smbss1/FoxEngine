@@ -26,6 +26,7 @@
 #include "EditorIcons.hpp"
 
 #include "PanelManager.hpp"
+#include "Renderer/Commands.hpp"
 
 namespace fox
 {
@@ -77,9 +78,6 @@ namespace fox
 
         // Create a new Scene
         NewScene();
-//        m_pEditorScene = new_ref<Scene>();
-//        m_pActiveScene = m_pEditorScene;
-//        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
 
         // Open a project if provided in cmd arguments
         if (!m_UserPrefs->StartupProject.empty())
@@ -150,13 +148,12 @@ namespace fox
         int mouseX = (int)mx;
         int mouseY = (int)my;
 
-        RendererCommand::Submit([=] {
-            // Check the position of the mouse is in the viewport boundary
-            if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
-            {
-                int pixelData = m_FinalRenderPass->GetSpecs().RenderTarget->ReadPixel(1, mouseX, mouseY);
-                m_oHoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_pActiveScene.Raw());
-            }
+        RendererCommand::Push<CheckHoverEntity>({
+            viewportSize,
+            { mouseX, mouseY },
+            m_oHoveredEntity,
+            m_FinalRenderPass,
+            m_pActiveScene
         });
 
         OnOverlayRender();
@@ -290,7 +287,7 @@ namespace fox
                     if (filepath.extension() == ".foxprefab")
                     {
                         Entity entity = EntitySerializer::DeserializeEntityAsPrefab(filepath.c_str(), *m_pActiveScene);
-                        event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(entity));
+                        event::EventSystem::Emit<OnSelectedEntityChangeEvent>(entity);
                     }
                 });
 
@@ -373,7 +370,8 @@ namespace fox
                  if (ImGui::MenuItem("Open Project", "Ctrl+O"))
                      OpenProject();
 
-                if (ImGui::BeginMenu("Open Recent")) {
+                if (ImGui::BeginMenu("Open Recent"))
+                {
                     size_t i = 0;
                     for (auto it = m_UserPrefs->RecentProjects.begin(); it != m_UserPrefs->RecentProjects.end(); it++)
                     {
@@ -528,9 +526,9 @@ namespace fox
         // Draw selected entity outline
         if (Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity())
         {
-            const TransformComponent& transform = selectedEntity.get<TransformComponent>();
-            glm::mat4 transformMatrice = m_pActiveScene->GetWorldSpaceTransformMatrix(selectedEntity);
-            Renderer2D::DrawRect(transformMatrice, glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+            const TransformComponent& transform = selectedEntity.GetTransform();
+            glm::mat4 transformMatrix = m_pActiveScene->GetWorldSpaceTransformMatrix(selectedEntity);
+            Renderer2D::DrawRect(transformMatrix, glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
         }
 
         Renderer2D::EndScene();
@@ -810,7 +808,7 @@ namespace fox
         else
             NewScene();
 
-        event::EventSystem::Get().Emit(OnProjectChangeEvent());
+        event::EventSystem::Emit<OnProjectChangeEvent>();
         m_PanelManager->Deserialize();
 
 //        SelectionManager::DeselectAll();
@@ -820,7 +818,7 @@ namespace fox
     void EditorLayer::CloseProject(bool unloadProject)
     {
         SaveProject();
-        event::EventSystem::Get().Emit(OnContextChangeEvent(nullptr));
+        event::EventSystem::Emit<OnContextChangeEvent>(nullptr);
 
 //        ScriptEngine::UnloadAppAssembly();
         ScriptEngine::SetSceneContext(nullptr);
@@ -854,7 +852,7 @@ namespace fox
         Ref<Project> project = new_ref<Project>();
         Project::SetActive(project);
 
-        event::EventSystem::Get().Emit(OnProjectChangeEvent());
+        event::EventSystem::Emit<OnProjectChangeEvent>();
         m_PanelManager->Deserialize();
         NewScene();
 
@@ -871,7 +869,7 @@ namespace fox
         m_pActiveScene = m_pEditorScene;
         m_EditorScenePath = std::filesystem::path();
         ScriptEngine::SetSceneContext(m_pActiveScene.Raw());
-        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
+        event::EventSystem::Emit<OnContextChangeEvent>(m_pActiveScene);
     }
 
     void EditorLayer::OpenScene(const std::filesystem::path& path)
@@ -893,7 +891,7 @@ namespace fox
             m_pActiveScene = m_pEditorScene;
             m_EditorScenePath = path;
             ScriptEngine::SetSceneContext(m_pActiveScene.Raw());
-            event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
+            event::EventSystem::Emit<OnContextChangeEvent>(m_pActiveScene);
         }
     }
 
@@ -941,7 +939,7 @@ namespace fox
         m_pActiveScene = Scene::Copy(m_pEditorScene);
         m_pActiveScene->OnRuntimeStart();
         ScriptEngine::SetSceneContext(m_pActiveScene.Raw());
-        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
+        event::EventSystem::Emit<OnContextChangeEvent>(m_pActiveScene);
     }
 
     void EditorLayer::OnSceneSimulate()
@@ -954,7 +952,7 @@ namespace fox
         m_pActiveScene = Scene::Copy(m_pEditorScene);
         m_pActiveScene->OnSimulationStart();
 
-        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
+        event::EventSystem::Emit<OnContextChangeEvent>(m_pActiveScene);
     }
 
     void EditorLayer::OnSceneStop()
@@ -969,7 +967,7 @@ namespace fox
         m_SceneState = SceneState::Edit;
         m_pActiveScene = m_pEditorScene;
         ScriptEngine::SetSceneContext(m_pActiveScene.Raw());
-        event::EventSystem::Get().Emit(OnContextChangeEvent(m_pActiveScene));
+        event::EventSystem::Emit<OnContextChangeEvent>(m_pActiveScene);
     }
 
     void EditorLayer::OnDuplicateEntity()

@@ -23,9 +23,11 @@
 #include "mono/metadata/threads.h"
 #include "Components/IDComponent.hpp"
 #include "Core/Any.hpp"
+#include "Utils/Iterator.hpp"
+#include "Asset/AssetManager.hpp"
+#include "ScriptAsset.hpp"
 //#endif // FOX_DEBUG
 
-#include <fstream>
 
 namespace fox
 {
@@ -39,10 +41,8 @@ namespace fox
         Ref<AssemblyInfo> CoreAssembly = nullptr;
         Ref<AssemblyInfo> AppAssembly = nullptr;
 
-        ManagedClass* EntityClass = nullptr;
-
-        std::unordered_map<std::string, ManagedClass*> EntityClasses;
         std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
+        ScriptEntityMap ScriptEntities;
 
         scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
 		bool AssemblyReloadPending = false;
@@ -89,19 +89,12 @@ namespace fox
 
     void ScriptEngine::Shutdown()
     {
-//        for (auto& [sceneID, entityInstances] : s_State->ScriptEntities)
-//        {
-//            auto scene = Scene::GetScene(sceneID);
-//
-//            if (!scene)
-//                continue;
-//
-//            for (auto& entityID : entityInstances)
-//                ShutdownScriptEntity(scene->TryGetEntityByUUID(entityID));
-//
-//            entityInstances.clear();
-//        }
-        s_Data->EntityClasses.clear();
+        for (auto& entityID : s_Data->ScriptEntities)
+        {
+            ShutdownScriptEntity(s_Data->SceneContext->TryGetEntityByUUID(entityID));
+        }
+        s_Data->ScriptEntities.clear();
+
         s_Data->EntityInstances.clear();
         s_Data->FieldMap.clear();
 
@@ -173,10 +166,8 @@ namespace fox
         s_Data->CoreAssembly->Assembly = Utils::LoadMonoAssembly(s_Data->Setting.CoreAssemblyPath, s_Data->Setting.EnableDebugging);
         s_Data->CoreAssembly->AssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly->Assembly);
         s_Data->CoreAssembly->Classes.clear();
-//        Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
 
         ScriptCache::Init();
-//        MarshalUtils::Init();
         return true;
     }
 
@@ -208,7 +199,6 @@ namespace fox
         s_Data->AppAssembly->Assembly = appAssembly;
         s_Data->AppAssembly->AssemblyImage = mono_assembly_get_image(s_Data->AppAssembly->Assembly);
         s_Data->AppAssembly->Classes.clear();
-        // Utils::PrintAssemblyTypes(s_Data->AppAssembly);
 
         s_Data->AppAssemblyFileWatcher = new_scope<filewatch::FileWatch<std::string>>(Project::ScriptModuleFilePath(), OnAppAssemblyFileSystemEvent);
 		s_Data->AssemblyReloadPending = false;
@@ -222,9 +212,6 @@ namespace fox
     {
         ScriptGlue::ClearTypes();
         ScriptGlue::RegisterComponents();
-
-        // Retrieve and instantiate class
-        s_Data->EntityClass = ScriptCache::GetManagedClassByName("Fox.Entity");
     }
 
     void ScriptEngine::CompileAppAssembly()
@@ -292,7 +279,7 @@ namespace fox
         FOX_CORE_INFO_TAG("ScriptEngine", "Reloading %", Project::ScriptModuleFilePath());
 
         // Cache old field values and destroy all previous script instances
-        std::unordered_map<UUID, std::unordered_map<uint32_t, Any>> oldFieldValues;
+        std::unordered_map<UUID, std::unordered_map<uint32_t, AnyValue>> oldFieldValues;
 
         auto view = s_Data->SceneContext->GetAllEntitiesWith<ScriptComponent>();
         for (const auto& enttEntity : view)
@@ -302,7 +289,7 @@ namespace fox
             auto& sc = entity.get<ScriptComponent>();
 
             ManagedClass* managedClass = ScriptCache::GetManagedClassByName(sc.ClassName);
-            oldFieldValues[entityID] = std::unordered_map<uint32_t, Any>();
+            oldFieldValues[entityID] = std::unordered_map<uint32_t, AnyValue>();
 
             for (auto fieldID : managedClass->Fields)
             {
@@ -315,7 +302,7 @@ namespace fox
                 if (!fieldInfo->IsWritable())
                     continue;
 
-                oldFieldValues[entityID][fieldID] = Any::Copy(storage->GetValue());
+                oldFieldValues[entityID][fieldID] = AnyValue::Copy(storage->GetValue());
             }
             ShutdownScriptEntity(entity, false);
         }
@@ -382,9 +369,8 @@ namespace fox
         for (const auto& [entityID, instance] : s_Data->EntityInstances)
         {
             auto& entityFields = s_Data->FieldMap[entityID];
-            for (const auto& fieldID : instance->m_ManagedClass->Fields)
+            for (auto [fieldID, storage] : entityFields)
             {
-                auto storage = entityFields[fieldID];
                 storage->SetRuntimeInstance(-1);
             }
         }
@@ -393,7 +379,11 @@ namespace fox
 
     bool ScriptEngine::EntityClassExists(const std::string& fullClassName)
     {
-        return s_Data->EntityClasses.find(fullClassName) != s_Data->EntityClasses.end();
+        Ref<ScriptAsset> asset = AssetManager::GetAsset<ScriptAsset>(fullClassName);
+        if (!asset)
+            return false;
+
+        return ScriptCache::GetManagedClassByID(asset->GetClassID()) != nullptr;
     }
 
     void ScriptEngine::InitializeScriptEntity(Entity entity)
@@ -413,22 +403,22 @@ namespace fox
 //        sc.FieldIDs.clear();
 
         ManagedClass* managedClass = ScriptCache::GetManagedClassByName(sc.ClassName);
-        for (auto fieldID : managedClass->Fields)
+        auto filterRange = iter(managedClass->Fields)
+                | map([](uint32_t fieldID) { return ScriptCache::GetFieldByID(fieldID); })
+                | filter([](ManagedField* field) { return field->HasFlag(FieldFlag::Public); });
+        while (const auto field = filterRange.next())
         {
-            auto fieldInfo = ScriptCache::GetFieldByID(fieldID);
-            if (!fieldInfo->HasFlag(FieldFlag::Public))
-                continue;
-
-            s_Data->FieldMap[entityID][fieldID] = new_ref<FieldStorage>(managedClass, fieldInfo);
-//            sc.FieldIDs.push_back(fieldID);
+            s_Data->FieldMap[entityID][(*field)->ID] = new_ref<FieldStorage>(managedClass, field.value());
+            ////            sc.FieldIDs.push_back(fieldID);
         }
+        s_Data->ScriptEntities.push_back(entityID);
     }
 
     void ScriptEngine::ShutdownScriptEntity(Entity entity, bool erase)
     {
 //        FOX_PROFILE_FUNC();
 
-        if (!entity.has<ScriptComponent>())
+        if (!entity || !entity.has<ScriptComponent>())
             return;
 
         auto& sc = entity.get<ScriptComponent>();
@@ -441,11 +431,11 @@ namespace fox
 //        sc.ManagedInstance = nullptr;
 //        sc.FieldIDs.clear();
 
-//        if (erase && s_Data->ScriptEntities.find(sceneID) != s_Data->ScriptEntities.end())
-//        {
-//            auto& scriptEntities = s_State->ScriptEntities.at(sceneID);
-//            scriptEntities.erase(std::remove(scriptEntities.begin(), scriptEntities.end(), entityID), scriptEntities.end());
-//        }
+        if (erase /*&& s_Data->ScriptEntities.find(sceneID) != s_Data->ScriptEntities.end()*/)
+        {
+            auto& scriptEntities = s_Data->ScriptEntities;
+            scriptEntities.erase(std::remove(scriptEntities.begin(), scriptEntities.end(), entityID), scriptEntities.end());
+        }
     }
 
     void ScriptEngine::OnCreateEntity(Entity entity)
@@ -455,16 +445,12 @@ namespace fox
         {
             UUID entityID = entity.GetUUID();
 
-            Ref<ScriptInstance> instance = new_ref<ScriptInstance>(s_Data->EntityClasses[sc.ClassName], entity);
+            Ref<ScriptInstance> instance = ScriptInstance::ToRefFrom(sc.ClassName, entity);
             s_Data->EntityInstances[entityID] = instance;
 
             auto& entityFields = s_Data->FieldMap[entityID];
-
-            ManagedClass* entityClass = instance->m_ManagedClass;
-            for (const auto& fieldID : entityClass->Fields)
+            for (auto [fieldID, storage] : entityFields)
             {
-                auto storage = entityFields[fieldID];
-
                 instance->SetFieldValue(storage->Field, storage->GetValue());
                 storage->SetRuntimeInstance(instance->m_Handle);
             }
@@ -496,7 +482,7 @@ namespace fox
         UUID targetEntityID = entityDst.GetUUID();
         UUID srcEntityID = entitySrc.GetUUID();
 
-        Ref<ScriptInstance> instance = new_ref<ScriptInstance>(s_Data->EntityClasses[srcScriptComp.ClassName], entityDst);
+        Ref<ScriptInstance> instance = ScriptInstance::ToRefFrom(srcScriptComp.ClassName, entityDst);
         s_Data->EntityInstances[targetEntityID] = instance;
 
         const auto srcClass = GetEntityClass(srcScriptComp.ClassName);
@@ -567,55 +553,22 @@ namespace fox
         return fields.at(fieldID);
     }
 
-    ManagedClass* ScriptEngine::GetEntityClass(const std::string& name)
+    ManagedClass* ScriptEngine::GetEntityClass(const std::string& fullClassName)
     {
-        if (s_Data->EntityClasses.find(name) == s_Data->EntityClasses.end())
+        Ref<ScriptAsset> asset = AssetManager::GetAsset<ScriptAsset>(fullClassName);
+        if (!asset)
             return nullptr;
 
-        return s_Data->EntityClasses.at(name);
-    }
-
-    std::unordered_map<std::string, ManagedClass*> ScriptEngine::GetEntityClasses()
-    {
-        return s_Data->EntityClasses;
+        return ScriptCache::GetManagedClassByID(asset->GetClassID());
     }
 
     void ScriptEngine::LoadAssemblyClasses()
     {
-        s_Data->EntityClasses.clear();
+        // NOTE: Maybe clear script files from asset manager
+//        s_Data->EntityClasses.clear();
         GCManager::CollectGarbage();
 
         ScriptCache::GenerateCacheForAssembly(s_Data->AppAssembly);
-
-        const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_Data->AppAssembly->AssemblyImage, MONO_TABLE_TYPEDEF);
-        int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
-        MonoClass* entityClass = mono_class_from_name(s_Data->CoreAssembly->AssemblyImage, "Fox", "Entity");
-
-        for (int32_t i = 0; i < numTypes; i++)
-        {
-            uint32_t cols[MONO_TYPEDEF_SIZE];
-            mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
-
-            const char* nameSpace = mono_metadata_string_heap(s_Data->AppAssembly->AssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
-            const char* className = mono_metadata_string_heap(s_Data->AppAssembly->AssemblyImage, cols[MONO_TYPEDEF_NAME]);
-            std::string fullName;
-            if (strlen(nameSpace) != 0)
-                fullName = fox::format("%.%", nameSpace, className);
-            else
-                fullName = className;
-
-            MonoClass* monoClass = mono_class_from_name(s_Data->AppAssembly->AssemblyImage, nameSpace, className);
-
-            if (monoClass == nullptr || monoClass == entityClass)
-                continue;
-
-            bool isEntity = mono_class_is_subclass_of(monoClass, entityClass, false);
-            if (!isEntity)
-                continue;
-
-            ManagedClass* scriptClass = ScriptCache::GetManagedClassByName(fullName);
-            s_Data->EntityClasses[fullName] = scriptClass;
-        }
     }
 
     MonoObject* ScriptEngine::GetManagedInstance(UUID uuid)
@@ -624,9 +577,9 @@ namespace fox
         return s_Data->EntityInstances.at(uuid)->GetManagedObject();
     }
 
-    MonoObject* ScriptEngine::CreateManagedObject(MonoClass* managedClass)
+    MonoObject* ScriptEngine::CreateManagedObject(ManagedClass* managedClass)
     {
-        MonoObject* monoObject = mono_object_new(s_Data->AppDomain, managedClass);
+        MonoObject* monoObject = mono_object_new(s_Data->AppDomain, managedClass->Class);
         FOX_CORE_ASSERT(monoObject, "Failed to create MonoObject!");
         return monoObject;
     }
@@ -646,77 +599,47 @@ namespace fox
         mono_runtime_object_init(object);
     }
 
-    GCHandle ScriptEngine::InstantiateClass(MonoClass* monoClass)
+    ScriptInstance::ScriptInstance(ManagedClass* managedClass, Entity entity) : ManagedInstance(managedClass)
     {
-//        FOX_PROFILE_SCOPE();
-
-        MonoObject* object = CreateManagedObject(monoClass);
-        if (object)
-        {
-            InitRuntimeObject(monoClass, object);
-            return GCManager::CreateObjectReference(object, false);
-        }
-
-        return -1;
-    }
-
-    ScriptInstance::ScriptInstance(ManagedClass* managedClass, Entity entity)
-        : m_ManagedClass(managedClass)
-    {
-        m_Handle = m_ManagedClass->Instantiate();
-
         m_OnCreateMethod = m_ManagedClass->GetMethod("OnCreate", 0);
         m_OnUpdateMethod = m_ManagedClass->GetMethod("OnUpdate", 1);
 
-        m_OnCollisionEnter2DMethod = s_Data->EntityClass->GetMethod("HandleOnCollisionEnter2D", 1);
-        m_OnCollisionExit2DMethod = s_Data->EntityClass->GetMethod("HandleOnCollisionExit2D", 1);
+        ManagedClass* EntityClass = ScriptCache::GetManagedClassByName("Fox.Entity");
+
+        m_OnCollisionEnter2DMethod = EntityClass->GetMethod("HandleOnCollisionEnter2D", 1);
+        m_OnCollisionExit2DMethod = EntityClass->GetMethod("HandleOnCollisionExit2D", 1);
 
         // Call Entity constructor
-        {
-            UUID entityID = entity.GetUUID();
-            m_ManagedClass->CallMethod(m_Handle, ".ctor", entityID);
-        }
-    }
-
-    ScriptInstance::~ScriptInstance()
-    {
-        GCManager::ReleaseObjectReference(m_Handle);
+        CallMethod(".ctor", entity.GetUUID());
     }
 
     void ScriptInstance::InvokeOnCreate()
     {
-        if (m_OnCreateMethod)
-            m_ManagedClass->InvokeMethod(GetManagedObject(), m_OnCreateMethod);
+        CallMethod(m_OnCreateMethod);
     }
 
     void ScriptInstance::InvokeOnUpdate(float ts)
     {
-        if (m_OnUpdateMethod)
-        {
-            void* param = &ts;
-            m_ManagedClass->InvokeMethod(GetManagedObject(), m_OnUpdateMethod, &param);
-        }
+        CallMethod(m_OnUpdateMethod, ts);
     }
 
     void ScriptInstance::InvokeOnCollisionEnter2D(Collision2DData collisionInfo)
     {
-        void* params = &collisionInfo;
-        m_ManagedClass->InvokeMethod(GetManagedObject(), m_OnCollisionEnter2DMethod, &params);
+        CallMethod(m_OnCollisionEnter2DMethod, collisionInfo);
     }
 
     void ScriptInstance::InvokeOnCollisionExit2D(Collision2DData collisionInfo)
     {
-        void* params = &collisionInfo;
-        m_ManagedClass->InvokeMethod(GetManagedObject(), m_OnCollisionExit2DMethod, &params);
+        CallMethod(m_OnCollisionExit2DMethod, collisionInfo);
     }
 
-    Utils::ValueWrapper ScriptInstance::GetFieldValue(const ManagedField* field)
+    Ref<ScriptInstance> ScriptInstance::ToRefFrom(ManagedClass* scriptClass, Entity entity)
     {
-        return Utils::GetFieldValue(GetManagedObject(), field);
+        return new_ref<ScriptInstance>(scriptClass, entity);
     }
 
-    void ScriptInstance::SetFieldValue(const ManagedField* field, const Utils::ValueWrapper& value)
+    Ref<ScriptInstance> ScriptInstance::ToRefFrom(const std::string_view& fullClassName, Entity entity)
     {
-        Utils::SetFieldValue(GetManagedObject(), field, value);
+        return ToRefFrom(ScriptCache::GetManagedClassByID(AssetManager::GetAsset<ScriptAsset>(fullClassName)->GetClassID()), entity);
     }
 }

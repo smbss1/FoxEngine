@@ -20,7 +20,7 @@ namespace fox
         s_MessageBufferRenderFilter |= ConsolePanel::loglevel::WARN;
         s_MessageBufferRenderFilter |= ConsolePanel::loglevel::ERROR;
 
-        event::EventSystem::Get().On<OnConsoleLogEvent>(FOX_BIND_EVENT_FN(ConsolePanel::OnLog));
+        event::EventSystem::On<OnConsoleLogEvent>(FOX_BIND_EVENT_FN(ConsolePanel::OnLog));
         m_MessageBuffer = std::vector<Ref<ConsolePanel::Message>>(m_Capacity);
     }
 

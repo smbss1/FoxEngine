@@ -48,11 +48,11 @@ namespace fox
         static void CacheClass(std::string_view className, MonoClass* monoClass);
         static void GenerateCacheForAssembly(Ref<AssemblyInfo> assemblyInfo);
 
-        static ManagedClass* GetManagedClassByName(const std::string& className);
+        static ManagedClass* GetManagedClassByName(const std::string_view& className);
         static ManagedClass* GetManagedClassByID(uint32_t classID);
         static ManagedClass* GetManagedClass(MonoClass* monoClass);
         static ManagedClass* GetMonoObjectClass(MonoObject* monoObject);
-        static ManagedMethod* GetManagedMethod(ManagedClass* managedClass, const std::string& name, uint32_t parameterCount, bool ignoreParent = false);
+        static ManagedMethod* GetManagedMethod(ManagedClass* managedClass, const std::string_view& name, uint32_t parameterCount, bool ignoreParent = false);
 
         static ManagedField* GetFieldByID(uint32_t fieldID);
         static ManagedField* GetFieldByName(const ManagedClass* managedClass, const std::string& fieldName);

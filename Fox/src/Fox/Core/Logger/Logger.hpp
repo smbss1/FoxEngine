@@ -201,7 +201,7 @@ namespace fox
             }
             *output_stream << stream.str() << std::endl;
 
-            event::EventSystem::Get().template Emit(OnConsoleLogEvent(stream.str(), type));
+            event::EventSystem::Emit<OnConsoleLogEvent>(stream.str(), type);
         }
 
         void set_output_stream(std::ostream& stream)

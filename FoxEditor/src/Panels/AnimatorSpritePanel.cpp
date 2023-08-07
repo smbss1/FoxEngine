@@ -14,7 +14,7 @@ namespace fox
 {
     AnimatorSpritePanel::AnimatorSpritePanel()
     {
-        event::EventSystem::Get().On<OnSelectedEntityChangeEvent>(FOX_BIND_EVENT_FN(AnimatorSpritePanel::OnSelectedEntityChange));
+        event::EventSystem::On<OnSelectedEntityChangeEvent>(FOX_BIND_EVENT_FN(AnimatorSpritePanel::OnSelectedEntityChange));
     }
 
     void AnimatorSpritePanel::OnSelectedEntityChange(const OnSelectedEntityChangeEvent& event)

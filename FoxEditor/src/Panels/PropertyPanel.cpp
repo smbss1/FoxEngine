@@ -29,8 +29,8 @@ namespace fox
 {
     PropertyPanel::PropertyPanel()
     {
-        event::EventSystem::Get().On<OnSelectedEntityChangeEvent>(FOX_BIND_EVENT_FN(PropertyPanel::OnSelectedEntityChange));
-        event::EventSystem::Get().On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(PropertyPanel::OnContextChangeChange));
+        event::EventSystem::On<OnSelectedEntityChangeEvent>(FOX_BIND_EVENT_FN(PropertyPanel::OnSelectedEntityChange));
+        event::EventSystem::On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(PropertyPanel::OnContextChangeChange));
     }
 
     PropertyPanel::PropertyPanel(const Ref<Scene>& context) : PropertyPanel()
@@ -275,8 +275,8 @@ namespace fox
                 IsScriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
                 if (!IsScriptClassExists)
                 {
-//                    if (!scriptClassExists)
-//                        ImGui::PopStyleColor();
+                    if (!scriptClassExists)
+                        ImGui::PopStyleColor();
 
                     bool wasCleared = scriptClassExists;
                     if (wasCleared)
@@ -286,6 +286,7 @@ namespace fox
 
                     if (wasCleared)
                         component.ClassName = "";
+                    return;
                 }
                 else
                 {
@@ -326,7 +327,7 @@ namespace fox
                     case ScriptFieldType::Entity:
                     {
                         UI::BeginPropertyGrid(name.c_str(), nullptr);
-                        Entity entityRef = scene->GetEntityByUUID(*data.template TryCast<UUID>());
+                        Entity entityRef = scene->TryGetEntityByUUID(*data.template TryCast<UUID>());
                         ImGui::Button(entityRef ? entityRef.GetName().c_str() : "No Reference",
                                       ImVec2(100.0f, 0.0f));
                         UI::EndPropertyGrid();

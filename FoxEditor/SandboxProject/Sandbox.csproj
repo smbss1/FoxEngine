@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net45</TargetFramework>
+    <RootNamespace>Sandbox</RootNamespace>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>./Assets/Scripts/Binaries</OutputPath>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <Reference Include="Fox-ScriptCore">
+        <HintPath>/home/samuel/Git Repos/FoxEngine/FoxEditor/Resources/Scripts/Fox-ScriptCore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

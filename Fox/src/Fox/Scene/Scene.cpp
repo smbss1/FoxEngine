@@ -218,7 +218,6 @@ namespace fox
         m_Registry.on_destroy<BoxCollider2D>().connect<&Scene::OnBoxCollider2DComponentDestroy>(this);
         m_Registry.on_construct<CircleCollider2D>().connect<&Scene::OnCircleCollider2DComponentConstruct>(this);
         m_Registry.on_destroy<CircleCollider2D>().connect<&Scene::OnCircleCollider2DComponentDestroy>(this);
-
     }
 
     Scene::~Scene()

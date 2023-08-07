@@ -22,11 +22,12 @@
 #include "Utils.hpp"
 #include "Asset/AssetManager.hpp"
 #include "Scene/Prefab.hpp"
+#include "Utils/PlatformUtils.hpp"
 
 namespace fox
 {
     static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFuncs;
-    static std::unordered_map<UUID, MonoDelegate*> s_AnimatorEventDelegates;
+    static std::unordered_map<UUID, std::unordered_map<UUID, MonoDelegate*>> s_AnimatorEventDelegates;
 
 #define FOX_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Fox.InternalCalls::" #Name, (void*) Name)
 
@@ -368,19 +369,44 @@ namespace fox
     void Animator_SubscribeToEvent(uint64_t entityID, uint64_t eventID, MonoDelegate* delegate)
     {
         Entity ent = GetEntity(entityID);
-        s_AnimatorEventDelegates[ent.GetUUID()] = delegate;
-        ent.get<Animator>().SubscribeToEvent(eventID, [uuid = ent.GetUUID()](UUID eventID) {
+        s_AnimatorEventDelegates[ent.GetUUID()][eventID] = delegate;
 
-            MonoDelegate* delegate = s_AnimatorEventDelegates[uuid];
+        ent.get<Animator>().SubscribeToEvent(eventID, [entityID = ent.GetUUID()](UUID eventID) {
+
+            MonoDelegate* delegate = s_AnimatorEventDelegates[entityID][eventID];
             MonoMethod* method = mono_get_delegate_invoke(mono_object_get_class((MonoObject*) delegate));
 
             uint64_t id = eventID;
             void* params = &id;
 
             MonoObject *ex;
-            mono_runtime_invoke(method, delegate, &params, &ex);
+            mono_runtime_invoke(method, delegate, nullptr, &ex);
             Utils::HandleException(ex);
         });
+    }
+
+    void Animator_UpdateDelegate(uint64_t entityID, uint64_t eventID, MonoDelegate* delegate)
+    {
+        Entity ent = GetEntity(entityID);
+        s_AnimatorEventDelegates[ent.GetUUID()][eventID] = delegate;
+    }
+
+    void Animator_GetDelegate(uint64_t entityID, uint64_t eventID, MonoDelegate** delegate)
+    {
+        auto entityIt = s_AnimatorEventDelegates.find(entityID);
+        if (entityIt == s_AnimatorEventDelegates.end())
+        {
+            delegate = nullptr;
+            return;
+        }
+
+        auto eventIt = s_AnimatorEventDelegates[entityID].find(eventID);
+        if (eventIt == s_AnimatorEventDelegates[entityID].end())
+        {
+            delegate = nullptr;
+            return;
+        }
+        *delegate = s_AnimatorEventDelegates[entityID][eventID];
     }
 
     uint64_t Animator_GetHashID(MonoString* eventName)
@@ -390,6 +416,14 @@ namespace fox
 
 #pragma endregion
 
+#pragma region Time
+
+    float Time_deltaTime()
+    {
+        return Time::delta_time;
+    }
+
+#pragma endregion
 
     #include <cxxabi.h>  // needed for abi::__cxa_demangle
 
@@ -498,6 +532,10 @@ namespace fox
 
         FOX_ADD_INTERNAL_CALL(Animator_SubscribeToEvent);
         FOX_ADD_INTERNAL_CALL(Animator_GetHashID);
+        FOX_ADD_INTERNAL_CALL(Animator_UpdateDelegate);
+        FOX_ADD_INTERNAL_CALL(Animator_GetDelegate);
+
+        FOX_ADD_INTERNAL_CALL(Time_deltaTime);
     }
 
 }

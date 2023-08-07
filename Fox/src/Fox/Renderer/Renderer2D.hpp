@@ -5,21 +5,30 @@
 #ifndef FOXENGINE_RENDERER2D_HPP
 #define FOXENGINE_RENDERER2D_HPP
 
-#include <Renderer/Texture.hpp>
-#include <Components/SpriteRenderer.hpp>
-#include <Renderer/Camera.hpp>
-#include <Renderer/EditorCamera.hpp>
-
-#include "OrthographicCamera.hpp"
-#include "SubTexture2D.hpp"
+#include "glm/vec2.hpp"
+#include "glm/vec3.hpp"
+#include "glm/vec4.hpp"
+#include "glm/mat4x4.hpp"
 
 namespace fox
 {
     class QuadVertex;
     class Shader;
+    struct SpriteRenderer;
+    struct ParticleSystem;
+    struct Texture2D;
+    struct SubTexture2D;
+    struct EditorCamera;
+    struct OrthographicCamera;
+
     class Renderer2D
     {
     public:
+        struct CameraData
+        {
+            glm::mat4 ViewProjection;
+        };
+
         static void Init();
         static void Shutdown();
 
@@ -28,8 +37,6 @@ namespace fox
         static void BeginScene(const OrthographicCamera& camera); // TODO: Remove
         static void EndScene();
         static void Flush();
-
-        static void AddToVertexBuffer(const QuadVertex& vertex);
 
         // Primitives
         static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);

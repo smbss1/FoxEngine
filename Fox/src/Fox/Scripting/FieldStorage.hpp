@@ -7,11 +7,14 @@
 
 #include <cstddef>
 #include "ValueWrapper.hpp"
-#include "ScriptTypes.hpp"
 #include "Utils.hpp"
+#include "GCManager.hpp"
 
 namespace fox
 {
+    class ManagedField;
+    class ManagedClass;
+
     class FieldStorage : public RefCounted
     {
     public:

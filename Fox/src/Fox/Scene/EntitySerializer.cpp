@@ -431,8 +431,7 @@ namespace fox
         const auto& fields = entityClass->Fields;
         if (fields.empty())
             return;
-        out << YAML::Key << "ScriptFields" << YAML::Value;
-        out << YAML::BeginSeq;
+        out << YAML::Key << "ScriptFields" << YAML::Value << YAML::BeginSeq;
         for (const auto fieldID : fields)
         {
             ManagedField* fieldInfo = ScriptCache::GetFieldByID(fieldID);
@@ -674,7 +673,6 @@ namespace fox
 	{
         ([&out, &entity]()
         {
-
             if (entity.has<Component>())
             {
                 std::string str = name_helper<Component>::name();

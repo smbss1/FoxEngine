@@ -119,7 +119,6 @@ namespace fox
     bool ImGuiFieldDrawer::DrawTexture(std::string name, Reflect::Any& valueFrom)
     {
         AssetHandle& value = *valueFrom.TryCast<AssetHandle>();
-//        ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
         return UI::AssetField(name, value, true, {".png"});
 //        if (ImGui::BeginDragDropTarget())
 //        {

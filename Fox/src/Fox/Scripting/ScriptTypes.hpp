@@ -11,6 +11,7 @@
 #include "Core/Logger/Logger.hpp"
 #include "Core/Assert.hpp"
 #include "ValueWrapper.hpp"
+#include "ScriptCache.hpp"
 
 #include <unordered_map>
 #include <string>
@@ -144,6 +145,8 @@ namespace fox
         }
     };
 
+    class ManagedInstance;
+
     class ManagedClass
     {
     public:
@@ -167,93 +170,84 @@ namespace fox
             Class = nullptr;
         }
 
-        GCHandle Instantiate();
-
         template<typename... TArgs>
-        MonoObject* CreateInstance(TArgs&&... args)
-        {
-            MonoObject* obj = CreateInstance();
-
-            // Call constructor
-            CallMethod(obj, ".ctor", std::forward<TArgs>(args)...);
-            return obj;
-        }
+        scope<ManagedInstance>&& CreateInstance(TArgs&&... args);
 
         ManagedField* GetFieldByName(const std::string &name);
-        ManagedMethod* GetMethod(const std::string& name, int parameterCount, bool ignoreParent = false);
-        void InvokeMethod(MonoObject* instance, ManagedMethod* method, void** params = nullptr, ManagedType returnType = ManagedType(), Utils::ValueWrapper* result = nullptr);
+        ManagedMethod* GetMethod(const std::string_view& name, int parameterCount, bool ignoreParent = false);
+
+        static ManagedClass* From(MonoObject* obj);
+
+    private:
+        MonoObject* CreateInstance();
+
+
+    private:
+        std::string m_ClassNamespace;
+        std::string m_ClassName;
+
+        friend class ScriptEngine;
+    };
+
+    class ManagedInstance : public RefCounted
+    {
+    public:
+        ManagedInstance(ManagedClass* managedClass);
+        ManagedInstance(GCHandle handle);
+        ManagedInstance(MonoObject* obj, bool weakReference = false);
+        ~ManagedInstance();
+
+        MonoObject* GetManagedObject() const { return GCManager::GetReferencedObject(m_Handle); }
+
+        void InvokeMethod(ManagedMethod* method, void** params = nullptr, ManagedType returnType = ManagedType(), Utils::ValueWrapper* result = nullptr);
 
         template<typename... TArgs>
-        void CallMethod(MonoObject* managedObject, const std::string& methodName, TArgs&&... args)
+        void CallMethod(const std::string_view& methodName, TArgs&&... args)
         {
 //            FOX_PROFILE_SCOPE(methodName.c_str());
 
-            if (managedObject == nullptr)
+            if (GetManagedObject() == nullptr)
             {
                 FOX_CORE_WARN_TAG("ScriptEngine", "Attempting to call method % on an invalid instance!", methodName);
                 return;
             }
 
-            constexpr size_t argsCount = sizeof...(args);
-
-            if (Class == nullptr)
+            if (m_ManagedClass == nullptr)
             {
                 FOX_CORE_ERROR_TAG("ScriptEngine", "Failed to find ManagedClass!");
                 return;
             }
 
-            ManagedMethod* method = GetMethod(methodName, argsCount);
+            constexpr size_t argsCount = sizeof...(args);
+
+            ManagedMethod* method = m_ManagedClass->GetMethod(methodName, argsCount);
             if (method == nullptr)
             {
                 FOX_CORE_ERROR_TAG("ScriptEngine", "Failed to find a C# method called % with % parameters", methodName, argsCount);
                 return;
             }
-
-            if constexpr (argsCount > 0)
-            {
-                // NOTE: const void** -> void** BAD. Ugly hack because unpacking const parameters into void** apparantly isn't allowed (understandable)
-                const void* data[] = { &args... };
-                InvokeMethod(managedObject, method, (void**)data);
-            }
-            else
-            {
-                InvokeMethod(managedObject, method, nullptr);
-            }
-        }
-
-        template<typename... TArgs>
-        void CallMethod(GCHandle instance, const std::string& methodName, TArgs&&... args)
-        {
-            MonoObject* obj = GCManager::GetReferencedObject(instance);
-            if (obj == nullptr)
-            {
-                FOX_CORE_WARN_TAG("ScriptEngine", "Attempting to call method % on an invalid instance!", methodName);
-                return;
-            }
-
-            CallMethod(obj, methodName, std::forward<TArgs>(args)...);
+            CallMethod(method, std::forward<TArgs>(args)...);
         }
 
         template<typename TReturn, typename... TArgs>
-        TReturn CallMethodWithReturn(MonoObject* monoObject, const std::string& methodName, TArgs&&... args)
+        TReturn CallMethodWithReturn(const std::string_view& methodName, TArgs&&... args)
         {
 //            FOX_PROFILE_SCOPE(methodName.c_str());
 
-            if (monoObject == nullptr)
+            if (GetManagedObject() == nullptr)
             {
                 FOX_CORE_WARN_TAG("ScriptEngine", "Attempting to call method % on an invalid object!", methodName);
                 return;
             }
 
-            constexpr size_t argsCount = sizeof...(args);
-
-            if (Class == nullptr)
+            if (m_ManagedClass == nullptr)
             {
                 FOX_CORE_ERROR_TAG("ScriptEngine", "Failed to find ManagedClass!");
                 return;
             }
 
-            ManagedMethod* method = GetMethod(methodName, argsCount);
+            constexpr size_t argsCount = sizeof...(args);
+            ManagedMethod* method = m_ManagedClass->GetMethod(methodName, argsCount);
             if (method == nullptr)
             {
                 FOX_CORE_ERROR_TAG("ScriptEngine", "Failed to find a C# method called % with % parameters", methodName, argsCount);
@@ -268,6 +262,90 @@ namespace fox
             }*/
 
             Utils::ValueWrapper result;
+            CallMethodWithReturn(method, result, std::forward<TArgs>(args)...);
+
+            FOX_CORE_ASSERT(result.GetDataSize() > 0, "[ScriptEngine]: Unexpected result!");
+            return result.Get<TReturn>();
+        }
+
+        template<typename T>
+        T GetFieldValue(const ManagedField* field)
+        {
+            return GetFieldValue(field).template Get<T>();
+        }
+
+        Utils::ValueWrapper GetFieldValue(const ManagedField* field);
+        void SetFieldValue(const ManagedField* field, const Utils::ValueWrapper& value) const;
+
+        static scope<ManagedInstance> From(MonoObject* monoObject);
+
+        template<typename... TConstructorArgs>
+        static scope<ManagedInstance> From(const std::string_view& className, TConstructorArgs&&... args)
+        {
+            return From(ScriptCache::GetManagedClassByID(FOX_SCRIPT_CLASS_ID(className)), std::forward<TConstructorArgs>(args)...);
+        }
+
+        template<typename... TConstructorArgs>
+        static scope<ManagedInstance> From(uint32_t classID, TConstructorArgs&&... args)
+        {
+            return From(ScriptCache::GetManagedClassByID(classID), std::forward<TConstructorArgs>(args)...);
+        }
+
+        template<typename... TConstructorArgs>
+        static scope<ManagedInstance> From(ManagedClass* managedClass, TConstructorArgs&&... args)
+        {
+//            FOX_PROFILE_SCOPE_DYNAMIC(managedClass->FullName.c_str());
+
+            if (managedClass == nullptr)
+            {
+                FOX_CORE_ERROR_TAG("ScriptEngine", "Attempting to create managed object with a null class!");
+                return nullptr;
+            }
+
+            if (managedClass->IsAbstract)
+                return nullptr;
+
+            scope<ManagedInstance> instance = CreateManagedObject(managedClass);
+            if (instance == nullptr)
+                return nullptr;
+
+            if (managedClass->IsStruct)
+                return std::move(instance);
+
+            instance->template CallMethod(".ctor", std::forward<TConstructorArgs>(args)...);
+            return std::move(instance);
+        }
+
+    protected:
+        template<typename... TArgs>
+        void CallMethod(ManagedMethod* method, TArgs&&... args)
+        {
+//            FOX_PROFILE_SCOPE(methodName.c_str());
+
+            if (!method)
+            {
+                return;
+            }
+
+            constexpr size_t argsCount = sizeof...(args);
+            if constexpr (argsCount > 0)
+            {
+                // NOTE: const void** -> void** BAD. Ugly hack because unpacking const parameters into void** apparantly isn't allowed (understandable)
+                const void* data[] = { &args... };
+                InvokeMethod(method, (void**)data);
+            }
+            else
+            {
+                InvokeMethod(method, nullptr);
+            }
+        }
+
+        template<typename... TArgs>
+        void CallMethodWithReturn(ManagedMethod* method, Utils::ValueWrapper* result, TArgs&&... args)
+        {
+//            FOX_PROFILE_SCOPE(methodName.c_str());
+
+            constexpr size_t argsCount = sizeof...(args);
             if constexpr (argsCount > 0)
             {
                 // TODO
@@ -280,40 +358,28 @@ namespace fox
 
                 // NOTE: const void** -> void** BAD. Ugly hack because unpacking const parameters into void** apparantly isn't allowed (understandable)
                 const void* data[] = { &args... };
-                InvokeMethod(monoObject, method, (void**)data, method->ReturnType, &result);
+                InvokeMethod(method, (void**)data, method->ReturnType, result);
             }
             else
             {
-                InvokeMethod(monoObject, method, nullptr, method->ReturnType, &result);
+                InvokeMethod(method, nullptr, method->ReturnType, result);
             }
-
-            FOX_CORE_ASSERT(result.GetDataSize() > 0, "[ScriptEngine]: Unexpected result!");
-            return result.Get<TReturn>();
-        }
-
-        template<typename TReturn, typename... TArgs>
-        TReturn CallMethodWithReturn(GCHandle instance, const std::string& methodName, TArgs&&... args)
-        {
-            MonoObject* obj = GCManager::GetReferencedObject(instance);
-            if (obj == nullptr)
-            {
-                FOX_CORE_WARN_TAG("ScriptEngine", "Attempting to call method % on an invalid instance!", methodName);
-                return;
-            }
-
-            return CallMethodWithReturn<TReturn, TArgs...>(GCManager::GetReferencedObject(instance), methodName, std::forward<TArgs>(args)...);
         }
 
     private:
-        MonoObject* CreateInstance();
+        static scope<ManagedInstance> CreateManagedObject(ManagedClass* managedClass);
 
-
-    private:
-        std::string m_ClassNamespace;
-        std::string m_ClassName;
-
-        friend class ScriptEngine;
+    protected:
+        ManagedClass* m_ManagedClass;
+        GCHandle m_Handle;
     };
+
+
+    template<typename... TArgs>
+    scope<ManagedInstance>&& ManagedClass::CreateInstance(TArgs&&... args)
+    {
+        return ManagedInstance::From(this, std::forward<TArgs>(args)...);
+    }
 
     namespace Utils
     {

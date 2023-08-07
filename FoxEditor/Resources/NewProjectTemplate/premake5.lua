@@ -71,7 +71,7 @@ project "Fox-ScriptCore"
 
 	files
 	{
-		"%{FoxRootDirectory}/Fox-ScriptCore/**.cs",
+		"%{FoxRootDirectory}/Fox-ScriptCore/Sources/**.cs",
 	}
 
 	linkAppReferences()

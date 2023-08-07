@@ -22,8 +22,8 @@ namespace fox
         m_pFolderIcon = Texture2D::Create("Resources/ContentBrowser/Icons/DirectoryIcon.png");
         m_pFileIcon = Texture2D::Create("Resources/ContentBrowser/Icons/FileIcon.png");
 
-        event::EventSystem::Get().On<OnProjectChangeEvent>(FOX_BIND_EVENT_FN(ContentBrowserPanel::OnProjectChange));
-        event::EventSystem::Get().On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(ContentBrowserPanel::OnContextChange));
+        event::EventSystem::On<OnProjectChangeEvent>(FOX_BIND_EVENT_FN(ContentBrowserPanel::OnProjectChange));
+        event::EventSystem::On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(ContentBrowserPanel::OnContextChange));
     }
 
     void ContentBrowserPanel::OnProjectChange(const OnProjectChangeEvent& event)

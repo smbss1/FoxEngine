@@ -20,7 +20,7 @@ namespace fox
     SettingsPanel::SettingsPanel()
     {
         EnableOverlay = true;
-        event::EventSystem::Get().On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(SettingsPanel::OnContextChangeChange));
+        event::EventSystem::On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(SettingsPanel::OnContextChangeChange));
     }
 
     void SettingsPanel::OnContextChangeChange(const OnContextChangeEvent& event)
@@ -153,7 +153,7 @@ namespace fox
                     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 1.0f); // adding 1px "border"
 
                     bool shouldCollide = selectedLayerInfo->Collisions & layer.AsBit();
-                    if (UI::Property(layer.Name.c_str(), shouldCollide))
+                    if (UI::Property(layer.Name, shouldCollide))
                     {
                         Physics2D::SetCollision(m_SelectedLayer, layer.LayerID, shouldCollide);
                         m_SerializeProject = true;

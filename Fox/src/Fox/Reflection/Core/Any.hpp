@@ -44,6 +44,21 @@ namespace fox::Reflect
 		std::string mMessage;
 	};
 
+    class Exception : public std::exception
+    {
+    public:
+        Exception(const std::string &msg)
+            : mMessage(msg) {}
+
+        const char *what() const noexcept override
+        {
+            return mMessage.c_str();
+        }
+
+    private:
+        std::string mMessage;
+    };
+
 	template <std::size_t>
 	class BasicAny;
 
@@ -126,6 +141,11 @@ namespace fox::Reflect
 
 		bool IsRef() const { return mCopy == nullptr; }  // check if it's a AnyRef
 
+        bool IsContainer()
+        {
+            return mType->IsArray() || mType->IsMapView();
+        }
+
 	private:
 		void *mInstance;
 		Details::AlignedStorageT<SIZE> mStorage;
@@ -134,7 +154,7 @@ namespace fox::Reflect
 
 		typedef void *(*CopyFun)(void*, const void*);
 		typedef void *(*MoveFun)(void*, void*);
-		typedef void (*DestroyFun)(void*);
+        typedef void (*DestroyFun)(void*);
 
 		CopyFun mCopy;
 		MoveFun mMove;
@@ -357,7 +377,7 @@ namespace fox::Reflect
 			casted = mInstance;
 		else
 		{
-			for (auto *base : mType->GetBases())
+			for (const auto& base : mType->GetBases())
 				if (base->GetType() == typeDesc)
 					casted = base->Cast(mInstance);
 		}
@@ -386,7 +406,7 @@ namespace fox::Reflect
 			converted = *this;
 		else
 		{
-			for (auto *conversion : mType->GetConversions())
+			for (const auto& conversion : mType->GetConversions())
 				if (conversion->GetToType() == typeDesc)
 					converted = conversion->Convert(mInstance);
 		}

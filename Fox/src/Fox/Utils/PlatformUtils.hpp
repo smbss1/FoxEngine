@@ -22,6 +22,11 @@ namespace fox {
     {
     public:
         static float GetTime();
+
+        static float time;
+        static float delta_time;
+        static float fixed_delta_time;
+        static float factor_physics;
     };
 }
 

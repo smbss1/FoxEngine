@@ -76,7 +76,7 @@ namespace fox
 
         return ScriptFieldType::None;
     }
-    
+
     bool ManagedType::IsSubClassOf(ManagedClass* otherClass) const
     {
         return mono_class_is_subclass_of(TypeClass->Class, otherClass->Class, false);
@@ -181,15 +181,10 @@ namespace fox
                                            classNamespace.c_str(), className.c_str());
     }
 
-    GCHandle ManagedClass::Instantiate()
-    {
-        return ScriptEngine::InstantiateClass(Class);
-    }
-
     MonoObject *ManagedClass::CreateInstance()
     {
-        MonoObject *obj = ScriptEngine::CreateManagedObject(Class);
-        ScriptEngine::InitRuntimeObject(Class, obj);
+        MonoObject *obj = ScriptEngine::CreateManagedObject(this);
+//        ScriptEngine::InitRuntimeObject(Class, obj);
         return obj;
     }
 
@@ -198,18 +193,77 @@ namespace fox
         return ScriptCache::GetFieldByName(this, name);
     }
 
-    ManagedMethod* ManagedClass::GetMethod(const std::string &name, int parameterCount, bool ignoreParent)
+    ManagedMethod* ManagedClass::GetMethod(const std::string_view &name, int parameterCount, bool ignoreParent)
     {
         return ScriptCache::GetManagedMethod(this, name, parameterCount, ignoreParent);
     }
 
-    void ManagedClass::InvokeMethod(MonoObject *instance, ManagedMethod* method, void **params, ManagedType returnType, Utils::ValueWrapper* result)
+    ManagedClass* ManagedClass::From(MonoObject* obj)
+    {
+        return ScriptCache::GetMonoObjectClass(obj);
+    }
+
+    ManagedInstance::ManagedInstance(ManagedClass* managedClass) : m_ManagedClass(managedClass)
+    {
+        m_Handle = GCManager::CreateObjectReference(ScriptEngine::CreateManagedObject(m_ManagedClass), false);
+    }
+
+    ManagedInstance::ManagedInstance(GCHandle handle) : m_Handle(handle)
+    {
+        m_ManagedClass = ManagedClass::From(GetManagedObject());
+    }
+
+    ManagedInstance::ManagedInstance(MonoObject* obj, bool weakReference) : m_Handle(GCManager::CreateObjectReference(obj, weakReference))
+    {
+        m_ManagedClass = ManagedClass::From(obj);
+    }
+
+    ManagedInstance::~ManagedInstance()
+    {
+        GCManager::ReleaseObjectReference(m_Handle);
+    }
+
+//    GCHandle ManagedInstance::InstantiateClass(ManagedClass* monoClass)
+//    {
+////        FOX_PROFILE_SCOPE();
+//
+//        scope<ManagedInstance> object = From(monoClass);
+//        if (object)
+//        {
+//            InitRuntimeObject(monoClass->Class, object);
+//            return GCManager::CreateObjectReference(object, false);
+//        }
+//
+//        return -1;
+//    }
+
+    void ManagedInstance::InvokeMethod(ManagedMethod* method, void** params, ManagedType returnType, Utils::ValueWrapper* result)
     {
         MonoObject *exception = nullptr;
-        MonoObject *resultObj = mono_runtime_invoke(method->Method, instance, params, &exception);
+        MonoObject *resultObj = mono_runtime_invoke(method->Method, GetManagedObject(), params, &exception);
         Utils::HandleException(exception);
 
-        if (returnType.IsValid() && resultObj != nullptr)
+        if (result && returnType.IsValid() && resultObj != nullptr)
             *result = Utils::MonoObjectToValue(resultObj, returnType);
+    }
+
+    Utils::ValueWrapper ManagedInstance::GetFieldValue(const ManagedField* field)
+    {
+        return Utils::GetFieldValue(GetManagedObject(), field);
+    }
+
+    void ManagedInstance::SetFieldValue(const ManagedField* field, const Utils::ValueWrapper& value) const
+    {
+        Utils::SetFieldValue(GetManagedObject(), field, value);
+    }
+
+    scope<ManagedInstance> ManagedInstance::CreateManagedObject(ManagedClass* managedClass)
+    {
+        return new_scope<ManagedInstance>(ScriptEngine::CreateManagedObject(managedClass));
+    }
+
+    scope<ManagedInstance> ManagedInstance::From(MonoObject* monoObject)
+    {
+        return new_scope<ManagedInstance>(GCManager::CreateObjectReference(monoObject, false));
     }
 }

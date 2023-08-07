@@ -6,23 +6,6 @@
 
 namespace fox
 {
-    scope<RenderCommandQueue> RendererCommand::s_CommandQueue = nullptr;
-
-    void RendererCommand::Init()
-    {
-        s_CommandQueue = new_scope<RenderCommandQueue>();
-    }
-
-    void RendererCommand::Shutdown()
-    {
-    }
-
-    void RendererCommand::WaitAndRender()
-    {
-//        FOX_PROFILE_FUNC();
-        s_CommandQueue->Execute();
-    }
-
     // -- RenderCommandQueue
     RenderCommandQueue::RenderCommandQueue()
     {
@@ -69,5 +52,23 @@ namespace fox
 
         m_CommandBufferPtr = m_CommandBuffer;
         m_CommandCount = 0;
+    }
+
+    //    scope<RenderCommandQueue> RendererCommand::s_CommandQueue = nullptr;
+    scope<RingBuffer> RendererCommand::s_CommandQueue;
+
+    void RendererCommand::Init()
+    {
+        s_CommandQueue = new_scope<RingBuffer>();
+    }
+
+    void RendererCommand::Shutdown()
+    {
+    }
+
+    void RendererCommand::WaitAndRender()
+    {
+//        FOX_PROFILE_FUNC();
+        s_CommandQueue->Execute();
     }
 }

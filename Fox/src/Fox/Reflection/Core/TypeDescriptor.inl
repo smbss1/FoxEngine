@@ -10,13 +10,12 @@
 
 namespace fox::Reflect
 {
-
-	template <typename Type, typename... Args>
+    template <typename Type, typename... Args>
 	void TypeDescriptor::AddConstructor()
 	{
 		Constructor *constructor = new ConstructorImpl<Type, Args...>();
 
-		mConstructors.push_back(constructor);
+		mConstructors.push_back(std::unique_ptr<Constructor>(constructor));
 	}
 
 	template <typename Type, typename... Args>
@@ -24,7 +23,7 @@ namespace fox::Reflect
 	{
 		Constructor *constructor = new FreeFunConstructor<Type, Args...>(ctorFun);
 
-		mConstructors.push_back(constructor);
+		mConstructors.push_back(std::unique_ptr<Constructor>(constructor));
 	}
 
 	template <typename B, typename T>
@@ -32,7 +31,7 @@ namespace fox::Reflect
 	{
 		Base *base = new BaseImpl<B, T>;
 
-		mBases.push_back(base);
+		mBases.push_back(std::unique_ptr<Base>(base));
 	}
 
 	template <typename C, typename T>
@@ -40,7 +39,7 @@ namespace fox::Reflect
 	{
 		DataMember *dataMember = new PtrDataMember<C, T>(dataMemPtr, name);
 
-		mDataMembers.push_back(dataMember);
+		mDataMembers.push_back(std::unique_ptr<DataMember>(dataMember));
 	}
 
 	template <auto Setter, auto Getter, typename Type>
@@ -48,7 +47,7 @@ namespace fox::Reflect
 	{
 		DataMember *dataMember = new SetGetDataMember<Setter, Getter, Type>(name);
 
-		mDataMembers.push_back(dataMember);
+		mDataMembers.push_back(std::unique_ptr<DataMember>(dataMember));
 	}
 
 	template <typename Ret, typename... Args>
@@ -56,7 +55,7 @@ namespace fox::Reflect
 	{
 		Function *memberFunction = new FreeFunction<Ret, Args...>(freeFun, name);
 
-		mMemberFunctions.push_back(memberFunction);
+		mMemberFunctions.push_back(std::unique_ptr<Function>(memberFunction));
 	}
 
 	template <typename C, typename Ret, typename... Args>
@@ -64,7 +63,7 @@ namespace fox::Reflect
 	{
 		Function *memberFunction = new MemberFunction<C, Ret, Args...>(memFun, name);
 
-		mMemberFunctions.push_back(memberFunction);
+		mMemberFunctions.push_back(std::unique_ptr<Function>(memberFunction));
 	}
 
 	template <typename C, typename Ret, typename... Args>
@@ -72,7 +71,7 @@ namespace fox::Reflect
 	{
 		Function *memberFunction = new ConstMemberFunction<C, Ret, Args...>(memFun, name);
 
-		mMemberFunctions.push_back(memberFunction);
+		mMemberFunctions.push_back(std::unique_ptr<Function>(memberFunction));
 	}
 
 	template <typename From, typename To>
@@ -80,7 +79,17 @@ namespace fox::Reflect
 	{
 		Conversion *conversion = new ConversionImpl<From, To>;
 
-		mConversions.push_back(conversion);
+		mConversions.push_back(std::unique_ptr<Conversion>(conversion));
+	}
+
+	template<typename T>
+	Enumeration* TypeDescriptor::AddEnumeration(const std::string &name)
+	{
+		auto enumeration = std::make_unique<Enumeration>();
+		enumeration->Setup<T>();
+		auto* e = enumeration.get();
+		m_Enums.push_back(std::move(enumeration));
+		return e;
 	}
 
 	inline std::string const &TypeDescriptor::GetName() const
@@ -93,7 +102,7 @@ namespace fox::Reflect
 		return mSize;
 	}
 
-	inline std::vector<Constructor*> TypeDescriptor::GetConstructors() const
+	inline const std::vector<std::unique_ptr<Constructor>>& TypeDescriptor::GetConstructors() const
 	{
 		return mConstructors;
 	}
@@ -101,15 +110,15 @@ namespace fox::Reflect
 	template <typename... Args>
 	const Constructor *TypeDescriptor::GetConstructor() const
 	{
-		for (auto *constructor : mConstructors)
+		for (const auto& constructor : mConstructors)
 			if (constructor->CanConstruct<Args...>(std::index_sequence_for<Args...>()))
 				//if (constructor->CanConstruct<Args...>(std::make_index_sequence<sizeof...(Args)>()))
-				return constructor;
+				return constructor.get();
 
 		return nullptr;
 	}
 
-	inline std::vector<Base*> TypeDescriptor::GetBases() const
+	inline const std::vector<std::unique_ptr<Base>>& TypeDescriptor::GetBases() const
 	{
 		return mBases;
 	}
@@ -117,18 +126,20 @@ namespace fox::Reflect
 	template <typename B>
 	Base *TypeDescriptor::GetBase() const
 	{
-		for (auto base : mBases)
+		for (const auto& base : mBases)
 			if (base->GetType() == Details::Resolve<B>)
-				return base;
+				return base.get();
 
 		return nullptr;
 	}
 
 	inline std::vector<DataMember*> TypeDescriptor::GetDataMembers() const
 	{
-		std::vector<DataMember*> dataMembers(mDataMembers);
+		std::vector<DataMember*> dataMembers;
+        for (const auto& data : mDataMembers)
+            dataMembers.push_back(data.get());
 
-		for (auto *base : mBases)
+		for (const auto& base : mBases)
 			for (auto dataMember : base->GetType()->GetDataMembers())
 				dataMembers.push_back(dataMember);
 
@@ -137,11 +148,11 @@ namespace fox::Reflect
 
 	inline DataMember *TypeDescriptor::GetDataMember(const std::string &name) const
 	{
-		for (auto *dataMember : mDataMembers)
+		for (const auto& dataMember : mDataMembers)
 			if (dataMember->GetName() == name)
-				return dataMember;
+				return dataMember.get();
 
-		for (auto *base : mBases)
+		for (const auto& base : mBases)
 			if (auto *baseDataMember = base->GetType()->GetDataMember(name))
 				return baseDataMember;
 
@@ -150,9 +161,12 @@ namespace fox::Reflect
 
 	inline std::vector<Function*> TypeDescriptor::GetMemberFunctions() const
 	{
-		std::vector<Function*> memberFunctions(mMemberFunctions);
+		std::vector<Function*> memberFunctions;
 
-		for (auto *base : mBases)
+        for (const auto& data : mMemberFunctions)
+            memberFunctions.push_back(data.get());
+
+		for (const auto& base : mBases)
 			for (auto memberFunction : base->GetType()->GetMemberFunctions())
 				memberFunctions.push_back(memberFunction);
 
@@ -161,18 +175,18 @@ namespace fox::Reflect
 
 	inline const Function *TypeDescriptor::GetMemberFunction(const std::string &name) const
 	{
-		for (auto *memberFunction : mMemberFunctions)
+		for (const auto& memberFunction : mMemberFunctions)
 			if (memberFunction->GetName() == name)
-				return memberFunction;
+				return memberFunction.get();
 
-		for (auto *base : mBases)
+		for (const auto& base : mBases)
 			if (auto *memberFunction = base->GetType()->GetMemberFunction(name))
 				return memberFunction;
 
 		return nullptr;
 	}
 
-	inline std::vector<Conversion*> TypeDescriptor::GetConversions() const
+	inline const std::vector<std::unique_ptr<Conversion>>& TypeDescriptor::GetConversions() const
 	{
 		return mConversions;
 	}
@@ -180,9 +194,9 @@ namespace fox::Reflect
 	template <typename To>
 	Conversion *TypeDescriptor::GetConversion() const
 	{
-		for (auto conversion : mConversions)
+		for (const auto& conversion : mConversions)
 			if (conversion->GetToType() == Details::Resolve<To>())
-				return conversion;
+				return conversion.get();
 
 		return nullptr;
 	}

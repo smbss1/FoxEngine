@@ -3,9 +3,12 @@ UserPrefs:
   EnginePath: /home/samuel/Git Repos/FoxEngine
   StartupProject: SandboxProject/Sandbox.foxproj
   RecentProjects:
-    - Name: tmp
-      ProjectPath: /home/samuel/Git Repos/FoxEngine/SandProject/tmp.foxproj
-      LastOpened: 1667369773
+    - Name: 2DHorror
+      ProjectPath: /home/samuel/Git Repos/2DHorror/2DHorror.foxproj
+      LastOpened: 1667787864
     - Name: Sandbox
       ProjectPath: /home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Sandbox.foxproj
-      LastOpened: 1667181369
+      LastOpened: 1667787621
+    - Name: tmp
+      ProjectPath: /home/samuel/Git Repos/FoxEngine/SandProject/tmp.foxproj
+      LastOpened: 1667786175

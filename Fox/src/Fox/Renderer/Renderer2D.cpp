@@ -7,7 +7,10 @@
 #include "Asset/AssetManager.hpp"
 #include "Renderer.hpp"
 #include "Material.hpp"
+#include <Renderer/EditorCamera.hpp>
 #include "../../../../FoxEditor/src/EditorLayer.hpp"
+#include "Commands.hpp"
+#include "Utils/Iterator.hpp"
 #include <Renderer/Renderer2D.hpp>
 #include <Renderer/VertexArray.hpp>
 #include <Renderer/Shader.hpp>
@@ -90,11 +93,7 @@ namespace fox
 
         Renderer2D::Statistics Stats;
 
-        struct CameraData
-        {
-            glm::mat4 ViewProjection;
-        };
-        CameraData CameraBuffer;
+        Renderer2D::CameraData CameraBuffer;
         Ref<UniformBuffer> CameraUniformBuffer;
 
         Ref<Shader> PointLightShader;
@@ -104,7 +103,7 @@ namespace fox
 
     void Renderer2D::Init()
     {
-        s_Data.pQuadVertexArray = fox::VertexArray::Create();
+        s_Data.pQuadVertexArray = VertexArray::Create();
         s_Data.pQuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
         s_Data.pQuadVertexBuffer->SetLayout({
               {fox::ShaderDataType::Float3, "a_Position"},
@@ -130,12 +129,12 @@ namespace fox
             quadIndices[i + 5] = offset + 0;
             offset += 4;
         }
-        auto quadIB = fox::IndexBuffer::Create(quadIndices, s_Data.MaxIndices);
+        auto quadIB = IndexBuffer::Create(quadIndices, s_Data.MaxIndices);
         s_Data.pQuadVertexArray->SetIndexBuffer(quadIB);
         delete[] quadIndices;
 
         // Circles
-        s_Data.CircleVertexArray = fox::VertexArray::Create();
+        s_Data.CircleVertexArray = VertexArray::Create();
         s_Data.CircleVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(CircleVertex));
         s_Data.CircleVertexBuffer->SetLayout({
              {fox::ShaderDataType::Float3, "a_WorldPosition"},
@@ -165,8 +164,8 @@ namespace fox
         uint32_t whiteTextureData = 0xffffffff;
         s_Data.pWhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
-        s_Data.QuadMaterial = new_ref<Material>(fox::Shader::Create("assets/shaders/Renderer2D_Quad.glsl"));
-        s_Data.CircleMaterial = new_ref<Material>(fox::Shader::Create("assets/shaders/Renderer2D_Circle.glsl"));
+        s_Data.QuadMaterial = new_ref<Material>(Shader::Create("assets/shaders/Renderer2D_Quad.glsl"));
+        s_Data.CircleMaterial = new_ref<Material>(Shader::Create("assets/shaders/Renderer2D_Circle.glsl"));
         s_Data.LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
         s_Data.PointLightShader = Shader::Create("assets/shaders/light.glsl");
 
@@ -178,7 +177,7 @@ namespace fox
         s_Data.QuadVertexPositions[2] = { 0.5f, 0.5f, 0.0f, 1.0f };
         s_Data.QuadVertexPositions[3] = { -0.5f, 0.5f, 0.0f, 1.0f };
 
-        s_Data.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
+        s_Data.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2D::CameraData), 0);
     }
 
     void Renderer2D::Shutdown()
@@ -199,10 +198,7 @@ namespace fox
 
     void Renderer2D::BeginScene(const glm::mat4& viewProj)
     {
-        RendererCommand::Submit([viewProj] {
-            s_Data.CameraBuffer.ViewProjection = viewProj;
-             s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
-         });
+        RendererCommand::Push<PushCameraUniformCmd>(s_Data.CameraUniformBuffer, viewProj);
         StartBatch();
     }
 
@@ -248,9 +244,9 @@ namespace fox
 
     void Renderer2D::Flush()
     {
-        uint32_t dataSize = (uint8_t *)s_Data.QuadVertexBufferPtr - (uint8_t *)s_Data.QuadVertexBufferBase;
-        if (dataSize)
+        if (s_Data.QuadIndexCount)
         {
+            uint32_t dataSize = (uint8_t *)s_Data.QuadVertexBufferPtr - (uint8_t *)s_Data.QuadVertexBufferBase;
             s_Data.pQuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
             for (uint32_t i = 0; i < s_Data.TextureSlotIndex; ++i) {
@@ -282,17 +278,6 @@ namespace fox
             Renderer::DrawLines(s_Data.LineVertexArray, s_Data.LineVertexCount);
             s_Data.Stats.DrawCalls++;
         }
-    }
-
-    void Renderer2D::AddToVertexBuffer(const QuadVertex& vertex)
-    {
-        s_Data.QuadVertexBufferPtr->oPosition = vertex.oPosition;
-        s_Data.QuadVertexBufferPtr->oColor = vertex.oColor;
-        s_Data.QuadVertexBufferPtr->oTexCoord = vertex.oTexCoord;
-        s_Data.QuadVertexBufferPtr->fTexIndex = vertex.fTexIndex;
-        s_Data.QuadVertexBufferPtr->fTilingFactor = vertex.fTilingFactor;
-        s_Data.QuadVertexBufferPtr->EntityID = vertex.EntityID;
-        s_Data.QuadVertexBufferPtr++;
     }
 
     void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const glm::vec4 &color)
@@ -418,14 +403,13 @@ namespace fox
 
         for (size_t i = 0; i < quadVertexCount; i++)
         {
-            AddToVertexBuffer({
-                  .oPosition = transform * s_Data.QuadVertexPositions[i],
-                  .oColor = tintColor,
-                  .oTexCoord = textureCoords[i],
-                  .fTexIndex = textureIndex, // if == 0 = White Texture
-                  .fTilingFactor = tilingFactor,
-                  .EntityID = entityID
-            });
+            s_Data.QuadVertexBufferPtr->oPosition = transform * s_Data.QuadVertexPositions[i];
+            s_Data.QuadVertexBufferPtr->oColor = tintColor;
+            s_Data.QuadVertexBufferPtr->oTexCoord = textureCoords[i];
+            s_Data.QuadVertexBufferPtr->fTexIndex = textureIndex;
+            s_Data.QuadVertexBufferPtr->fTilingFactor = tilingFactor;
+            s_Data.QuadVertexBufferPtr->EntityID = entityID;
+            s_Data.QuadVertexBufferPtr++;
         }
 
         s_Data.QuadIndexCount += 6;
@@ -440,10 +424,10 @@ namespace fox
         // if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
         // 	NextBatch();
 
-        for (size_t i = 0; i < 4; i++)
+        for (auto& QuadVertexPosition : s_Data.QuadVertexPositions)
         {
-            s_Data.CircleVertexBufferPtr->WorldPosition = transform * s_Data.QuadVertexPositions[i];
-            s_Data.CircleVertexBufferPtr->LocalPosition = s_Data.QuadVertexPositions[i] * 2.0f;
+            s_Data.CircleVertexBufferPtr->WorldPosition = transform * QuadVertexPosition;
+            s_Data.CircleVertexBufferPtr->LocalPosition = QuadVertexPosition * 2.0f;
             s_Data.CircleVertexBufferPtr->Color = color;
             s_Data.CircleVertexBufferPtr->Thickness = thickness;
             s_Data.CircleVertexBufferPtr->Fade = fade;
@@ -465,11 +449,10 @@ namespace fox
 
     void Renderer2D::DrawParticle(const glm::mat4& transform, ParticleSystem& src)
     {
-        for (const auto& particle : src.ParticlePool)
+        auto activeParticle = iter(src.ParticlePool) | filter([](const Particle& particle) { return particle.Active; });
+        while (auto particle = activeParticle.next())
         {
-            if (!particle.Active)
-                continue;
-            DrawRotatedQuad(particle.Position, particle.Size, particle.Rotation, particle.Color);
+            DrawRotatedQuad(particle->Position, particle->Size, particle->Rotation, particle->Color);
         }
     }
 

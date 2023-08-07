@@ -15,11 +15,11 @@ namespace fox::Reflect
 		if (from == to)
 			return true;
 
-		for (auto *base : from->GetBases())
+		for (const auto& base : from->GetBases())
 			if (base->GetType() == to)
 				return true;
 
-		for (auto *conversion : from->GetConversions())
+		for (const auto& conversion : from->GetConversions())
 			if (conversion->GetToType() == to)
 				return true;
 

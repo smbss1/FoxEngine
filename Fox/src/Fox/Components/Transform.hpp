@@ -19,6 +19,8 @@
 
 #include "Core/UUID.hpp"
 #include "Math/Math.hpp"
+#include <vector>
+#include <array>
 
 namespace fox
 {
@@ -92,10 +94,48 @@ namespace fox
             rotation = glm::eulerAngles(rotationQuat);
         }
 
-        glm::vec3 GetRotation() const
+        const glm::vec3& GetRotation() const
         {
             return rotation;
         }
+
+//        void SetPos(std::array<float, 3> pos)
+//        {
+//            position.x = pos[0];
+//            position.y = pos[1];
+//            position.z = pos[2];
+//        }
+//
+//        std::array<float, 3> GetPos() const
+//        {
+//            return {position.x, position.y, position.z};
+//        }
+//
+//        void SetRotationPriv(std::array<float, 3> euler)
+//        {
+//            rotation.x = euler[0];
+//            rotation.y = euler[1];
+//            rotation.z = euler[2];
+//
+//            rotationQuat = glm::quat(rotation);
+//        }
+//
+//        std::array<float, 3> GetRotationPriv() const
+//        {
+//            return {rotation.x, rotation.y, rotation.z};
+//        }
+//
+//        void SetScale(std::array<float, 3> s)
+//        {
+//            scale.x = s[0];
+//            scale.y = s[1];
+//            scale.z = s[2];
+//        }
+//
+//        std::array<float, 3> GetScale() const
+//        {
+//            return {scale.x, scale.y, scale.z};
+//        }
     };
 
     struct HierarchyComponent

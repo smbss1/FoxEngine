@@ -12,40 +12,59 @@
 
 namespace fox
 {
-    struct Any
+    struct AnyValue
     {
-        void* Data;
-        uint32_t Size;
+        void* Data = nullptr;
+        uint32_t Size = 0;
 
-        Any()
+        AnyValue()
             : Data(nullptr), Size(0)
         {
         }
 
-        Any(void* data, uint32_t size)
-            : Data(data), Size(size)
+        template <typename T, typename U = typename std::remove_cv<std::remove_reference_t<std::decay_t<T>>>::type, typename = typename std::enable_if<!std::is_same_v<U, AnyValue>>::type>
+        AnyValue(T&& value)
         {
+            Allocate(sizeof(T));
+            memcpy(Data, &value, sizeof(T));
         }
 
-        static Any Copy(const Any& other)
+        AnyValue(int8_t value)
         {
-            Any buffer;
+            Allocate(sizeof(int8_t));
+            memcpy(Data, &value, sizeof(int8_t));
+        }
+
+        AnyValue(void* data, uint32_t size)
+        {
+            Allocate(size);
+            memcpy(Data, data, size);
+        }
+
+        ~AnyValue()
+        {
+            Release();
+        }
+
+        static AnyValue Copy(const AnyValue& other)
+        {
+            AnyValue buffer;
             buffer.Allocate(other.Size);
             memcpy(buffer.Data, other.Data, other.Size);
             return buffer;
         }
 
-        static Any Copy(const Utils::ValueWrapper& other)
+        static AnyValue Copy(const Utils::ValueWrapper& other)
         {
-            Any buffer;
+            AnyValue buffer;
             buffer.Allocate(other.GetDataSize());
             memcpy(buffer.Data, other.GetRawData(), other.GetDataSize());
             return buffer;
         }
 
-        static Any Copy(const void* data, uint32_t size)
+        static AnyValue Copy(const void* data, uint32_t size)
         {
-            Any buffer;
+            AnyValue buffer;
             buffer.Allocate(size);
             memcpy(buffer.Data, data, size);
             return buffer;
@@ -61,6 +80,8 @@ namespace fox
 
             Data = new byte[size];
             Size = size;
+
+            ZeroInitialize();
         }
 
         void Release()
@@ -90,7 +111,7 @@ namespace fox
 
         byte* ReadBytes(uint32_t size, uint32_t offset)
         {
-            FOX_CORE_ASSERT(offset + size <= Size, "Any overflow!");
+            FOX_CORE_ASSERT(offset + size <= Size, "AnyValue overflow!");
             byte* buffer = new byte[size];
             memcpy(buffer, (byte*)Data + offset, size);
             return buffer;
@@ -98,7 +119,7 @@ namespace fox
 
         void Write(const void* data, uint32_t size, uint32_t offset = 0)
         {
-            FOX_CORE_ASSERT(offset + size <= Size, "Any overflow!");
+            FOX_CORE_ASSERT(offset + size <= Size, "AnyValue overflow!");
             memcpy((byte*)Data + offset, data, size);
         }
 
@@ -123,19 +144,30 @@ namespace fox
             return (T*)Data;
         }
 
+        template<typename T>
+        T& AsRef() const
+        {
+            return *static_cast<T*>(Data);
+        }
+
+        void* Raw() const
+        {
+            return Data;
+        }
+
         inline uint32_t GetSize() const { return Size; }
     };
 
-    struct AnySafe : public Any
+    struct AnyValueSafe : public AnyValue
     {
-        ~AnySafe()
+        ~AnyValueSafe()
         {
             Release();
         }
 
-        static AnySafe Copy(const void* data, uint32_t size)
+        static AnyValueSafe Copy(const void* data, uint32_t size)
         {
-            AnySafe buffer;
+            AnyValueSafe buffer;
             buffer.Allocate(size);
             memcpy(buffer.Data, data, size);
             return buffer;

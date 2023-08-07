@@ -126,7 +126,7 @@ namespace fox
         }
 
         template<typename T>
-        static Ref<T> GetAsset(const std::string& filepath)
+        static Ref<T> GetAsset(const std::string_view& filepath)
         {
             return GetAsset<T>(GetAssetHandleFromFilePath(filepath));
         }

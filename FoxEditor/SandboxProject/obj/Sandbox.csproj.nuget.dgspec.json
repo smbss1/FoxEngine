@@ -1,0 +1,53 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Sandbox.csproj": {}
+  },
+  "projects": {
+    "/home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Sandbox.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Sandbox.csproj",
+        "projectName": "Sandbox",
+        "projectPath": "/home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/Sandbox.csproj",
+        "packagesPath": "/home/samuel/.nuget/packages/",
+        "outputPath": "/home/samuel/Git Repos/FoxEngine/FoxEditor/SandboxProject/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/samuel/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net45"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net45": {
+            "targetAlias": "net45",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net45": {
+          "targetAlias": "net45",
+          "dependencies": {
+            "Microsoft.NETFramework.ReferenceAssemblies": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.2, )",
+              "autoReferenced": true
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.109/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

@@ -18,7 +18,7 @@ namespace fox
 {
     SceneHierarchyPanel::SceneHierarchyPanel()
     {
-        event::EventSystem::Get().On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(SceneHierarchyPanel::OnContextChangeChange));
+        event::EventSystem::On<OnContextChangeEvent>(FOX_BIND_EVENT_FN(SceneHierarchyPanel::OnContextChangeChange));
     }
 
     SceneHierarchyPanel::~SceneHierarchyPanel()
@@ -35,7 +35,7 @@ namespace fox
     void SceneHierarchyPanel::SetSelectedEntity(const Entity& e)
     {
         m_SelectedEntity = e;
-        event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_SelectedEntity));
+        event::EventSystem::Emit<OnSelectedEntityChangeEvent>(m_SelectedEntity);
     }
 
     void SceneHierarchyPanel::OnImGui(bool& isOpen)
@@ -86,7 +86,7 @@ namespace fox
 
         UI::HandleContentBrowserPayloadCustom({".foxprefab"}, [this](std::filesystem::path& filepath) {
             Entity entity = EntitySerializer::DeserializeEntityAsPrefab(filepath.c_str(), *m_pContext);
-            event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(entity));
+            event::EventSystem::Emit<OnSelectedEntityChangeEvent>(entity);
         });
         ImGui::End();
 

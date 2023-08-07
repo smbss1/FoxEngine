@@ -17,6 +17,8 @@ namespace fox::Reflect
 	template <typename Type>
 	class TypeFactory
 	{
+    private:
+        Enumeration* m_CurrentEnum = nullptr;
 	public:
 		TypeFactory &ReflectType(const std::string &name)
 		{
@@ -113,6 +115,30 @@ namespace fox::Reflect
 
 			return *this;
 		}
+
+        template <typename T>
+        TypeFactory& BeginEnum(const std::string& name)
+        {
+            m_CurrentEnum = Details::Resolve<Type>()->template AddEnumeration<T>(name);
+
+            return *this;
+        }
+
+        template <typename T>
+        TypeFactory& AddValue(const std::string& name, T value)
+        {
+            if (m_CurrentEnum)
+            {
+                m_CurrentEnum->template Add(name, value);
+            }
+            return *this;
+        }
+
+        TypeFactory& EndEnum()
+        {
+            m_CurrentEnum = nullptr;
+            return *this;
+        }
 	};
 
 }  // namespace Reflect

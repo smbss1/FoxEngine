@@ -232,6 +232,7 @@ namespace fox
         const T& operator*() const { return *m_Instance; }
 
         bool IsValid() const { return m_Instance ? RefUtils::IsLive(m_Instance) : false; }
+        T* Raw() const { return m_Instance; }
         operator bool() const { return IsValid(); }
     private:
         T* m_Instance = nullptr;

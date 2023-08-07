@@ -332,8 +332,8 @@ namespace fox
                 case ScriptFieldType::Vector2: return Marshal::BoxValue(FOX_CACHED_CLASS("Fox.Vector2"), value.Get<glm::vec2>());
                 case ScriptFieldType::Vector3: return Marshal::BoxValue(FOX_CACHED_CLASS("Fox.Vector3"), value.Get<glm::vec3>());
                 case ScriptFieldType::Vector4: return Marshal::BoxValue(FOX_CACHED_CLASS("Fox.Vector4"), value.Get<glm::vec4>());
-                case ScriptFieldType::Prefab: return ScriptEngine::CreateManagedObject("Fox.Prefab", value.Get<AssetHandle>());
-                case ScriptFieldType::Entity: return ScriptEngine::CreateManagedObject("Fox.Entity", value.Get<UUID>());
+                case ScriptFieldType::Prefab: return ManagedInstance::From("Fox.Prefab", value.Get<AssetHandle>())->GetManagedObject();
+                case ScriptFieldType::Entity: return ManagedInstance::From("Fox.Entity", value.Get<UUID>())->GetManagedObject();
             }
 
             FOX_CORE_ASSERT(false, "Unsupported value type!");

@@ -85,6 +85,7 @@ target_link_libraries(fox_editor PRIVATE
     monosgen-2.0
     m
     pthread
+    rttr_core
     glad
     glm
     fox_json
@@ -99,18 +100,22 @@ target_link_directories(fox_editor PRIVATE
     /home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib
     /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib
     /usr/lib/pkgconfig/../../lib
+    /home/samuel/.xmake/packages/r/rttr/0.9.6/1febeb0e57544a14a228957bd1dad80b/lib
 )
 target_link_options(fox_editor PRIVATE
     -m64
 )
 target_sources(fox_editor PRIVATE
+    FoxEditor/src/Panels/AnimatorSpritePanel.cpp
     FoxEditor/src/Panels/StatsPanel.cpp
     FoxEditor/src/Panels/ContentBrowserPanel.cpp
     FoxEditor/src/Panels/SceneHierarchyPanel.cpp
     FoxEditor/src/Panels/ConsolePanel.cpp
     FoxEditor/src/Panels/SettingsPanel.cpp
     FoxEditor/src/Panels/PropertyPanel.cpp
+    FoxEditor/src/EditorIcons.cpp
     FoxEditor/src/EditorApp.cpp
+    FoxEditor/src/PanelManager.cpp
     FoxEditor/src/EditorLayer.cpp
 )
 
@@ -144,6 +149,7 @@ target_include_directories(fox_engine PRIVATE
     /usr/include/X11/dri
     /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/include
     /usr/lib/pkgconfig/../../include/mono-2.0
+    /home/samuel/.xmake/packages/r/rttr/0.9.6/1febeb0e57544a14a228957bd1dad80b/include
 )
 target_compile_definitions(fox_engine PRIVATE
     _GLFW_X11
@@ -208,6 +214,7 @@ target_link_libraries(fox_engine PRIVATE
     monosgen-2.0
     m
     pthread
+    rttr_core
     glad
     glm
     fox_json
@@ -221,6 +228,7 @@ target_link_directories(fox_engine PRIVATE
     /home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib
     /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib
     /usr/lib/pkgconfig/../../lib
+    /home/samuel/.xmake/packages/r/rttr/0.9.6/1febeb0e57544a14a228957bd1dad80b/lib
     build/linux/x86_64/release
 )
 target_sources(fox_engine PRIVATE
@@ -247,6 +255,7 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/ImGui/ImGuiBuild.cpp
     Fox/src/Fox/ImGui/ImGuiExtension.cpp
     Fox/src/Fox/ImGui/ImGuiLayer.cpp
+    Fox/src/Fox/ImGui/ImGuiExtensions.cpp
     Fox/src/Fox/ImGui/ImGuiFieldDrawer.cpp
     Fox/src/Fox/Asset/AssetImporter.cpp
     Fox/src/Fox/Asset/AssetRegistry.cpp
@@ -271,12 +280,15 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Scene/SceneSerializer.cpp
     Fox/src/Fox/Scene/ScriptableBehaviour.cpp
     Fox/src/Fox/Scene/SceneCamera.cpp
+    Fox/src/Fox/Scene/Time.cpp
     Fox/src/Fox/Scene/EntitySerializer.cpp
     Fox/src/Fox/Utils/String.cpp
+    Fox/src/Fox/Utils/RingBuffer.cpp
     Fox/src/Fox/Utils/Path.cpp
     Fox/src/Fox/Utils/PlatformUtils.cpp
     Fox/src/Fox/Utils/FileSystem.cpp
-    Fox/src/Fox/Reflection/Reflection.cpp
+    Fox/src/Fox/Reflection/Reflect.cpp
+    Fox/src/Fox/Reflection/Serializer.cpp
     Fox/src/Fox/Core/LayerStack.cpp
     Fox/src/Fox/Core/Layer.cpp
     Fox/src/Fox/Core/Logger.cpp
@@ -289,7 +301,9 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Core/Window.cpp
     Fox/src/Fox/Core/Application.cpp
     Fox/src/Fox/Core/Ref.cpp
+    Fox/src/Fox/Core/Any.cpp
     Fox/src/Fox/Core/Project.cpp
+    Fox/src/Fox/Renderer/Commands.cpp
     Fox/src/Fox/Renderer/SubTexture2D.cpp
     Fox/src/Fox/Renderer/Texture.cpp
     Fox/src/Fox/Renderer/Renderer2D.cpp
@@ -297,15 +311,18 @@ target_sources(fox_engine PRIVATE
     Fox/src/Fox/Renderer/Shader.cpp
     Fox/src/Fox/Renderer/VertexArray.cpp
     Fox/src/Fox/Renderer/UniformBuffer.cpp
+    Fox/src/Fox/Renderer/Material.cpp
     Fox/src/Fox/Renderer/RendererCommand.cpp
     Fox/src/Fox/Renderer/Buffer.cpp
     Fox/src/Fox/Renderer/Framebuffer.cpp
     Fox/src/Fox/Renderer/OrthographicCamera.cpp
     Fox/src/Fox/Renderer/RendererAPI.cpp
+    Fox/src/Fox/Renderer/RenderPass.cpp
     Fox/src/Fox/Renderer/OrthographicCameraController.cpp
     Fox/src/Fox/Renderer/Renderer.cpp
     Fox/src/Fox/Renderer/GraphicsContext.cpp
     Fox/src/Fox/Ecs/Entity.cpp
+    Fox/src/Fox/Physics2D.cpp
 )
 
 # target
@@ -532,6 +549,7 @@ target_link_libraries(sandbox PRIVATE
     monosgen-2.0
     m
     pthread
+    rttr_core
     glad
     glm
     fox_json
@@ -546,6 +564,7 @@ target_link_directories(sandbox PRIVATE
     /home/samuel/.xmake/packages/g/glfw/3.3.8/aa037e96cc854680a09e144c4b5c8fe0/lib
     /home/samuel/.xmake/packages/b/box2d/2.4.1/f60ae68e483c4942bc8545c18171c10c/lib
     /usr/lib/pkgconfig/../../lib
+    /home/samuel/.xmake/packages/r/rttr/0.9.6/1febeb0e57544a14a228957bd1dad80b/lib
 )
 target_link_options(sandbox PRIVATE
     -m64

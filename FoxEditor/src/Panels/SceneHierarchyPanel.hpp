@@ -24,7 +24,6 @@ namespace fox
 
         const Entity& GetSelectedEntity() const { return m_SelectedEntity; }
         void SetSelectedEntity(const Entity& e);
-//        event::EventSystem::Get().Emit(OnSelectedEntityChangeEvent(m_oHoveredEntity));
 
     private:
         void DrawEntityNode(const Entity& e);
