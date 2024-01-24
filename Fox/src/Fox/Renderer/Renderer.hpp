@@ -14,6 +14,7 @@ namespace fox
     class RendererAPI;
     class VertexArray;
     class Material;
+    class Mesh;
 
     class Renderer
     {
@@ -29,6 +30,7 @@ namespace fox
         static void Clear();
         static void DrawIndexed(const Ref<VertexArray>& pVertexArray, uint32_t uIndexCount = 0);
         static void RenderGeometry(Ref<Material> shader, const Ref<VertexArray>& pVertexArray, uint32_t uIndexCount = 0);
+        static void RenderInstanceGeometry(Ref<Material> material, const Ref<Mesh>& mesh, uint32_t instanceCount);
 
         static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 

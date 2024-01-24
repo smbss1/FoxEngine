@@ -6,8 +6,8 @@
 */
 
 #pragma once
-// #ifndef FOX_ENTRY_POINT_HPP_
-// #define FOX_ENTRY_POINT_HPP_
+#ifndef FOX_ENTRY_POINT_HPP_
+#define FOX_ENTRY_POINT_HPP_"
 
 extern fox::Application* fox::CreateApp(ApplicationCommandLineArgs args);
 
@@ -15,15 +15,20 @@ int main(int argc, char** argv)
 {
     fox::Application *pApp = nullptr;
     try {
+        fox::InitializeCore();
         pApp = fox::CreateApp({argc, argv});
         pApp->Run();
     } catch (std::exception& e) {
         FOX_CORE_ERROR("%", e.what());
     }
-    FOX_CORE_INFO("Application stopped");
-    if (pApp)
+    if (pApp) {
+        FOX_CORE_INFO("Application stopped");
         delete pApp;
+        pApp = nullptr;
+    }
+    std::cout << "Application stopped" << std::endl;
+    fox::ShutdownCore();
     return 0;
 }
 
-// #endif
+#endif

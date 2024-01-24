@@ -6,20 +6,21 @@
 #define FOXENGINE_FPATHS_HPP
 
 #include <string>
-#include <filesystem>
+#include "Core/Base.hpp"
 #include "Ref.hpp"
 #include "Assert.hpp"
+#include "FoxSignalDefs.hpp"
 
 namespace fox
 {
     struct ProjectConfig
     {
-        std::string Name;
+        std::string Name = "";
 
-        std::string AssetDirectory;
-        std::string AssetRegistryPath;
+        std::string AssetDirectory = "";
+        std::string AssetRegistryPath = "";
 
-        std::string ScriptModulePath;
+        std::string ScriptModulePath = "";
         std::string DefaultNamespace;
 
         std::string StartScene;
@@ -37,10 +38,27 @@ namespace fox
     class Project : public RefCounted
     {
     public:
+        inline static ProjectEvent ProjectBeforeLoad;
+        inline static ProjectEvent ProjectLoaded;
+        inline static ProjectEvent ProjectBeforeUnload;
+        inline static ProjectEvent ProjectUnloaded;
+        inline static ProjectEvent ProjectBeforeSave;
+        inline static ProjectEvent ProjectSaved;
+
         const ProjectConfig& GetConfig() const { return m_Config; }
 
         static Ref<Project> GetActive() { return s_ActiveProject; }
-        static void SetActive(Ref<Project> project);
+        static Ref<Project> Load(const std::filesystem::path& path);
+        static void Unload();
+        static Ref<Project> New();
+        static bool SaveActive(const std::filesystem::path& path);
+
+        static std::filesystem::path GetAssetFileSystemPath(const std::filesystem::path& path) { return AssetsDir() / path; }
+
+        static std::filesystem::path Project::GetAssetAbsolutePath(const std::filesystem::path& path)
+        {
+            return AssetsDir() / path;
+        }
 
         static const std::string& ProjectName()
         {
@@ -48,44 +66,45 @@ namespace fox
             return s_ActiveProject->GetConfig().Name;
         }
 
-        static std::filesystem::path ProjectDir()
+        static fs::path ProjectDir()
         {
             FOX_CORE_ASSERT(s_ActiveProject);
-            return s_ActiveProject->GetConfig().ProjectDirectory;
+            return s_ActiveProject->m_ProjectDirectory;
         }
 
-        static std::filesystem::path AssetsDir()
+        static fs::path AssetsDir()
         {
             FOX_CORE_ASSERT(s_ActiveProject);
-            return std::filesystem::path(s_ActiveProject->GetConfig().ProjectDirectory) / s_ActiveProject->GetConfig().AssetDirectory;
+            return fs::path(s_ActiveProject->m_ProjectDirectory) / s_ActiveProject->GetConfig().AssetDirectory;
         }
 
-        static std::filesystem::path AssetRegistryPath()
+        static fs::path AssetRegistryPath()
         {
             FOX_CORE_ASSERT(s_ActiveProject);
-            return std::filesystem::path(s_ActiveProject->GetConfig().ProjectDirectory) / s_ActiveProject->GetConfig().AssetRegistryPath;
+            return fs::path(s_ActiveProject->m_ProjectDirectory) / s_ActiveProject->GetConfig().AssetRegistryPath;
         }
 
-        static std::filesystem::path ScriptModulePath()
+        static fs::path ScriptModulePath()
         {
             FOX_CORE_ASSERT(s_ActiveProject);
-            return std::filesystem::path(s_ActiveProject->GetConfig().ProjectDirectory) / s_ActiveProject->GetConfig().ScriptModulePath;
+            return fs::path(s_ActiveProject->m_ProjectDirectory) / s_ActiveProject->GetConfig().ScriptModulePath;
         }
 
-        static std::filesystem::path ScriptModuleFilePath()
+        static fs::path ScriptModuleFilePath()
         {
             FOX_CORE_ASSERT(s_ActiveProject);
             return ScriptModulePath() / fox::format("%.dll", ProjectName());
         }
 
-        static std::filesystem::path CacheDirectory()
+        static fs::path CacheDirectory()
         {
             FOX_CORE_ASSERT(s_ActiveProject);
-            return std::filesystem::path(s_ActiveProject->GetConfig().ProjectDirectory) / "Cache";
+            return fs::path(s_ActiveProject->m_ProjectDirectory) / "Cache";
         }
 
     private:
-        ProjectConfig m_Config;
+        ProjectConfig m_Config {};
+        std::filesystem::path m_ProjectDirectory;
 
         friend class ProjectSerializer;
 

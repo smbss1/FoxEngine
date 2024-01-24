@@ -22,11 +22,23 @@ namespace fox
         {
         }
 
-        template <typename T, typename U = typename std::remove_cv<std::remove_reference_t<std::decay_t<T>>>::type, typename = typename std::enable_if<!std::is_same_v<U, AnyValue>>::type>
-        AnyValue(T&& value)
+        AnyValue(AnyValue&& other) : Data(other.Data), Size(other.Size)
         {
-            Allocate(sizeof(T));
-            memcpy(Data, &value, sizeof(T));
+            other.Data = nullptr;
+            other.Size = 0;
+        }
+
+        //template <typename T, typename U = typename std::remove_cv<std::remove_reference_t<std::decay_t<T>>>::type, typename = typename std::enable_if<!std::is_same_v<U, AnyValue>>::type>
+        //AnyValue(T&& value)
+        //{
+        //    Allocate(sizeof(T));
+        //    memcpy(Data, &value, sizeof(T));
+        //}
+
+        AnyValue(const AnyValue& other)
+        {
+            Allocate(other.Size);
+            memcpy(Data, other.Data, other.Size);
         }
 
         AnyValue(int8_t value)
@@ -35,15 +47,28 @@ namespace fox
             memcpy(Data, &value, sizeof(int8_t));
         }
 
-        AnyValue(void* data, uint32_t size)
+   /*     AnyValue(void* data, uint32_t size)
         {
             Allocate(size);
             memcpy(Data, data, size);
-        }
+        }*/
 
         ~AnyValue()
         {
             Release();
+        }
+
+        AnyValue& operator=(AnyValue&& other)
+        {
+            // Guard self assignment
+            if (this == &other)
+                return *this;
+
+            Data = other.Data;
+            Size = other.Size;
+            other.Data = nullptr;
+            other.Size = 0;
+            return *this;
         }
 
         static AnyValue Copy(const AnyValue& other)
@@ -72,8 +97,11 @@ namespace fox
 
         void Allocate(uint32_t size)
         {
-            delete[] (byte*)Data;
-            Data = nullptr;
+            if (Data != nullptr)
+            {
+                delete[](byte*)Data;
+                Data = nullptr;
+            }
 
             if (size == 0)
                 return;
@@ -86,7 +114,7 @@ namespace fox
 
         void Release()
         {
-            delete[] (byte*)Data;
+            delete[](byte*)Data;
             Data = nullptr;
             Size = 0;
         }
@@ -160,9 +188,19 @@ namespace fox
 
     struct AnyValueSafe : public AnyValue
     {
+        AnyValueSafe() : AnyValue()
+        {
+        }
+
         ~AnyValueSafe()
         {
             Release();
+        }
+
+        AnyValueSafe(AnyValueSafe&& other)
+        {
+            Data = std::move(other.Data);
+            Size = std::move(other.Size);
         }
 
         static AnyValueSafe Copy(const void* data, uint32_t size)

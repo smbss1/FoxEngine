@@ -5,11 +5,12 @@
 #include "Renderer/RendererCommand.hpp"
 #include "Renderer/Renderer2D.hpp"
 #include "Renderer/Renderer.hpp"
-#include "Renderer/Shader.hpp"
 #include "Renderer/VertexArray.hpp"
+#include "Renderer/VertexBuffer.hpp"
 #include "Renderer/RendererAPI.hpp"
 #include "Material.hpp"
 #include "Commands.hpp"
+#include "Mesh.hpp"
 
 namespace fox
 {
@@ -45,13 +46,27 @@ namespace fox
     void Renderer::RenderGeometry(Ref<Material> material, const Ref<VertexArray>& pVertexArray, uint32_t uIndexCount)
     {
         WeakRef<Material> weakMat = material;
-        RendererCommand::Push<FunctionCmd>([weakMat, pVertexArray, uIndexCount] mutable {
+        RendererCommand::Push<FunctionCmd>([weakMat, pVertexArray, uIndexCount]() mutable {
             if (weakMat.IsValid())
             {
                 weakMat->UpdateForRendering();
                 m_spRenderer->DrawIndexed(pVertexArray, uIndexCount);
+                weakMat->EndRendering();
             }
         });
+    }
+
+    void Renderer::RenderInstanceGeometry(Ref<Material> material, const Ref<Mesh>& mesh, uint32_t instanceCount)
+    {
+        WeakRef<Material> weakMat = material;
+        RendererCommand::Push<FunctionCmd>([weakMat, mesh, instanceCount]() mutable {
+            if (weakMat.IsValid())
+            {
+                weakMat->UpdateForRendering();
+                m_spRenderer->DrawElementsInstanced(mesh->VertexArray, mesh->VertexArray->GetIndexBuffer()->GetCount(), instanceCount);
+                weakMat->EndRendering();
+            }
+            });
     }
 
     void Renderer::DrawIndexed(const fox::Ref<fox::VertexArray> &pVertexArray, uint32_t uIndexCount)
@@ -66,9 +81,7 @@ namespace fox
 
     void Renderer::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
     {
-        RendererCommand::Push<FunctionCmd>([vertexArray, vertexCount] {
-            m_spRenderer->DrawLines(vertexArray, vertexCount);
-        });
+        m_spRenderer->DrawLines(vertexArray, vertexCount);
     }
 
     void Renderer::SetLineWidth(float width)

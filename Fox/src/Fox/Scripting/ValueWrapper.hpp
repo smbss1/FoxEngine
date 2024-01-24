@@ -5,7 +5,7 @@
 #ifndef FOXENGINE_VALUEWRAPPER_HPP
 #define FOXENGINE_VALUEWRAPPER_HPP
 
-#include <filesystem>
+#include "Core/Base.hpp"
 #include <glm/glm.hpp>
 
 #include <string>
@@ -84,6 +84,11 @@ namespace fox::Utils
         template<typename TValueType>
         TValueType Get() const
         {
+            if (!HasValue())
+            {
+                return TValueType();
+            }
+
             FOX_CORE_ASSERT(HasValue(), "ValueWrapper::Get - No value!");
 
             if constexpr (std::is_same<TValueType, std::string>::value)

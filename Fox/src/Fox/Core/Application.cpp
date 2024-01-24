@@ -8,9 +8,6 @@
 #include "Core/Logger/Logger.hpp"
 #include "Scripting/ScriptEngine.hpp"
 #include "Utils/PlatformUtils.hpp"
-#include "Reflection/Reflect.hpp"
-#include "Project.hpp"
-#include "Utils/RingBuffer.hpp"
 #include "Renderer/Commands.hpp"
 
 namespace fox
@@ -27,7 +24,7 @@ namespace fox
         // Set working directory here
         if (!m_Specification.WorkingDirectory.empty())
         {
-            std::filesystem::current_path(m_Specification.WorkingDirectory);
+            fs::current_path(m_Specification.WorkingDirectory);
         }
 
         m_pWindow = Window::Create(WindowProps(m_Specification.Name));
@@ -36,7 +33,6 @@ namespace fox
 
         Renderer::Init();
         ScriptEngine::Init(specification.ScriptSetting);
-        Reflection::Init();
 
         // Add the ImGui state of GUI
         m_ImGuiLayer = new ImGuiLayer;
@@ -47,9 +43,14 @@ namespace fox
 
     Application::~Application()
     {
+        Input::SetWindow(nullptr);
+		m_MainThreadQueue.clear();
         ScriptEngine::Shutdown();
         Renderer::WaitAndRender();
         Renderer::Shutdown();
+
+        m_LayerStack.~LayerStack();
+        m_pWindow = nullptr;
     }
 
     void Application::PushLayer(Layer* layer)

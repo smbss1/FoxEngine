@@ -22,6 +22,8 @@ namespace fox
 
         void SetViewportSize(uint32_t width, uint32_t height);
 
+        void OnViewportSizeChanged() override;
+
         float GetPerspectiveVerticalFOV() const { return m_PerspectiveFOV; }
         void SetPerspectiveVerticalFOV(float verticalFov) { m_PerspectiveFOV = verticalFov; RecalculateProjection(); }
         float GetPerspectiveNearClip() const { return m_PerspectiveNear; }

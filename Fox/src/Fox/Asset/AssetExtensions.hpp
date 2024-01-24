@@ -37,6 +37,27 @@ namespace fox
 //            { ".sound_graph", AssetType::SoundGraphSound }
         };
 
+    inline static std::unordered_map<AssetType, std::vector<std::string>> s_AssetTypeToExtensionsMap =
+    {
+        // Hazel types
+        { AssetType::Scene, { ".foxscene" } },
+        { AssetType::Prefab, { ".foxprefab" } },
+        //            { ".hsoundc", AssetType::SoundConfig },
+        //            { ".hpm", AssetType::PhysicsMat },
+
+        // Textures
+        { AssetType::Texture, { ".png", ".jpg", ".jpeg" } },
+
+        // Audio
+        { AssetType::Audio, { ".wav", ".ogg" } },
+
+        // Fonts
+        { AssetType::Font, { ".ttf", ".ttc", ".otf" } },
+
+        // Graphs
+//            { ".sound_graph", AssetType::SoundGraphSound }
+    };
+
 }
 
 #endif //FOXENGINE_ASSETEXTENSIONS_HPP

@@ -31,9 +31,9 @@ namespace fox
         // Not Serialized
         std::string FilePath;
 
-        void Save(const std::filesystem::path& filepath = "");
-        void ConstructFrom(const std::filesystem::path& filepath);
-        void AddRecentProject(const std::string& name, const std::filesystem::path& filepath);
+        void Save(const fs::path& filepath = "");
+        void ConstructFrom(const fs::path& filepath);
+        void AddRecentProject(const std::string& name, const fs::path& filepath);
         void AddRecentProject(std::map<time_t, RecentProject, std::greater<time_t>>::iterator it);
     };
 
@@ -43,8 +43,8 @@ namespace fox
         UserPreferencesSerializer(UserPreferences& preferences);
         ~UserPreferencesSerializer();
 
-        void Serialize(const std::filesystem::path& filepath);
-        void Deserialize(const std::filesystem::path& filepath);
+        void Serialize(const fs::path& filepath);
+        void Deserialize(const fs::path& filepath);
 
     private:
         UserPreferences& m_Preferences;

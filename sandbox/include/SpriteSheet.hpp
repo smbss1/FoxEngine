@@ -5,7 +5,7 @@
 #ifndef FOXENGINE_SPRITE_SHEET_HPP
 #define FOXENGINE_SPRITE_SHEET_HPP
 
-#include "FoxEngine.hpp"
+#include <FoxEngine.hpp>
 
 class SpriteSheetLayer : public fox::Layer
 {

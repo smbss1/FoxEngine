@@ -49,6 +49,7 @@ namespace fox
 
     OpenGLShader::~OpenGLShader()
     {
+        GLCall(glUseProgram(0));
         GLCall(glDeleteProgram(m_RendererID));
     }
 
@@ -273,6 +274,34 @@ namespace fox
             glShaderIDs.push_back(shader);
         }
 
+        //GLCall(glBindAttribLocation(program, 0, "a_Position"));
+
+        // example of struct for size of buffer data
+        // it's not a struct who will be in code
+        // but this struct must be the representation of what m_attributeData contains
+        //struct TestInstance
+        //{
+        //    glm::vec4 color;
+        //    float texIndex;
+        //};
+
+        //struct Data
+        //{
+        //    void* data;
+        //    uint8_t size;
+        //};
+
+        //std::vector<Data> m_attributeData;
+        //auto g = glm::vec4(1, 0, 1, 1);
+        //m_attributeData.push_back({ glm::value_ptr(g), sizeof(glm::vec4) }); // color attribute
+        //m_attributeData.push_back({ (void*)5, sizeof(float)}); // TexIndex attribute
+
+        // so here m_attributeData.size() should be equal to sizeof(TestInstance)
+
+        // Later when sending the data to the vbo who hold the dynami per-instance data
+
+        // Push the mesh and the m_attributeData
+
         // Link our program
         GLCall(glLinkProgram(program));
 
@@ -300,11 +329,63 @@ namespace fox
 
         GLCall(glValidateProgram(program));
 
+        //// Get Attribute Locations
+        //GLint numAttribs;
+        //glGetProgramInterfaceiv(program, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &numAttribs);
+
+        //GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };
+
+        //printf("Active attributes:\n");
+        //for (int i = 0; i < numAttribs; ++i) {
+        //    GLint results[3];
+        //    glGetProgramResourceiv(program, GL_PROGRAM_INPUT, i, 3, properties, 3, NULL, results);
+
+        //    GLint nameBufSize = results[0] + 1;
+        //    char* name = new char[nameBufSize];
+        //    glGetProgramResourceName(program, GL_PROGRAM_INPUT, i, nameBufSize, NULL, name);
+        //    printf("%-5d %s (%s)\n", results[2], name, getTypeString(results[1]));
+        //    delete[] name;
+        //}
+
+
+
         for (auto idd : glShaderIDs) {
             GLCall(glDetachShader(program, idd));
             GLCall(glDeleteShader(idd));
         }
 
         m_RendererID = program;
+    }
+
+    const char* OpenGLShader::getTypeString(GLenum type)
+    {
+        // There are many more types than are covered here, but
+        // these are the most common in these examples.
+        switch (type) {
+        case GL_FLOAT:
+            return "float";
+        case GL_FLOAT_VEC2:
+            return "vec2";
+        case GL_FLOAT_VEC3:
+            return "vec3";
+        case GL_FLOAT_VEC4:
+            return "vec4";
+        case GL_DOUBLE:
+            return "double";
+        case GL_INT:
+            return "int";
+        case GL_UNSIGNED_INT:
+            return "unsigned int";
+        case GL_BOOL:
+            return "bool";
+        case GL_FLOAT_MAT2:
+            return "mat2";
+        case GL_FLOAT_MAT3:
+            return "mat3";
+        case GL_FLOAT_MAT4:
+            return "mat4";
+        default:
+            return "?";
+        }
     }
 }

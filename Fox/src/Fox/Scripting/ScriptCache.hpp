@@ -32,8 +32,8 @@ typedef struct _MonoClassField MonoClassField;
 namespace fox
 {
     class ManagedClass;
-    class ManagedMethod;
-    class ManagedField;
+    struct ManagedMethod;
+    struct ManagedField;
     struct AssemblyInfo;
 
     class ScriptCache

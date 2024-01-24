@@ -42,7 +42,7 @@ namespace fox
                 { "Fox.Prefab", ScriptFieldType::Prefab },
             };
 
-        MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPBD)
+        MonoAssembly* LoadMonoAssembly(const fs::path& assemblyPath, bool loadPBD)
         {
             uint32_t fileSize = 0;
             char* fileData = FileSystem::ReadBytes(assemblyPath, &fileSize);
@@ -60,7 +60,7 @@ namespace fox
 
             if (loadPBD)
             {
-                std::filesystem::path pdbPath = assemblyPath;
+                fs::path pdbPath = assemblyPath;
                 pdbPath.replace_extension(".pdb");
 
                 if (FileSystem::Exists(pdbPath))
@@ -115,10 +115,12 @@ namespace fox
 
         std::string MonoToString(MonoString* monoString)
         {
-            char* cStr = mono_string_to_utf8(monoString);
-            std::string string = cStr;
-            free(cStr);
-            return std::move(string);
+            mono_unichar2* chl = mono_string_chars(monoString);
+            std::string out("");
+            for (int i = 0; i < mono_string_length(monoString); i++) {
+                out += chl[i];
+            }
+            return out;
         }
 
         bool HandleException(MonoObject* exception)

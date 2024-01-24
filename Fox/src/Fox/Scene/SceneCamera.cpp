@@ -32,18 +32,27 @@ namespace fox
         RecalculateProjection();
     }
 
+    void SceneCamera::OnViewportSizeChanged()
+    {
+        //FOX_CORE_ASSERT(m_ViewportWidth > 0 && m_ViewportHeight > 0, "");
+        //m_AspectRatio = (float)m_ViewportWidth / (float)m_ViewportHeight;
+        //RecalculateProjection();
+    }
+
     void SceneCamera::SetViewportSize(uint32_t width, uint32_t height)
     {
         FOX_CORE_ASSERT(width > 0 && height > 0, "");
         m_AspectRatio = (float) width / (float) height;
         RecalculateProjection();
+        Camera::SetViewportSize(width, height);
     }
 
     void SceneCamera::RecalculateProjection()
     {
         if (m_ProjectionType == ProjectionType::Perspective)
         {
-            m_Projection = glm::perspective(m_PerspectiveFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
+            m_ProjectionMatrix = glm::perspective(m_PerspectiveFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
+            m_ProjectionMatrix = glm::perspective(m_PerspectiveFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
         }
         else
         {
@@ -52,7 +61,7 @@ namespace fox
             float orthoBottom = -m_OrthographicSize * 0.5f;
             float orthoTop = m_OrthographicSize * 0.5f;
 
-            m_Projection = glm::ortho(orthoLeft, orthoRight,
+            m_ProjectionMatrix = glm::ortho(orthoLeft, orthoRight,
                                       orthoBottom, orthoTop, m_OrthographicNear, m_OrthographicFar);
         }
     }

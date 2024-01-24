@@ -109,6 +109,7 @@ namespace fox
 
     OpenGLFrameBuffer::~OpenGLFrameBuffer()
     {
+        GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
         GLCall(glDeleteFramebuffers(1, &m_RendererID));
         GLCall(glDeleteTextures(m_vColorAttachments.size(), m_vColorAttachments.data()));
         GLCall(glDeleteTextures(1, &m_uDepthAttachment));
@@ -165,6 +166,15 @@ namespace fox
         int pixelData;
         GLCall(glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData));
         return pixelData;
+    }
+
+    float OpenGLFrameBuffer::ReadDepthPixel(int x, int y)
+    {
+        Bind();
+        float depth;
+        GLCall(glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth));
+        Unbind();
+        return depth;
     }
 
     void OpenGLFrameBuffer::Invalidate()

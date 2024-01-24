@@ -4,6 +4,7 @@
 
 #ifndef FOXENGINE_STATE_HPP
 #define FOXENGINE_STATE_HPP
+#pragma once
 
 #include <string>
 #include "Events/Event.hpp"

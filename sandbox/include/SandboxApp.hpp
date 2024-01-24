@@ -8,7 +8,7 @@
 #ifndef FOX_SANDBOX_HPP_
 #define FOX_SANDBOX_HPP_
 
-#include "FoxEngine.hpp"
+#include <FoxEngine.hpp>
 
 class SandboxApp : public fox::Application
 {

@@ -28,6 +28,36 @@ namespace fox
         }
     }
 
+    void Material::EndRendering()
+    {
+        m_Shader->Unbind();
+    }
+
+    void Material::UpdateBuffer()
+    {
+        m_AttributesBuffer.reset();
+        for (auto& it : m_AttributesInfo)
+        {
+            m_AttributesBuffer.write(it.second.data, it.second.dataSize);
+        }
+    }
+
+    //void Material::SetAttribute(int index, float value)
+    //{
+    //    AttributeInfo* attribute;
+    //    auto& it = m_AttributesInfo.find(index);
+    //    if (it == m_AttributesInfo.end())
+    //    {
+    //        // For now add a new attribute but I may change it to return and move this code to a new function
+    //        m_AttributesInfo[index] = {};
+    //        attribute = &m_AttributesInfo[index];
+    //    }
+    //    attribute = &it->second;
+
+    //    std::copy(value, value + sizeof(float), attribute->data);
+    //    attribute->dataSize = sizeof(float);
+    //}
+
     void Material::Set(const std::string &name, float v0)
     {
         m_Uniforms[name] = {

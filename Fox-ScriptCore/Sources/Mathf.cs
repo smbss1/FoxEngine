@@ -1033,6 +1033,23 @@ namespace Fox
 			v.Normalize();
 			return new Quaternion(0, 0, v.y, v.x);
 		}
+		
+		public static Quaternion Euler(Vector3 euler)
+		{
+			float cr = Cos(euler.x * 0.5f);
+			float sr = Sin(euler.x * 0.5f);
+			float cp = Cos(euler.y * 0.5f);
+			float sp = Sin(euler.y * 0.5f);
+			float cy = Cos(euler.z * 0.5f);
+			float sy = Sin(euler.z * 0.5f);
+
+			return new Quaternion(
+				x: sr * cp * cy - cr * sp * sy,
+				y: cr * sp * cy + sr * cp * sy,
+				z: cr * cp * sy - sr * sp * cy,
+				w: cr * cp * cy + sr * sp * sy
+			);
+		}
 
 		/// <summary>Returns a matrix representing a 2D position and rotation</summary>
 		/// <param name="point">The location of the matrix</param>

@@ -12,7 +12,7 @@
 
 namespace fox
 {
-    class ManagedField;
+    struct ManagedField;
     class ManagedClass;
 
     class FieldStorage : public RefCounted
@@ -29,6 +29,11 @@ namespace fox
         T GetValue() const
         {
             return GetValue().template Get<T>();
+        }
+
+        bool HasValue() const
+        {
+            return GetValue().HasValue();
         }
 
         Utils::ValueWrapper GetValue() const

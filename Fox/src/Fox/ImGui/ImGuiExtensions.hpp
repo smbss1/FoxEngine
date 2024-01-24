@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <vector>
 #include <string>
-#include <filesystem>
+#include "Core/Base.hpp"
 #include "imgui.h"
 #include "glm/detail/setup.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -69,11 +69,12 @@ namespace fox::UI
         return ImGui::ColorEdit4(label.c_str(), glm::value_ptr(value));
     }
 
+    bool AssetField(const std::string& label, AssetLink& value, bool handlePayload);
     bool AssetField(const std::string& label, AssetHandle& value, bool handlePayload = false, const std::vector<std::string>& extensions = {});
     void PreviewTexture(AssetHandle& value, const std::vector<std::string>& extensions);
     bool ImageButton(AssetHandle& handle);
     bool HandleContentBrowserPayload(AssetHandle& handle, const std::vector<std::string>& extensions);
-    bool HandleContentBrowserPayloadCustom(const std::vector<std::string>& extensions, std::function<void(std::filesystem::path&)> func);
+    bool HandleContentBrowserPayloadCustom(const std::vector<std::string>& extensions, std::function<void(fs::path&)> func);
     bool DropBoxAsset(AssetHandle& handle, const std::vector<std::string>& extensions);
     bool Enum(const std::string& name, const char* typeString[], int size, int index, int& valueFrom);
     bool ToggleButton(const std::string& str_id, bool& v);

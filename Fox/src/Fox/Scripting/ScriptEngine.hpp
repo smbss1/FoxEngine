@@ -5,6 +5,7 @@
 #ifndef FOXENGINE_SCRIPTENGINE_HPP
 #define FOXENGINE_SCRIPTENGINE_HPP
 
+#include "Core/Base.hpp"
 #include "Scene/Scene.hpp"
 #include "Ecs/Entity.hpp"
 #include "GCManager.hpp"
@@ -12,7 +13,6 @@
 #include "ScriptCache.hpp"
 #include "FieldStorage.hpp"
 
-#include <filesystem>
 #include <string>
 #include <map>
 
@@ -64,7 +64,7 @@ namespace fox
 
     struct AssemblyInfo : public RefCounted
     {
-        std::filesystem::path FilePath = "";
+        fs::path FilePath = "";
         MonoAssembly* Assembly = nullptr;
         MonoImage* AssemblyImage = nullptr;
         std::vector<uint32_t> Classes;
@@ -73,7 +73,7 @@ namespace fox
 
     struct ScriptEngineSetting
     {
-        std::filesystem::path CoreAssemblyPath;
+        fs::path CoreAssemblyPath;
         bool EnableDebugging;
         bool EnableProfiling;
     };
@@ -87,6 +87,8 @@ namespace fox
         static bool LoadAssembly();
         static bool LoadAppAssembly();
         static void ReloadAppDomain();
+        static void CompileAppAssembly();
+
         static MonoDomain* GetAppDomain();
         static Ref<AssemblyInfo> GetCoreAssembly();
         static Ref<AssemblyInfo> GetAppAssembly();
@@ -100,6 +102,7 @@ namespace fox
 
         static void InitializeScriptEntity(Entity entity);
         static void ShutdownScriptEntity(Entity entity, bool erase = true);
+        static void CopyScriptEntityData(Entity srcEntity, Entity dstEntity);
 
         static void OnCreateEntity(Entity entity);
         static void OnEntityInstantiated(Entity entityDst, Entity entitySrc);
@@ -126,11 +129,9 @@ namespace fox
         static void InitRuntimeObject(MonoObject* object);
 
         static void LoadAssemblyClasses();
-        static void CompileAppAssembly();
 
         friend class ManagedClass;
         friend class ScriptGlue;
-        friend class ManagedClass;
         friend class ScriptCache;
         friend class FieldStorage;
         friend class ManagedInstance;

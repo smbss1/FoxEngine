@@ -8,13 +8,8 @@
 
 namespace fox
 {
-    Ref<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
-    {
-        return new_ref<OpenGLTexture>(width, height);
-    }
-
-    Ref<Texture2D> Texture2D::Create(const std::string &path)
-    {
-        return new_ref<OpenGLTexture>(path);
-    }
+	Ref<Texture2D> Texture2D::Create(const TextureSpecification& specification, Buffer data)
+	{
+        return new_ref<OpenGLTexture>(specification, data);
+	}
 }

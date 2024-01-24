@@ -18,7 +18,6 @@ namespace fox
     {
     public:
         OpenGLVertexArray();
-
         ~OpenGLVertexArray() override;
 
         void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) override;
@@ -27,12 +26,11 @@ namespace fox
         [[nodiscard]] const Ref<IndexBuffer>& GetIndexBuffer() const override;
 
         void Bind() const override;
-
         void Unbind() const override;
 
     private:
+        bool m_UseInstancing = false;
         uint32_t m_RendererID = 0;
-        uint32_t m_uVertexBufferIndex = 0;
         std::vector<Ref<VertexBuffer>> m_vVerticesBuffers;
         Ref<IndexBuffer> m_pIndexBuffer;
     };

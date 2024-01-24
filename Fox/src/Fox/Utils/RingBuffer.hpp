@@ -10,22 +10,6 @@
 
 namespace fox
 {
-//    struct ThreadCmd
-//    {
-//        virtual void Execute() = 0;
-//    };
-
-    struct ThreadCmdTest
-    {
-        std::string msg;
-
-        ThreadCmdTest(std::string m) : msg(m) {}
-        void Execute()
-        {
-            std::cout << msg << std::endl;
-        }
-    };
-
     class RingBuffer
     {
     public:

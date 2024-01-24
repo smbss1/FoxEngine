@@ -8,7 +8,7 @@
 #include "Core/Project.hpp"
 #include "yaml-cpp/yaml.h"
 
-#include <filesystem>
+#include "Core/Base.hpp"
 
 #include "AssetExtensions.hpp"
 #include "Utils/String.hpp"
@@ -19,7 +19,7 @@ namespace fox
 
     void AssetManager::Init()
     {
-        AssetImporter::Init();
+        //AssetImporter::Init();
 
         LoadAssetRegistry();
 //        FileSystem::SetChangeCallback(AssetManager::OnFileSystemChanged);
@@ -103,7 +103,7 @@ namespace fox
         return s_NullMetadata;
     }
 
-    const AssetMetadata& AssetManager::GetMetadata(const std::filesystem::path& filepath)
+    const AssetMetadata& AssetManager::GetMetadata(const fs::path& filepath)
     {
         const auto relativePath = GetRelativePath(filepath);
 
@@ -116,13 +116,13 @@ namespace fox
         return s_NullMetadata;
     }
 
-    std::filesystem::path AssetManager::GetRelativePath(const std::filesystem::path& filepath)
+    fs::path AssetManager::GetRelativePath(const fs::path& filepath)
     {
-        std::filesystem::path relativePath = filepath.lexically_normal();
+        fs::path relativePath = filepath.lexically_normal();
         std::string temp = filepath.string();
         if (temp.find(Project::AssetsDir().string()) != std::string::npos)
         {
-            relativePath = std::filesystem::relative(filepath, Project::AssetsDir());
+            relativePath = fs::relative(filepath, Project::AssetsDir());
             if (relativePath.empty())
             {
                 relativePath = filepath.lexically_normal();
@@ -131,12 +131,12 @@ namespace fox
         return relativePath;
     }
 
-    AssetHandle AssetManager::GetAssetHandleFromFilePath(const std::filesystem::path& filepath)
+    AssetHandle AssetManager::GetAssetHandleFromFilePath(const fs::path& filepath)
     {
         return GetMetadata(filepath).Handle;
     }
 
-    void AssetManager::OnAssetRenamed(AssetHandle assetHandle, const std::filesystem::path& newFilePath)
+    void AssetManager::OnAssetRenamed(AssetHandle assetHandle, const fs::path& newFilePath)
     {
         AssetMetadata metadata = GetMetadata(assetHandle);
         if (!metadata.IsValid())
@@ -166,14 +166,21 @@ namespace fox
         return s_AssetExtensionMap.at(ext.c_str());
     }
 
-    AssetType AssetManager::GetAssetTypeFromPath(const std::filesystem::path& path)
+    const std::vector<std::string>& AssetManager::GetExtensionsFromAssetType(AssetType type)
+    {
+        if (s_AssetTypeToExtensionsMap.find(type) == s_AssetTypeToExtensionsMap.end())
+            return {};
+        return s_AssetTypeToExtensionsMap.at(type);
+    }
+
+    AssetType AssetManager::GetAssetTypeFromPath(const fs::path& path)
     {
         return GetAssetTypeFromExtension(path.extension().string());
     }
 
     void AssetManager::LoadAssetRegistry()
     {
-        FOX_CORE_INFO_TAG("AssetManager", "Loading Asset Registry");
+        FOX_CORE_INFO_TAG("AssetManager", "Loading Asset Registry: %", Project::AssetRegistryPath());
 
         const auto& assetRegistryPath = Project::AssetRegistryPath();
         if (!FileSystem::Exists(assetRegistryPath))
@@ -189,7 +196,7 @@ namespace fox
         if (!handles)
         {
             FOX_CORE_ERROR("[AssetManager] Asset Registry appears to be corrupted!");
-//            FOX_CORE_VERIFY(false);
+            FOX_CORE_VERIFY(false);
             return;
         }
 
@@ -212,9 +219,9 @@ namespace fox
                 std::string mostLikelyCandidate;
                 uint32_t bestScore = 0;
 
-                for (auto& pathEntry : std::filesystem::recursive_directory_iterator(Project::AssetsDir()))
+                for (auto& pathEntry : fs::recursive_directory_iterator(Project::AssetsDir()))
                 {
-                    const std::filesystem::path& path = pathEntry.path();
+                    const fs::path& path = pathEntry.path();
 
                     if (path.filename() != metadata.FilePath.filename())
                         continue;
@@ -253,7 +260,7 @@ namespace fox
                 }
 
                 std::replace(mostLikelyCandidate.begin(), mostLikelyCandidate.end(), '\\', '/');
-                metadata.FilePath = std::filesystem::relative(mostLikelyCandidate, Project::GetActive()->AssetsDir());
+                metadata.FilePath = fs::relative(mostLikelyCandidate, Project::GetActive()->AssetsDir());
                 FOX_CORE_WARN("[AssetManager] Found most likely match '%'", metadata.FilePath);
             }
 
@@ -269,9 +276,9 @@ namespace fox
         FOX_CORE_INFO("[AssetManager] Loaded % asset entries", s_AssetRegistry.Count());
     }
 
-    AssetHandle AssetManager::ImportAsset(const std::filesystem::path& filepath)
+    AssetHandle AssetManager::ImportAsset(const fs::path& filepath)
     {
-        std::filesystem::path path = GetRelativePath(filepath);
+        fs::path path = GetRelativePath(filepath);
 
         if(auto& metadata = GetMetadata(path); metadata.IsValid())
             return metadata.Handle;
@@ -302,20 +309,29 @@ namespace fox
         {
             FOX_CORE_WARN("Trying to reload asset that was never loaded");
 
-            Ref<Asset> asset;
-            metadata.IsDataLoaded = AssetImporter::TryLoadData(metadata, asset);
+            Ref<Asset> asset = AssetImporter::ImportAsset(metadata.Handle, metadata);
+            if (asset)
+            {
+                asset->Handle = assetHandle;
+            }
+            metadata.IsDataLoaded = asset != nullptr;
             return metadata.IsDataLoaded;
         }
 
         FOX_CORE_ASSERT(s_LoadedAssets.find(assetHandle) != s_LoadedAssets.end());
         Ref<Asset>& asset = s_LoadedAssets.at(assetHandle);
-        metadata.IsDataLoaded = AssetImporter::TryLoadData(metadata, asset);
+        asset = AssetImporter::ImportAsset(metadata.Handle, metadata);
+        if (asset)
+        {
+            asset->Handle = assetHandle;
+        }
+        metadata.IsDataLoaded = asset != nullptr;
         return metadata.IsDataLoaded;
     }
 
-    void AssetManager::ProcessDirectory(const std::filesystem::path& directoryPath)
+    void AssetManager::ProcessDirectory(const fs::path& directoryPath)
     {
-        for (auto entry : std::filesystem::directory_iterator(directoryPath))
+        for (auto entry : fs::directory_iterator(directoryPath))
         {
             if (entry.is_directory())
                 ProcessDirectory(entry.path());

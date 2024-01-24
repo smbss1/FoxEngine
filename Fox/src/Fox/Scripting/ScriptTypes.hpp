@@ -164,7 +164,7 @@ namespace fox
 
     public:
         ManagedClass() = default;
-        ManagedClass(const std::string& classNamespace, const std::string& className, bool isCore = false);
+        //ManagedClass(const std::string& classNamespace, const std::string& className, bool isCore = false);
         ~ManagedClass()
         {
             Class = nullptr;
@@ -198,6 +198,7 @@ namespace fox
         ~ManagedInstance();
 
         MonoObject* GetManagedObject() const { return GCManager::GetReferencedObject(m_Handle); }
+        bool IsValid() const { return GetManagedObject() != nullptr; }
 
         void InvokeMethod(ManagedMethod* method, void** params = nullptr, ManagedType returnType = ManagedType(), Utils::ValueWrapper* result = nullptr);
 
@@ -312,7 +313,7 @@ namespace fox
             if (managedClass->IsStruct)
                 return std::move(instance);
 
-            instance->template CallMethod(".ctor", std::forward<TConstructorArgs>(args)...);
+            instance->CallMethod(".ctor", std::forward<TConstructorArgs>(args)...);
             return std::move(instance);
         }
 
@@ -322,7 +323,7 @@ namespace fox
         {
 //            FOX_PROFILE_SCOPE(methodName.c_str());
 
-            if (!method)
+            if (!method || !method->Method)
             {
                 return;
             }

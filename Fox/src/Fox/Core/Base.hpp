@@ -28,263 +28,56 @@ privDefer<F> defer_func(F f) {
 #define DEFER_3(x)    DEFER_2(x, __COUNTER__)
 #define defer(code)   auto DEFER_3(_defer_) = defer_func([&](){code;})
 
-//// Properties
-//// a read-write property with data store and
-//// automatically generated get/set functions.
-//// this is what C++/CLI calls a trivial scalar
-//// property
-//template <class T>
-//class Property
-//{
-//    T data;
-//public:
-//    // might be useful for template
-//    // deductions
-//    using value_type = T;
-//
-//    // access with function call syntax
-//    Property() : data() { }
-//    T operator()() const
-//    {
-//        return data;
-//    }
-//
-//    T operator()(T const & value)
-//    {
-//        data = value;
-//        return data;
-//    }
-//
-//    // access with get()/set() syntax
-//    T get() const
-//    {
-//        return data;
-//    }
-//
-//    T set(T const & value)
-//    {
-//        data = value;
-//        return data;
-//    }
-//
-//    // access with '=' sign
-//    // in an industrial-strength library,
-//    // specializations for appropriate types
-//    // might choose to add combined operators
-//    // like +=, etc.
-//    operator T() const
-//    {
-//        return data;
-//    }
-//
-//    T operator=(T const & value)
-//    {
-//        data = value;
-//        return data;
-//    }
-//
-//    bool operator==(T const & value) const {
-//        return data == value;
-//    }
-//};
-//
-//// a read-only property calling a
-//// user-defined getter
-//template <typename T, typename Object,
-//        T (Object::*real_getter)()>
-//class ROProperty {
-//    Object * my_object;
-//public:
-//    ROProperty() : my_object(0) {}
-//    ROProperty(Object * me = 0)
-//            : my_object(me) {}
-//
-//    // this function must be called by the
-//    // containing class, normally in a
-//    // constructor, to initialize the
-//    // ROProperty so it knows where its
-//    // real implementation code can be
-//    // found.
-//    // obj is usually the containing
-//    // class, but need not be; it could be a
-//    // special implementation object.
-//    void operator()(Object * obj) {
-//        my_object = obj;
-//    }
-//
-//    // function call syntax
-//    T operator()() const {
-//        return (my_object->*real_getter)();
-//    }
-//
-//    // get/set syntax
-//    T get() const {
-//        return (my_object->*real_getter)();
-//    }
-//    void set(T const & value);
-//    // reserved but not implemented,
-//    // per C++/CLI
-//
-//    // use on rhs of '='
-//    operator T() const {
-//        return (my_object->*real_getter)();
-//    }
-//
-//    typedef T value_type;
-//    // might be useful for template
-//    // deductions
-//};
-//
-//// a write-only property calling a
-//// user-defined setter
-//template <class T, class Object,
-//        T (Object::*real_setter)(T const &)>
-//class WOProperty {
-//    Object * my_object;
-//public:
-//    WOProperty() : my_object(0) {}
-//    WOProperty(Object * me = 0)
-//            : my_object(me) {}
-//
-//    // this function must be called by the
-//    // containing class, normally in a
-//    // constructor, to initialize the
-//    // WOProperty so it knows where its real
-//    // implementation code can be found
-//    void operator()(Object * obj) {
-//        my_object = obj;
-//    }
-//    // function call syntax
-//    T operator()(T const & value) {
-//        return (my_object->*real_setter)(value);
-//    }
-//    // get/set syntax
-//    T get() const;
-//    // reserved but not implemented,
-//    // per C++/CLI
-//    T set(T const & value) {
-//        return (my_object->*real_setter)(value);
-//    }
-//
-//    // access with '=' sign
-//    T operator=(T const & value) {
-//        return (my_object->*real_setter)(value);
-//    }
-//
-//    typedef T value_type;
-//    // might be useful for template
-//    // deductions
-//};
-//
-//// a read-write property which invokes
-//// user-defined functions
-//template <class T,
-//        class Object,
-//        T (Object::*real_getter)(),
-//        void (Object::*real_setter)(T const &)>
-//class RWProperty
-//{
-//    Object * my_object;
-//public:
-//    RWProperty() : my_object(0) {}
-//    RWProperty(Object * me = 0)
-//            : my_object(me) {}
-//
-//    // this function must be called by the
-//    // containing class, normally in a
-//    // constructor, to initialize the
-//    // ROProperty so it knows where its
-//    // real implementation code can be
-//    // found
-//    void operator()(Object * obj) {
-//        my_object = obj;
-//    }
-//
-//    // function call syntax
-//    T operator()() const {
-//        return (my_object->*real_getter)();
-//    }
-//    void operator()(T const & value) {
-//        (my_object->*real_setter)(value);
-//    }
-//
-//    // get/set syntax
-//    T get() const {
-//        return (my_object->*real_getter)();
-//    }
-//    void set(T const & value) {
-//        (my_object->*real_setter)(value);
-//    }
-//    // access with '=' sign
-//    operator T() const {
-//        return (my_object->*real_getter)();
-//    }
-//    void operator=(T const & value) {
-//        (my_object->*real_setter)(value);
-//    }
-//    bool operator==(T const & value) const {
-//        return (my_object->*real_getter)() == value;
-//    }
-//
-//    typedef T value_type;
-//    // might be useful for template
-//    // deductions
-//};
-//
-//#include <map>
-//template <class KeyCode,
-//        class T,
-//        class Compare = std::less<KeyCode>,
-//        class Allocator = std::allocator<std::pair<const KeyCode, T>>>
-//class IndexedProperty
-//{
-//    std::map<KeyCode, T, Compare,
-//            Allocator> data;
-//    typedef typename std::map<KeyCode, T, Compare,
-//            Allocator>::iterator
-//            map_iterator;
-//public:
-//
-//    // function call syntax
-//    T operator()(KeyCode const & key) {
-//        std::pair<map_iterator, bool> result;
-//        result
-//                = data.insert(std::make_pair(key, T()));
-//        return (*result.first).second;
-//    }
-//    T operator()(KeyCode const & key,
-//                 T const & t) {
-//        std::pair<map_iterator, bool> result;
-//        result
-//                = data.insert(std::make_pair(key, t));
-//        return (*result.first).second;
-//    }
-//
-//    // get/set syntax
-//    T get_Item(KeyCode const & key) {
-//        std::pair<map_iterator, bool> result;
-//        result
-//                = data.insert(std::make_pair(key, T()));
-//        return (*result.first).second;
-//    }
-//    T set_Item(KeyCode const & key,
-//               T const & t) {
-//        std::pair<map_iterator, bool> result;
-//        result
-//                = data.insert(std::make_pair(key, t));
-//        return (*result.first).second;
-//    }
-//
-//    // operator [] syntax
-//    T& operator[](KeyCode const & key) {
-//        return (*((data.insert(make_pair(
-//                key, T()))).first)).second;
-//    }
-//};
-//
-//#define PROP(TYPE) Property<TYPE>
-//#define ROPROP(TYPE, CLASS, GETTER) ROProperty<TYPE, CLASS, &CLASS::GETTER>
-//#define WOPROP(TYPE, CLASS, SETTER) WOProperty<TYPE, CLASS, &CLASS::SETTER>
-//#define RWPROP(TYPE, CLASS, GETTER, SETTER) RWProperty<TYPE, CLASS, &CLASS::GETTER, &CLASS::SETTER>
+
+#if _MSVC_LANG >= 201703L || __cplusplus >= 201703L && defined(__has_include)
+    // ^ Supports MSVC prior to 15.7 without setting /Zc:__cplusplus to fix __cplusplus
+    // _MSVC_LANG works regardless. But without the switch, the compiler always reported 199711L: https://blogs.msdn.microsoft.com/vcblog/2018/04/09/msvc-now-correctly-reports-__cplusplus/
+    #if __has_include(<filesystem>) // Two stage __has_include needed for MSVC 2015 and per https://gcc.gnu.org/onlinedocs/cpp/_005f_005fhas_005finclude.html
+        #define GHC_USE_STD_FS
+
+        // Old Apple OSs don't support fs, though the header is available at compile
+        // time. In particular, fs is unavailable before macOS 10.15, iOS/tvOS 13.0,
+        // and watchOS 6.0.
+        #ifdef __APPLE__
+            #include <Availability.h>
+            // Note: This intentionally uses fs on any new Apple OS, like visionOS
+            // released after fs, where fs is always available.
+            // (All other __<platform>_VERSION_MIN_REQUIREDs will be undefined and thus 0.)
+            #if __MAC_OS_X_VERSION_MIN_REQUIRED && __MAC_OS_X_VERSION_MIN_REQUIRED < 101500 \
+             || __IPHONE_OS_VERSION_MIN_REQUIRED && __IPHONE_OS_VERSION_MIN_REQUIRED < 130000 \
+             || __TV_OS_VERSION_MIN_REQUIRED && __TV_OS_VERSION_MIN_REQUIRED < 130000 \
+             || __WATCH_OS_VERSION_MAX_ALLOWED && __WATCH_OS_VERSION_MAX_ALLOWED < 60000
+                #undef GHC_USE_STD_FS
+            #endif  
+        #endif
+    #endif
+#endif
+
+#ifdef GHC_USE_STD_FS
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#else
+    #include "filesystem.hpp"
+    namespace fs = ghc::filesystem;
+#endif
+
+    template <typename T>
+    struct reversion_wrapper { T& iterable; };
+
+    template <typename T>
+    auto begin(reversion_wrapper<T> w) { return std::rbegin(w.iterable); }
+
+    template <typename T>
+    auto end(reversion_wrapper<T> w) { return std::rend(w.iterable); }
+
+    template <typename T>
+    reversion_wrapper<T> reverse(T&& iterable) { return { iterable }; }
+
+namespace fox
+{
+    void InitializeCore();
+    void ShutdownCore();
+}
+
 
 #endif //FOXENGINE_BASE_HPP

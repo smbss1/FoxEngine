@@ -62,7 +62,7 @@
 ////        }
 //        out << YAML::BeginMap; // Class
 //
-//        auto prop_list = localObj->get_derived_type().get_properties();
+//        auto prop_list = localObj->get_derived_type().GetProperties();
 //        for (auto prop : prop_list)
 //        {
 //            // Retrieving value from property
@@ -111,7 +111,7 @@
 //        else
 //        {
 //            // Not a fundemental, or a container. Check if it's an object
-//            auto child_props = varType.get_properties();
+//            auto child_props = varType.GetProperties();
 //            if (!child_props.empty())
 //            {
 //                // We have properties, thus we can be serialized as an object

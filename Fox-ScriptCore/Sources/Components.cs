@@ -58,7 +58,29 @@ namespace Fox
                 InternalCalls.TransformComponent_GetRotation(Entity.ID, out Vector3 v);
                 return v;
             }
-            set => InternalCalls.TransformComponent_SetRotation(Entity.ID, ref value);
+            set
+            {
+                Vector3 tempRotation = value * Mathfs.Deg2Rad;
+                InternalCalls.TransformComponent_SetRotation(Entity.ID, ref tempRotation);
+            }
+        }
+
+        public Vector3 right
+        {
+            get
+            {
+                InternalCalls.TransformComponent_GetRight(Entity.ID, out Vector3 v);
+                return v;
+            }
+        }
+
+        public Vector3 forward
+        {
+            get
+            {
+                InternalCalls.TransformComponent_GetForward(Entity.ID, out Vector3 v);
+                return v;
+            }
         }
 
         /// <summary>
@@ -163,6 +185,10 @@ namespace Fox
     public class BoxCollider2D : Collider2D
     {
     }
+
+    public class CircleCollider2D : Collider2D
+    {
+    }
     #endregion
     
 #region Animator
@@ -215,5 +241,16 @@ namespace Fox
             }
         }
     }
-#endregion
+    #endregion
+
+    #region Transform
+    public class CameraComponent : Component
+    {
+        public Vector3 ScreenToWorld(Vector2 screenPos)
+        {
+            InternalCalls.Camera_ScreenToWorld(Entity.ID, ref screenPos, out Vector3 worldPos);
+            return worldPos;
+        }
+    }
+    #endregion
 }

@@ -1,6 +1,6 @@
 UserPrefs:
   ShowWelcomeScreen: true
-  EnginePath: /home/samuel/Git Repos/FoxEngine
+  EnginePath: C:\Users\besse\Documents\GitHub\FoxEngine
   StartupProject: SandboxProject/Sandbox.foxproj
   RecentProjects:
     - Name: 2DHorror

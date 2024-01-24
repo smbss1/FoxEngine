@@ -3,6 +3,7 @@
 //
 
 #include "EditorIcons.hpp"
+#include "Asset/TextureImporter.hpp"
 
 namespace fox
 {
@@ -12,8 +13,8 @@ namespace fox
 
     void EditorIcons::Init()
     {
-        IconPlay = Texture2D::Create("Resources/PlayButton.png");
-        IconSimulate = Texture2D::Create("Resources/SimulateButton.png");
-        IconStop = Texture2D::Create("Resources/StopButton.png");
+        IconPlay = TextureImporter::LoadTexture2D("Resources/PlayButton.png");
+        IconSimulate = TextureImporter::LoadTexture2D("Resources/SimulateButton.png");
+        IconStop = TextureImporter::LoadTexture2D("Resources/StopButton.png");
     }
 }

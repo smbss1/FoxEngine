@@ -1,8 +1,8 @@
 -- FoxRootDirectory = os.getenv("FOX_DIR")
 
 -- NOTE: Finding a way to set in env variable in linux or in getting the value in a file config
-FoxRootDirectory = "/home/samuel/Git Repos/FoxEngine/"
--- include (path.join(FoxRootDirectory, "Foxnut", "Resources", "LUA", "Fox.lua"))
+FoxRootDirectory = "C:\\Users\\besse\\Documents\\GitHub\\FoxEngine\\"
+-- include (path.join(FoxRootDirectory, "FoxEditor", "Resources", "LUA", "Fox.lua"))
 
 local function getAssemblyFiles(directory, is_windows)
 	if is_windows then
@@ -92,7 +92,7 @@ group ""
 project "Sandbox"
 	kind "SharedLib"
 	language "C#"
-	dotnetframework "4.5"
+	dotnetframework "4.8"
 
 	targetname "Sandbox"
 	targetdir ("%{prj.location}/Assets/Scripts/Binaries")

@@ -86,7 +86,7 @@ namespace fox
     void PanelManager::Deserialize()
     {
         std::string outStr;
-        std::filesystem::path layoutPath = "EditorLayout.yaml";
+        fs::path layoutPath = "EditorLayout.yaml";
         if (!FileSystem::ReadFile(layoutPath, outStr))
             return;
 

@@ -174,12 +174,12 @@ namespace fox
     }
 
 
-    ManagedClass::ManagedClass(const std::string &classNamespace, const std::string &className, bool isCore)
-        : m_ClassNamespace(classNamespace), m_ClassName(className)
-    {
-        Class = mono_class_from_name(isCore ? ScriptEngine::GetCoreAssembly()->AssemblyImage : ScriptEngine::GetAppAssembly()->AssemblyImage,
-                                           classNamespace.c_str(), className.c_str());
-    }
+    //ManagedClass::ManagedClass(const std::string &classNamespace, const std::string &className, bool isCore)
+    //    : m_ClassNamespace(classNamespace), m_ClassName(className)
+    //{
+    //    Class = mono_class_from_name(isCore ? ScriptEngine::GetCoreAssembly()->AssemblyImage : ScriptEngine::GetAppAssembly()->AssemblyImage,
+    //                                       classNamespace.c_str(), className.c_str());
+    //}
 
     MonoObject *ManagedClass::CreateInstance()
     {

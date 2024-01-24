@@ -129,7 +129,7 @@ namespace fox::Reflect
         {
             if (m_CurrentEnum)
             {
-                m_CurrentEnum->template Add(name, value);
+                m_CurrentEnum->Add(name, value);
             }
             return *this;
         }

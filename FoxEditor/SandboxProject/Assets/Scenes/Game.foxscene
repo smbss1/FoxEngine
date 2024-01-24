@@ -8,18 +8,22 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteRenderer:
-      Color: [1, 1, 1, 1]
+      Color: [0.867256641, 0.180358678, 0.180358678, 1]
     ScriptComponent:
       ClassName: Sandbox.Player
       ScriptFields:
         - ID: 4002109686
           Name: Sandbox.Player:Speed
           Type: 12
-          Data: 12
+          Data: 2
         - ID: 1414718891
           Name: Sandbox.Player:BulletPrefab
           Type: 18
-          Data: 2250225605053858380
+          Data: 17726382112825679518
+        - ID: 2999744233
+          Name: Sandbox.Player:CameraEntity
+          Type: 18
+          Data: 9358953404056040341
     Rigidbody2D:
       BodyType: Kinematic
       FixedRotation: true
@@ -64,75 +68,7 @@ Entities:
         - ID: 3418016451
           Name: Sandbox.CameraFollow:dampTime
           Type: 12
-          Data: 0.699999988
-    HierarchyComponent:
-      Parent: 0
-      Children:
-        []
-  - Entity: 11431865266355737168
-    NameComponent:
-      Name: Bullet
-    TransformComponent:
-      Position: [-3.66214371, 1.73459375, 0.000122069941]
-      Rotation: [0, 0, 0]
-      Scale: [0.200000003, 0.5, 1]
-    SpriteRenderer:
-      Color: [1, 1, 1, 1]
-    ScriptComponent:
-      ClassName: Sandbox.Bullet
-      ScriptFields:
-        - ID: 2802533049
-          Name: Sandbox.Bullet:Speed
-          Type: 12
-          Data: 12
-    Rigidbody2D:
-      BodyType: Dynamic
-      FixedRotation: true
-      GravityScale: 0
-      LayerID: 0
-    BoxCollider2D:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-    HierarchyComponent:
-      Parent: 0
-      Children:
-        []
-  - Entity: 16471339227282434742
-    NameComponent:
-      Name: Bound
-    TransformComponent:
-      Position: [0.554649353, 10.6949844, 0]
-      Rotation: [0, 0, 0]
-      Scale: [38.5999985, 2.20000005, 1]
-    Rigidbody2D:
-      BodyType: Kinematic
-      FixedRotation: true
-      GravityScale: 0
-      LayerID: 0
-    BoxCollider2D:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-    HierarchyComponent:
-      Parent: 0
-      Children:
-        []
-  - Entity: 95256646438508480
-    NameComponent:
-      Name: Entity
-    TransformComponent:
-      Position: [2.40579033, 0.619459093, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRenderer:
-      Color: [0.807829201, 0.218487605, 0.218487605, 1]
+          Data: 1
     HierarchyComponent:
       Parent: 0
       Children:

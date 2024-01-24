@@ -7,7 +7,7 @@
 
 //#include "ScriptEngine.hpp"
 
-#include <filesystem>
+#include "Core/Base.hpp"
 #include "mono/metadata/object.h"
 
 extern "C" {
@@ -24,14 +24,14 @@ typedef struct _MonoString MonoString;
 namespace fox
 {
     enum class ScriptFieldType;
-    class ManagedType;
-    class ManagedField;
+    struct ManagedType;
+    struct ManagedField;
 
     namespace Utils
     {
         class ValueWrapper;
 
-        MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPBD = false);
+        MonoAssembly* LoadMonoAssembly(const fs::path& assemblyPath, bool loadPBD = false);
         void PrintAssemblyTypes(MonoAssembly* assembly);
         ScriptFieldType MonoTypeToScriptFieldType(MonoType* monoType);
         std::string MonoToString(MonoString* monoString);

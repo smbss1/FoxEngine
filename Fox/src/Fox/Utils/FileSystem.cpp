@@ -9,16 +9,25 @@
 #include "Core/Core.hpp"
 #include "Core/Logger/Logger.hpp"
 
+#ifdef FOX_PLATFORM_WINDOWS
+    #include "windows.h"
+#endif
+
 namespace fox::FileSystem
 {
-    bool Exists(const std::filesystem::path& filepath)
+    bool Exists(const fs::path& filepath)
     {
-        return std::filesystem::exists(filepath);
+        return fs::exists(filepath);
     }
 
     bool Exists(const std::string& filepath)
     {
-        return std::filesystem::exists(std::filesystem::path(filepath));
+        return fs::exists(fs::path(filepath));
+    }
+
+    bool WriteFile(const fs::path& strFile, const std::string& strSave)
+    {
+        return WriteFile(strFile.string(), strSave);
     }
 
     bool WriteFile(const std::string& strFile, const std::string& strSave)
@@ -30,6 +39,11 @@ namespace fox::FileSystem
         oFile << strSave;
 
         return true;
+    }
+
+    bool ReadFile(const fs::path& strFile, std::string& strOutReadContent)
+    {
+        return ReadFile(strFile.string(), strOutReadContent);
     }
 
     bool ReadFile(const std::string& strFile, std::string& strOutReadContent)
@@ -47,7 +61,7 @@ namespace fox::FileSystem
         return true;
     }
 
-    char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
+    char* ReadBytes(const fs::path& filepath, uint32_t* outSize)
     {
         std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
 
@@ -90,7 +104,7 @@ namespace fox::FileSystem
         }
 
         return lOpenStatus == ERROR_SUCCESS;
-#elifdef FOX_PLATFORM_LINUX
+#elif FOX_PLATFORM_LINUX
         return !GetEnvironmentVariable(key).empty();
 #endif
     }
@@ -114,7 +128,7 @@ namespace fox::FileSystem
             }
         }
         return false;
-#elifdef FOX_PLATFORM_LINUX
+#elif FOX_PLATFORM_LINUX
         return setenv(key.c_str(), value.c_str(), 1) == 0;
 #endif
     }
@@ -129,7 +143,7 @@ namespace fox::FileSystem
         if (lOpenStatus == ERROR_SUCCESS)
         {
             DWORD valueType;
-            char* data = hnew char[512];
+            char* data = new char[512];
             DWORD dataSize = 512;
             LSTATUS status = RegGetValueA(hKey, NULL, key.c_str(), RRF_RT_ANY, &valueType, (PVOID)data, &dataSize);
 

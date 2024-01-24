@@ -12,7 +12,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
-#include <filesystem>
+#include "Core/Base.hpp"
 
 namespace fox
 {
@@ -25,6 +25,7 @@ namespace fox
         * @return true if the write success, otherwise false
         */
         bool WriteFile(const std::string& strFile, const std::string& strSave);
+        bool WriteFile(const fs::path& strFile, const std::string& strSave);
 
         /**
         * @brief Read file
@@ -33,6 +34,7 @@ namespace fox
         * @return true if the read success, otherwise false
         */
         bool ReadFile(const std::string& strFile, std::string& strOutReadContent);
+        bool ReadFile(const fs::path& strFile, std::string& strOutReadContent);
 
         /**
         * @brief Read bytes from file
@@ -40,9 +42,9 @@ namespace fox
         * @param[out] outSize the number of bytes read
         * @return the bytes array read
         */
-        char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize);
+        char* ReadBytes(const fs::path& filepath, uint32_t* outSize);
 
-        bool Exists(const std::filesystem::path& filepath);
+        bool Exists(const fs::path& filepath);
         bool Exists(const std::string& filepath);
 
         bool HasEnvironmentVariable(const std::string& key);

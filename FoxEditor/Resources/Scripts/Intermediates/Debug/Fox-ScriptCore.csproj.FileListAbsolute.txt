@@ -1,0 +1,6 @@
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\Resources\Scripts\Intermediates\Debug\Fox-ScriptCore.csproj.AssemblyReference.cache
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\Resources\Scripts\Intermediates\Debug\Fox-ScriptCore.csproj.CoreCompileInputs.cache
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\Resources\Scripts\Intermediates\Debug\Fox-ScriptCore.dll
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\Resources\Scripts\Intermediates\Debug\Fox-ScriptCore.pdb
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\Resources\Scripts\Fox-ScriptCore.dll
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\Resources\Scripts\Fox-ScriptCore.pdb

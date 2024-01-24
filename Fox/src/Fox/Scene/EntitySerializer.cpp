@@ -115,7 +115,7 @@ namespace fox
 
 #define WRITE_SCRIPT_FIELD(FieldType, Type)       \
             case ScriptFieldType::FieldType:          \
-                out << scriptField.GetValue<Type>();  \
+                out << scriptField->GetValue<Type>();  \
                 break
 
     #define READ_SCRIPT_FIELD(FieldType, Type)             \
@@ -444,7 +444,13 @@ namespace fox
             if (!fieldInfo->IsWritable())
                 continue;
 
-            FieldStorage& scriptField = *ScriptEngine::GetFieldStorage(entity, fieldID);
+            Ref<FieldStorage> scriptField = ScriptEngine::GetFieldStorage(entity, fieldID);
+            if (scriptField == nullptr)
+            {
+                // TODO(Yan): turn this assert into FoxEditor log warning
+                FOX_WARN("Serialized C# field % doesn't exist in script cache! This could be because the script field no longer exists or because it's been renamed.", fieldInfo->FullName);
+                continue;
+            }
 
             out << YAML::BeginMap; // ScriptField
             out << YAML::Key << "ID" << YAML::Value << fieldInfo->ID;
@@ -552,7 +558,7 @@ namespace fox
     template<>
     void SerializeEntityComponent<ParticleSystem>(YAML::Emitter& out, Entity entity, ParticleSystem& component)
     {
-        out << YAML::Key << "PlayOnStart" << YAML::Value << component.Play;
+        out << YAML::Key << "PlayOnStart" << YAML::Value << component.PlayOnStart;
         out << YAML::Key << "MaxParticles" << YAML::Value << component.MaxParticles;
         out << YAML::Key << "LifeTime" << YAML::Value << component.ParticleSettings.LifeTime;
         out << YAML::Key << "RotationSpeed" << YAML::Value << component.ParticleSettings.RotationSpeed;
@@ -570,7 +576,7 @@ namespace fox
     template<>
     void DeserializeEntryComponent<ParticleSystem>(YAML::Node& data, Entity& deserializedEntity, ParticleSystem& component)
     {
-        FOX_DESERIALIZE_PROPERTY(PlayOnStart, component.Play, data);
+        FOX_DESERIALIZE_PROPERTY(PlayOnStart, component.PlayOnStart, data);
         FOX_DESERIALIZE_PROPERTY(LifeTime, component.ParticleSettings.LifeTime, data);
         FOX_DESERIALIZE_PROPERTY(RotationSpeed, component.ParticleSettings.RotationSpeed, data);
         FOX_DESERIALIZE_PROPERTY(Speed, component.ParticleSettings.Speed, data);
@@ -743,17 +749,22 @@ namespace fox
     {
         if (entity.has<PrefabComponent>())
         {
-            FOX_CORE_ERROR("Entity already has a prefab component!");
-            return;
+            // TODO for the future:
+            // Show a popup like Unity who ask you if you want to save as a prefab original or a variant
+            FOX_CORE_WARN("Entity already has a prefab component!");
+            entity.remove<PrefabComponent>();
         }
 
         YAML::Emitter out;
 
-        Ref<Scene> scene = Scene::CreateEmpty();
+        Ref<Scene> scene = Scene::CreateEmpty(true);
         std::string name = entity.GetName();
         Entity newEntity = scene->NewEntity(name);
 
         entity.m_Scene->CopyAllComponentsIfExists(newEntity, entity);
+
+        ScriptEngine::InitializeScriptEntity(newEntity);
+        ScriptEngine::CopyScriptEntityData(entity, newEntity);
 
         // Add PrefabComponent
         auto& prefabComp = newEntity.add<PrefabComponent>(UUID(), newEntity.GetUUID());
@@ -774,7 +785,7 @@ namespace fox
         fout << out.c_str();
     }
 
-    Entity EntitySerializer::DeserializeEntityAsPrefab(const char* filepath, Scene& scene)
+    Entity EntitySerializer::DeserializeEntityAsPrefab(const fs::path& filepath, Scene& scene)
     {
         std::ifstream stream(filepath);
         std::stringstream strStream;
@@ -783,11 +794,11 @@ namespace fox
         YAML::Node data = YAML::Load(strStream.str());
         if (!data["Prefab"])
         {
-            FOX_CORE_ERROR("Invalid prefab format: %", std::filesystem::path(filepath).filename());
+            FOX_CORE_ERROR("Invalid prefab format: %", filepath.filename());
             return {};
         }
 
-        std::string filename = std::filesystem::path(filepath).filename();
+        std::string filename = filepath.filename().string();
         UUID prefabID = data["Prefab"].as<UUID>();
         if (!prefabID)
         {

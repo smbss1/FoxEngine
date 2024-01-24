@@ -12,7 +12,6 @@
 
 namespace fox
 {
-    class ShaderProgramSource;
     class OpenGLShader : public Shader
     {
     public:
@@ -26,6 +25,7 @@ namespace fox
         void Unbind() const override;
 
         const std::string& GetName() const override { return m_strName; }
+        const uint32_t& GetID() const override { return m_RendererID; }
 
         void SetUniform(const std::string &name, float v0) const override;
         void SetUniform(const std::string &name, float v0, float v1) const override;
@@ -59,10 +59,13 @@ namespace fox
         void CompileShader(const std::unordered_map<GLenum, std::string>& shaderSources);
         std::unordered_map<GLenum, std::string> ParseShader(const std::string& source);
 
+        const char* getTypeString(GLenum type);
+
         std::string m_strName;
         std::string m_strFilepath;
         unsigned int m_RendererID;
         mutable std::unordered_map<std::string, int> m_LocationCache;
+        mutable std::unordered_map<std::string, int> m_AttributeCache;
     };
 }
 

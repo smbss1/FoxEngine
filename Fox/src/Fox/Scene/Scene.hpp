@@ -24,7 +24,7 @@ class b2World;
 
 namespace fox
 {
-    class TransformComponent;
+    struct TransformComponent;
     class Prefab;
     class Scene : public RefCounted
     {
@@ -33,6 +33,8 @@ namespace fox
         ~Scene();
 
         static Ref<Scene> Copy(Ref<Scene> other);
+        static bool Load(const fs::path& path, Ref<Scene>& newScene);
+        static bool Save(Ref<Scene>& newScene, const fs::path& path);
 
         Entity NewEntity(const std::string& name = std::string());
         Entity NewChildEntity(Entity parent, const std::string& name = std::string());
@@ -51,6 +53,7 @@ namespace fox
         glm::mat4 GetWorldSpaceTransformMatrix(Entity entity);
         TransformComponent GetWorldSpaceTransform(Entity entity);
 
+        Entity GetPrimaryCameraEntity();
 
         void DuplicateEntity(Entity entity);
         Entity CloneEntity(Entity entity, Entity parent, const glm::vec3* translation = nullptr, const glm::vec3* rotation = nullptr, const glm::vec3* scale = nullptr);
@@ -72,8 +75,8 @@ namespace fox
         }
 
         void OnUpdateRuntime(Timestep ts);
-        void OnUpdateSimulation(EditorCamera& camera, Timestep ts);
-        void OnUpdateEditor(EditorCamera& camera, Timestep ts);
+        void OnUpdateSimulation(Camera& camera, Timestep ts);
+        void OnUpdateEditor(Camera& camera, Timestep ts);
         void OnViewportResize(uint32_t width, uint32_t height);
 
         void OnRuntimeStart();
@@ -82,12 +85,11 @@ namespace fox
         void OnSimulationStart();
         void OnSimulationStop();
 
-        Entity GetPrimaryCameraEntity();
-
         bool IsRunning() const { return m_IsRunning; }
         void CopyAllComponentsIfExists(Entity dst, Entity src);
 
     private:
+        static Ref<Scene> CreateEmpty(bool initialize = false);
 
         void ProcessPostQueue();
 
@@ -95,12 +97,11 @@ namespace fox
         void OnPhysics2DStop();
 
         void RenderScene();
-        void RenderScene(EditorCamera& camera);
+        void RenderScene(Camera& camera);
 
         void SortEntities();
 
-        static Ref<Scene> CreateEmpty();
-
+        void OnScriptComponentConstruct(entt::registry& registry, entt::entity entity);
         void OnCameraComponentConstruct(entt::registry& registry, entt::entity entity);
         void OnRigidBody2DComponentConstruct(entt::registry& registry, entt::entity entity);
         void OnRigidBody2DComponentDestroy(entt::registry& registry, entt::entity entity);

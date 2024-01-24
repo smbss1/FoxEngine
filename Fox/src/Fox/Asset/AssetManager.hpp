@@ -28,20 +28,22 @@ namespace fox
         static void Shutdown();
 
         static const AssetMetadata& GetMetadata(AssetHandle handle);
-        static const AssetMetadata& GetMetadata(const std::filesystem::path& filepath);
+        static const AssetMetadata& GetMetadata(const fs::path& filepath);
         static const AssetMetadata& GetMetadata(const Ref<Asset>& asset) { return GetMetadata(asset->Handle); }
 
-        static std::filesystem::path GetFileSystemPath(const AssetMetadata& metadata) { return Project::AssetsDir() / metadata.FilePath; }
+        static fs::path GetFileSystemPath(const AssetMetadata& metadata) { return Project::AssetsDir() / metadata.FilePath; }
         static std::string GetFileSystemPathString(const AssetMetadata& metadata) { return GetFileSystemPath(metadata).string(); }
-        static std::filesystem::path GetRelativePath(const std::filesystem::path& filepath);
+        static fs::path GetRelativePath(const fs::path& filepath);
 
-        static AssetHandle GetAssetHandleFromFilePath(const std::filesystem::path& filepath);
+        static AssetHandle GetAssetHandleFromFilePath(const fs::path& filepath);
         static bool IsAssetHandleValid(AssetHandle assetHandle) { return IsMemoryAsset(assetHandle) || GetMetadata(assetHandle).IsValid(); }
 
         static AssetType GetAssetTypeFromExtension(const std::string& extension);
-        static AssetType GetAssetTypeFromPath(const std::filesystem::path& path);
+        static const std::vector<std::string>& GetExtensionsFromAssetType(AssetType type);
 
-        static AssetHandle ImportAsset(const std::filesystem::path& filepath);
+        static AssetType GetAssetTypeFromPath(const fs::path& path);
+
+        static AssetHandle ImportAsset(const fs::path& filepath);
         static bool ReloadData(AssetHandle assetHandle);
 
         template<typename T, typename... Args>
@@ -111,10 +113,12 @@ namespace fox
             Ref<Asset> asset = nullptr;
             if (!metadata.IsDataLoaded)
             {
-                metadata.IsDataLoaded = AssetImporter::TryLoadData(metadata, asset);
+                asset = AssetImporter::ImportAsset(assetHandle, metadata);
+                metadata.IsDataLoaded = asset != nullptr;
                 if (!metadata.IsDataLoaded)
                     return nullptr;
 
+                asset->Handle = assetHandle;
                 s_LoadedAssets[assetHandle] = asset;
             }
             else
@@ -179,14 +183,14 @@ namespace fox
         }
     private:
         static void LoadAssetRegistry();
-        static void ProcessDirectory(const std::filesystem::path& directoryPath);
+        static void ProcessDirectory(const fs::path& directoryPath);
         static void ReloadAssets();
         static void WriteRegistryToFile();
 
         static AssetMetadata& GetMetadataInternal(AssetHandle handle);
 
 //        static void OnFileSystemChanged(const std::vector<FileSystemChangedEvent>& events);
-        static void OnAssetRenamed(AssetHandle assetHandle, const std::filesystem::path& newFilePath);
+        static void OnAssetRenamed(AssetHandle assetHandle, const fs::path& newFilePath);
         static void OnAssetDeleted(AssetHandle assetHandle);
 
     private:

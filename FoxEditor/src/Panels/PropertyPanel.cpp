@@ -23,7 +23,7 @@
 #include "ImGui/IconsFontAwesome5.hpp"
 #include "Physics2D.hpp"
 
-#include <filesystem>
+#include "Core/Base.hpp"
 
 namespace fox
 {
@@ -121,6 +121,25 @@ namespace fox
             entity.remove<T>();
     }
 
+    //template<typename T>
+    //static void DrawComponent(const std::string& name, Entity entity, std::function<bool(const Reflect::TypeDescriptor*, const std::string&, Reflect::Any&)> drawField)
+    //{
+    //    DrawComponent<T>(name, entity, [](auto& component) {
+    //        auto reflect = Reflect::Resolve<T>();
+    //        auto members = reflect->GetDataMembers();
+
+    //        for (Reflect::DataMember* member : members)
+    //        {
+    //            auto value = member->Get(component);
+    //            const Reflect::TypeDescriptor* type = member->GetType();
+    //            if (drawField(type, member->GetName(), value))
+    //            {
+    //                member->Set(component, value);
+    //            }
+    //        }
+    //        });
+    //}
+
     template<typename T>
     static void DrawComponent(const std::string& name, Entity entity)
     {
@@ -166,7 +185,10 @@ namespace fox
                 data = storage.GetValue<glm::vec4>();
                 break;
             case ScriptFieldType::Entity:
-                data = storage.GetValue<UUID>();
+                if (!storage.HasValue())
+                    data = UUID::Empty();
+                else
+                    data = storage.GetValue<UUID>();
                 break;
             case ScriptFieldType::Prefab:
                 data = storage.GetValue<AssetHandle>();
@@ -256,7 +278,6 @@ namespace fox
                     camera.SetPerspectiveFarClip(far);
             }
         });
-
         DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_pContext](auto& component) mutable
         {
             bool IsScriptClassExists;
@@ -328,8 +349,7 @@ namespace fox
                     {
                         UI::BeginPropertyGrid(name.c_str(), nullptr);
                         Entity entityRef = scene->TryGetEntityByUUID(*data.template TryCast<UUID>());
-                        ImGui::Button(entityRef ? entityRef.GetName().c_str() : "No Reference",
-                                      ImVec2(100.0f, 0.0f));
+                        ImGui::Button(entityRef ? entityRef.GetName().c_str() : "No Reference", ImVec2(100.0f, 0.0f));
                         UI::EndPropertyGrid();
 
                         if (ImGui::BeginDragDropTarget())
@@ -356,7 +376,7 @@ namespace fox
                         UI::AssetField(name, assetHandle);
 
                         UI::HandleContentBrowserPayloadCustom({".foxprefab"},
-                                                              [&storage](std::filesystem::path &filepath)
+                                                              [&storage](fs::path &filepath)
                                                               {
                                                                   storage.SetValue(
                                                                       AssetManager::GetAssetHandleFromFilePath(
@@ -367,10 +387,15 @@ namespace fox
                 }
             }
         });
-
         DrawComponent<SpriteRenderer>("Sprite Renderer", entity, [](SpriteRenderer& comp)
         {
-            UI::AssetField("Sprite", comp.Sprite, true, {".png"});
+            AssetLink link;
+            link.Handle = comp.Sprite;
+            link.Type = (uint16_t)AssetType::Texture;
+            if (UI::AssetField("Sprite", link, true))
+            {
+                comp.Sprite = link.Handle;
+            }
             UI::PropertyColor("Color", comp.Color);
             UI::Property("Tiling Factor", comp.TilingFactor);
         });
@@ -407,7 +432,7 @@ namespace fox
         DrawComponent<ParticleSystem>("Particle System", entity, [](ParticleSystem& component)
         {
             ParticleProps& props = component.ParticleSettings;
-            UI::Property("Play On Start", component.Play);
+            UI::Property("Play On Start", component.PlayOnStart);
             UI::Property("Life Time", props.LifeTime, 1.0f, 0.01f, FLT_MAX);
             if (UI::Property("Max Particles", component.MaxParticles))
             {

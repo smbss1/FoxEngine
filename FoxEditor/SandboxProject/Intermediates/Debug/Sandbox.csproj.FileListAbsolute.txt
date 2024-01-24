@@ -1,0 +1,9 @@
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\SandboxProject\Assets\Scripts\Binaries\Sandbox.dll
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\SandboxProject\Assets\Scripts\Binaries\Sandbox.pdb
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\SandboxProject\Assets\Scripts\Binaries\Fox-ScriptCore.dll
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\SandboxProject\Assets\Scripts\Binaries\Fox-ScriptCore.pdb
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\SandboxProject\Intermediates\Debug\Sandbox.csproj.AssemblyReference.cache
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\SandboxProject\Intermediates\Debug\Sandbox.csproj.CoreCompileInputs.cache
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\SandboxProject\Intermediates\Debug\Sandbox.csproj.CopyComplete
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\SandboxProject\Intermediates\Debug\Sandbox.dll
+C:\Users\besse\Documents\GitHub\FoxEngine\FoxEditor\SandboxProject\Intermediates\Debug\Sandbox.pdb

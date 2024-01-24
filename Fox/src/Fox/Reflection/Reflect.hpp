@@ -101,7 +101,7 @@ namespace fox
 //        const std::vector<Member>& GetMembers() const
 //        {
 //            std::vector<Member> members;
-//            for (auto property : m_Type.get_properties())
+//            for (auto property : m_Type.GetProperties())
 //            {
 //                members.push_back(Member(property));
 //            }

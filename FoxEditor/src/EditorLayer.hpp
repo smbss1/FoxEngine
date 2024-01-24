@@ -8,8 +8,6 @@
 #ifndef FOX_EDITOR_STATE_HPP_
 #define FOX_EDITOR_STATE_HPP_
 
-#include "Utils/Vec2.hpp"
-
 #include "FoxEngine.hpp"
 #include "Panels/SceneHierarchyPanel.hpp"
 #include "Renderer/EditorCamera.hpp"
@@ -36,7 +34,7 @@ namespace fox
         void OnUpdate(Timestep ts) override;
         void OnImGuiRender() override;
         void OnEvent(Event& event) override;
-        void OpenScene(const std::filesystem::path& path);
+        void OpenScene(const fs::path& path);
 
         static EditorLayer& Get() { return *s_Instance; }
 
@@ -73,10 +71,13 @@ namespace fox
         void UI_Toolbar();
         void OnOverlayRender();
 
+        void OnProjectLoaded();
+        void OnProjectUnload();
+
     private:
         fox::OrthographicCameraController m_CameraController;
 
-        Vec2 m_oViewportSize = {0, 0};
+        glm::vec2 m_oViewportSize = {0, 0};
         bool m_bViewportFocused = false;
         bool m_bViewportHovered = false;
         Ref<Scene> m_pActiveScene;
@@ -84,10 +85,11 @@ namespace fox
         scope<PanelManager> m_PanelManager;
 
         Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
-        EditorCamera m_oEditorCamera;
+        //EditorCamera m_oEditorCamera;
 
         int m_iGizmoType = -1;
 
+        glm::vec2 m_vViewportPosition;
         glm::vec2 m_vViewportBounds[2];
         Entity m_oHoveredEntity;
         std::string m_EditorScenePath;

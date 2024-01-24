@@ -3,17 +3,23 @@
 #type vertex
 #version 450 core
 
-layout(location = 0) in vec3 a_Position;
-layout(location = 1) in vec4 a_Color;
-layout(location = 2) in vec2 a_TexCoord;
-layout(location = 3) in float a_TexIndex;
-layout(location = 4) in float a_TilingFactor;
-layout(location = 5) in int a_EntityID;
-
 layout(std140, binding = 0) uniform Camera
 {
+	mat4 u_View;
+	mat4 u_Projection;
 	mat4 u_ViewProjection;
+	vec3 u_CamPos;
 };
+
+layout(location = 0) in vec3 a_Position;
+layout(location = 1) in vec3 a_Normal;
+layout(location = 2) in vec2 a_TexCoord;
+
+layout(location = 3) in vec4 a_Color;
+layout(location = 4) in float a_TexIndex;
+layout(location = 5) in float a_TilingFactor;
+layout(location = 6) in int a_EntityID;
+layout(location = 7) in mat4 a_ModelMatrice;
 
 struct VertexOutput
 {
@@ -23,12 +29,11 @@ struct VertexOutput
 };
 
 layout (location = 0) out VertexOutput Output;
-layout (location = 3) out flat float v_TexIndex;
-layout (location = 4) out flat int v_EntityID;
+out flat float v_TexIndex;
+out flat int v_EntityID;
+out vec3 v_Position;
+//out vec3 v_Normal;
 
-//layout (location = 5) out vec3 v_lightPos;
-//out vec3 ex_pos;
-//vec3 lightPos = vec3(0, 0, 0);
 
 void main()
 {
@@ -37,17 +42,25 @@ void main()
 	Output.TilingFactor = a_TilingFactor;
 	v_TexIndex = a_TexIndex;
 	v_EntityID = a_EntityID;
+	v_Position = vec4(a_ModelMatrice * vec4(a_Position, 1.0f)).xyz;
+//	v_Normal = mat3(a_ModelMatrice) * a_Normal;
 
-//	v_lightPos = lightPos;
-//	ex_pos = a_Position;
-
-	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+	gl_Position = u_ViewProjection * a_ModelMatrice * vec4(a_Position, 1.0f);
 }
+
 
 #type fragment
 #version 450 core
 
-layout(location = 0) out vec4 o_Color;
+layout(std140, binding = 0) uniform Camera
+{
+	mat4 u_View;
+	mat4 u_Projection;
+	mat4 u_ViewProjection;
+	vec3 u_CamPos;
+};
+
+layout(location = 0) out vec4 FragColor;
 layout(location = 1) out int o_EntityID;
 
 struct VertexOutput
@@ -58,34 +71,14 @@ struct VertexOutput
 };
 
 layout (location = 0) in VertexOutput Input;
-layout (location = 3) in flat float v_TexIndex;
-layout (location = 4) in flat int v_EntityID;
+in flat float v_TexIndex;
+in flat int v_EntityID;
+in vec3 v_Position;
+//in vec3 v_Normal;
 
 layout (binding = 0) uniform sampler2D u_Textures[32];
 
-
-//struct Light
-//{
-//	vec2 position;
-//	vec3 color;
-//	float intensity;
-//};
-
-//uniform vec3 lightColor;
-//uniform vec3 lightPos;
-
-//uniform int lightCount;
-//uniform Light lights[256];
-
-//layout (location = 5) out vec3 v_lightPos;
-//in vec3 ex_pos;
-
-//float constant = 1.0f;
-//float linear = 0.09f;
-//float quadratic = 0.032f;
-//vec3 lightColor = vec3(1, 0, 0);
-//float intensity = 2.0f;
-//float radius = 5;
+uniform vec3 lightPos;
 
 void main()
 {
@@ -129,34 +122,25 @@ void main()
 	if (texColor.a == 0.0)
 		discard;
 
-//	float dist = length(v_lightPos - ex_pos) / radius;
-//	float att = 1 / (constant + linear * dist + quadratic * dist * dist);
-//
-////	att *= clamp(1.0 - dist, 0.0, 1.0);
-//	//	att *= att;
-//	vec3 diffuse = clamp(att * lightColor, 0.0, 1.0);
-//	vec4 finalcolor = vec4(diffuse * intensity, 1.0);
-//	texColor *= finalcolor;
-
-
-//	float dist = distance(v_lightPos, ex_pos);
-//	float attenuation = 1.0 / (1.0 + 0.1*dist + 0.01*dist*dist);
-
-
-//	vec3 lAtt = vec3(0.0001, 0.0001, 0.001);
-//	vec2 uv = gl_FragCoord.xy;
-//	vec4 outc = vec4(0.0);
-//	float lightIntensity = 1.0f;
-//	vec3 lightColor = vec3(1, 0, 0);
-
-//	for (int i = 0; i < lightCount; i++)
-//	{
-//		float dist = distance(lightPos, uv);
-//		float att = 1.0 / (lAtt.x + lAtt.y * dist + lAtt.z * dist * dist);
-//		outc += vec4(vec3(att), 1.0) * lightIntensity * vec4(lightColor, 1.0);
-//	}
-
-//	o_Color = vec4(vec3(attenuation), 1.0);
-	o_Color = texColor;
+	FragColor = texColor;
 	o_EntityID = v_EntityID;
+
+// Its working
+//	// Ambient
+//	vec3 ambientLight = vec3(0.1f, 0.1f, 0.1f);
+//
+//	// Diffuse
+//	vec3 posToLightDirVec = normalize(lightPos - v_Position);
+//	vec3 diffuseColor = vec3(1.0f, 1.0f, 1.0f);
+//	float diffuse = clamp(dot(posToLightDirVec, v_Normal), 0, 1);
+//	vec3 diffuseFinal = diffuseColor * diffuse;
+//
+//	// Specular
+//	vec3 lightToPosDirVec = normalize(v_Position - lightPos);
+//	vec3 reflectDirVec = normalize(reflect(lightToPosDirVec, normalize(v_Normal)));
+//	vec3 posToViewDirVec = normalize(u_CamPos - v_Position);
+//	float specularConstant = pow(max(dot(posToViewDirVec, reflectDirVec), 0.0), 30);
+//	vec3 specularFinal = vec3(1.f, 1.f, 1.f) * specularConstant;
+//
+//	FragColor = texColor * (vec4(ambientLight, 1.0f) + vec4(diffuseFinal, 1.0f) + vec4(specularFinal, 1.0f));
 }

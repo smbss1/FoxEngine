@@ -37,6 +37,7 @@ namespace fox
         friend class Scene;
         friend class PrefabEditor;
         friend class PrefabSerializer;
+        friend class PrefabImporter;
         friend class ScriptEngine;
     };
 }

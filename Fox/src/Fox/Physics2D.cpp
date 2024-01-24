@@ -110,7 +110,7 @@ namespace fox
         {
             return false;
         }
-        result = it.base();
+        result = &(*it);
         return true;
     }
 
@@ -121,7 +121,7 @@ namespace fox
         {
             return false;
         }
-        result = it.base();
+        result = &(*it);
         return true;
     }
 

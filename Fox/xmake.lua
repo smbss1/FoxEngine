@@ -1,4 +1,3 @@
-
 add_requires("yaml-cpp", "glfw", "opengl")
 add_requires("box2d")
 add_requires("mono")

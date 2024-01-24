@@ -1,6 +1,6 @@
-
 #ifndef FOX_ENGINE_HPP_
 #define FOX_ENGINE_HPP_
+#pragma once
 
 #include "Core/Base.hpp"
 
@@ -27,7 +27,7 @@
 #include "Renderer/Renderer2D.hpp"
 #include "Renderer/RendererCommand.hpp"
 
-#include "Renderer/Buffer.hpp"
+#include "Renderer/VertexBuffer.hpp"
 #include "Renderer/Shader.hpp"
 #include "Renderer/Framebuffer.hpp"
 #include "Renderer/Texture.hpp"

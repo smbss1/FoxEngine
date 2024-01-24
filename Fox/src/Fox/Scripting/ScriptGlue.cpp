@@ -23,11 +23,11 @@
 #include "Asset/AssetManager.hpp"
 #include "Scene/Prefab.hpp"
 #include "Utils/PlatformUtils.hpp"
+#include <Utils/CPlusPlusMangle.hpp>
 
 namespace fox
 {
     static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFuncs;
-    static std::unordered_map<UUID, std::unordered_map<UUID, MonoDelegate*>> s_AnimatorEventDelegates;
 
 #define FOX_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Fox.InternalCalls::" #Name, (void*) Name)
 
@@ -78,9 +78,7 @@ namespace fox
     {
 //        FOX_PROFILE_SCOPE();
 
-        Scene* scene = ScriptEngine::GetSceneContext();
-        FOX_ASSERT(scene);
-        Entity entity = scene->GetEntityByUUID(entityID);
+        Entity entity = GetEntity(entityID);
         FOX_ASSERT(entity);
 
         MonoType* managedType = mono_reflection_type_get_type(componentType);
@@ -143,9 +141,15 @@ namespace fox
         return scene->Instantiate(prefab, inPosition, inRotation, inScale).GetUUID();
     }
 
+
     uint64_t Entity_InstantiatePrefabWithPosition(AssetHandle* prefabHandle, glm::vec3* inPosition)
     {
         return Entity_InstantiatePrefabWithTransform(prefabHandle, inPosition, nullptr, nullptr);
+    }
+
+    uint64_t Entity_InstantiatePrefabWithPositionAndRotation(AssetHandle* prefabHandle, glm::vec3* inPosition, glm::vec3* inRotation)
+    {
+        return Entity_InstantiatePrefabWithTransform(prefabHandle, inPosition, inRotation, nullptr);
     }
 
     static void Entity_Destroy(uint64_t entityToDestroy)
@@ -166,12 +170,7 @@ namespace fox
     {
 //        FOX_PROFILE_SCOPE();
 
-        Scene* scene = ScriptEngine::GetSceneContext();
-        FOX_ASSERT(scene);
-        Entity entity = scene->GetEntityByUUID(entityID);
-        FOX_ASSERT(entity);
-
-        const auto& name = entity.get<NameComponent>();
+        const auto& name = GetEntity(entityID).get<NameComponent>();
         return mono_string_new(mono_domain_get(), name.name.c_str());
     }
 
@@ -179,13 +178,10 @@ namespace fox
     {
 //        FOX_PROFILE_SCOPE();
 
-        Scene* scene = ScriptEngine::GetSceneContext();
-        FOX_ASSERT(scene);
-        Entity entity = scene->GetEntityByUUID(entityID);
+        Entity entity = GetEntity(entityID);
         FOX_ASSERT(entity);
 
         const auto& name = entity.get<NameComponent>();
-
         entity.get<NameComponent>().name = mono_string_to_utf8(tag);
     }
 #pragma endregion
@@ -196,24 +192,29 @@ namespace fox
     {
 //        FOX_PROFILE_SCOPE();
 
-        Scene* scene = ScriptEngine::GetSceneContext();
-        FOX_ASSERT(scene);
-        Entity entity = scene->GetEntityByUUID(entityID);
-        FOX_ASSERT(entity);
-
-        *outTranslation = entity.get<TransformComponent>().position;
+        *outTranslation = GetEntity(entityID).get<TransformComponent>().position;
     }
 
     static void TransformComponent_SetTranslation(UUID entityID, glm::vec3* translation)
     {
 //        FOX_PROFILE_SCOPE();
+        GetEntity(entityID).get<TransformComponent>().position = *translation;
+    }
 
-        Scene* scene = ScriptEngine::GetSceneContext();
-        FOX_ASSERT(scene);
-        Entity entity = scene->GetEntityByUUID(entityID);
-        FOX_ASSERT(entity);
+    void TransformComponent_GetRight(uint64_t entityID, glm::vec3* outRotation)
+    {
+        //        FOX_PROFILE_SCOPE();
 
-        entity.get<TransformComponent>().position = *translation;
+        // Rotate the standard forward vector by the quaternion
+        *outRotation = GetEntity(entityID).get<TransformComponent>().GetRotationQuat() * glm::vec3(1, 0, 0);
+    }
+
+    void TransformComponent_GetForward(uint64_t entityID, glm::vec3* outRotation)
+    {
+        //        FOX_PROFILE_SCOPE();
+
+        // Rotate the standard forward vector by the quaternion
+        *outRotation = GetEntity(entityID).get<TransformComponent>().GetRotationQuat() * glm::vec3(0, 0, -1);
     }
 
     void TransformComponent_GetRotation(uint64_t entityID, glm::vec3* outRotation)
@@ -301,12 +302,7 @@ namespace fox
     {
 //        FOX_PROFILE_SCOPE();
 
-        Scene* scene = ScriptEngine::GetSceneContext();
-        FOX_ASSERT(scene);
-        Entity entity = scene->GetEntityByUUID(entityID);
-        FOX_ASSERT(entity);
-
-        auto& rb2d = entity.get<Rigidbody2D>();
+        auto& rb2d = GetEntity(entityID).get<Rigidbody2D>();
         b2Body* body = (b2Body*)rb2d.RuntimeBody;
         body->ApplyLinearImpulse(b2Vec2(impulse->x, impulse->y), b2Vec2(point->x, point->y), wake);
     }
@@ -315,12 +311,7 @@ namespace fox
     {
 //        FOX_PROFILE_SCOPE();
 
-        Scene* scene = ScriptEngine::GetSceneContext();
-        FOX_ASSERT(scene);
-        Entity entity = scene->GetEntityByUUID(entityID);
-        FOX_ASSERT(entity);
-
-        auto& rb2d = entity.get<Rigidbody2D>();
+        auto& rb2d = GetEntity(entityID).get<Rigidbody2D>();
         b2Body* body = (b2Body*)rb2d.RuntimeBody;
         body->ApplyLinearImpulseToCenter(b2Vec2(impulse->x, impulse->y), wake);
     }
@@ -365,6 +356,8 @@ namespace fox
 #pragma endregion
 
 #pragma region Animator
+
+    static std::unordered_map<UUID, std::unordered_map<UUID, MonoDelegate*>> s_AnimatorEventDelegates;
 
     void Animator_SubscribeToEvent(uint64_t entityID, uint64_t eventID, MonoDelegate* delegate)
     {
@@ -425,20 +418,22 @@ namespace fox
 
 #pragma endregion
 
-    #include <cxxabi.h>  // needed for abi::__cxa_demangle
-
-    std::shared_ptr<char> cppDemangle(const char *abiName)
+#pragma region Particle
+    static void ParticleSystem_Play(UUID entityID)
     {
-//        FOX_PROFILE_SCOPE();
-
-        int status;
-        char *ret = abi::__cxa_demangle(abiName, 0, 0, &status);
-
-        /* NOTE: must free() the returned char when done with it! */
-        std::shared_ptr<char> retval;
-        retval.reset( (char *)ret, [](char *mem) { if (mem) free((void*)mem); } );
-        return retval;
+        //        FOX_PROFILE_SCOPE();
+        GetEntity(entityID).get<ParticleSystem>().Play();
     }
+#pragma endregion
+
+#pragma region Camera
+    static void Camera_ScreenToWorld(UUID entityID, glm::vec2* screenPos, glm::vec3* outWorldPos)
+    {
+        //        FOX_PROFILE_SCOPE();
+
+        *outWorldPos = GetEntity(entityID).get<CameraComponent>().camera.ScreenToWorldSpace(*screenPos);
+    }
+#pragma endregion
 
     template<typename... Component>
     static void RegisterComponent()
@@ -447,9 +442,8 @@ namespace fox
 
         ([]()
         {
-            std::string_view typeName = typeid(Component).name();
-            auto demandleTypename = cppDemangle(typeName.data());
-            std::string_view demandleTypenameView = demandleTypename.get();
+            auto demandleTypename = dbj::demang<Component>();
+            std::string_view demandleTypenameView = demandleTypename;
 
             size_t pos = demandleTypenameView.find_last_of(':');
             std::string_view structName = demandleTypenameView.substr(pos + 1);
@@ -502,6 +496,7 @@ namespace fox
         FOX_ADD_INTERNAL_CALL(Entity_Instantiate);
         FOX_ADD_INTERNAL_CALL(Entity_InstantiatePrefab);
         FOX_ADD_INTERNAL_CALL(Entity_InstantiatePrefabWithPosition);
+        FOX_ADD_INTERNAL_CALL(Entity_InstantiatePrefabWithPositionAndRotation);
         FOX_ADD_INTERNAL_CALL(Entity_Destroy);
 
         FOX_ADD_INTERNAL_CALL(NameComponent_GetName);
@@ -513,7 +508,10 @@ namespace fox
         FOX_ADD_INTERNAL_CALL(TransformComponent_SetRotation);
         FOX_ADD_INTERNAL_CALL(TransformComponent_GetScale);
         FOX_ADD_INTERNAL_CALL(TransformComponent_SetScale);
+        FOX_ADD_INTERNAL_CALL(TransformComponent_GetRight);
+        FOX_ADD_INTERNAL_CALL(TransformComponent_GetForward);
 
+        
         FOX_ADD_INTERNAL_CALL(SpriteRendererComponent_GetColor);
         FOX_ADD_INTERNAL_CALL(SpriteRendererComponent_SetColor);
         FOX_ADD_INTERNAL_CALL(SpriteRendererComponent_GetTilingFactor);
@@ -536,6 +534,7 @@ namespace fox
         FOX_ADD_INTERNAL_CALL(Animator_GetDelegate);
 
         FOX_ADD_INTERNAL_CALL(Time_deltaTime);
-    }
 
+        FOX_ADD_INTERNAL_CALL(Camera_ScreenToWorld);
+    }
 }

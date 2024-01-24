@@ -33,6 +33,7 @@ namespace fox
         Ref<Scene> m_pContext = nullptr;
         Entity m_SelectedEntity;
         bool m_bIsDeleted = false; // Is the entity deleted ?
+        bool m_bIsDuplicated = false; // Is the entity deleted ?
     };
 }
 

@@ -26,12 +26,10 @@ EditorApp::EditorApp(const fox::ApplicationSpecification& specification) : fox::
     auto commandLineArgs = Application::Get().GetSpecs().CommandLineArgs;
     if (commandLineArgs.Count > 1)
         m_ProjectPath = commandLineArgs[1];
-    else
-        m_ProjectPath = "SandboxProject/Sandbox.foxproj";
 
     // User Preferences
     {
-        if (!std::filesystem::exists("UserPreferences.yaml"))
+        if (!fs::exists("UserPreferences.yaml"))
             m_UserPrefs->Save("UserPreferences.yaml");
         else
             m_UserPrefs->ConstructFrom("UserPreferences.yaml");
@@ -44,7 +42,7 @@ EditorApp::EditorApp(const fox::ApplicationSpecification& specification) : fox::
 
     // Update the FOX_DIR environment variable every time we launch
     {
-        std::filesystem::path workingDirectory = std::filesystem::current_path();
+        fs::path workingDirectory = fs::current_path();
         if (workingDirectory.stem().string() == "FoxEditor")
             workingDirectory = workingDirectory.parent_path();
 //        fox::FileSystem::SetEnvironmentVariable("FOX_DIR", workingDirectory.string());

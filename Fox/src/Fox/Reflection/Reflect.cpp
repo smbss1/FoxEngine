@@ -197,7 +197,7 @@ namespace fox::reflection
 
 //    template<typename T>
 //    void SerializeObject(T& arg) {
-//        rttr::array_range<rttr::property> properties = rttr::type::get(arg).get_properties();
+//        rttr::array_range<rttr::property> properties = rttr::type::get(arg).GetProperties();
 ////        const ClassInfo* objectInfo = GetClass<T>();
 ////
 ////        auto& func = objectInfo->fields[7];
@@ -304,10 +304,17 @@ namespace fox
             .AddDataMember<&TransformComponent::SetRotation, &TransformComponent::GetRotation>("Rotation")
             .AddDataMember(&TransformComponent::scale, "Scale");
 
+        Reflect::Reflect<AssetLink>("AssetLink")
+            .BeginEnum<AssetType>("AssetType")
+                .AddValue("Texture", AssetType::Texture)
+            .EndEnum()
+            .AddDataMember(&AssetLink::Handle, "Handle")
+            .AddDataMember(&AssetLink::Type, "Type");
+
         // Sprite Renderer
         Reflect::Reflect<SpriteRenderer>("SpriteRenderer")
             .AddConstructor<>()
-            .AddDataMember(&SpriteRenderer::Sprite, "Sprite")
+            .AddDataMember<&SpriteRenderer::SetSprite, &SpriteRenderer::GetSprite>("Sprite")
             .AddDataMember(&SpriteRenderer::Color, "Color")
             .AddDataMember(&SpriteRenderer::TilingFactor, "Tiling Factor");
 

@@ -18,12 +18,15 @@ namespace Fox
 		public float sqrMagnitude => x * x + y * y + z * z;
 		public Vector3 normalized => this / magnitude;
 
-		public static Vector3 one => new Vector3(1.0f);
-		public static Vector3 zero => new Vector3(0.0f);
+		public static Vector3 one => new Vector3(1);
+		public static Vector3 zero => new Vector3(0);
+		public static Vector3 forward => new Vector3(0, 0, 1);
+        public static Vector3 up => new Vector3(0, 1, 0);
+        public static Vector3 right => new Vector3(1, 0, 0);
 
-		#region Constructors
+        #region Constructors
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public Vector3(in float scalar)
 		{
 			x = y = z = scalar;

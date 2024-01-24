@@ -12,7 +12,7 @@
 #include "Core/Project.hpp"
 #include "ImGui/ImGuiExtensions.hpp"
 
-#include <filesystem>
+#include "Core/Base.hpp"
 
 namespace fox
 {
@@ -84,7 +84,7 @@ namespace fox
             ImGui::EndDragDropTarget();
         }
 
-        UI::HandleContentBrowserPayloadCustom({".foxprefab"}, [this](std::filesystem::path& filepath) {
+        UI::HandleContentBrowserPayloadCustom({".foxprefab"}, [this](fs::path& filepath) {
             Entity entity = EntitySerializer::DeserializeEntityAsPrefab(filepath.c_str(), *m_pContext);
             event::EventSystem::Emit<OnSelectedEntityChangeEvent>(entity);
         });
@@ -95,6 +95,13 @@ namespace fox
             m_pContext->DestroyEntity(m_SelectedEntity);
             SetSelectedEntity({});
             m_bIsDeleted = false;
+        }
+
+        if (m_bIsDuplicated && m_SelectedEntity)
+        {
+            m_pContext->DuplicateEntity(m_SelectedEntity);
+            SetSelectedEntity({});
+            m_bIsDuplicated = false;
         }
     }
 
@@ -147,8 +154,10 @@ namespace fox
         if (ImGui::BeginPopupContextItem())
         {
             m_SelectedEntity = entity;
-            if (ImGui::MenuItem("Delete Entity"))
+            if (ImGui::MenuItem("Delete"))
                 m_bIsDeleted = true;
+            if (ImGui::MenuItem("Duplicate"))
+                m_bIsDuplicated = true;
 
             ImGui::EndPopup();
         }

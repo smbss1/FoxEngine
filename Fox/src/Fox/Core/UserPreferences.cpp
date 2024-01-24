@@ -11,26 +11,26 @@
 
 namespace fox
 {
-    void UserPreferences::Save(const std::filesystem::path& filepath)
+    void UserPreferences::Save(const fs::path& filepath)
     {
-        std::filesystem::path path = filepath;
+        fs::path path = filepath;
         if (path.empty())
             path = FilePath;
         UserPreferencesSerializer serializer(*this);
         serializer.Serialize(path);
     }
 
-    void UserPreferences::ConstructFrom(const std::filesystem::path& filepath)
+    void UserPreferences::ConstructFrom(const fs::path& filepath)
     {
         UserPreferencesSerializer serializer(*this);
         serializer.Deserialize(filepath);
     }
 
-    void UserPreferences::AddRecentProject(const std::string& name, const std::filesystem::path& filepath)
+    void UserPreferences::AddRecentProject(const std::string& name, const fs::path& filepath)
     {
         RecentProject projectEntry;
         projectEntry.Name = name;
-        projectEntry.FilePath = filepath;
+        projectEntry.FilePath = filepath.string();
         projectEntry.LastOpened = time(nullptr);
 
         // Remove this project to the list of recent project
@@ -70,7 +70,7 @@ namespace fox
     {
     }
 
-    void UserPreferencesSerializer::Serialize(const std::filesystem::path& filepath)
+    void UserPreferencesSerializer::Serialize(const fs::path& filepath)
     {
         YAML::Emitter out;
         out << YAML::BeginMap;
@@ -107,7 +107,7 @@ namespace fox
         m_Preferences.FilePath = filepath.string();
     }
 
-    void UserPreferencesSerializer::Deserialize(const std::filesystem::path& filepath)
+    void UserPreferencesSerializer::Deserialize(const fs::path& filepath)
     {
         std::ifstream stream(filepath);
         FOX_CORE_ASSERT(stream);

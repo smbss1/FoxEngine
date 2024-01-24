@@ -5,8 +5,8 @@
 #ifndef FOXENGINE_ORTHOGRAPHICCAMERACONTROLLER_HPP
 #define FOXENGINE_ORTHOGRAPHICCAMERACONTROLLER_HPP
 
-#include <Events/MouseEvent.hpp>
-#include <Events/ApplicationEvent.hpp>
+#include "Events/MouseEvent.hpp"
+#include "Events/ApplicationEvent.hpp"
 #include "OrthographicCamera.hpp"
 
 namespace fox
@@ -18,7 +18,7 @@ namespace fox
 
         void OnUpdate(float deltaTime);
         void OnEvent(Event &e);
-        void OnResize(float width, float height);
+        void OnResize(const glm::vec2& viewportPosition, float width, float height);
 
         OrthographicCamera &GetCamera()
         { return m_Camera; }

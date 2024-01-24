@@ -5,10 +5,10 @@
 #ifndef FOXENGINE_EVENT_HPP
 #define FOXENGINE_EVENT_HPP
 
-#include <common.hpp>
 #include <string>
 #include <functional>
 
+#include "common.hpp"
 #include "Core/Base.hpp"
 
 namespace fox

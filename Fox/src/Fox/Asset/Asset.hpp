@@ -12,6 +12,13 @@
 namespace fox
 {
     using AssetHandle = UUID;
+    struct AssetMetadata;
+
+    struct AssetLink
+    {
+        AssetHandle Handle;
+        uint16_t Type;
+    };
 
     class Asset : public RefCounted
     {
@@ -25,6 +32,8 @@ namespace fox
         virtual AssetType GetAssetType() const { return AssetType::None; }
 
         bool IsValid() const { return ((Flags & (uint16_t)AssetFlag::Missing) | (Flags & (uint16_t)AssetFlag::Invalid)) == 0; }
+
+        const AssetMetadata& GetMetadata() const;
 
         virtual bool operator==(const Asset& other) const
         {

@@ -7,11 +7,12 @@
 
 #include <string>
 #include <functional>
-#include <Core/Input/KeyCodes.hpp>
-#include <Core/Input/MouseCodes.hpp>
+//#include "glm/glm.hpp"
 #include "common.hpp"
+#include "Core/Input/KeyCodes.hpp"
+#include "Core/Input/MouseCodes.hpp"
 #include "Events/Event.hpp"
-#include "glm/glm.hpp"
+#include <glm/fwd.hpp>
 
 namespace fox
 {

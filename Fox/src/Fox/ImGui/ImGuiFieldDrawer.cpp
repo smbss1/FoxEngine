@@ -2,7 +2,7 @@
 // Created by samuel on 07/10/22.
 //
 
-#include <filesystem>
+#include "Core/Base.hpp"
 #include "Reflection/Core/Reflect.hpp"
 
 #include "ImGuiFieldDrawer.hpp"
@@ -28,7 +28,7 @@ namespace fox
         {Reflect::Resolve<glm::vec3>(),                 ImGuiFieldDrawer::DrawVec3},
         {Reflect::Resolve<glm::vec4>(),                 ImGuiFieldDrawer::DrawVec4},
         {Reflect::Resolve<fox::Ref<fox::Texture2D>>(),  ImGuiFieldDrawer::DrawTexture},
-//        {Reflect::Resolve<AssetHandle>(),               ImGuiFieldDrawer::DrawAsset},
+        {Reflect::Resolve<AssetLink>(),               ImGuiFieldDrawer::DrawAsset},
 
         {Reflect::Resolve<Rigidbody2D::BodyType>(),     ImGuiFieldDrawer::DrawRigidbody2D_BodyType},
     };
@@ -118,46 +118,19 @@ namespace fox
 
     bool ImGuiFieldDrawer::DrawTexture(std::string name, Reflect::Any& valueFrom)
     {
-        AssetHandle& value = *valueFrom.TryCast<AssetHandle>();
-        return UI::AssetField(name, value, true, {".png"});
-//        if (ImGui::BeginDragDropTarget())
-//        {
-//            if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-//                const char *path = (const char *) payload->Data;
-//                std::filesystem::path texturePath = Project::AssetsDir() / path;
-//                Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
-//                valueFrom = texture;
-//                return true;
-//
-//                // if (texture->IsLoaded())
-//                // 	component.Sprite = texture;
-//                // else
-//                // 	FOX_CORE_WARN("Could not load texture %", texturePath.filename().string());
-//            }
-//            ImGui::EndDragDropTarget();
-//        }
-
-//        return false;
+        AssetLink* value = valueFrom.TryCast<AssetLink>();
+        return UI::AssetField(name, value->Handle, true, {".png"});
     }
 
-//    bool ImGuiFieldDrawer::DrawAsset(std::string name, Reflect::Any& valueFrom)
-//    {
-//        auto *value = valueFrom.TryCast<AssetHandle>();
-//        Ref<Asset> asset = AssetManager::GetAsset<Asset>(*value);
-//        if (asset == nullptr)
-//            return false;
-//        switch (asset->GetAssetType())
-//        {
-////            case AssetType::Texture:
-////                return DrawTexture(name, valueFrom);
-//
-//            default:
-//                break;
-//        }
-//
-////        valueFrom = *value;
-//        return false;
-//    }
+    bool ImGuiFieldDrawer::DrawAsset(std::string name, Reflect::Any& valueFrom)
+    {
+        AssetLink *link = valueFrom.TryCast<AssetLink>();
+        AssetHandle prevAssetHandle = link->Handle;
+
+        bool result = UI::AssetField(name, *link, true);
+        valueFrom = *link;
+        return prevAssetHandle != link->Handle;
+    }
 
 
 //    bool ImGuiFieldDrawer::DrawEntityRef(std::string name, Reflect::Any& valueFrom)

@@ -99,6 +99,11 @@ namespace fox
             return rotation;
         }
 
+        const glm::quat& GetRotationQuat() const
+        {
+            return rotationQuat;
+        }
+
 //        void SetPos(std::array<float, 3> pos)
 //        {
 //            position.x = pos[0];

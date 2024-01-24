@@ -10,7 +10,6 @@
 #include <mutex>
 #include <string>
 #include <sstream>
-#include <thread>
 
 #include <chrono>
 #include <ctime>
@@ -141,13 +140,6 @@ namespace fox
          */
         std::mutex mutex;
 
-        /**
-         * Class constructor
-         */
-        Logger() : output_stream(&std::cout)
-        {
-        };
-
         template<typename T>
         std::string to_str(T t) {
             std::stringstream os;
@@ -162,6 +154,13 @@ namespace fox
             static Logger logger;
             return logger;
         }
+
+        /**
+         * Class constructor
+         */
+        Logger() : output_stream(&std::cout)
+        {
+        };
 
         /**
          * Get the Type enum to string
@@ -256,6 +255,31 @@ namespace fox
     {
         log(ERROR, tag, msg, args...);
     }
+
+    class Log
+    {
+        inline static std::shared_ptr<Logger>& GetCoreLogger() { return s_CoreLogger; }
+        inline static std::shared_ptr<Logger>& GetClientLogger() { return s_ClientLogger; }
+        inline static std::shared_ptr<Logger>& GetEditorConsoleLogger() { return s_EditorConsoleLogger; }
+
+    public:
+
+        static void Init();
+        static void Shutdown();
+
+        enum class Type : uint8_t
+        {
+            Core = 0, Client = 1
+        };
+
+        template<typename... Args>
+        inline static void PrintAssertMessage(Log::Type type, std::string_view prefix, Args&&... args);
+
+    private:
+        static std::shared_ptr<Logger> s_CoreLogger;
+        static std::shared_ptr<Logger> s_ClientLogger;
+        static std::shared_ptr<Logger> s_EditorConsoleLogger;
+    };
 }
 
 // Core log macros
@@ -277,5 +301,24 @@ namespace fox
 #define FOX_INFO_TAG(tag, ...)          ::fox::info(tag, __VA_ARGS__)
 #define FOX_WARN_TAG(tag, ...)          ::fox::warn(tag, __VA_ARGS__)
 #define FOX_ERROR_TAG(tag, ...)         ::fox::error(tag, __VA_ARGS__)
+
+namespace fox
+{
+    template<typename... Args>
+    inline void Log::PrintAssertMessage(Log::Type type, std::string_view prefix, Args&&... args)
+    {
+        auto logger = (type == Type::Core) ? GetCoreLogger() : GetClientLogger();
+        // Implement multiple args if needed
+        //const std::size_t n = sizeof...(Args);
+        logger->log(typelog::ERROR, "", "%: %", prefix, std::forward<Args>(args)...);
+    }
+
+    template<>
+    inline void Log::PrintAssertMessage(Log::Type type, std::string_view prefix)
+    {
+        auto logger = (type == Type::Core) ? GetCoreLogger() : GetClientLogger();
+        logger->log(typelog::ERROR, "", "%", prefix);
+    }
+}
 
 #endif //TCPSERVER_LOGGER_HPP

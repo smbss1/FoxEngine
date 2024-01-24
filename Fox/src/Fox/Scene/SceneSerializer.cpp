@@ -30,35 +30,36 @@ namespace fox
         out << YAML::EndMap; // Entity
     }
 
-    void SceneSerializer::Serialize(const std::string &filepath)
+    bool SceneSerializer::Serialize(const fs::path& filepath)
     {
         YAML::Emitter out;
         out << YAML::BeginMap;
         out << YAML::Key << "Scene" << YAML::Value << "Untitled";
         out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
         m_pScene->m_Registry.each([&](auto entityID)
-         {
-             Entity entity = { entityID, m_pScene.Raw() };
-             if (!entity)
-                 return;
+        {
+            Entity entity = { entityID, m_pScene.Raw() };
+            if (!entity)
+                return;
 
-             SerializeEntity(out, entity);
-         });
+            SerializeEntity(out, entity);
+        });
         out << YAML::EndSeq;
         out << YAML::EndMap;
 
         std::ofstream fout(filepath);
         fout << out.c_str();
+        return true;
     }
 
-    void SceneSerializer::SerializeRuntime(const std::string &filepath)
+    void SceneSerializer::SerializeRuntime(const fs::path& filepath)
     {
         FOX_CORE_ASSERT(false, "");
     }
 
-    bool SceneSerializer::Deserialize(const std::string &filepath)
+    bool SceneSerializer::Deserialize(const fs::path& filepath)
     {
-        YAML::Node data = YAML::LoadFile(filepath);
+        YAML::Node data = YAML::LoadFile(filepath.string());
         if (!data["Scene"])
             return false;
 
@@ -88,7 +89,7 @@ namespace fox
         return true;
     }
 
-    bool SceneSerializer::DeserializeRuntime(const std::string &filepath)
+    bool SceneSerializer::DeserializeRuntime(const fs::path& filepath)
     {
         FOX_CORE_ASSERT(false, "");
         return false;

@@ -38,36 +38,42 @@ namespace fox
 
     OpenGLVertexArray::~OpenGLVertexArray()
     {
+        GLCall(glBindVertexArray(0));
         GLCall(glDeleteVertexArrays(1, &m_RendererID));
     }
 
     void OpenGLVertexArray::Bind() const
     {
         GLCall(glBindVertexArray(m_RendererID));
+
+        if (m_pIndexBuffer)
+            m_pIndexBuffer->Bind();
     }
 
     void OpenGLVertexArray::Unbind() const
     {
         GLCall(glBindVertexArray(0));
+
+        if (m_pIndexBuffer)
+            m_pIndexBuffer->Unbind();
+
+        for (auto& e : m_vVerticesBuffers)
+        {
+            e->Unbind();
+        }
     }
 
     void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)
     {
         FOX_CORE_ASSERT(!vertexBuffer->GetLayout().GetElements().empty(), "Vertex Buffer has no layout!");
+        FOX_CORE_ASSERT(vertexBuffer->IsUploaded(), "Vertex Buffer hasn't been uploaded!");
+
         GLCall(glBindVertexArray(m_RendererID));
         vertexBuffer->Bind();
 
-        uint32_t index = 0;
         const auto& layout = vertexBuffer->GetLayout();
         for (const auto& element : vertexBuffer->GetLayout())
         {
-            GLCall(glEnableVertexAttribArray(index));
-            GLCall(glVertexAttribPointer(index, element.GetComponentCount(),
-                              ShaderDataTypeToOpenGLType(element.m_eType),
-                              element.m_bNormalized ? GL_TRUE:GL_FALSE, layout.GetStride(),
-                              (const void*) element.m_uOffset));
-            index++;
-
             switch (element.m_eType)
             {
                 case ShaderDataType::Float:
@@ -75,14 +81,14 @@ namespace fox
                 case ShaderDataType::Float3:
                 case ShaderDataType::Float4:
                 {
-                    glEnableVertexAttribArray(m_uVertexBufferIndex);
-                    glVertexAttribPointer(m_uVertexBufferIndex,
+                    glEnableVertexAttribArray(element.m_uIndex);
+                    glVertexAttribPointer(element.m_uIndex,
                                           element.GetComponentCount(),
                                           ShaderDataTypeToOpenGLType(element.m_eType),
                                           element.m_bNormalized ? GL_TRUE : GL_FALSE,
                                           layout.GetStride(),
                                           (const void*)element.m_uOffset);
-                    m_uVertexBufferIndex++;
+                    glVertexAttribDivisor(element.m_uIndex, element.m_uDivisor);
                     break;
                 }
                 case ShaderDataType::Int:
@@ -91,30 +97,29 @@ namespace fox
                 case ShaderDataType::Int4:
                 case ShaderDataType::Bool:
                 {
-                    glEnableVertexAttribArray(m_uVertexBufferIndex);
-                    glVertexAttribIPointer(m_uVertexBufferIndex,
+                    glEnableVertexAttribArray(element.m_uIndex);
+                    glVertexAttribIPointer(element.m_uIndex,
                                            element.GetComponentCount(),
                                            ShaderDataTypeToOpenGLType(element.m_eType),
                                            layout.GetStride(),
                                            (const void*)element.m_uOffset);
-                    m_uVertexBufferIndex++;
+                    glVertexAttribDivisor(element.m_uIndex, element.m_uDivisor);
                     break;
                 }
                 case ShaderDataType::Mat3:
                 case ShaderDataType::Mat4:
                 {
-                    uint8_t count = element.GetComponentCount();
-                    for (uint8_t i = 0; i < count; i++)
+                   uint8_t count = element.GetComponentCount();
+                   for (uint8_t i = 0; i < count; i++)
                     {
-                        glEnableVertexAttribArray(m_uVertexBufferIndex);
-                        glVertexAttribPointer(m_uVertexBufferIndex,
+                        glEnableVertexAttribArray(element.m_uIndex + i);
+                        glVertexAttribPointer(element.m_uIndex + i,
                                               count,
                                               ShaderDataTypeToOpenGLType(element.m_eType),
                                               element.m_bNormalized ? GL_TRUE : GL_FALSE,
                                               layout.GetStride(),
                                               (const void*)(element.m_uOffset + sizeof(float) * count * i));
-                        glVertexAttribDivisor(m_uVertexBufferIndex, 1);
-                        m_uVertexBufferIndex++;
+                        glVertexAttribDivisor(element.m_uIndex + i, element.m_uDivisor);
                     }
                     break;
                 }
@@ -123,13 +128,15 @@ namespace fox
             }
         }
         m_vVerticesBuffers.push_back(vertexBuffer);
+
+        GLCall(glBindVertexArray(0));
+        vertexBuffer->Unbind();
     }
 
     void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer> &indexBuffer)
     {
-        GLCall(glBindVertexArray(m_RendererID));
-        indexBuffer->Bind();
         m_pIndexBuffer = indexBuffer;
+        Bind();
     }
 
     const std::vector<Ref<VertexBuffer>> &OpenGLVertexArray::GetVertexBuffers() const

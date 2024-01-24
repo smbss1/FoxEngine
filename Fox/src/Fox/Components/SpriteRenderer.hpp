@@ -10,6 +10,9 @@
 #include "Core/Logger/Logger.hpp"
 #include "Core/Random.hpp"
 
+#include "Renderer/Material.hpp"
+#include "Renderer/Renderer2D.hpp"
+
 namespace fox
 {
     struct SpriteRenderer
@@ -21,6 +24,21 @@ namespace fox
         glm::vec4 Color { 1.0f, 1.0f, 1.0f, 1.0f };
         float TilingFactor = 1.0f;
         int Depth = 0;
+
+        Ref<Material> Material = Renderer2D::GetDefaultSpriteMaterial();
+
+        AssetLink GetSprite() const
+        {
+            AssetLink link;
+            link.Handle = Sprite;
+            link.Type = (uint16_t)AssetType::Texture;
+            return link;
+        }
+
+        void SetSprite(const AssetLink& link)
+        {
+            Sprite = link.Handle;
+        }
     };
 
     struct CircleRenderer
@@ -63,6 +81,8 @@ namespace fox
         float Speed;
         float RotationSpeed;
         bool Active = false;
+
+        float Depth;
     };
 
     struct ParticleSystem
@@ -73,11 +93,13 @@ namespace fox
         number_type PoolIndex = 0;
         number_type MaxParticles = 500;
         ParticleProps ParticleSettings;
+        Ref<Material> Material = Renderer2D::GetDefaultSpriteMaterial();
+
+        Random random = {};
         float accumulator = 0.0f;
 
-        bool Play = false;
-
-        Random random;
+        bool PlayOnStart = true;
+        bool IsPlaying = false;
 
         ParticleSystem()
         {
@@ -94,20 +116,23 @@ namespace fox
             ParticleSettings.VelocityVariation = glm::vec2(1.0f, 1.0f);
             ParticleSettings.Position = glm::vec2(0, 0);
         }
+
         ParticleSystem(const ParticleSystem&) = default;
 
         // stores the index of the last particle used (for quick access to next dead particle)
-        number_type FirstUnusedParticle()
+        int32_t FirstUnusedParticle()
         {
             // first search from last used particle, this will usually return almost instantly
-            for (number_type i = PoolIndex; i < MaxParticles; ++i){
+            for (number_type i = PoolIndex; i < MaxParticles; ++i)
+            {
                 if (!ParticlePool[i].Active){
                     PoolIndex = i;
                     return i;
                 }
             }
             // otherwise, do a linear search
-            for (number_type i = 0; i < PoolIndex; ++i){
+            for (number_type i = 0; i < PoolIndex; ++i)
+            {
                 if (!ParticlePool[i].Active){
                     PoolIndex = i;
                     return i;
@@ -115,7 +140,7 @@ namespace fox
             }
             // all particles are taken, override the first one (note that if it repeatedly hits this case, more particles should be reserved)
             PoolIndex = 0;
-            return 0;
+            return -1;
         }
 
         void Resize()
@@ -137,7 +162,8 @@ namespace fox
                 }
 
                 particle.LifeRemaining -= ts;
-                particle.Position += particle.Velocity * particle.Speed * (float)ts;
+                particle.Depth -= ts;
+                particle.Position += particle.Velocity * particle.Speed * ts;
 
                 particle.Rotation += particle.RotationSpeed * ts;
 
@@ -150,26 +176,19 @@ namespace fox
             }
         }
 
+        void Play()
+        {
+            IsPlaying = true;
+        }
+
         void Emit(number_type count = 1)
         {
             for (number_type i = 0; i < count; ++i)
             {
-//                Particle& particle = ParticlePool[PoolIndex];
-//                int current = PoolIndex;
-//                while (particle.Active)
-//                {
-//                    --PoolIndex;
-//                    if (PoolIndex <= 0)
-//                        PoolIndex = ParticlePool.size() - 1;
-//                    particle = ParticlePool[PoolIndex];
-//                    if (current == PoolIndex)
-//                        return;
-//                }
-//                --PoolIndex;
-//                if (PoolIndex <= 0)
-//                    PoolIndex = ParticlePool.size() - 1;
-
-                Particle& particle = ParticlePool[FirstUnusedParticle()];
+                int32_t index = FirstUnusedParticle();
+                if (index == -1)
+                    break;
+                Particle& particle = ParticlePool[index];
 
                 particle.Active = true;
                 particle.Position = ParticleSettings.Position;
@@ -190,6 +209,7 @@ namespace fox
                 particle.LifeRemaining = ParticleSettings.LifeTime;
                 particle.SizeBegin = ParticleSettings.SizeBegin + ParticleSettings.SizeVariation * (random.GetFloat32() - 0.5f);
                 particle.SizeEnd = ParticleSettings.SizeEnd;
+                particle.Depth = 1.0;
             }
         }
     };

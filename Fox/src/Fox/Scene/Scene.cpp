@@ -6,8 +6,8 @@
 */
 
 #include "Scene.hpp"
-#include "Renderer/Camera.hpp"
 #include "Components/CameraComponent.hpp"
+#include "Renderer/Camera.hpp"
 #include "Renderer/Renderer2D.hpp"
 #include "Core/Application.hpp"
 #include "Components/ScriptableBehaviour.hpp"
@@ -16,6 +16,7 @@
 #include "Components.hpp"
 #include "Ecs/Entity.hpp"
 #include "Prefab.hpp"
+#include "Scene/SceneSerializer.hpp"
 
 #include "box2d/b2_world.h"
 #include "box2d/b2_body.h"
@@ -211,6 +212,8 @@ namespace fox
 //        m_Registry.on_destroy<AudioComponent>().connect<&Scene::OnAudioComponentDestroy>(this);
 
         m_Registry.on_construct<CameraComponent>().connect<&Scene::OnCameraComponentConstruct>(this);
+        m_Registry.on_construct<ScriptComponent>().connect<&Scene::OnScriptComponentConstruct>(this);
+        m_Registry.on_replace<ScriptComponent>().connect<&Scene::OnScriptComponentConstruct>(this);
 
         m_Registry.on_construct<Rigidbody2D>().connect<&Scene::OnRigidBody2DComponentConstruct>(this);
         m_Registry.on_destroy<Rigidbody2D>().connect<&Scene::OnRigidBody2DComponentDestroy>(this);
@@ -326,8 +329,13 @@ namespace fox
         if (uuid == UUID::Empty())
             return {};
 //        FOX_PROFILE_FUNC();
-        FOX_CORE_ASSERT(m_EntityMap.find(id) != m_EntityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");
-        return { m_EntityMap.at(uuid), this };
+        //FOX_CORE_ASSERT(m_EntityMap.find(uuid) != m_EntityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");
+        try {
+            return { m_EntityMap.at(uuid), this };
+        }
+        catch (const std::out_of_range& e) {
+            return Entity{};
+        }
     }
 
     Entity Scene::TryGetEntityByUUID(UUID uuid)
@@ -509,7 +517,7 @@ namespace fox
         return transformComponent;
     }
 
-    void Scene::OnUpdateEditor(EditorCamera &camera, Timestep ts)
+    void Scene::OnUpdateEditor(Camera &camera, Timestep ts)
     {
         // Update Animation
         {
@@ -533,7 +541,7 @@ namespace fox
         RenderScene(camera);
     }
 
-    void Scene::OnUpdateSimulation(EditorCamera& camera, Timestep ts)
+    void Scene::OnUpdateSimulation(Camera& camera, Timestep ts)
     {
         // Physics
         {
@@ -621,10 +629,11 @@ namespace fox
             for (auto entity : view) {
                 auto [transform, particleSystem] = view.get<TransformComponent, ParticleSystem>(entity);
 
-                if (!particleSystem.Play)
+                if (!particleSystem.IsPlaying)
                     continue;
 
-                particleSystem.ParticleSettings.Position = transform.position;
+                Entity e = Entity(entity, this);
+                particleSystem.ParticleSettings.Position = GetWorldSpaceTransform(e).position;
 
                 // Update the time that has passed between intervals
                 particleSystem.accumulator += ts;
@@ -715,9 +724,10 @@ namespace fox
         if (cameraEntity)
         {
             Camera& mainCamera = cameraEntity.get<CameraComponent>().camera;
-            glm::mat4 cameraTransform = cameraEntity.get<TransformComponent>().GetTransform();
+            //glm::mat4 cameraTransform = cameraEntity.get<TransformComponent>().GetTransform();
 
-            Renderer2D::BeginScene(mainCamera.GetProjection() * glm::inverse(cameraTransform));
+            mainCamera.SetTransform(cameraEntity.get<TransformComponent>());
+            Renderer2D::BeginScene(mainCamera);
             RenderScene();
             Renderer2D::EndScene();
         }
@@ -730,6 +740,16 @@ namespace fox
         m_IsRunning = true;
 
         OnPhysics2DStart();
+
+        {
+            auto view = m_Registry.view<TransformComponent, ParticleSystem>();
+            for (auto entity : view)
+            {
+                auto [transform, particleSystem] = view.get<TransformComponent, ParticleSystem>(entity);
+                if (particleSystem.PlayOnStart)
+                    particleSystem.Play();
+            }
+        }
 
         // Scripting
         {
@@ -793,8 +813,7 @@ namespace fox
             b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
             body->SetFixedRotation(rb2d.FixedRotation);
 
-            b2MassData massData;
-            body->GetMassData(&massData);
+            b2MassData massData = body->GetMassData();
             massData.mass = rb2d.Mass;
             body->SetMassData(&massData);
             body->SetGravityScale(rb2d.GravityScale);
@@ -854,7 +873,7 @@ namespace fox
         m_PhysicsWorld = nullptr;
     }
 
-    void Scene::RenderScene(EditorCamera& camera)
+    void Scene::RenderScene(Camera& camera)
     {
         Renderer2D::BeginScene(camera);
         RenderScene();
@@ -930,6 +949,12 @@ namespace fox
         return {};
     }
 
+    void Scene::OnScriptComponentConstruct(entt::registry& registry, entt::entity entity)
+    {
+        Entity e = { entity, this };
+        FOX_INFO("Script Construct");
+    }
+
     void Scene::OnCameraComponentConstruct(entt::registry& registry, entt::entity entity)
     {
         Entity e = { entity, this };
@@ -958,8 +983,7 @@ namespace fox
         b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
         body->SetFixedRotation(rb2d.FixedRotation);
 
-        b2MassData massData;
-        body->GetMassData(&massData);
+        b2MassData massData = body->GetMassData();
         massData.mass = rb2d.Mass;
         body->SetMassData(&massData);
         body->SetGravityScale(rb2d.GravityScale);
@@ -1119,9 +1143,25 @@ namespace fox
         return newScene;
     }
 
+    bool Scene::Save(Ref<Scene>& sceneToSave, const fs::path& path)
+    {
+        SceneSerializer serializer(sceneToSave);
+        return serializer.Serialize(path.string());
+    }
+
+    bool Scene::Load(const fs::path& path, Ref<Scene>& newScene)
+    {
+        SceneSerializer serializer(newScene);
+        return serializer.Deserialize(path.string());
+    }
+
     void Scene::DuplicateEntity(Entity entity)
     {
-        Entity newEntity = NewEntity(entity.GetName());
+        if (!entity)
+            return;
+
+        std::string name = entity.GetName();
+        Entity newEntity = NewEntity(name);
         CopyComponentIfExists(AllComponents{}, newEntity, entity);
     }
 
@@ -1173,17 +1213,18 @@ namespace fox
 
     void Scene::SortEntities()
     {
-        m_Registry.sort<IDComponent>([&](const auto lhs, const auto rhs)
-                                     {
-                                         auto lhsEntity = m_EntityMap.find(lhs.ID);
-                                         auto rhsEntity = m_EntityMap.find(rhs.ID);
-                                         return static_cast<uint32_t>(lhsEntity->second) < static_cast<uint32_t>(rhsEntity->second);
-                                     });
+        m_Registry.sort<IDComponent>(
+            [&](const auto lhs, const auto rhs)
+            {
+                auto lhsEntity = m_EntityMap.find(lhs.ID);
+                auto rhsEntity = m_EntityMap.find(rhs.ID);
+                return static_cast<uint32_t>(lhsEntity->second) < static_cast<uint32_t>(rhsEntity->second);
+            });
     }
 
-    Ref<Scene> Scene::CreateEmpty()
+    Ref<Scene> Scene::CreateEmpty(bool initialize)
     {
-        return new_ref<Scene>(false);
+        return new_ref<Scene>(initialize);
     }
 
 

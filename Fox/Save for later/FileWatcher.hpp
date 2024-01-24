@@ -6,7 +6,7 @@
 #define FOXENGINE_FILEWATCHER_HPP
 
 
-#include <filesystem>
+#include "Core/Base.hpp"
 #include <chrono>
 #include <thread>
 #include <unordered_map>
@@ -26,7 +26,7 @@ namespace fox
 
     class FileWatcher
     {
-        using PathMap = std::unordered_map<std::string, std::filesystem::file_time_type>;
+        using PathMap = std::unordered_map<std::string, fs::file_time_type>;
         using WatchFunc = std::function<void(std::string, FileStatus)>;
     public:
 
@@ -34,8 +34,8 @@ namespace fox
         FileWatcher(std::string path_to_watch, std::chrono::duration<int, std::milli> delay)
                 : path_to_watch(path_to_watch), delay(delay)
         {
-            for (auto &file : std::filesystem::recursive_directory_iterator(path_to_watch)) {
-                m_vPaths[file.path().string()] = std::filesystem::last_write_time(file);
+            for (auto &file : fs::recursive_directory_iterator(path_to_watch)) {
+                m_vPaths[file.path().string()] = fs::last_write_time(file);
             }
         }
 
@@ -59,7 +59,7 @@ namespace fox
 
                    auto it = m_vPaths.begin();
                    while (it != m_vPaths.end()) {
-                       if (!std::filesystem::exists(it->first))
+                       if (!fs::exists(it->first))
                        {
                            m_oCallback(it->first, FileStatus::erased);
                            it = m_vPaths.erase(it);
@@ -69,8 +69,8 @@ namespace fox
                    }
 
                    // Check if a file was created or modified
-                   for (auto &file : std::filesystem::recursive_directory_iterator(path_to_watch)) {
-                       auto current_file_last_write_time = std::filesystem::last_write_time(file);
+                   for (auto &file : fs::recursive_directory_iterator(path_to_watch)) {
+                       auto current_file_last_write_time = fs::last_write_time(file);
 
                        // File creation
                        if (!contains(file.path().string())) {

@@ -11,7 +11,7 @@
 
 
 #ifdef FOX_DEBUG
-    #define FOX_DEBUGBREAK debug_break()
+    #define FOX_DEBUGBREAK __debugbreak()
 	#define FOX_ENABLE_ASSERTS
 #else
     #define FOX_DEBUGBREAK
@@ -19,18 +19,12 @@
 
 #ifdef FOX_ENABLE_ASSERTS
 
-// Alteratively we could use the same "default" message for both "WITH_MSG" and "NO_MSG" and
-	// provide support for custom formatting by concatenating the formatting string instead of having the format inside the default message
-	#define FOX_INTERNAL_ASSERT_IMPL(check, msg, ...) { if(!(check)) { FOX_CORE_ERROR(msg, __VA_ARGS__); FOX_DEBUGBREAK; } }
-	#define FOX_INTERNAL_ASSERT_WITH_MSG(check, ...) FOX_INTERNAL_ASSERT_IMPL(check, "Assertion failed: %", __VA_ARGS__)
-	#define FOX_INTERNAL_ASSERT_NO_MSG(check) FOX_INTERNAL_ASSERT_IMPL(check, "Assertion '%' failed at %:%", FOX_STRINGIFY_MACRO(check), std::filesystem::path(__FILE__).filename().string(), __LINE__)
+	#define FOX_CORE_ASSERT_MESSAGE_INTERNAL(...)  ::fox::Log::PrintAssertMessage(::fox::Log::Type::Core, "Assertion Failed", __VA_ARGS__)
+	#define FOX_ASSERT_MESSAGE_INTERNAL(...)  ::fox::Log::PrintAssertMessage(::fox::Log::Type::Client, "Assertion Failed", __VA_ARGS__)
 
-	#define FOX_INTERNAL_ASSERT_GET_MACRO_NAME(arg1, arg2, macro, ...) macro
-	#define FOX_INTERNAL_ASSERT_GET_MACRO(...) FOX_EXPAND_MACRO( FOX_INTERNAL_ASSERT_GET_MACRO_NAME(__VA_ARGS__, FOX_INTERNAL_ASSERT_WITH_MSG, FOX_INTERNAL_ASSERT_NO_MSG) )
+	#define FOX_CORE_ASSERT(condition, ...) { if(!(condition)) { FOX_CORE_ASSERT_MESSAGE_INTERNAL(__VA_ARGS__); FOX_DEBUGBREAK; } }
+	#define FOX_ASSERT(condition, ...) { if(!(condition)) { FOX_ASSERT_MESSAGE_INTERNAL(__VA_ARGS__); FOX_DEBUGBREAK; } }
 
-	// Currently accepts at least the condition and one additional parameter (the message) being optional
-	#define FOX_ASSERT(...) FOX_EXPAND_MACRO( FOX_INTERNAL_ASSERT_GET_MACRO(__VA_ARGS__) )
-	#define FOX_CORE_ASSERT(...) FOX_EXPAND_MACRO( FOX_INTERNAL_ASSERT_GET_MACRO(__VA_ARGS__)(__VA_ARGS__))
 #else
     #define FOX_ASSERT(...)
     #define FOX_CORE_ASSERT(...)
@@ -49,7 +43,5 @@
     #define FOX_CORE_VERIFY(condition, ...)
     #define FOX_VERIFY(condition, ...)
 #endif
-
-
 
 #endif //FOXENGINE_ASSERT_HPP

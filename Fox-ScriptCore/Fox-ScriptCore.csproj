@@ -1,23 +1,94 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net45</TargetFramework>
-        <RootNamespace>Fox_ScriptCore</RootNamespace>
-        <Nullable>disable</Nullable>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>../../FoxEditor/Resources/Scripts</OutputPath>
-      <PlatformTarget>x86</PlatformTarget>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <OutputPath>../../FoxEditor/Resources/Scripts/</OutputPath>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <Folder Include="Scene" />
-    </ItemGroup>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9D7AA63E-8948-9A44-72DC-0A6B5E4976A9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Fox-ScriptCore</RootNamespace>
+    <AssemblyName>Fox-ScriptCore</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <OutputPath>..\FoxEditor\Resources\Scripts\</OutputPath>
+    <BaseIntermediateOutputPath>..\FoxEditor\Resources\Scripts\Intermediates\Debug\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>..\FoxEditor\Resources\Scripts\</OutputPath>
+    <BaseIntermediateOutputPath>..\FoxEditor\Resources\Scripts\Intermediates\Release\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Dist|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>..\FoxEditor\Resources\Scripts\</OutputPath>
+    <BaseIntermediateOutputPath>..\FoxEditor\Resources\Scripts\Intermediates\Dist\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Dist|AnyCPU' ">
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sources\AssetHandle.cs" />
+    <Compile Include="Sources\Bounds.cs" />
+    <Compile Include="Sources\Color.cs" />
+    <Compile Include="Sources\Components.cs" />
+    <Compile Include="Sources\Entity.cs" />
+    <Compile Include="Sources\Input.cs" />
+    <Compile Include="Sources\InternalCalls.cs" />
+    <Compile Include="Sources\KeyCode.cs" />
+    <Compile Include="Sources\Log.cs" />
+    <Compile Include="Sources\Mathf.cs" />
+    <Compile Include="Sources\Mathf_Extensions.cs" />
+    <Compile Include="Sources\Matrix4.cs" />
+    <Compile Include="Sources\MouseCode.cs" />
+    <Compile Include="Sources\Prefab.cs" />
+    <Compile Include="Sources\Quaternion.cs" />
+    <Compile Include="Sources\Rect.cs" />
+    <Compile Include="Sources\Time.cs" />
+    <Compile Include="Sources\Vector2.cs" />
+    <Compile Include="Sources\Vector3.cs" />
+    <Compile Include="Sources\Vector4.cs" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>

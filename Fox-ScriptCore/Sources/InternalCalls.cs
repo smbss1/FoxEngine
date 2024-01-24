@@ -26,7 +26,10 @@ namespace Fox
 		[MethodImpl(MethodImplOptions.InternalCall)]
 		internal static extern ulong Entity_InstantiatePrefabWithPosition(ref AssetHandle prefabHandle, ref Vector3 position);
 
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		[MethodImpl(MethodImplOptions.InternalCall)]
+		internal static extern ulong Entity_InstantiatePrefabWithPositionAndRotation(ref AssetHandle prefabHandle, ref Vector3 position, ref Vector3 rotation);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void Entity_Destroy(ulong entityToDestroy);
 	#endregion
 	
@@ -66,46 +69,51 @@ namespace Fox
 		internal static extern void TransformComponent_GetScale(ulong entityID, out Vector3 scale);
 		[MethodImpl(MethodImplOptions.InternalCall)]
 		internal static extern void TransformComponent_SetScale(ulong entityID, ref Vector3 scale);
-	#endregion
 
-	#region Rigidbody2D Component
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_GetBodyType(ulong entityID, out int v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_SetBodyType(ulong entityID, ref int v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_GetAutoMass(ulong entityID, out bool v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_SetAutoMass(ulong entityID, ref bool v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_GetMass(ulong entityID, out float v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_SetMass(ulong entityID, ref float v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_GetLinearDrag(ulong entityID, out float v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_SetLinearDrag(ulong entityID, ref float v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_GetAngularDrag(ulong entityID, out float v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_SetAngularDrag(ulong entityID, ref float v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_GetAllowSleep(ulong entityID, out bool v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_SetAllowSleep(ulong entityID, ref bool v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_GetAwake(ulong entityID, out bool v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_SetAwake(ulong entityID, ref bool v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_GetContinuous(ulong entityID, out bool v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_SetContinuous(ulong entityID, ref bool v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_GetFreezeRotation(ulong entityID, out bool v);
-		// [MethodImpl(MethodImplOptions.InternalCall)]
-		// internal static extern void Rigidbody2DComponent_SetFreezeRotation(ulong entityID, ref bool v);
-		[MethodImpl(MethodImplOptions.InternalCall)]
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void TransformComponent_GetRight(ulong entityID, out Vector3 direction);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void TransformComponent_GetForward(ulong entityID, out Vector3 direction);
+        #endregion
+
+        #region Rigidbody2D Component
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_GetBodyType(ulong entityID, out int v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_SetBodyType(ulong entityID, ref int v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_GetAutoMass(ulong entityID, out bool v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_SetAutoMass(ulong entityID, ref bool v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_GetMass(ulong entityID, out float v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_SetMass(ulong entityID, ref float v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_GetLinearDrag(ulong entityID, out float v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_SetLinearDrag(ulong entityID, ref float v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_GetAngularDrag(ulong entityID, out float v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_SetAngularDrag(ulong entityID, ref float v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_GetAllowSleep(ulong entityID, out bool v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_SetAllowSleep(ulong entityID, ref bool v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_GetAwake(ulong entityID, out bool v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_SetAwake(ulong entityID, ref bool v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_GetContinuous(ulong entityID, out bool v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_SetContinuous(ulong entityID, ref bool v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_GetFreezeRotation(ulong entityID, out bool v);
+        // [MethodImpl(MethodImplOptions.InternalCall)]
+        // internal static extern void Rigidbody2DComponent_SetFreezeRotation(ulong entityID, ref bool v);
+        [MethodImpl(MethodImplOptions.InternalCall)]
 		internal static extern void Rigidbody2DComponent_GetGravityScale(ulong entityID, out float v);
 		[MethodImpl(MethodImplOptions.InternalCall)]
 		internal static extern void Rigidbody2DComponent_SetGravityScale(ulong entityID, ref float v);
@@ -149,5 +157,10 @@ namespace Fox
 	
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static float Time_deltaTime();
-	}
+
+        #region Camera Component
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Camera_ScreenToWorld(ulong entityID, ref Vector2 screenPos, out Vector3 worldPos);
+        #endregion
+    }
 }

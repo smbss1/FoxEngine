@@ -5,6 +5,9 @@
 #ifndef FOXENGINE_VERTEXARRAY_HPP
 #define FOXENGINE_VERTEXARRAY_HPP
 
+#include <vector>
+#include "Core/Ref.hpp"
+
 namespace fox
 {
     class VertexBuffer;

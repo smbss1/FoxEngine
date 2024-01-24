@@ -18,7 +18,7 @@ namespace fox
 {
     class EntitySerializer;
     class Prefab;
-    class TransformComponent;
+    struct TransformComponent;
     class Entity
     {
     public:
@@ -41,9 +41,11 @@ namespace fox
          */
         Entity(const Entity& other) = default;
 
-        operator bool () const { return m_EntityHandle != entt::null && m_Scene != nullptr; }
+        operator bool() const { return m_EntityHandle != entt::null && m_Scene != nullptr; }
         operator entt::entity () const { return m_EntityHandle; }
         operator uint32_t() const { return (uint32_t)m_EntityHandle; }
+
+        bool IsValid() const { return m_Scene != nullptr && m_Scene->m_Registry.valid(m_EntityHandle); }
 
         UUID GetUUID() const;
         const std::string& GetName() const;
@@ -125,7 +127,7 @@ namespace fox
         }
 
         template<typename T>
-        bool has()
+        bool has() const
         {
             return m_Scene->m_Registry.has<T>(m_EntityHandle);
         }

@@ -8,6 +8,7 @@
 #include "Scripting/ValueWrapper.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
+#include "Utils/MemoryBuffer.hpp"
 
 #include <unordered_map>
 #include <string>
@@ -77,6 +78,16 @@ namespace fox
         }
     }
 
+    struct AttributeInfo
+    {
+        // type
+        // location
+        // ...
+
+        uint8_t data[1024];
+        uint32_t dataSize;
+    };
+
     class Material : public RefCounted
     {
     public:
@@ -96,11 +107,62 @@ namespace fox
         void Set(const std::string &name, const glm::mat4& value);
         void Set(const std::string &name, const Ref<Texture2D>& value, uint32_t slotIndex = 0);
 
+        //void SetAttribute(int index, float value);
+
+        template<typename T>
+        void SetAttribute(int index, T* value, size_t size)
+        {
+            AttributeInfo* attribute;
+            auto it = m_AttributesInfo.find(index);
+            if (it == m_AttributesInfo.end())
+            {
+                // For now add a new attribute but I may change it to return and move this code to a new function
+                m_AttributesInfo[index] = AttributeInfo();
+                attribute = &m_AttributesInfo[index];
+            }
+            else
+            {
+                attribute = &it->second;
+            }
+
+            //std::copy(value, value + size, attribute->data);
+            std::memset(attribute->data, 0, 1024);
+            std::memcpy(attribute->data, value, size);
+            attribute->dataSize = size;
+        }
+
+        template<typename T>
+        void SetAttribute(int index, T* value)
+        {
+            SetAttribute(index, value, sizeof(T));
+        }
+
+        template<typename T>
+        void SetAttribute(int index, const T& value)
+        {
+            SetAttribute(index, &value, sizeof(T));
+        }
+
         void UpdateForRendering();
+        void EndRendering();
+
+        void UpdateBuffer();
+
+        const Ref<Shader>& GetShader() const { return m_Shader; }
+        const uint32_t& GetID() const { return m_Shader->GetID(); }
+        const MemoryBuffer& GetAttributesData() const { return m_AttributesBuffer; }
+        //MemoryBuffer& GetAttributesData() { return m_AttributesBuffer; }
+        void SetMainTexture(const Ref<Texture>& texture) { m_MainTexture = texture; }
+        const Ref<Texture>& GetMainTexture() const { return m_MainTexture; }
     private:
         Ref<Shader> m_Shader;
         std::unordered_map<std::string, ShaderData> m_Uniforms;
         std::unordered_map<std::string, TextureMat> m_UniformsTextures;
+        std::map<int, AttributeInfo> m_AttributesInfo;
+
+        Ref<Texture> m_MainTexture;
+        
+        MemoryBuffer m_AttributesBuffer;
     };
 }
 

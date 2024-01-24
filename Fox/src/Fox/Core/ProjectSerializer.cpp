@@ -6,7 +6,7 @@
 #include "yaml-cpp/yaml.h"
 #include "Physics2D.hpp"
 
-#include <filesystem>
+#include "Core/Base.hpp"
 #include <fstream>
 
 namespace fox
@@ -16,7 +16,7 @@ namespace fox
     {
     }
 
-    void ProjectSerializer::Serialize(const std::filesystem::path& filepath)
+    bool ProjectSerializer::Serialize(const fs::path& filepath)
     {
         YAML::Emitter out;
         out << YAML::BeginMap;
@@ -95,9 +95,10 @@ namespace fox
 
         std::ofstream fout(filepath);
         fout << out.c_str();
+        return true;
     }
 
-    bool ProjectSerializer::Deserialize(const std::filesystem::path& filepath)
+    bool ProjectSerializer::Deserialize(const fs::path& filepath)
     {
         Physics2D::Init();
 
@@ -129,9 +130,10 @@ namespace fox
         config.EnableAutoSave = rootNode["AutoSave"].as<bool>(false);
         config.AutoSaveIntervalSeconds = rootNode["AutoSaveInterval"].as<int>(300);
 
-        std::filesystem::path projectPath = filepath;
+        fs::path projectPath = filepath;
         config.ProjectFileName = projectPath.filename().string();
         config.ProjectDirectory = projectPath.parent_path().string();
+        m_Project->m_ProjectDirectory = config.ProjectDirectory;
 
         // Physics
         auto physicsNode = rootNode["Physics2D"];

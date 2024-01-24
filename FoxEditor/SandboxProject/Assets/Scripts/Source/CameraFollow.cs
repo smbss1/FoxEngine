@@ -18,10 +18,10 @@ namespace Sandbox
             Transform = GetComponent<TransformComponent>();
         }
         
-        void OnUpdate(float ts)
-        {
-            cameraPos = new Vector3(PlayerTransform.position.x, PlayerTransform.position.y, 0);
-            Transform.position = Vector3.SmoothDamp(Transform.position, cameraPos, ref velocity, dampTime);
-        }
+        // void OnUpdate(float ts)
+        // {
+        //     cameraPos = new Vector3(PlayerTransform.position.x, PlayerTransform.position.y, 0);
+        //     Transform.position = Vector3.SmoothDamp(Transform.position, cameraPos, ref velocity, dampTime);
+        // }
     }
 }

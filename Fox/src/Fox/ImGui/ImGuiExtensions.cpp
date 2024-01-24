@@ -257,12 +257,30 @@ namespace fox::UI
         return ImGui::SliderScalar(label.c_str(), ImGuiDataType_S64, &value, &min, &max, "%lld", flags);
     }
 
+    bool AssetField(const std::string& label, AssetLink& value, bool handlePayload)
+    {
+        AssetHandle prevAsset = value.Handle;
+
+        UI::BeginPropertyGrid(label.c_str(), nullptr);
+
+        Ref<Asset> asset = AssetManager::GetAsset<Asset>(value.Handle);
+        ImGui::Button(asset ? AssetManager::GetFileSystemPath(asset->GetMetadata()).stem().string().c_str() : "None");
+        UI::EndPropertyGrid();
+
+        if (handlePayload)
+        {
+            const std::vector<std::string>& extensions = AssetManager::GetExtensionsFromAssetType((AssetType)value.Type);
+            HandleContentBrowserPayload(value.Handle, extensions);
+        }
+        return prevAsset != value.Handle;
+    }
+
     bool AssetField(const std::string& label, AssetHandle& value, bool handlePayload, const std::vector<std::string>& extensions)
     {
         UI::BeginPropertyGrid(label.c_str(), nullptr);
 
         Ref<Asset> asset = AssetManager::GetAsset<Asset>(value);
-        bool result = ImGui::Button(asset ? AssetManager::GetFileSystemPath(AssetManager::GetMetadata(value)).stem().c_str() : "None");
+        bool result = ImGui::Button(asset ? AssetManager::GetFileSystemPath(asset->GetMetadata()).stem().string().c_str() : "None");
         UI::EndPropertyGrid();
 
         if (handlePayload)
@@ -290,30 +308,41 @@ namespace fox::UI
 
     bool HandleContentBrowserPayload(AssetHandle& handle, const std::vector<std::string>& extensions)
     {
-        return HandleContentBrowserPayloadCustom(extensions, [&handle](std::filesystem::path& filepath) {
+        return HandleContentBrowserPayloadCustom(extensions, [&handle](fs::path& filepath) {
             handle = AssetManager::GetAssetHandleFromFilePath(filepath);
         });
     }
 
-    bool HandleContentBrowserPayloadCustom(const std::vector<std::string>& extensions, std::function<void(std::filesystem::path&)> func)
+    bool HandleContentBrowserPayloadCustom(const std::vector<std::string>& extensions, std::function<void(fs::path&)> func)
     {
         if (ImGui::BeginDragDropTarget())
         {
-            if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+            bool found = false;
+            fs::path prefabPath;
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM", ImGuiDragDropFlags_AcceptPeekOnly))
             {
-                const char *path = (const char *) payload->Data;
-                std::filesystem::path prefabPath = Project::AssetsDir() / path;
+                const char* path = (const char*)payload->Data;
+                prefabPath = Project::AssetsDir() / path;
 
                 for (auto& extension : extensions)
                 {
                     if (prefabPath.extension() == extension)
                     {
-                        func(prefabPath);
-                        return true;
+                        found = true;
                     }
                 }
+                if (!found)
+                {
+                    return found;
+                }
+            }
+
+            if (ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+            {
+                func(prefabPath);
             }
             ImGui::EndDragDropTarget();
+            return true;
         }
         return false;
     }
@@ -352,7 +381,7 @@ namespace fox::UI
             ImGui::Text("Drop a texture here...");
         }
         ImGui::EndChild();
-        UI::HandleContentBrowserPayload(handle, extensions);
+        return UI::HandleContentBrowserPayload(handle, extensions);
     }
 
     bool Property(const std::string& name, const char* typeString[], int size, int index, int& valueFrom)

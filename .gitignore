@@ -1,4 +1,7 @@
 .vscode
+.cache
+.vs
+.oldvs
 build
 app
 cmake-build-debug

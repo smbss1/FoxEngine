@@ -7,7 +7,7 @@
 
 #include "Asset.hpp"
 
-#include <filesystem>
+#include "Core/Base.hpp"
 
 namespace fox
 {
@@ -16,7 +16,7 @@ namespace fox
         AssetHandle Handle = 0;
         AssetType Type;
 
-        std::filesystem::path FilePath;
+        fs::path FilePath;
         bool IsDataLoaded = false;
         bool IsMemoryAsset = false;
 

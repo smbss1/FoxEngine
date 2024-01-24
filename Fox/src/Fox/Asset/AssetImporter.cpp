@@ -5,48 +5,50 @@
 #include "AssetImporter.hpp"
 #include "AssetManager.hpp"
 
+#include "TextureImporter.hpp"
+#include "SceneImporter.hpp"
+#include "PrefabImporter.hpp"
+
 namespace fox
 {
-    std::unordered_map<AssetType, scope<AssetSerializer>> AssetImporter::s_Serializers;
+    using AssetImportFunction = std::function<Ref<Asset>(AssetHandle, const AssetMetadata&)>;
+    static std::map<AssetType, AssetImportFunction> s_AssetImportFunctions = {
+        { AssetType::Texture, TextureImporter::ImportTexture2D },
+        { AssetType::Scene, SceneImporter::ImportScene },
+        { AssetType::Prefab, PrefabImporter::Import },
+    };
 
-    void AssetImporter::Init()
+    using AssetSerializeFunction = std::function<void(const AssetMetadata&, const Ref<Asset>&)>;
+    static std::map<AssetType, AssetSerializeFunction> s_AssetSerializeFunctions = {
+        { AssetType::Scene, SceneImporter::Serialize },
+        { AssetType::Prefab, PrefabImporter::Serialize },
+    };
+
+    Ref<Asset> AssetImporter::ImportAsset(AssetHandle handle, const AssetMetadata& metadata)
     {
-        s_Serializers[AssetType::Prefab] = new_scope<PrefabSerializer>();
-        s_Serializers[AssetType::Texture] = new_scope<TextureSerializer>();
-//        s_Serializers[AssetType::Material] = new_scope<MaterialAssetSerializer>();
-//        s_Serializers[AssetType::PhysicsMat] = new_scope<PhysicsMaterialSerializer>();
-//        s_Serializers[AssetType::Audio] = new_scope<AudioFileSourceSerializer>();
-//        s_Serializers[AssetType::SoundConfig] = new_scope<SoundConfigSerializer>();
-        s_Serializers[AssetType::Scene] = new_scope<SceneAssetSerializer>();
-//        s_Serializers[AssetType::Font] = new_scope<FontSerializer>();
-//        s_Serializers[AssetType::SoundGraphSound] = new_scope<SoundGraphGraphSerializer>();
-    }
+        if (s_AssetImportFunctions.find(metadata.Type) == s_AssetImportFunctions.end())
+        {
+            FOX_CORE_ERROR("No importer available for asset type: {}", (uint16_t)metadata.Type);
+            return nullptr;
+        }
 
+        return s_AssetImportFunctions.at(metadata.Type)(handle, metadata);
+    }
+  
     void AssetImporter::Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset)
     {
-        if (s_Serializers.find(metadata.Type) == s_Serializers.end())
+        if (s_AssetSerializeFunctions.find(metadata.Type) == s_AssetSerializeFunctions.end())
         {
             FOX_CORE_WARN("There's currently no importer for assets of type %", metadata.FilePath.stem().string());
             return;
         }
 
-        s_Serializers[asset->GetAssetType()]->Serialize(metadata, asset);
+        s_AssetSerializeFunctions.at(metadata.Type)(metadata, asset);
     }
 
     void AssetImporter::Serialize(const Ref<Asset>& asset)
     {
-        const AssetMetadata& metadata = AssetManager::GetMetadata(asset->Handle);
+        const AssetMetadata& metadata = asset->GetMetadata();
         Serialize(metadata, asset);
-    }
-
-    bool AssetImporter::TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset)
-    {
-        if (s_Serializers.find(metadata.Type) == s_Serializers.end())
-        {
-            FOX_CORE_WARN("There's currently no importer for assets of type %", metadata.FilePath.stem().string());
-            return false;
-        }
-
-        return s_Serializers[metadata.Type]->TryLoadData(metadata, asset);
     }
 }

@@ -5,7 +5,7 @@
 #include "OpenGLRendererAPI.hpp"
 #include "OpenGLUtils.hpp"
 #include "Renderer/VertexArray.hpp"
-#include "Renderer/Buffer.hpp"
+#include "Renderer/VertexBuffer.hpp"
 #include "glad/glad.h"
 
 namespace fox
@@ -31,7 +31,15 @@ namespace fox
     {
         pVertexArray->Bind();
         uint32_t count = uIndexCount ? uIndexCount : pVertexArray->GetIndexBuffer()->GetCount();
-        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+        GLCall(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr));
+        pVertexArray->Unbind();
+    }
+
+    void OpenGLRendererAPI::DrawElementsInstanced(const Ref<VertexArray>& pVertexArray, uint32_t indicesCount, uint32_t instanceCount)
+    {
+        pVertexArray->Bind();
+        GLCall(glDrawElementsInstanced(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr, instanceCount));
+        pVertexArray->Unbind();
     }
 
     void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
@@ -42,11 +50,12 @@ namespace fox
     void OpenGLRendererAPI::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
     {
         vertexArray->Bind();
-        glDrawArrays(GL_LINES, 0, vertexCount);
+        GLCall(glDrawArrays(GL_LINES, 0, vertexCount));
+        vertexArray->Unbind();
     }
 
     void OpenGLRendererAPI::SetLineWidth(float width)
     {
-        glLineWidth(width);
+        GLCall(glLineWidth(width));
     }
 }

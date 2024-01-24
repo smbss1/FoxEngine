@@ -12,6 +12,7 @@
 #include "Core/Ref.hpp"
 #include "Renderer2D.hpp"
 #include "Core/Logger/Logger.hpp"
+#include "Renderer/Camera.hpp"
 
 namespace fox
 {
@@ -47,11 +48,11 @@ namespace fox
         WeakRef<UniformBuffer> m_CameraUniformBuffer;
         Renderer2D::CameraData m_CameraBuffer;
 
-        explicit PushCameraUniformCmd(WeakRef<UniformBuffer> CameraUniformBuffer, const glm::mat4& viewProj)
+        explicit PushCameraUniformCmd(WeakRef<UniformBuffer> CameraUniformBuffer, const Renderer2D::CameraData& data)
             : m_CameraUniformBuffer(CameraUniformBuffer)
-            {
-                m_CameraBuffer.ViewProjection = viewProj;
-            }
+        {
+            m_CameraBuffer = data;
+        }
 
         void Execute();
     };

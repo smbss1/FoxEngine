@@ -32,6 +32,7 @@ namespace fox
         static bool DrawBool(std::string name, Reflect::Any& valueFrom);
         static bool DrawFloat(std::string name, Reflect::Any& outData);
         static bool DrawTexture(std::string name, Reflect::Any& outData);
+        static bool DrawAsset(std::string name, Reflect::Any& valueFrom);
 
         static bool DrawVec2(std::string name, Reflect::Any& outData);
         static bool DrawVec3(std::string name, Reflect::Any& outData);

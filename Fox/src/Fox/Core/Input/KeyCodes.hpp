@@ -2,6 +2,8 @@
 #ifndef FOX_KEYCODES_HPP_
 #define FOX_KEYCODES_HPP_
 
+#include <cstdint>
+
 namespace fox
 {
     using KeyCode = uint16_t;

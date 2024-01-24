@@ -1,22 +1,22 @@
 Panels:
+  - ID: 330970078
+    Name: Stats
+    IsOpen: false
+  - ID: 1061066610
+    Name: Properties
+    IsOpen: false
+  - ID: 1254897244
+    Name: Scene Hierarchy
+    IsOpen: false
+  - ID: 3741296424
+    Name: Console
+    IsOpen: true
+  - ID: 1102538908
+    Name: Content Browser
+    IsOpen: true
   - ID: 471749095
     Name: Animator
     IsOpen: false
-  - ID: 3741296424
-    Name: ConsolePanel
-    IsOpen: true
   - ID: 707409970
-    Name: SettingsPanel
-    IsOpen: true
-  - ID: 330970078
-    Name: StatsPanel
-    IsOpen: true
-  - ID: 1254897244
-    Name: SceneHierarchyPanel
-    IsOpen: true
-  - ID: 1102538908
-    Name: ContentBrowserPanel
-    IsOpen: true
-  - ID: 1061066610
-    Name: PropertyPanel
-    IsOpen: true
+    Name: Settings
+    IsOpen: false

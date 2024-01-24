@@ -10,7 +10,7 @@
 
 #ifdef __linux__
     #define FOX_PLATFORM_LINUX
-#elif _WIN32
+#elif _WIN32 || _WIN64
     #define FOX_PLATFORM_WINDOWS
 #endif
 

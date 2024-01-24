@@ -5,7 +5,7 @@
 #ifndef FOXENGINE_INDEXBUFFER_HPP
 #define FOXENGINE_INDEXBUFFER_HPP
 
-#include <Renderer/Buffer.hpp>
+#include "Renderer/VertexBuffer.hpp"
 
 namespace fox
 {

@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fox-ScriptCore", "Fox-ScriptCore\Fox-ScriptCore.csproj", "{242CF9A3-37CE-48D4-941E-9E3AF5115047}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FoxEditor", "FoxEditor", "{CC5E0A51-4724-4A2C-9B6D-679FBD0A7022}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox", "FoxEditor\SandboxProject\Sandbox.csproj", "{DEF1A2C7-B72B-4A27-837B-B9AE6A7C438E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{242CF9A3-37CE-48D4-941E-9E3AF5115047}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{242CF9A3-37CE-48D4-941E-9E3AF5115047}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{242CF9A3-37CE-48D4-941E-9E3AF5115047}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{242CF9A3-37CE-48D4-941E-9E3AF5115047}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEF1A2C7-B72B-4A27-837B-B9AE6A7C438E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEF1A2C7-B72B-4A27-837B-B9AE6A7C438E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEF1A2C7-B72B-4A27-837B-B9AE6A7C438E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEF1A2C7-B72B-4A27-837B-B9AE6A7C438E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DEF1A2C7-B72B-4A27-837B-B9AE6A7C438E} = {CC5E0A51-4724-4A2C-9B6D-679FBD0A7022}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B2E29D58-5418-4FFD-97BF-D4389669E447}
+	EndGlobalSection
+EndGlobal
