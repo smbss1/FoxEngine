@@ -7,7 +7,6 @@
 #include "ScriptGlue.hpp"
 #include "ScriptCache.hpp"
 #include "Marshal.hpp"
-#include "Scripting/MonoWrapper/FMonoAssembly.hpp"
 #include "Scripting/MonoWrapper/FMonoDomain.hpp"
 #include "Scripting/MonoWrapper/FMonoJIT.hpp"
 #include "Utils.hpp"
@@ -16,16 +15,12 @@
 #include "Components/ScriptComponent.hpp"
 
 #include "common.hpp"
-#include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
 #include "mono/metadata/object.h"
-
-#include "mono/metadata/mono-debug.h"
 
 //#ifdef FOX_DEBUG
 #include "Utils/FileSystem.hpp"
 #include "Core/Project.hpp"
-#include "mono/metadata/threads.h"
 #include "Core/Any.hpp"
 #include "Utils/Iterator.hpp"
 #include "Asset/AssetManager.hpp"
