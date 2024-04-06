@@ -41,6 +41,10 @@ namespace fox
             ImGui::Begin("Settings", &isOpen);
             defer({ ImGui::End(); });
 
+            if (ImGui::Button("Compile C# Assembly")) {
+                ScriptEngine::CompileAppAssembly();
+            }
+
             if (ImGui::Button("Reload C# Assembly")) {
                 ScriptEngine::ReloadAppDomain();
             }

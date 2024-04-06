@@ -24,6 +24,7 @@
 #include "Scene/Prefab.hpp"
 #include "Utils/PlatformUtils.hpp"
 #include <Utils/CPlusPlusMangle.hpp>
+#include <cstddef>
 
 namespace fox
 {

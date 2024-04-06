@@ -162,9 +162,14 @@ namespace fox
         return !s_Window->GetKey(key) && s_KeyStateMap[key];
     }
 
+	bool Input::IsMouseButtonDown(Mouse button)
+    {
+        return s_Window->IsMouseButtonDown(button);
+    }
+
     bool Input::IsMouseButtonPressed(Mouse button)
     {
-        return s_Window->IsMouseButtonPressed(button);
+        return s_Window->IsMouseButtonPressed(button) && !s_MouseButtonStateMap[button];
     }
 
     glm::vec2 Input::GetMousePosition()
@@ -188,9 +193,9 @@ namespace fox
 			s_KeyStateMap[key] = s_Window->GetKey(key);
 		}
 
-		// for (Mouse mouseButton : s_AllMouseButtons) {
-		// 	s_MouseButtonStateMap[mouseButton] = GetMouseButton(mouseButton);
-		// }
+		for (Mouse mouseButton : s_AllMouseButtons) {
+			s_MouseButtonStateMap[mouseButton] = s_Window->IsMouseButtonPressed(mouseButton);
+		}
 	}
 
     void Input::SetWindow(Window *pWindow)

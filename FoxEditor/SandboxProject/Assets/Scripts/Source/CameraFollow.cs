@@ -10,18 +10,18 @@ namespace Sandbox
         private Vector3 velocity = Vector3.zero;
 
         private TransformComponent PlayerTransform;
-        private TransformComponent Transform;
+        private TransformComponent m_Transform;
 
         void OnCreate()
         {
             PlayerTransform = Player.GetComponent<TransformComponent>();
-            Transform = GetComponent<TransformComponent>();
+            m_Transform = GetComponent<TransformComponent>();
         }
         
-        // void OnUpdate(float ts)
-        // {
-        //     cameraPos = new Vector3(PlayerTransform.position.x, PlayerTransform.position.y, 0);
-        //     Transform.position = Vector3.SmoothDamp(Transform.position, cameraPos, ref velocity, dampTime);
-        // }
+        void OnUpdate(float ts)
+        {
+            cameraPos = new Vector3(PlayerTransform.position.x, PlayerTransform.position.y, 0);
+            m_Transform.position = Vector3.SmoothDamp(m_Transform.position, cameraPos, ref velocity, dampTime);
+        }
     }
 }

@@ -158,6 +158,7 @@ public:
     bool IsKeyDown(const fox::KeyCode key) override;
 
     bool IsMouseButtonPressed(const fox::Mouse button) override;
+    bool IsMouseButtonDown(const fox::Mouse button) override;
     glm::vec2 GetMousePosition() override;
 
 private:

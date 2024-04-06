@@ -16,6 +16,7 @@ namespace Sandbox
 
         CameraComponent Camera;
         Vector3 mousePos;
+        bool isPressed;
 
         public void OnCreate()
         {
@@ -71,11 +72,16 @@ namespace Sandbox
                 velocity.y = -1.0f;
             }
 
-            if (Input.IsKeyPressed(KeyCode.Space) && BulletPrefab != null)
+            if (Input.IsMouseButtonPressed(MouseCode.Button0) && BulletPrefab != null && !isPressed)
             {
                 Vector3 pos = m_Transform.position;
                 pos += m_Transform.right * 1;
                 Instantiate(BulletPrefab, pos, m_Transform.rotation);
+                isPressed = true;
+            }
+            else
+            {
+                isPressed = false;
             }
 
             velocity *= Speed;

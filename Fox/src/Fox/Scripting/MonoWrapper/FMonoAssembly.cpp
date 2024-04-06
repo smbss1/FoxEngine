@@ -20,6 +20,7 @@ FMonoAssembly::FMonoAssembly(const FMonoDomain& domain, const std::string& path)
 		throw FMonoException("NATIVE::Could not open assembly with path : " + path);
 
 	image_ = mono_assembly_get_image(assembly_);
+	Filepath = path;
 }
 
 auto FMonoAssembly::GetType(const std::string& name) const -> FMonoType

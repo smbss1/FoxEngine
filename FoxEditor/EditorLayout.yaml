@@ -10,13 +10,13 @@ Panels:
     IsOpen: false
   - ID: 3741296424
     Name: Console
-    IsOpen: true
+    IsOpen: false
   - ID: 1102538908
     Name: Content Browser
-    IsOpen: true
+    IsOpen: false
   - ID: 471749095
     Name: Animator
     IsOpen: false
   - ID: 707409970
     Name: Settings
-    IsOpen: false
+    IsOpen: true

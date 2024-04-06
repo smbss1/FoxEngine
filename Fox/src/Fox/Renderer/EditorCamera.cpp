@@ -66,11 +66,11 @@ namespace fox
             glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
             m_InitialMousePosition = mouse;
 
-            if (Input::IsMouseButtonPressed(Mouse::ButtonMiddle))
+            if (Input::IsMouseButtonDown(Mouse::ButtonMiddle))
                 MousePan(delta);
-            else if (Input::IsMouseButtonPressed(Mouse::ButtonLeft))
+            else if (Input::IsMouseButtonDown(Mouse::ButtonLeft))
                 MouseRotate(delta);
-            else if (Input::IsMouseButtonPressed(Mouse::ButtonRight))
+            else if (Input::IsMouseButtonDown(Mouse::ButtonRight))
                 MouseZoom(delta.y);
         }
 

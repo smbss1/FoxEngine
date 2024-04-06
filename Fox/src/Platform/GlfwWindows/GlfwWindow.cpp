@@ -208,6 +208,12 @@ bool GlfwWindow::IsMouseButtonPressed(const fox::Mouse button)
     return state == GLFW_PRESS;
 }
 
+bool GlfwWindow::IsMouseButtonDown(const fox::Mouse button)
+{
+    auto state = glfwGetMouseButton(m_pWindow, static_cast<int32_t>(button));
+    return state == GLFW_PRESS || state == GLFW_REPEAT;
+}
+
 glm::vec2 GlfwWindow::GetMousePosition()
 {
     double xpos, ypos;

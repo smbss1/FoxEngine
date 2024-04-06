@@ -445,8 +445,6 @@ namespace fox
             {
                 if (ImGui::MenuItem("Create Script"))
                     NewScript();
-                if (ImGui::MenuItem("Compile"))
-                    ScriptEngine::CompileAppAssembly();
 
                 ImGui::EndMenu();
             }
@@ -834,7 +832,7 @@ namespace fox
         SaveProject();
         event::EventSystem::Emit<OnContextChangeEvent>(nullptr);
 
-//        ScriptEngine::UnloadAppAssembly();
+// //        ScriptEngine::UnloadAppAssembly();
         ScriptEngine::SetSceneContext(nullptr);
 //        m_ViewportRenderer->SetScene(nullptr);
 //        m_SecondViewportRenderer->SetScene(nullptr);
@@ -996,12 +994,6 @@ namespace fox
         AssetManager::Init();
         //ScriptEngine::Init(specification.ScriptSetting);
         Reflection::Init();
-
-        /*
-        auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
-        OpenScene(startScenePath);
-        m_ContentBrowserPanel = new_scope<ContentBrowserPanel>();
-        */
 
         auto appAssemblyPath = Project::ScriptModuleFilePath();
         if (!appAssemblyPath.empty() && FileSystem::Exists(appAssemblyPath))

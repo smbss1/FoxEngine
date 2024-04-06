@@ -34,8 +34,20 @@ namespace fox
 
     private:
         bool OnMouseScrolled(MouseScrolledEvent &e);
-
         bool OnWindowResized(WindowResizeEvent &e);
+
+        void MousePan(const glm::vec2& delta);
+        void MouseZoom(float delta);
+
+        std::pair<float, float> PanSpeed() const;
+        float ZoomSpeed() const;
+
+        glm::vec3 GetUpDirection() const;
+        glm::vec3 GetRightDirection() const;
+        glm::vec3 GetForwardDirection() const;
+
+        glm::vec3 CalculatePosition() const;
+        void UpdateView();
 
     private:
         float m_AspectRatio;
@@ -46,7 +58,9 @@ namespace fox
 
         glm::vec3 m_CameraPosition = {0.0f, 0.0f, 0.0f};
         float m_CameraRotation = 0.0f; //In degrees, in the anti-clockwise direction
-        float m_CameraTranslationSpeed = 5.0f, m_CameraRotationSpeed = 180.0f;
+        glm::vec3 m_FocalPoint = { 0.0f, 0.0f, 0.0f };
+
+        glm::vec2 m_InitialMousePosition = { 0.0f, 0.0f };
     };
 }
 

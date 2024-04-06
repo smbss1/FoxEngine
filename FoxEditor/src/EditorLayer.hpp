@@ -47,7 +47,7 @@ namespace fox
         bool OnKeyPressed(KeyPressedEvent &e);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 
-         void NewProject();
+        void NewProject();
         void OpenProject();
         void OpenProject(const std::string& filepath);
         void CloseProject(bool unloadProject = true);

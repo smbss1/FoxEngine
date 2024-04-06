@@ -11,6 +11,7 @@ namespace fox::mono
     public:
         explicit FMonoString(const FMonoObject& obj);
         explicit FMonoString(const FMonoDomain& domain, const std::string& as_utf8);
+        static FMonoString EmptyString();
 
         auto as_utf8() const -> std::string;
         auto as_utf16() const -> std::u16string;

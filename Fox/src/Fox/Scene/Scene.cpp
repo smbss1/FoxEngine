@@ -87,16 +87,17 @@ namespace fox
                 const auto& sc = e1.get<ScriptComponent>();
                 if (!bSensor)
                 {
+                    // TODO: Multiple script instance
                     ScriptEngine::GetEntityScriptInstance(e1.GetUUID())->InvokeOnCollisionEnter2D(collisionData);
 //                    for (const auto& className : sc.Classes)
 //                        ScriptEngine::GetInstance(e1, className)->InvokeOnCollisionEnter2D(collisionData);
                 }
                else
                {
-//                    ScriptEngine::GetEntityScriptInstance(e1.GetUUID())->InvokeOnCollisionEnter2D(collisionData);
+                   ScriptEngine::GetEntityScriptInstance(e1.GetUUID())->InvokeOnCollisionEnter2D(collisionData);
 
-//                    for (const auto& className : sc.ClassName)
-//                        ScriptEngine::GetInstance(e1, sc.ClassName)->InvokeOnSensorEnter2D(collisionData);
+                //    for (const auto& className : sc.ClassName)
+                //        ScriptEngine::GetInstance(e1, sc.ClassName)->InvokeOnSensorEnter2D(collisionData);
                }
             }
 
@@ -111,6 +112,7 @@ namespace fox
                 const auto& sc = e2.get<ScriptComponent>();
                 if (!aSensor)
                 {
+                    // TODO: Multiple script instance
                     ScriptEngine::GetEntityScriptInstance(e2.GetUUID())->InvokeOnCollisionEnter2D(collisionData);
 //                    for (const auto& className : sc.Classes)
 //                        ScriptEngine::GetInstance(e1, className)->InvokeOnCollisionEnter2D(collisionData);
@@ -157,6 +159,7 @@ namespace fox
 
             if (e1.has<ScriptComponent>())
             {
+                // TODO: Multiple script instance
                 const auto& sc = e1.get<ScriptComponent>();
                 if (bSensor)
                 {
@@ -181,6 +184,7 @@ namespace fox
 //            collisionData.RelativeVelocity = { velocityA.x - velocityB.x, velocityA.y - velocityB.y };
             if (e2.has<ScriptComponent>())
             {
+                // TODO: Multiple script instance
                 const auto& sc = e2.get<ScriptComponent>();
                 if (aSensor)
                 {
@@ -213,7 +217,6 @@ namespace fox
 
         m_Registry.on_construct<CameraComponent>().connect<&Scene::OnCameraComponentConstruct>(this);
         m_Registry.on_construct<ScriptComponent>().connect<&Scene::OnScriptComponentConstruct>(this);
-        m_Registry.on_replace<ScriptComponent>().connect<&Scene::OnScriptComponentConstruct>(this);
 
         m_Registry.on_construct<Rigidbody2D>().connect<&Scene::OnRigidBody2DComponentConstruct>(this);
         m_Registry.on_destroy<Rigidbody2D>().connect<&Scene::OnRigidBody2DComponentDestroy>(this);
@@ -609,18 +612,18 @@ namespace fox
                 ScriptEngine::OnUpdateEntity(entity, ts);
             }
 
-//            m_Registry.view<NativeScript>().each([=](auto entity, auto& nsc)
-//              {
-//                  // TODO: Move to Scene::OnScenePlay
-//                  if (!nsc.Instance)
-//                  {
-//                      nsc.Instance = nsc.InstantiateScript();
-//                      nsc.Instance->m_Entity = Entity{ entity, this };
-//                      nsc.Instance->OnCreate();
-//                  }
-//
-//                  nsc.Instance->OnUpdate(ts);
-//              });
+        //    m_Registry.view<NativeScript>().each([=](auto entity, auto& nsc)
+        //      {
+        //          // TODO: Move to Scene::OnScenePlay
+        //          if (!nsc.Instance)
+        //          {
+        //              nsc.Instance = nsc.InstantiateScript();
+        //              nsc.Instance->m_Entity = Entity{ entity, this };
+        //              nsc.Instance->OnCreate();
+        //          }
+
+        //          nsc.Instance->OnUpdate(ts);
+        //      });
         }
 
         // Update ParticleSystem

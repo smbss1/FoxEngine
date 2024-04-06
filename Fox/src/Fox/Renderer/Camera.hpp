@@ -21,31 +21,32 @@ namespace fox
 
         virtual ~Camera() = default;
 
-        [[nodiscard]] void SetPosition(const glm::vec3& newPosition, bool recalcute = true)
+        void SetPosition(const glm::vec3& newPosition, bool recalculate = true)
         {
             m_Position = newPosition;
-            if (recalcute) RecalculateViewMatrix();
+            if (recalculate) RecalculateViewMatrix();
         }
 
         [[nodiscard]] const glm::vec3& GetPosition() const { return m_Position; }
         [[nodiscard]] float GetRotation() const { return m_Rotation; }
-        void SetRotation(float rotation, bool recalcute = true)
+        void SetRotation(float rotation, bool recalculate = true)
         {
             m_Rotation = rotation;
-            if (recalcute) RecalculateViewMatrix();
+            if (recalculate) RecalculateViewMatrix();
         }
 
         void SetTransform(const TransformComponent& transform)
         {
             m_Position = transform.position;
             m_Rotation = transform.GetRotation().z;
-            m_ViewMatrix = transform.GetTransform();
+            RecalculateViewMatrix();
             m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
         }
 
         [[nodiscard]] const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
         [[nodiscard]] const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
         [[nodiscard]] glm::mat4 GetViewProjectionMatrix() const { return m_ProjectionMatrix * m_ViewMatrix; }
+        [[nodiscard]] glm::vec2 GetViewportSize() const { return { m_ViewportWidth, m_ViewportHeight }; }
 
         inline void SetViewportSize(float width, float height) { m_ViewportWidth = width; m_ViewportHeight = height; OnViewportSizeChanged(); }
         inline void SetViewportPosition(const glm::vec2& position) { m_ViewportPos = position; }

@@ -1,5 +1,38 @@
 Scene: Untitled
 Entities:
+  - Entity: 9358953404056040341
+    NameComponent:
+      Name: Camera
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 17
+        OrthographicNear: -1
+        OrthographicFar: 10
+      Primary: true
+      FixedAspectRatio: false
+    ScriptComponent:
+      ClassName: Sandbox.CameraFollow
+      ScriptFields:
+        - ID: 2647205277
+          Name: Sandbox.CameraFollow:Player
+          Type: 18
+          Data: 6131204461046171101
+        - ID: 3418016451
+          Name: Sandbox.CameraFollow:dampTime
+          Type: 12
+          Data: 1
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
   - Entity: 6131204461046171101
     NameComponent:
       Name: Player
@@ -8,7 +41,7 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteRenderer:
-      Color: [0.867256641, 0.180358678, 0.180358678, 1]
+      Color: [0.0649181381, 0.559976399, 0.829181492, 1]
     ScriptComponent:
       ClassName: Sandbox.Player
       ScriptFields:
@@ -36,39 +69,6 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
-    HierarchyComponent:
-      Parent: 0
-      Children:
-        []
-  - Entity: 9358953404056040341
-    NameComponent:
-      Name: Camera
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CameraComponent:
-      Camera:
-        ProjectionType: 1
-        PerspectiveFOV: 0.785398185
-        PerspectiveNear: 0.00999999978
-        PerspectiveFar: 1000
-        OrthographicSize: 17
-        OrthographicNear: -1
-        OrthographicFar: 1
-      Primary: true
-      FixedAspectRatio: false
-    ScriptComponent:
-      ClassName: Sandbox.CameraFollow
-      ScriptFields:
-        - ID: 2647205277
-          Name: Sandbox.CameraFollow:Player
-          Type: 18
-          Data: 6131204461046171101
-        - ID: 3418016451
-          Name: Sandbox.CameraFollow:dampTime
-          Type: 12
-          Data: 1
     HierarchyComponent:
       Parent: 0
       Children:

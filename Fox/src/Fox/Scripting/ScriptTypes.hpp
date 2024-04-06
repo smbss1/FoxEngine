@@ -7,6 +7,8 @@
 
 #include "GCManager.hpp"
 #include "Core/UUID.hpp"
+#include "Scripting/FieldStorage.hpp"
+#include "Utils/expected.hpp"
 #include "common.hpp"
 #include "Core/Logger/Logger.hpp"
 #include "Core/Assert.hpp"
@@ -317,6 +319,15 @@ namespace fox
             return std::move(instance);
         }
 
+        const std::unordered_map<uint32_t, Ref<FieldStorage>>& GetFieldStorage() const { return m_FieldStorage; }
+        tl::expected<FieldStorage*, std::string> GetField(uint32_t fieldID)
+        {
+            auto it = m_FieldStorage.find(fieldID);
+            if (it == m_FieldStorage.end())
+                return tl::make_unexpected<std::string>("Field not found");
+            return it->second.Raw();
+        }
+
     protected:
         template<typename... TArgs>
         void CallMethod(ManagedMethod* method, TArgs&&... args)
@@ -373,6 +384,8 @@ namespace fox
     protected:
         ManagedClass* m_ManagedClass;
         GCHandle m_Handle;
+
+        std::unordered_map<uint32_t, Ref<FieldStorage>> m_FieldStorage;
     };
 
 

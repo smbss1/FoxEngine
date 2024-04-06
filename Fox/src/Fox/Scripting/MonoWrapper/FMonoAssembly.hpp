@@ -5,6 +5,8 @@
 
 #include <mono/metadata/image.h>
 
+#include "Core/Base.hpp"
+
 namespace fox::mono
 {
     class FMonoDomain;
@@ -24,6 +26,7 @@ namespace fox::mono
     private:
         MonoAssembly* assembly_ = nullptr;
         MonoImage* image_ = nullptr;
+        fs::path Filepath;
     };
 
 } // namespace fox::mono

@@ -1,6 +1,9 @@
 #include "FMonoString.hpp"
 #include "FMonoDomain.hpp"
+#include "Scripting/MonoWrapper/FMonoAssembly.hpp"
 #include "Scripting/MonoWrapper/FMonoObject.hpp"
+#include "Scripting/MonoWrapper/FMonoString.hpp"
+#include "mono/metadata/object-forward.h"
 
 namespace fox::mono
 {
@@ -13,6 +16,18 @@ namespace fox::mono
     FMonoString::FMonoString(const FMonoDomain& domain, const std::string& str)
         : FMonoObject(reinterpret_cast<MonoObject*>(mono_string_new(domain.GetInternalPtr(), str.c_str())))
     {
+    }
+
+    static MonoString* EmptyMonoString = nullptr;
+
+    FMonoString FMonoString::EmptyString()
+    {
+        // TODOI
+        if (EmptyMonoString == nullptr)
+        {
+            EmptyMonoString = mono_string_empty(FMonoDomain::GetCurrentDomain().GetInternalPtr());
+        }
+        return FMonoString(FMonoObject((MonoObject*)EmptyMonoString));
     }
 
     auto FMonoString::as_utf8() const -> std::string
